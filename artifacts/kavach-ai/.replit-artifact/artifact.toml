@@ -1,0 +1,27 @@
+kind = "mobile"
+previewPath = "/kavach-ai/"
+title = "KavachAI — India Cyber Safety"
+version = "1.0.0"
+id = "artifacts/kavach-ai"
+router = "expo-domain"
+
+[[integratedSkills]]
+name = "expo"
+version = "1.0.0"
+
+[[services]]
+ensurePreviewReachable = "/status"
+name = "expo"
+paths = [ "/kavach-ai/" ]
+localPort = 25528
+
+[services.development]
+run = "pnpm --filter @workspace/kavach-ai run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/kavach-ai", "run", "build" ]
+run = [ "pnpm", "--filter", "@workspace/kavach-ai", "run", "serve" ]
+
+[services.env]
+PORT = "25528"
+BASE_PATH = "/kavach-ai/"
