@@ -1,6 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import i18n from "i18next";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -14,11 +14,14 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-const SCAMMER_NUMBER = "+91 87654-32100";
+const DEMO_NUMBER = "+91 87654-32100";
 
 export default function CallAlertScreen() {
   const insets = useSafeAreaInsets();
   const { t, i18n: i18nInstance } = useTranslation();
+  const params = useLocalSearchParams<{ number?: string | string[] }>();
+  const rawNumber = Array.isArray(params.number) ? params.number[0] : params.number;
+  const callerNumber = rawNumber && rawNumber.trim() ? rawNumber.trim() : DEMO_NUMBER;
   const topInset = Platform.OS === "web" ? 67 : insets.top;
   const bottomInset = (Platform.OS === "web" ? 34 : insets.bottom) + 20;
 
@@ -115,7 +118,7 @@ export default function CallAlertScreen() {
             <Feather name="phone-incoming" size={36} color="#FFFFFF" />
           </View>
         </Animated.View>
-        <Text style={s.callerNumber}>{SCAMMER_NUMBER}</Text>
+        <Text style={s.callerNumber}>{callerNumber}</Text>
         <Text style={s.callerUnknown}>{t("callAlert.unknownCaller")}</Text>
       </View>
 

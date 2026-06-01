@@ -147,8 +147,22 @@ export default function ProfileScreen() {
                 thumbColor="#FFFFFF"
               />
             }
-            isLast={true}
+            isLast={false}
           />
+          <TouchableOpacity
+            style={s.settingRow}
+            onPress={() => { Haptics.selectionAsync(); router.push("/screening"); }}
+            activeOpacity={0.75}
+          >
+            <View style={[s.settingIconBg, { backgroundColor: "#ecfeff" }]}>
+              <Feather name="phone-incoming" size={18} color="#0891b2" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={s.settingLabel}>{t("profile.screening")}</Text>
+              <Text style={s.settingSub}>{t("profile.screeningSub")}</Text>
+            </View>
+            <Feather name="chevron-right" size={16} color="#94a3b8" />
+          </TouchableOpacity>
         </View>
 
         {/* Language section */}

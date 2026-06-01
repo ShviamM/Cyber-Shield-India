@@ -17,7 +17,14 @@
       "supportsTablet": false
     },
     "android": {
+      "package": "com.kavachai.app",
       "backgroundColor": "#060b18",
+      "permissions": [
+        "android.permission.READ_PHONE_STATE",
+        "android.permission.READ_CALL_LOG",
+        "android.permission.RECEIVE_SMS",
+        "android.permission.POST_NOTIFICATIONS"
+      ],
       "intentFilters": [
         {
           "action": "VIEW",

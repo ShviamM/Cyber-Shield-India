@@ -83,6 +83,8 @@ const en = {
     guardianModeSub: "Real-time scam call warnings",
     notifications: "Threat Notifications",
     notificationsSub: "Alerts for new scams in your city",
+    screening: "On-Device Screening",
+    screeningSub: "Screen calls & SMS for scams (Android)",
     displayLanguage: "Display Language",
     helplineCardTitle: "Cyber Crime Helpline",
     helplineCardSub: "Call immediately if you've been scammed",
@@ -452,6 +454,47 @@ const en = {
       "Do NOT share OTP or send money!",
       "Verify first, then talk",
     ],
+  },
+
+  screening: {
+    title: "On-Device Screening",
+    subtitle: "Real-time scam call & SMS protection",
+    intro:
+      "Let KavachAI watch for scam calls and messages right on your phone and warn you the moment one arrives. Checks happen on your device.",
+    unavailableTitle: "Available on Android app builds",
+    unavailableBuild:
+      "On-device screening needs the installed Android app. It can't run in this preview or Expo Go. You can still review the settings and privacy model here.",
+    unavailableIos:
+      "Apple doesn't allow apps to screen calls or read SMS, so this protection is Android-only.",
+    sectionProtections: "PROTECTIONS",
+    callTitle: "Scam Call Screening",
+    callSub: "Warns you when a high-risk number calls",
+    smsTitle: "Scam SMS Screening",
+    smsSub: "Flags likely scam texts as they arrive",
+    statusCallRole: "KavachAI is your call screening app",
+    statusSmsPerm: "SMS access granted",
+    statusNotif: "Alert notifications allowed",
+    statusBlocklist: "{{n}} high-risk numbers synced on-device",
+    sectionPrivacy: "YOUR PRIVACY",
+    privacy: {
+      onDevice: "All screening runs on your phone — nothing is uploaded automatically.",
+      noContent: "Message contents are never sent off your device without your tap.",
+      userControl: "Turn each protection on or off any time.",
+      neverBlocks: "KavachAI warns you — it never silently blocks or answers calls.",
+    },
+    sectionHow: "HOW IT WORKS",
+    how: {
+      step1: "KavachAI keeps a private list of high-risk numbers from your checks and reports.",
+      step2: "Incoming calls and texts are matched against it instantly, on-device.",
+      step3: "If something looks risky, you get a clear warning — tap to verify it safely.",
+    },
+    previewWarning: "Preview a scam-call warning",
+    roleDeniedTitle: "Call screening not enabled",
+    roleDeniedMsg:
+      "To screen calls, allow KavachAI to be your call screening app in the system dialog.",
+    smsDeniedTitle: "SMS permission needed",
+    smsDeniedMsg:
+      "KavachAI needs SMS access to screen messages on your device. You can grant it in Settings.",
   },
 
   language: {

@@ -70,6 +70,7 @@ function RootLayoutNav() {
           animation: "slide_from_bottom",
         }}
       />
+      <Stack.Screen name="screening" options={{ title: t("screening.title") }} />
       <Stack.Screen name="report" options={{ title: t("report.title") }} />
       <Stack.Screen name="categories" options={{ title: t("categories.title") }} />
       <Stack.Screen name="safety" options={{ title: t("safety.title") }} />
