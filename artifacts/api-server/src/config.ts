@@ -9,8 +9,15 @@ function intEnv(name: string, fallback: number): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
+// SMS provider for OTP delivery. Defaults to Twilio in production and the dev
+// mock otherwise. Set SMS_PROVIDER=twilio to test real SMS in development.
+const smsProvider = (process.env.SMS_PROVIDER ?? (isProduction ? "twilio" : "mock"))
+  .trim()
+  .toLowerCase();
+
 export const config = {
   isProduction,
+  smsProvider,
   otpTtlSeconds: intEnv("OTP_TTL_SECONDS", 300),
   otpMaxAttempts: intEnv("OTP_MAX_ATTEMPTS", 5),
   otpResendIntervalSeconds: intEnv("OTP_RESEND_INTERVAL_SECONDS", 30),
