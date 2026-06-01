@@ -16,7 +16,15 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useAppContext } from "@/context/AppContext";
 import { CITY_HOTSPOTS, GOLDEN_RULES, LIVE_THREATS, SCAM_OF_DAY } from "@/constants/data";
+import { STRINGS } from "@/constants/strings";
 import { useColors } from "@/hooks/useColors";
+
+const SERVICE_LINKS = [
+  { icon: "flag" as const, label: STRINGS.services.reportFraud, color: "#dc2626", bg: "#fef2f2", route: "/report" },
+  { icon: "grid" as const, label: STRINGS.services.scamCategories, color: "#7c3aed", bg: "#f5f3ff", route: "/categories" },
+  { icon: "book-open" as const, label: STRINGS.services.safetyTips, color: "#138808", bg: "#f0fdf4", route: "/safety" },
+  { icon: "phone-call" as const, label: STRINGS.services.helpline, color: "#0B3D91", bg: "#EBF0FA", route: "/helpline" },
+];
 
 const SAFFRON = "#FF6713";
 const NAVY = "#0B3D91";
@@ -83,7 +91,12 @@ export default function HomeScreen() {
               <View style={s.bellDot} />
               <Feather name="bell" size={18} color="rgba(255,255,255,0.8)" />
             </TouchableOpacity>
-            <Feather name="user" size={18} color="rgba(255,255,255,0.8)" />
+            <TouchableOpacity
+              onPress={() => { Haptics.selectionAsync(); router.push("/(tabs)/profile"); }}
+              activeOpacity={0.75}
+            >
+              <Feather name="user" size={18} color="rgba(255,255,255,0.8)" />
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -157,6 +170,23 @@ export default function HomeScreen() {
               </TouchableOpacity>
             ))}
           </View>
+        </View>
+
+        {/* Learn & Report quick links */}
+        <View style={s.serviceRow}>
+          {SERVICE_LINKS.map((svc) => (
+            <TouchableOpacity
+              key={svc.route}
+              style={s.serviceChip}
+              onPress={() => { Haptics.selectionAsync(); router.push(svc.route as any); }}
+              activeOpacity={0.75}
+            >
+              <View style={[s.serviceIconBox, { backgroundColor: svc.bg }]}>
+                <Feather name={svc.icon} size={18} color={svc.color} />
+              </View>
+              <Text style={s.serviceLabel} numberOfLines={2}>{svc.label}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
         {/* Active Scams Today */}
@@ -445,6 +475,15 @@ const s = StyleSheet.create({
   },
   toolLabel: { fontSize: 11, fontWeight: "700" as const, color: "#1e293b" },
   toolSublabel: { fontSize: 9, color: "#64748b" },
+
+  // Service quick links
+  serviceRow: { flexDirection: "row", gap: 8, marginHorizontal: 16, marginTop: 12 },
+  serviceChip: { flex: 1, alignItems: "center", gap: 6 },
+  serviceIconBox: {
+    width: 48, height: 48, borderRadius: 14,
+    alignItems: "center", justifyContent: "center",
+  },
+  serviceLabel: { fontSize: 10, fontWeight: "600" as const, color: "#475569", textAlign: "center", lineHeight: 13 },
 
   // Scam cards
   scamCard: {

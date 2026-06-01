@@ -1,5 +1,8 @@
 import { Feather } from "@expo/vector-icons";
+import { useQuery } from "@tanstack/react-query";
+import { checkNumber, listCategories } from "@workspace/api-client-react";
 import * as Haptics from "expo-haptics";
+import { router } from "expo-router";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -14,7 +17,9 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CheckItem, useAppContext } from "@/context/AppContext";
+import { STRINGS } from "@/constants/strings";
 import { useColors } from "@/hooks/useColors";
+import { isValidIndianPhone, phoneForApi } from "@/lib/phone";
 
 const NAVY = "#0B3D91";
 const SAFFRON = "#FF6713";
@@ -33,23 +38,17 @@ type Result = {
   status: "safe" | "warning" | "danger" | "invalid";
   headline: string;
   detail: string;
+  /** Present for number checks fetched from the backend. */
+  phone?: string;
+  reportCount?: number;
+  verifiedScam?: boolean;
+  categories?: string[];
 };
 
-function doCheck(type: CheckType, raw: string): Result {
+function doLocalCheck(type: CheckType, raw: string): Result {
   const v = raw.trim();
   const vl = v.toLowerCase();
-  if (!v) return { status: "invalid", headline: "Enter a value to check", detail: "" };
-
-  if (type === "number") {
-    const d = v.replace(/\D/g, "");
-    if (d.length < 10)
-      return { status: "invalid", headline: "Invalid phone number", detail: "Enter a valid 10-digit Indian number." };
-    if (d.includes("999") || d.startsWith("1800") || d.startsWith("1860"))
-      return { status: "danger", headline: "HIGH RISK — Fraud Number", detail: "This number has 847 community reports for impersonation fraud. Do NOT share OTP, PIN or make any payment." };
-    if (d.endsWith("11") || d.endsWith("22") || d.includes("777"))
-      return { status: "warning", headline: "Suspected Spam Caller", detail: "34 reports as a telemarketer or spam caller. Proceed with caution and do not share personal details." };
-    return { status: "safe", headline: "No Reports Found", detail: "No community fraud reports for this number. Always verify caller identity before sharing sensitive information." };
-  }
+  if (!v) return { status: "invalid", headline: STRINGS.verify.enterValue, detail: "" };
 
   if (type === "link") {
     if (!vl.startsWith("http"))
@@ -102,6 +101,13 @@ export default function VerifyScreen() {
   const [result, setResult] = useState<Result | null>(null);
   const [checking, setChecking] = useState(false);
 
+  const { data: catData } = useQuery({
+    queryKey: ["categories"],
+    queryFn: () => listCategories(),
+  });
+  const categoryName = (key: string) =>
+    catData?.categories.find((c) => c.key === key)?.nameEn ?? key;
+
   const topInset = Platform.OS === "web" ? 0 : insets.top;
   const bottomPad = (Platform.OS === "web" ? 34 : insets.bottom) + 80;
   const activePlaceholder = TYPES.find((t) => t.key === selectedType)?.hint ?? "";
@@ -111,11 +117,40 @@ export default function VerifyScreen() {
     if (!input.trim()) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setChecking(true);
-    await new Promise((r) => setTimeout(r, 700));
-    const r = doCheck(selectedType, input.trim());
+
+    let r: Result;
+    if (selectedType === "number") {
+      if (!isValidIndianPhone(input)) {
+        r = { status: "invalid", headline: STRINGS.verify.risk.unknown.headline, detail: STRINGS.report.invalidPhone };
+      } else {
+        try {
+          const res = await checkNumber(phoneForApi(input) as string);
+          const copy = STRINGS.verify.risk[res.riskLevel];
+          const status =
+            res.riskLevel === "high" ? "danger" : res.riskLevel === "medium" ? "warning" : "safe";
+          r = {
+            status,
+            headline: copy.headline,
+            detail: copy.detail,
+            phone: res.phone,
+            reportCount: res.reportCount,
+            verifiedScam: res.verifiedScam,
+            categories: res.categories,
+          };
+        } catch {
+          r = { status: "invalid", headline: STRINGS.verify.checkFailed, detail: "" };
+        }
+      }
+    } else {
+      await new Promise((res) => setTimeout(res, 700));
+      r = doLocalCheck(selectedType, input.trim());
+    }
+
     setResult(r);
     setChecking(false);
-    addCheck({ type: selectedType, value: input.trim(), result: r.status });
+    if (r.status !== "invalid") {
+      addCheck({ type: selectedType, value: input.trim(), result: r.status });
+    }
     if (r.status === "danger") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     else if (r.status === "warning") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
     else Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -239,6 +274,45 @@ export default function VerifyScreen() {
             {result.detail ? (
               <Text style={s.resultDetail}>{result.detail}</Text>
             ) : null}
+
+            {result.reportCount !== undefined && (
+              <View style={s.numberMeta}>
+                <View style={s.metaRow}>
+                  <Feather name="users" size={13} color="#475569" />
+                  <Text style={s.metaTxt}>
+                    {result.reportCount > 0
+                      ? STRINGS.verify.reportCount(result.reportCount)
+                      : STRINGS.verify.noReports}
+                  </Text>
+                </View>
+                {result.verifiedScam && (
+                  <View style={s.verifiedBadge}>
+                    <Feather name="alert-octagon" size={11} color="#dc2626" />
+                    <Text style={s.verifiedTxt}>{STRINGS.verify.verifiedScam}</Text>
+                  </View>
+                )}
+                {result.categories && result.categories.length > 0 && (
+                  <View style={s.catChips}>
+                    {result.categories.map((key) => (
+                      <View key={key} style={s.catChip}>
+                        <Text style={s.catChipTxt}>{categoryName(key)}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+                <TouchableOpacity
+                  style={s.reportBtn}
+                  onPress={() => {
+                    Haptics.selectionAsync();
+                    router.push(`/report?phone=${encodeURIComponent(input.trim())}`);
+                  }}
+                  activeOpacity={0.8}
+                >
+                  <Feather name="flag" size={14} color={SAFFRON} />
+                  <Text style={s.reportBtnTxt}>{STRINGS.verify.reportThisNumber}</Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         )}
 
@@ -330,6 +404,27 @@ const s = StyleSheet.create({
   resultIconBox: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
   resultHeadline: { fontSize: 15, fontWeight: "700" as const, flex: 1 },
   resultDetail: { fontSize: 13, color: "#334155", lineHeight: 20, marginLeft: 50 },
+  numberMeta: { marginTop: 4, gap: 10 },
+  metaRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  metaTxt: { fontSize: 13, color: "#475569", fontWeight: "600" as const },
+  verifiedBadge: {
+    flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start",
+    backgroundColor: "#fef2f2", borderColor: "rgba(220,38,38,0.25)", borderWidth: 1,
+    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8,
+  },
+  verifiedTxt: { fontSize: 11, fontWeight: "700" as const, color: "#991b1b" },
+  catChips: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
+  catChip: {
+    backgroundColor: "rgba(11,61,145,0.07)", borderRadius: 8,
+    paddingHorizontal: 10, paddingVertical: 5,
+  },
+  catChipTxt: { fontSize: 11, fontWeight: "600" as const, color: NAVY },
+  reportBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
+    backgroundColor: "#fff7ed", borderColor: "rgba(255,103,19,0.3)", borderWidth: 1.5,
+    borderRadius: 12, paddingVertical: 12, marginTop: 2,
+  },
+  reportBtnTxt: { fontSize: 14, fontWeight: "700" as const, color: "#9a3412" },
   historyTitle: {
     fontSize: 11, fontWeight: "700" as const, letterSpacing: 1,
     color: "#94a3b8", marginBottom: 10, marginTop: 8,
