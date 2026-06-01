@@ -77,12 +77,13 @@ Current baseline (in `engine-accuracy.test.ts`):
 
 | Metric | Baseline floor |
 | --- | --- |
-| F1 | 88.2% |
-| Accuracy | 88.8% |
+| F1 | 92.7% |
+| Accuracy | 93.0% |
 
 The task that introduced this guard quoted F1 81.3% / accuracy 83.3%, but the
-dataset has since been strengthened and the deterministic engine now scores
-F1 88.235% / accuracy 88.889% — that higher level is the floor we defend.
+dataset has since been expanded to 72 balanced examples and the deterministic
+engine now scores F1 92.754% / accuracy 93.056% — that higher level is the floor
+we defend.
 
 **Raise the baseline intentionally** as the engine or dataset improves (commit
 the new floor together with the change that earns it). **Never lower it** to make

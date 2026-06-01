@@ -34,3 +34,39 @@
 {"id": "msg-009", "type": "message", "value": "Your Amazon order #402 has been shipped and will arrive tomorrow.", "label": "legit", "note": "Legit transactional notification"}
 {"id": "msg-010", "type": "message", "value": "Reminder: your electricity bill of Rs 1200 is due on the 5th. Use the official app to clear it.", "label": "legit", "note": "Legit bill reminder"}
 {"id": "msg-011", "type": "message", "value": "Thanks for your payment. Your account balance has been updated successfully.", "label": "legit", "note": "Legit receipt containing 'account' keyword"}
+{"id": "phone-007", "type": "phone", "value": "9870000001", "label": "scam", "note": "Five community reports, last seen about a month ago", "reputation": {"reportCount": 5, "verifiedScam": false, "lastReportedDaysAgo": 30}}
+{"id": "phone-008", "type": "phone", "value": "9870000002", "label": "scam", "note": "Repeatedly reported but stale (4 reports, none recent)", "reputation": {"reportCount": 4, "verifiedScam": false, "lastReportedDaysAgo": 200}}
+{"id": "phone-009", "type": "phone", "value": "9870000003", "label": "scam", "note": "Moderator-verified scam number", "reputation": {"reportCount": 7, "verifiedScam": true, "lastReportedDaysAgo": 2}}
+{"id": "phone-010", "type": "phone", "value": "9123456780", "label": "legit", "note": "Clean number, no reports", "reputation": {"reportCount": 0, "verifiedScam": false, "lastReportedDaysAgo": null}}
+{"id": "phone-011", "type": "phone", "value": "9123456781", "label": "legit", "note": "Single stale report on an otherwise clean number (should not flag)", "reputation": {"reportCount": 1, "verifiedScam": false, "lastReportedDaysAgo": 200}}
+{"id": "phone-012", "type": "phone", "value": "9123456782", "label": "legit", "note": "Clean number, no reports", "reputation": {"reportCount": 0, "verifiedScam": false, "lastReportedDaysAgo": null}}
+{"id": "url-013", "type": "url", "value": "http://198.51.100.23/", "label": "scam", "note": "Raw IP host, no keyword triggers"}
+{"id": "url-014", "type": "url", "value": "http://amaz0n-india.xyz", "label": "scam", "note": "Typosquat (zero-for-o) on an abused TLD, no keyword triggers"}
+{"id": "url-015", "type": "url", "value": "https://xn--80ak6aa92e.com", "label": "scam", "note": "Punycode homograph domain, no keyword triggers"}
+{"id": "url-016", "type": "url", "value": "http://rewards-zone.top/c/9f2", "label": "scam", "note": "Abused TLD + non-HTTPS, opaque path, no keyword triggers"}
+{"id": "url-017", "type": "url", "value": "https://login.phonepe-rewards.xyz/", "label": "scam", "note": "Brand impersonation (phonepe) + abused TLD"}
+{"id": "url-018", "type": "url", "value": "https://account.icici-kyc.online/update", "label": "scam", "note": "Brand impersonation (icici) + abused TLD + sensitive path"}
+{"id": "url-019", "type": "url", "value": "https://www.hdfcbank.com/personal/netbanking", "label": "legit", "note": "Official bank page; host contains 'bank' keyword"}
+{"id": "url-020", "type": "url", "value": "https://www.axisbank.com/login", "label": "legit", "note": "Official bank login page containing 'login'/'bank' keywords"}
+{"id": "url-021", "type": "url", "value": "https://accounts.icicibank.com/secure/login", "label": "legit", "note": "Official bank sub-domain with scam-adjacent path keywords"}
+{"id": "url-022", "type": "url", "value": "https://www.incometax.gov.in/iec/foportal", "label": "legit", "note": "Official government portal"}
+{"id": "url-023", "type": "url", "value": "https://www.flipkart.com/account/orders", "label": "legit", "note": "Legit ecommerce account page containing 'account' keyword"}
+{"id": "url-024", "type": "url", "value": "https://en.wikipedia.org/wiki/Phishing", "label": "legit", "note": "Legit article whose path literally says 'phishing'"}
+{"id": "upi-008", "type": "upi", "value": "9800011122@okicici", "label": "scam", "note": "Known handle but VPA embeds a reported scam number"}
+{"id": "upi-009", "type": "upi", "value": "9870000001@okhdfcbank", "label": "scam", "note": "Known handle but VPA embeds a reported scam number"}
+{"id": "upi-010", "type": "upi", "value": "9870000003@ybl", "label": "scam", "note": "Known handle but VPA embeds a moderator-verified scam number"}
+{"id": "upi-011", "type": "upi", "value": "9870000002.scam@paytm", "label": "scam", "note": "Known handle, reported number buried in a non-numeric prefix"}
+{"id": "upi-012", "type": "upi", "value": "merchant.store@okhdfcbank", "label": "legit", "note": "Known PSP handle, no reputation linkage"}
+{"id": "upi-013", "type": "upi", "value": "9123456780@ybl", "label": "legit", "note": "Phone-linked VPA but the embedded number is clean"}
+{"id": "upi-014", "type": "upi", "value": "freelancer@fam", "label": "legit", "note": "Valid newer PSP handle a stale allowlist would miss"}
+{"id": "upi-015", "type": "upi", "value": "9123456781@naviaxis", "label": "legit", "note": "Newer PSP handle; embedded number has only a single stale report"}
+{"id": "msg-012", "type": "message", "value": "Aapka parcel customs mein atka hai. Turant 9870000001 par call karein warna wapas chala jayega.", "label": "scam", "note": "Hinglish parcel-customs scam, no English trigger words, reputation-linked phone"}
+{"id": "msg-013", "type": "message", "value": "Update your details here: http://amaz0n-india.xyz to avoid losing access.", "label": "scam", "note": "Scam link on abused TLD, avoids classic trigger keywords"}
+{"id": "msg-014", "type": "message", "value": "Pay the small processing fee to 9870000003@ybl and your personal loan is approved instantly.", "label": "scam", "note": "Advance-fee loan scam, no trigger words, reputation-linked UPI/number"}
+{"id": "msg-015", "type": "message", "value": "Your refund is ready. Confirm your details at http://198.51.100.23/refund", "label": "scam", "note": "Refund-bait message with raw-IP phishing link"}
+{"id": "msg-016", "type": "message", "value": "Beta, this is your uncle. I lost my wallet while travelling and I am stuck. Please send some money quickly, I will return it tomorrow.", "label": "scam", "note": "Relative-impersonation scam, semantic-only, no entities (needs the AI signal)"}
+{"id": "msg-017", "type": "message", "value": "Your OTP is 558213, valid for 10 minutes. Never share your OTP or password with anyone.", "label": "legit", "note": "Genuine OTP message dense with scam-adjacent keywords"}
+{"id": "msg-018", "type": "message", "value": "Your KYC update is complete. Thank you for banking with us.", "label": "legit", "note": "Legit KYC-completion notice containing 'kyc' keyword"}
+{"id": "msg-019", "type": "message", "value": "Reminder: your EMI of Rs 4500 is due on the 7th. Check your account in the official app.", "label": "legit", "note": "Legit reminder containing 'account' keyword"}
+{"id": "msg-020", "type": "message", "value": "Congratulations! Your order has been confirmed and will be delivered by Friday.", "label": "legit", "note": "Legit order update that opens like a prize scam"}
+{"id": "msg-021", "type": "message", "value": "Hi, this is Dr. Mehta's clinic. Your appointment is confirmed for tomorrow at 4pm.", "label": "legit", "note": "Ordinary appointment confirmation"}

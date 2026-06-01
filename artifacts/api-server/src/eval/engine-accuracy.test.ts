@@ -12,15 +12,17 @@ import { scoreDataset } from "./run";
  * BASELINE — raise these intentionally as the engine (or dataset) improves;
  * never lower them to make a failing run pass.
  *   - The task that introduced this guard quoted F1 81.3% / accuracy 83.3%.
- *   - The benchmark dataset has since been strengthened, lifting the
- *     deterministic engine to F1 88.235% / accuracy 88.889%, which is the real
- *     floor we now defend. A single new misclassification moves these metrics
- *     by ~2-3 points, so any genuine regression trips the check while the small
- *     buffer below keeps the assertion stable against floating-point noise.
+ *   - The benchmark dataset has since been expanded to 72 labeled examples
+ *     (balanced across phone/url/upi/message, with harder edge cases), lifting
+ *     the deterministic engine to F1 92.754% / accuracy 93.056%, which is the
+ *     real floor we now defend. On the larger set a single new misclassification
+ *     moves these metrics by ~1.4 points, so any genuine regression trips the
+ *     check while the small buffer below keeps the assertion stable against
+ *     floating-point noise.
  */
 const BASELINE = {
-  f1: 0.882,
-  accuracy: 0.888,
+  f1: 0.927,
+  accuracy: 0.93,
 } as const;
 
 describe("fraud engine accuracy regression guard", () => {
