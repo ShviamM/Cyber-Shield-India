@@ -1,0 +1,36 @@
+{"id": "phone-001", "type": "phone", "value": "+919812345678", "label": "scam", "note": "Moderator-verified scam number", "reputation": {"reportCount": 8, "verifiedScam": true, "lastReportedDaysAgo": 3}}
+{"id": "phone-002", "type": "phone", "value": "9800011122", "label": "scam", "note": "Heavily community-reported (6 reports)", "reputation": {"reportCount": 6, "verifiedScam": false, "lastReportedDaysAgo": 12}}
+{"id": "phone-003", "type": "phone", "value": "9765432100", "label": "scam", "note": "3 recent reports", "reputation": {"reportCount": 3, "verifiedScam": false, "lastReportedDaysAgo": 10}}
+{"id": "phone-004", "type": "phone", "value": "9711122233", "label": "scam", "note": "2 recent reports", "reputation": {"reportCount": 2, "verifiedScam": false, "lastReportedDaysAgo": 5}}
+{"id": "phone-005", "type": "phone", "value": "9900112233", "label": "legit", "note": "Clean number, no reports", "reputation": {"reportCount": 0, "verifiedScam": false, "lastReportedDaysAgo": null}}
+{"id": "phone-006", "type": "phone", "value": "8877665544", "label": "legit", "note": "Clean number, no reports", "reputation": {"reportCount": 0, "verifiedScam": false, "lastReportedDaysAgo": null}}
+{"id": "url-001", "type": "url", "value": "http://203.0.113.45/", "label": "scam", "note": "Raw IP host, no keyword triggers"}
+{"id": "url-002", "type": "url", "value": "http://hdfc-rewards.xyz", "label": "scam", "note": "Brand impersonation + abused TLD, no obvious keyword"}
+{"id": "url-003", "type": "url", "value": "https://xn--pple-43d.com", "label": "scam", "note": "Punycode homograph (apple look-alike)"}
+{"id": "url-004", "type": "url", "value": "http://win-iphone-now.top/claim", "label": "scam", "note": "Abused TLD + non-HTTPS, no keyword match"}
+{"id": "url-005", "type": "url", "value": "https://bit.ly/3xK9zQ", "label": "scam", "note": "Shortened link hiding destination"}
+{"id": "url-006", "type": "url", "value": "http://sbi-kyc-verify.tk/login", "label": "scam", "note": "Brand impersonation + TLD + sensitive path"}
+{"id": "url-007", "type": "url", "value": "https://www.google.com", "label": "legit", "note": "Clean popular site"}
+{"id": "url-008", "type": "url", "value": "https://accounts.google.com/signin", "label": "legit", "note": "Legit sign-in URL containing 'account' token"}
+{"id": "url-009", "type": "url", "value": "https://www.icicibank.com/personal/login", "label": "legit", "note": "Official bank login page"}
+{"id": "url-010", "type": "url", "value": "https://onlinesbi.sbi/", "label": "legit", "note": "Official SBI domain"}
+{"id": "url-011", "type": "url", "value": "https://www.amazon.in/gp/css/order-history", "label": "legit", "note": "Legit ecommerce order page"}
+{"id": "url-012", "type": "url", "value": "https://paytm.com/", "label": "legit", "note": "Official payment provider"}
+{"id": "upi-001", "type": "upi", "value": "9800011122@ybl", "label": "scam", "note": "Known handle but VPA embeds a reported scam number"}
+{"id": "upi-002", "type": "upi", "value": "9765432100@okhdfcbank", "label": "scam", "note": "Known handle but VPA embeds a reported scam number"}
+{"id": "upi-003", "type": "upi", "value": "scammer123@randomxyz", "label": "scam", "note": "Unknown handle, no reputation linkage"}
+{"id": "upi-004", "type": "upi", "value": "merchant@oksbi", "label": "legit", "note": "Known PSP handle"}
+{"id": "upi-005", "type": "upi", "value": "shopkeeper@okaxis", "label": "legit", "note": "Known PSP handle"}
+{"id": "upi-006", "type": "upi", "value": "somebiz@fbl", "label": "legit", "note": "Valid but less-common PSP handle"}
+{"id": "upi-007", "type": "upi", "value": "9900112233@paytm", "label": "legit", "note": "Known handle, VPA embeds a clean number"}
+{"id": "msg-001", "type": "message", "value": "Dear customer, your SBI account will be blocked. Update KYC now: http://sbi-kyc-verify.tk/login", "label": "scam", "note": "Keyword-rich KYC scam with malicious link"}
+{"id": "msg-002", "type": "message", "value": "Dear customer, claim your reward of Rs 5000. Visit http://hdfc-rewards.xyz before it expires.", "label": "scam", "note": "Scam link without classic trigger keywords"}
+{"id": "msg-003", "type": "message", "value": "Hi, I saw your profile and have a great earning opportunity. Ping me on 9800011122 to start today.", "label": "scam", "note": "Reputation-linked phone, no keyword triggers"}
+{"id": "msg-004", "type": "message", "value": "Congratulations! You have won the KBC lottery of Rs 25 lakh. Reply to claim.", "label": "scam", "note": "Pure-text lottery scam (semantic-only)"}
+{"id": "msg-005", "type": "message", "value": "Madam, this is the cyber crime cell. A case is registered against your Aadhaar. Join the video call immediately or face arrest.", "label": "scam", "note": "Digital-arrest scam, semantic-only, no entities"}
+{"id": "msg-006", "type": "message", "value": "URGENT: Your electricity will be disconnected tonight. Pay immediately at scammerpay@randomxyz to avoid it.", "label": "scam", "note": "Urgency scam with unknown UPI"}
+{"id": "msg-007", "type": "message", "value": "Your OTP for login is 432122. Do not share it with anyone.", "label": "legit", "note": "Genuine OTP message containing scam-adjacent keywords"}
+{"id": "msg-008", "type": "message", "value": "Hey, are we still meeting for lunch at 1pm tomorrow?", "label": "legit", "note": "Ordinary personal message"}
+{"id": "msg-009", "type": "message", "value": "Your Amazon order #402 has been shipped and will arrive tomorrow.", "label": "legit", "note": "Legit transactional notification"}
+{"id": "msg-010", "type": "message", "value": "Reminder: your electricity bill of Rs 1200 is due on the 5th. Use the official app to clear it.", "label": "legit", "note": "Legit bill reminder"}
+{"id": "msg-011", "type": "message", "value": "Thanks for your payment. Your account balance has been updated successfully.", "label": "legit", "note": "Legit receipt containing 'account' keyword"}

@@ -9,7 +9,7 @@ import { analyzeUpi } from "./upi";
 
 export type FraudCheckType = "phone" | "url" | "upi" | "message";
 
-const SEVERITY_WEIGHT: Record<FraudSignal["severity"], number> = {
+export const SEVERITY_WEIGHT: Record<FraudSignal["severity"], number> = {
   info: 0,
   low: 12,
   medium: 30,
@@ -27,7 +27,7 @@ type Analysis = {
   confidence?: number | null;
 };
 
-function fuse(
+export function fuse(
   signals: FraudSignal[],
   couldAnalyze: boolean,
 ): { score: number; riskLevel: FraudVerdict["riskLevel"] } {
@@ -131,7 +131,7 @@ async function analyzeUpiTarget(raw: string): Promise<Analysis> {
   return { signals, couldAnalyze: true };
 }
 
-function extractEntities(text: string): {
+export function extractEntities(text: string): {
   urls: string[];
   upis: string[];
   phones: string[];

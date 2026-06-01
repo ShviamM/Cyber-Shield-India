@@ -1,7 +1,7 @@
 import { db, scamCategoriesTable } from "@workspace/db";
 import { logger } from "./logger";
 
-const SEED_CATEGORIES = [
+export const SEED_CATEGORIES = [
   {
     key: "upi_fraud",
     nameEn: "UPI / Payment Fraud",
