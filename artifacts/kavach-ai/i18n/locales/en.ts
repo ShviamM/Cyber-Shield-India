@@ -220,6 +220,18 @@ const en = {
       qrLabel: "Check QR Code",
       qrHint: "Paste QR content here",
     },
+    scan: {
+      button: "Scan with camera",
+      title: "Scan a QR Code",
+      hint: "Point your camera at a QR code to check it for scams.",
+      cancel: "Cancel",
+      permissionTitle: "Camera access needed",
+      permissionBody:
+        "Allow camera access to scan QR codes. You can still paste QR content manually below.",
+      grantPermission: "Allow camera",
+      openSettings: "Open Settings",
+      unavailable: "Camera scanning isn't available here. Paste the QR content below instead.",
+    },
     status: {
       safe: "Safe",
       warning: "Warning",

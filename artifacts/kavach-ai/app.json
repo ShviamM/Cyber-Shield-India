@@ -23,7 +23,8 @@
         "android.permission.READ_PHONE_STATE",
         "android.permission.READ_CALL_LOG",
         "android.permission.RECEIVE_SMS",
-        "android.permission.POST_NOTIFICATIONS"
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.CAMERA"
       ],
       "intentFilters": [
         {
@@ -51,7 +52,13 @@
       ],
       "expo-font",
       "expo-web-browser",
-      "expo-localization"
+      "expo-localization",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "KavachAI uses the camera to scan QR codes so it can check them for payment scams."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

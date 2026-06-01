@@ -2,13 +2,16 @@ import { Feather } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { checkNumber, fraudCheck, listCategories } from "@workspace/api-client-react";
 import type { FraudCheckRequestType, FraudVerdict } from "@workspace/api-client-react";
+import { CameraView, useCameraPermissions } from "expo-camera";
 import * as Haptics from "expo-haptics";
+import * as Linking from "expo-linking";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import {
   ActivityIndicator,
+  Modal,
   Platform,
   ScrollView,
   StyleSheet,
@@ -82,6 +85,20 @@ function detectType(raw: string): CheckType {
   return "message";
 }
 
+/**
+ * Maps a decoded QR payload to the engine check type. A bare UPI id goes through
+ * the UPI engine; a plain http(s) URL through the URL engine. Everything else
+ * (including `upi://pay?...` deep links, which the message analyzer expands into
+ * their embedded UPI id / amount / phone) goes through the message engine.
+ */
+function detectScanType(raw: string): Exclude<CheckType, "number" | "qr"> {
+  const v = raw.trim();
+  const vl = v.toLowerCase();
+  if (vl.startsWith("http://") || vl.startsWith("https://")) return "link";
+  if (/^[\w.\-]+@[\w]+$/.test(v)) return "upi";
+  return "message";
+}
+
 function verdictToResult(v: FraudVerdict, t: TFunction): Result {
   const status: Result["status"] =
     v.riskLevel === "high"
@@ -119,6 +136,9 @@ export default function VerifyScreen() {
   const [input, setInput] = useState("");
   const [result, setResult] = useState<Result | null>(null);
   const [checking, setChecking] = useState(false);
+  const [scannerOpen, setScannerOpen] = useState(false);
+  const [permission, requestPermission] = useCameraPermissions();
+  const scannedRef = useRef(false);
 
   const { data: catData } = useQuery({
     queryKey: ["categories"],
@@ -191,6 +211,42 @@ export default function VerifyScreen() {
   function handleCheck() {
     runCheck(selectedType, input);
   }
+
+  async function openScanner() {
+    Haptics.selectionAsync();
+    let granted = permission?.granted ?? false;
+    if (!granted) {
+      const res = await requestPermission();
+      granted = res.granted;
+    }
+    if (!granted) return;
+    scannedRef.current = false;
+    setScannerOpen(true);
+  }
+
+  function handleBarcodeScanned(payload: string) {
+    if (scannedRef.current) return;
+    scannedRef.current = true;
+    setScannerOpen(false);
+    const decoded = payload.trim();
+    if (!decoded) return;
+    const kind = detectScanType(decoded);
+    setSelectedType(kind);
+    setInput(decoded);
+    runCheck(kind, decoded);
+  }
+
+  async function openSettings() {
+    Haptics.selectionAsync();
+    if (Platform.OS === "web") return;
+    try {
+      await Linking.openSettings();
+    } catch {
+      // no-op: settings may be unavailable on some devices
+    }
+  }
+
+  const canAskCamera = !permission || permission.canAskAgain;
 
   // Share-to-check / deep-link prefill: kavach-ai://verify?q=...&kind=...
   const autoRan = useRef<string | null>(null);
@@ -298,6 +354,35 @@ export default function VerifyScreen() {
             </TouchableOpacity>
           )}
         </View>
+
+        {/* QR camera scan */}
+        {selectedType === "qr" && (
+          <>
+            <TouchableOpacity
+              style={s.scanBtn}
+              onPress={openScanner}
+              disabled={checking}
+              activeOpacity={0.85}
+            >
+              <Feather name="camera" size={18} color={SAFFRON} />
+              <Text style={s.scanBtnText}>{t("verify.scan.button")}</Text>
+            </TouchableOpacity>
+            {permission && !permission.granted && !canAskCamera && (
+              <View style={s.scanNotice}>
+                <View style={s.scanNoticeRow}>
+                  <Feather name="info" size={13} color="#9a3412" style={{ marginTop: 1 }} />
+                  <Text style={s.scanNoticeTxt}>{t("verify.scan.permissionBody")}</Text>
+                </View>
+                {Platform.OS !== "web" && (
+                  <TouchableOpacity style={s.settingsBtn} onPress={openSettings} activeOpacity={0.8}>
+                    <Feather name="settings" size={14} color="#9a3412" />
+                    <Text style={s.settingsBtnTxt}>{t("verify.scan.openSettings")}</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
+          </>
+        )}
 
         {/* Check button */}
         <TouchableOpacity
@@ -435,6 +520,40 @@ export default function VerifyScreen() {
           </>
         )}
       </ScrollView>
+
+      {/* Camera QR scanner */}
+      <Modal
+        visible={scannerOpen}
+        animationType="slide"
+        onRequestClose={() => setScannerOpen(false)}
+        presentationStyle="fullScreen"
+      >
+        <View style={s.scannerRoot}>
+          {scannerOpen && (
+            <CameraView
+              style={s.camera}
+              facing="back"
+              barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
+              onBarcodeScanned={(e) => handleBarcodeScanned(e.data)}
+            />
+          )}
+          <View style={[s.scannerOverlay, { paddingTop: insets.top + 16 }]} pointerEvents="box-none">
+            <View style={s.scannerHeader}>
+              <Text style={s.scannerTitle}>{t("verify.scan.title")}</Text>
+              <Text style={s.scannerHint}>{t("verify.scan.hint")}</Text>
+            </View>
+            <View style={s.scanFrame} />
+            <TouchableOpacity
+              style={[s.scannerCancel, { marginBottom: insets.bottom + 24 }]}
+              onPress={() => { Haptics.selectionAsync(); setScannerOpen(false); }}
+              activeOpacity={0.85}
+            >
+              <Feather name="x" size={18} color="#fff" />
+              <Text style={s.scannerCancelTxt}>{t("verify.scan.cancel")}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -494,6 +613,42 @@ const s = StyleSheet.create({
     elevation: 4,
   },
   checkBtnText: { fontSize: 16, fontWeight: "700" as const, color: "#fff" },
+  scanBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center",
+    gap: 8, height: 50, borderRadius: 16, marginBottom: 12,
+    backgroundColor: "#fff7ed", borderColor: "rgba(255,103,19,0.35)", borderWidth: 1.5,
+  },
+  scanBtnText: { fontSize: 15, fontWeight: "700" as const, color: "#9a3412" },
+  scanNotice: {
+    gap: 10, backgroundColor: "#fff7ed", borderRadius: 12, padding: 12, marginBottom: 12,
+  },
+  scanNoticeRow: { flexDirection: "row", alignItems: "flex-start", gap: 8 },
+  scanNoticeTxt: { flex: 1, fontSize: 12, color: "#9a3412", lineHeight: 18 },
+  settingsBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6,
+    backgroundColor: "#fff", borderColor: "rgba(255,103,19,0.3)", borderWidth: 1,
+    borderRadius: 10, paddingVertical: 9,
+  },
+  settingsBtnTxt: { fontSize: 13, fontWeight: "700" as const, color: "#9a3412" },
+  scannerRoot: { flex: 1, backgroundColor: "#000" },
+  camera: { ...StyleSheet.absoluteFillObject },
+  scannerOverlay: {
+    flex: 1, justifyContent: "space-between", alignItems: "center",
+    paddingHorizontal: 24, paddingBottom: 24,
+  },
+  scannerHeader: { alignItems: "center", gap: 6 },
+  scannerTitle: { fontSize: 18, fontWeight: "800" as const, color: "#fff", textAlign: "center" },
+  scannerHint: { fontSize: 13, color: "rgba(255,255,255,0.85)", textAlign: "center", lineHeight: 19 },
+  scanFrame: {
+    width: 240, height: 240, borderRadius: 24,
+    borderWidth: 3, borderColor: "rgba(255,255,255,0.9)",
+  },
+  scannerCancel: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
+    backgroundColor: "rgba(0,0,0,0.55)", borderRadius: 16,
+    paddingVertical: 14, paddingHorizontal: 28,
+  },
+  scannerCancelTxt: { fontSize: 15, fontWeight: "700" as const, color: "#fff" },
   resultCard: {
     borderRadius: 16, borderWidth: 1.5, padding: 16, gap: 10, marginBottom: 8,
   },
