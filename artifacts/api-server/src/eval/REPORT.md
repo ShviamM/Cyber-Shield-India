@@ -10,23 +10,23 @@
 | System | Precision | Recall | F1 | Accuracy | TP/FP/FN/TN |
 | --- | --- | --- | --- | --- | --- |
 | Legacy rule-based | 66.7% | 52.6% | 58.8% | 61.1% | 10/5/9/12 |
-| New multi-signal engine | 100.0% | 68.4% | 81.3% | 83.3% | 13/0/6/17 |
+| New multi-signal engine | 100.0% | 78.9% | 88.2% | 88.9% | 15/0/4/17 |
 
 ## Improvement (engine − legacy)
 
 | Metric | Legacy | Engine | Delta |
 | --- | --- | --- | --- |
 | Precision | 66.7% | 100.0% | +33.3 pts |
-| Recall | 52.6% | 68.4% | +15.8 pts |
-| F1 | 58.8% | 81.3% | +22.4 pts |
-| Accuracy | 61.1% | 83.3% | +22.2 pts |
+| Recall | 52.6% | 78.9% | +26.3 pts |
+| F1 | 58.8% | 88.2% | +29.4 pts |
+| Accuracy | 61.1% | 88.9% | +27.8 pts |
 
 ## Per-type F1 (legacy → engine)
 
 | Type | N | Legacy F1 | Engine F1 | Delta |
 | --- | --- | --- | --- | --- |
-| phone | 6 | 100.0% | 85.7% | -14.3 pts |
-| url | 12 | 40.0% | 90.9% | +50.9 pts |
+| phone | 6 | 100.0% | 100.0% | +0.0 pts |
+| url | 12 | 40.0% | 100.0% | +60.0 pts |
 | upi | 7 | 40.0% | 80.0% | +40.0 pts |
 | message | 11 | 54.5% | 66.7% | +12.1 pts |
 

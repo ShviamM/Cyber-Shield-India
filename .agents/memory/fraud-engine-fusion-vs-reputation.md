@@ -13,19 +13,22 @@ surfaced clearly when building the evaluation harness.
   `fuse()` over severity *weights* (info 0, low 12, medium 30, high 55) with
   verdict thresholds high ≥70, medium ≥40, low ≥15.
 
-**Consequence:** a lone `medium` reputation → one weight-30 signal → fuse score
-30 → falls in the `low` band (15–39) → the engine reports **low**, i.e. it
-does NOT flag a number that the raw reputation rule calls `medium`. So the
-engine is *more conservative* about phones than the legacy reputation rule when
-reputation is the only signal.
+**Resolved:** the medium severity weight is now **40** (was 30), so a lone
+`medium` signal scores exactly 40 and lands in the `medium` band (>= 40). A
+single community-`medium` phone reputation now warns the user, matching product
+intent. This closed a measured phone F1 regression vs. the legacy rule.
 
-**Why it matters:** when tuning fusion thresholds or weights, remember that a
-single medium/low signal alone can never reach the engine's `medium` band — you
-need either a `high` signal (55) or multiple stacked signals. Don't assume
-`computeRiskLevel` "medium" == engine "medium".
+**Why 40 (weight) instead of lowering the medium threshold to 30:** bumping the
+weight is surgical — it only changes single/stacked-`medium` behavior. Lowering
+the threshold would also start flagging triple-`low` stacks (3×12 = 36), risking
+new false positives. The two risk scales still don't auto-align, so the rule of
+thumb stands: severity weights, not `computeRiskLevel`, decide the verdict band.
 
-**How to apply:** if the product wants a single community-`medium` phone to warn
-the user, either bump the phone medium signal weight or lower the medium
-threshold — changing `computeRiskLevel` alone won't do it. Re-run the eval
-harness (`pnpm --filter @workspace/api-server run eval`) to measure any such
-change.
+**Still true:** `computeRiskLevel` "medium" only becomes engine "medium" because
+the weight was tuned to match the threshold. A `low` signal (12) alone still
+can't reach `medium`; you need a `medium`/`high` signal or stacking. Don't change
+`computeRiskLevel` alone to move a verdict band.
+
+**How to apply:** re-run the eval harness
+(`pnpm --filter @workspace/api-server run eval`) after any weight/threshold
+change and confirm per-type F1 and overall precision don't regress.

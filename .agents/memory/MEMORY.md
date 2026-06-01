@@ -1,6 +1,6 @@
 - [KavachAI i18n](kavach-ai-i18n.md) — locale files aren't type-checked against en; verify key parity with a runtime flatten script, and rely on i18next fallbackLng (no manual deep-merge).
 - [Twilio connector quirks](twilio-connector.md) — send via connectors.proxy only; restricted key (no accounts/read); creds from /connection?include_secrets, not listConnections.
 - [Orval schema naming](orval-schema-naming.md) — a component schema named like an operationId's response collides in generated zod; name response schemas noun-first (e.g. FraudVerdict not FraudCheckResponse).
-- [Fraud engine fusion vs reputation scales](fraud-engine-fusion-vs-reputation.md) — engine fuse() weights/thresholds make a lone "medium" computeRiskLevel reputation render as "low"; the two risk scales don't line up.
+- [Fraud engine fusion vs reputation scales](fraud-engine-fusion-vs-reputation.md) — medium weight tuned to 40 so a lone "medium" signal now flags medium; weights (not computeRiskLevel) decide the verdict band.
 - [API client codegen staleness](api-client-codegen.md) — generated api.ts can lag the spec (schema present, operation fn missing); run lib/api-spec codegen after adding endpoints.
 - [KavachAI → Netraksh rename](netraksh-rename.md) — confirmed: run as final sweep AFTER all V2 tasks; rename brand/user-facing only, keep technical IDs (dir/package/slug/scheme).

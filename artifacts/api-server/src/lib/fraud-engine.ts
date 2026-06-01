@@ -12,7 +12,10 @@ export type FraudCheckType = "phone" | "url" | "upi" | "message";
 export const SEVERITY_WEIGHT: Record<FraudSignal["severity"], number> = {
   info: 0,
   low: 12,
-  medium: 30,
+  // A lone "medium" signal must reach the medium verdict band (>= 40) on its
+  // own, so a single community-"medium" phone reputation warns the user instead
+  // of fusing down to "low". Weight is aligned with the medium threshold.
+  medium: 40,
   high: 55,
 };
 
