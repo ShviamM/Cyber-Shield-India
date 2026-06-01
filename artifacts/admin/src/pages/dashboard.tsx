@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { NumberReputation } from "@/components/number-reputation";
 import type { UpdateReportStatusRequestStatus } from "@workspace/api-client-react";
 
 export default function Dashboard() {
@@ -181,6 +182,7 @@ export default function Dashboard() {
                             </Badge>
                           )}
                         </div>
+                        <NumberReputation phone={report.phone} />
                       </div>
                       
                       <div className="text-xs text-muted-foreground space-y-1">
