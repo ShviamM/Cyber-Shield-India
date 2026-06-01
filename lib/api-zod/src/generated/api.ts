@@ -187,7 +187,8 @@ export const AdminListReportsResponse = zod.object({
   "reporterName": zod.string().nullish(),
   "reporterPhone": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "verifiedScam": zod.boolean()
 })),
   "total": zod.number()
 })
@@ -215,7 +216,8 @@ export const AdminUpdateReportResponse = zod.object({
   "reporterName": zod.string().nullish(),
   "reporterPhone": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
-  "updatedAt": zod.coerce.date()
+  "updatedAt": zod.coerce.date(),
+  "verifiedScam": zod.boolean()
 })
 
 

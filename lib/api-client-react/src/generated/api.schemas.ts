@@ -103,6 +103,7 @@ export interface AdminReport {
   reporterPhone?: string | null;
   createdAt: string;
   updatedAt: string;
+  verifiedScam: boolean;
 }
 
 export interface AdminReportListResponse {

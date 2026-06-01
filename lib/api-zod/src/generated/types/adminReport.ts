@@ -18,4 +18,5 @@ export interface AdminReport {
   reporterPhone?: string | null;
   createdAt: Date;
   updatedAt: Date;
+  verifiedScam: boolean;
 }

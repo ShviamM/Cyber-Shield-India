@@ -33,8 +33,9 @@ export function toAdminReportDto(input: {
   report: FraudReport;
   reporterName: string | null;
   reporterPhone: string | null;
+  verifiedScam: boolean;
 }): AdminReport {
-  const { report, reporterName, reporterPhone } = input;
+  const { report, reporterName, reporterPhone, verifiedScam } = input;
   return {
     id: report.id,
     phone: report.phone,
@@ -47,5 +48,6 @@ export function toAdminReportDto(input: {
     reporterPhone,
     createdAt: report.createdAt,
     updatedAt: report.updatedAt,
+    verifiedScam,
   };
 }

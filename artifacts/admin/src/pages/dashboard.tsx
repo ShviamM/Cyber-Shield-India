@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Shield, LogOut, CheckCircle2, XCircle, AlertTriangle, ShieldAlert, Phone, Clock, Search, ListFilter } from "lucide-react";
+import { Shield, LogOut, CheckCircle2, XCircle, AlertTriangle, ShieldAlert, ShieldOff, Phone, Clock, Search, ListFilter, Ban } from "lucide-react";
 import { format } from "date-fns";
 import { useAuth } from "@/hooks/use-auth";
 import { useLogout, useAdminListReports, getAdminListReportsQueryKey, useAdminUpdateReport, useAdminVerifyNumber } from "@workspace/api-client-react";
@@ -66,7 +66,11 @@ export default function Dashboard() {
   const handleVerifyNumber = async (phone: string, verifiedScam: boolean) => {
     try {
       await verifyNumber.mutateAsync({ phone, data: { verifiedScam } });
-      toast.success(`Number ${phone} marked as ${verifiedScam ? 'Verified Scam' : 'Safe'}`);
+      toast.success(
+        verifiedScam
+          ? `Number ${phone} added to blacklist`
+          : `Number ${phone} removed from blacklist`,
+      );
       queryClient.invalidateQueries({ queryKey: getAdminListReportsQueryKey() });
     } catch (err) {
       toast.error("Failed to update number reputation");
@@ -171,6 +175,11 @@ export default function Dashboard() {
                           }>
                             {report.status}
                           </Badge>
+                          {report.verifiedScam && (
+                            <Badge variant="destructive" className="gap-1">
+                              <Ban className="w-3 h-3" /> Blacklisted
+                            </Badge>
+                          )}
                         </div>
                       </div>
                       
@@ -212,14 +221,25 @@ export default function Dashboard() {
                           </Button>
                         )}
                         <div className="flex-1" />
-                        <Button 
-                          size="sm" 
-                          variant="secondary" 
-                          onClick={() => handleVerifyNumber(report.phone, true)}
-                          disabled={verifyNumber.isPending}
-                        >
-                          Blacklist Number
-                        </Button>
+                        {report.verifiedScam ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleVerifyNumber(report.phone, false)}
+                            disabled={verifyNumber.isPending}
+                          >
+                            <ShieldOff className="w-4 h-4 mr-1" /> Remove from Blacklist
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => handleVerifyNumber(report.phone, true)}
+                            disabled={verifyNumber.isPending}
+                          >
+                            <Ban className="w-4 h-4 mr-1" /> Blacklist Number
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>

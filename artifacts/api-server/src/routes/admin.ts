@@ -1,6 +1,11 @@
 import { Router, type IRouter } from "express";
 import { and, count, desc, eq } from "drizzle-orm";
-import { db, fraudReportsTable, usersTable } from "@workspace/db";
+import {
+  db,
+  fraudReportsTable,
+  numberReputationTable,
+  usersTable,
+} from "@workspace/db";
 import {
   AdminListReportsQueryParams,
   AdminUpdateReportBody,
@@ -40,9 +45,14 @@ router.get("/admin/reports", requireAdmin, async (req, res) => {
       report: fraudReportsTable,
       reporterName: usersTable.fullName,
       reporterPhone: usersTable.phone,
+      verifiedScam: numberReputationTable.verifiedScam,
     })
     .from(fraudReportsTable)
     .innerJoin(usersTable, eq(fraudReportsTable.reporterId, usersTable.id))
+    .leftJoin(
+      numberReputationTable,
+      eq(fraudReportsTable.phone, numberReputationTable.phone),
+    )
     .where(where)
     .orderBy(desc(fraudReportsTable.createdAt))
     .limit(limit)
@@ -59,6 +69,7 @@ router.get("/admin/reports", requireAdmin, async (req, res) => {
         report: r.report,
         reporterName: r.reporterName,
         reporterPhone: r.reporterPhone,
+        verifiedScam: r.verifiedScam ?? false,
       }),
     ),
     total,
@@ -89,7 +100,7 @@ router.patch("/admin/reports/:id", requireAdmin, async (req, res) => {
     .where(eq(fraudReportsTable.id, params.id))
     .returning();
 
-  await recomputeReputation(updated.phone);
+  const reputation = await recomputeReputation(updated.phone);
 
   const [reporter] = await db
     .select({ fullName: usersTable.fullName, phone: usersTable.phone })
@@ -101,6 +112,7 @@ router.patch("/admin/reports/:id", requireAdmin, async (req, res) => {
     report: updated,
     reporterName: reporter?.fullName ?? null,
     reporterPhone: reporter?.phone ?? null,
+    verifiedScam: reputation.verifiedScam,
   });
   res.json(response);
 });
