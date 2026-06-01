@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Shield, LogOut, CheckCircle2, XCircle, AlertTriangle, ShieldAlert, Phone, Clock, Search, ListFilter } from "lucide-react";
 import { format } from "date-fns";
 import { useAuth } from "@/hooks/use-auth";
@@ -26,7 +26,7 @@ export default function Dashboard() {
   const verifyNumber = useAdminVerifyNumber();
 
   // Debounce search
-  useState(() => {
+  useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchPhone);
     }, 500);

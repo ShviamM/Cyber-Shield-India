@@ -48,7 +48,7 @@ export default function Login() {
       const res = await requestOtp.mutateAsync({ data: { phone: data.phone } });
       setPhone(data.phone);
       setIsNewUser(res.isNewUser);
-      setDevOtp(res.devOtp ?? null);
+      setDevOtp(import.meta.env.DEV ? res.devOtp ?? null : null);
       setStep("otp");
     } catch (err: any) {
       phoneForm.setError("phone", { message: err?.message || "Failed to send code" });
