@@ -166,6 +166,31 @@ export const CheckNumberResponse = zod.object({
 
 
 /**
+ * Evaluates a target (phone, URL, UPI ID, or raw message text) by fusing several signals — AI message classification, URL heuristics and an optional external threat feed, and community phone reputation — into one explainable risk verdict (level, 0-100 score, and contributing reasons).
+ * @summary Multi-signal fraud risk check
+ */
+export const FraudCheckBody = zod.object({
+  "type": zod.enum(['phone', 'url', 'upi', 'message']).describe('The kind of target being checked'),
+  "value": zod.string().describe('The phone number, URL, UPI ID, or raw message text to evaluate')
+})
+
+export const FraudCheckResponse = zod.object({
+  "type": zod.enum(['phone', 'url', 'upi', 'message']),
+  "value": zod.string().describe('The normalized\/echoed target (never contains secrets)'),
+  "riskLevel": zod.enum(['low', 'medium', 'high', 'unknown']),
+  "score": zod.number().describe('Overall risk score from 0 (safe) to 100 (high risk)'),
+  "category": zod.string().nullish().describe('Detected scam category key when a message is classified'),
+  "confidence": zod.number().nullish().describe('AI classification confidence (0-1) when applicable'),
+  "reasons": zod.array(zod.string()).describe('Human-readable contributing reasons'),
+  "signals": zod.array(zod.object({
+  "source": zod.enum(['message_ai', 'url_heuristic', 'url_threat_feed', 'phone_reputation', 'upi_heuristic']).describe('Which analyzer produced this signal'),
+  "severity": zod.enum(['info', 'low', 'medium', 'high']),
+  "label": zod.string().describe('Human-readable explanation of the signal')
+}).describe('A single contributing factor in the overall verdict')).describe('Structured breakdown of every contributing signal')
+})
+
+
+/**
  * @summary List reports for moderation
  */
 export const adminListReportsQueryLimitDefault = 100;

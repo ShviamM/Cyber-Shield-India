@@ -162,6 +162,98 @@ export interface NumberReputation {
   lastReportedAt?: string | null;
 }
 
+/**
+ * The kind of target being checked
+ */
+export type FraudCheckRequestType = typeof FraudCheckRequestType[keyof typeof FraudCheckRequestType];
+
+
+export const FraudCheckRequestType = {
+  phone: 'phone',
+  url: 'url',
+  upi: 'upi',
+  message: 'message',
+} as const;
+
+export interface FraudCheckRequest {
+  /** The kind of target being checked */
+  type: FraudCheckRequestType;
+  /** The phone number, URL, UPI ID, or raw message text to evaluate */
+  value: string;
+}
+
+/**
+ * Which analyzer produced this signal
+ */
+export type FraudSignalSource = typeof FraudSignalSource[keyof typeof FraudSignalSource];
+
+
+export const FraudSignalSource = {
+  message_ai: 'message_ai',
+  url_heuristic: 'url_heuristic',
+  url_threat_feed: 'url_threat_feed',
+  phone_reputation: 'phone_reputation',
+  upi_heuristic: 'upi_heuristic',
+} as const;
+
+export type FraudSignalSeverity = typeof FraudSignalSeverity[keyof typeof FraudSignalSeverity];
+
+
+export const FraudSignalSeverity = {
+  info: 'info',
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+} as const;
+
+/**
+ * A single contributing factor in the overall verdict
+ */
+export interface FraudSignal {
+  /** Which analyzer produced this signal */
+  source: FraudSignalSource;
+  severity: FraudSignalSeverity;
+  /** Human-readable explanation of the signal */
+  label: string;
+}
+
+export type FraudVerdictType = typeof FraudVerdictType[keyof typeof FraudVerdictType];
+
+
+export const FraudVerdictType = {
+  phone: 'phone',
+  url: 'url',
+  upi: 'upi',
+  message: 'message',
+} as const;
+
+export type FraudVerdictRiskLevel = typeof FraudVerdictRiskLevel[keyof typeof FraudVerdictRiskLevel];
+
+
+export const FraudVerdictRiskLevel = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+  unknown: 'unknown',
+} as const;
+
+export interface FraudVerdict {
+  type: FraudVerdictType;
+  /** The normalized/echoed target (never contains secrets) */
+  value: string;
+  riskLevel: FraudVerdictRiskLevel;
+  /** Overall risk score from 0 (safe) to 100 (high risk) */
+  score: number;
+  /** Detected scam category key when a message is classified */
+  category?: string | null;
+  /** AI classification confidence (0-1) when applicable */
+  confidence?: number | null;
+  /** Human-readable contributing reasons */
+  reasons: string[];
+  /** Structured breakdown of every contributing signal */
+  signals: FraudSignal[];
+}
+
 export type ListReportsParams = {
 phone?: string;
 category?: string;

@@ -27,6 +27,8 @@ import type {
   CategoryListResponse,
   CreateReportRequest,
   ErrorResponse,
+  FraudCheckRequest,
+  FraudVerdict,
   HealthStatus,
   ListReportsParams,
   NumberCheckResponse,
@@ -731,6 +733,78 @@ export function useCheckNumber<TData = Awaited<ReturnType<typeof checkNumber>>, 
 
 
 
+
+export const getFraudCheckUrl = () => {
+
+
+
+
+  return `/api/check`
+}
+
+/**
+ * Evaluates a target (phone, URL, UPI ID, or raw message text) by fusing several signals — AI message classification, URL heuristics and an optional external threat feed, and community phone reputation — into one explainable risk verdict (level, 0-100 score, and contributing reasons).
+ * @summary Multi-signal fraud risk check
+ */
+export const fraudCheck = async (fraudCheckRequest: FraudCheckRequest, options?: RequestInit): Promise<FraudVerdict> => {
+
+  return customFetch<FraudVerdict>(getFraudCheckUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      fraudCheckRequest,)
+  }
+);}
+
+
+
+
+export const getFraudCheckMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof fraudCheck>>, TError,{data: BodyType<FraudCheckRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof fraudCheck>>, TError,{data: BodyType<FraudCheckRequest>}, TContext> => {
+
+const mutationKey = ['fraudCheck'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof fraudCheck>>, {data: BodyType<FraudCheckRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  fraudCheck(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type FraudCheckMutationResult = NonNullable<Awaited<ReturnType<typeof fraudCheck>>>
+    export type FraudCheckMutationBody = BodyType<FraudCheckRequest>
+    export type FraudCheckMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Multi-signal fraud risk check
+ */
+export const useFraudCheck = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof fraudCheck>>, TError,{data: BodyType<FraudCheckRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof fraudCheck>>,
+        TError,
+        {data: BodyType<FraudCheckRequest>},
+        TContext
+      > => {
+      return useMutation(getFraudCheckMutationOptions(options));
+    }
 
 export const getAdminListReportsUrl = (params?: AdminListReportsParams,) => {
   const normalizedParams = new URLSearchParams();

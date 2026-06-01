@@ -18,6 +18,8 @@ tags:
     description: Number trust / risk scoring
   - name: categories
     description: Scam categories
+  - name: fraud
+    description: Multi-signal fraud risk scoring
   - name: admin
     description: Moderation (admin only)
 paths:
@@ -205,6 +207,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/NumberCheckResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /check:
+    post:
+      operationId: fraudCheck
+      tags: [fraud]
+      summary: Multi-signal fraud risk check
+      description: >-
+        Evaluates a target (phone, URL, UPI ID, or raw message text) by fusing
+        several signals — AI message classification, URL heuristics and an
+        optional external threat feed, and community phone reputation — into one
+        explainable risk verdict (level, 0-100 score, and contributing reasons).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FraudCheckRequest"
+      responses:
+        "200":
+          description: Risk verdict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FraudVerdict"
         default:
           $ref: "#/components/responses/Error"
 
@@ -656,3 +684,82 @@ components:
         - phone
         - reportCount
         - verifiedScam
+
+    FraudCheckRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [phone, url, upi, message]
+          description: The kind of target being checked
+        value:
+          type: string
+          description: The phone number, URL, UPI ID, or raw message text to evaluate
+      required:
+        - type
+        - value
+
+    FraudSignal:
+      type: object
+      description: A single contributing factor in the overall verdict
+      properties:
+        source:
+          type: string
+          enum:
+            - message_ai
+            - url_heuristic
+            - url_threat_feed
+            - phone_reputation
+            - upi_heuristic
+          description: Which analyzer produced this signal
+        severity:
+          type: string
+          enum: [info, low, medium, high]
+        label:
+          type: string
+          description: Human-readable explanation of the signal
+      required:
+        - source
+        - severity
+        - label
+
+    FraudVerdict:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [phone, url, upi, message]
+        value:
+          type: string
+          description: The normalized/echoed target (never contains secrets)
+        riskLevel:
+          type: string
+          enum: [low, medium, high, unknown]
+        score:
+          type: integer
+          description: Overall risk score from 0 (safe) to 100 (high risk)
+        category:
+          type: string
+          nullable: true
+          description: Detected scam category key when a message is classified
+        confidence:
+          type: number
+          nullable: true
+          description: AI classification confidence (0-1) when applicable
+        reasons:
+          type: array
+          description: Human-readable contributing reasons
+          items:
+            type: string
+        signals:
+          type: array
+          description: Structured breakdown of every contributing signal
+          items:
+            $ref: "#/components/schemas/FraudSignal"
+      required:
+        - type
+        - value
+        - riskLevel
+        - score
+        - reasons
+        - signals

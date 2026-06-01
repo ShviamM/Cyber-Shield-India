@@ -1,2 +1,3 @@
 - [KavachAI i18n](kavach-ai-i18n.md) — locale files aren't type-checked against en; verify key parity with a runtime flatten script, and rely on i18next fallbackLng (no manual deep-merge).
 - [Twilio connector quirks](twilio-connector.md) — send via connectors.proxy only; restricted key (no accounts/read); creds from /connection?include_secrets, not listConnections.
+- [Orval schema naming](orval-schema-naming.md) — a component schema named like an operationId's response collides in generated zod; name response schemas noun-first (e.g. FraudVerdict not FraudCheckResponse).

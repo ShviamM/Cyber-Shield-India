@@ -25,6 +25,12 @@ export const config = {
   sessionTtlDays: intEnv("SESSION_TTL_DAYS", 60),
   reportDuplicateWindowHours: intEnv("REPORT_DUPLICATE_WINDOW_HOURS", 24),
   reportMaxPerHour: intEnv("REPORT_MAX_PER_HOUR", 20),
+  // Multi-signal fraud check: per-client rate limit (the engine may call the AI
+  // model and an external threat feed, so this protects cost and abuse).
+  fraudCheckMaxPerMinute: intEnv("FRAUD_CHECK_MAX_PER_MINUTE", 20),
+  // Optional Google Safe Browsing API key. When unset, URL checks fall back to
+  // structural heuristics only (explicitly noted in the verdict).
+  safeBrowsingApiKey: (process.env.GOOGLE_SAFE_BROWSING_API_KEY ?? "").trim(),
   adminPhones: (process.env.ADMIN_PHONES ?? "")
     .split(",")
     .map((p) => normalizeIndianPhone(p.trim()))

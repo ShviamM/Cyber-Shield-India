@@ -4,6 +4,7 @@ import authRouter from "./auth";
 import categoriesRouter from "./categories";
 import reportsRouter from "./reports";
 import numbersRouter from "./numbers";
+import checkRouter from "./check";
 import adminRouter from "./admin";
 
 const router: IRouter = Router();
@@ -13,6 +14,7 @@ router.use(authRouter);
 router.use(categoriesRouter);
 router.use(reportsRouter);
 router.use(numbersRouter);
+router.use(checkRouter);
 router.use(adminRouter);
 
 export default router;
