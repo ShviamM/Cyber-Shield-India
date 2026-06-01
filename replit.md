@@ -40,6 +40,21 @@ _Populate as you build — explicit user instructions worth remembering across s
 
 _Populate as you build — sharp edges, "always run X before Y" rules._
 
+- **Share-to-check needs a dev/production build, not Expo Go.** The mobile app
+  (`artifacts/kavach-ai`) receives `ACTION_SEND` text shared from WhatsApp/SMS/browsers
+  via `expo-share-intent` (a native module config plugin in `app.json`). Expo Go can't
+  load the native module, so it's disabled there (`Constants.appOwnership === "expo"`)
+  and the preview keeps working unchanged. To verify share-to-check:
+  `pnpm --filter @workspace/kavach-ai exec expo prebuild --no-install --clean` then
+  `expo run:android` (or `run:ios`), install on a device/emulator, then in another app
+  use Share → KavachAI. The shared text opens the Verify tab prefilled and auto-runs.
+  Routing lives in `app/_layout.tsx` (`useShareIntentRouter`), reusing the verify
+  screen's existing `q`/`kind` route-param prefill.
+- **iOS dev builds with `expo-share-intent` v5 need `patch-package`** (per the package's
+  README — patches the `xcode` package during prebuild). Android needs no patch. If an
+  iOS prebuild fails with "Config sync failed … xcodeproj … reading 'path'", add the
+  upstream `xcode+3.0.1.patch` and a `postinstall: patch-package` script before building.
+
 ## Pointers
 
 - See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details

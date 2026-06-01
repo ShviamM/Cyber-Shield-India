@@ -32,11 +32,6 @@
           "autoVerify": true,
           "data": [{ "scheme": "kavach-ai" }],
           "category": ["BROWSABLE", "DEFAULT"]
-        },
-        {
-          "action": "SEND",
-          "data": [{ "mimeType": "text/plain" }],
-          "category": ["DEFAULT"]
         }
       ]
     },
@@ -57,6 +52,17 @@
         "expo-camera",
         {
           "cameraPermission": "KavachAI uses the camera to scan QR codes so it can check them for payment scams."
+        }
+      ],
+      [
+        "expo-share-intent",
+        {
+          "iosActivationRules": {
+            "NSExtensionActivationSupportsText": true,
+            "NSExtensionActivationSupportsWebURLWithMaxCount": 1,
+            "NSExtensionActivationSupportsWebPageWithMaxCount": 1
+          },
+          "androidIntentFilters": ["text/*"]
         }
       ]
     ],

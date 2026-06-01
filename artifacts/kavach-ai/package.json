@@ -58,6 +58,7 @@
   "dependencies": {
     "expo-camera": "~17.0.10",
     "expo-localization": "~17.0.9",
+    "expo-share-intent": "5.1.1",
     "i18next": "^26.3.0",
     "react-i18next": "^17.0.8"
   }
