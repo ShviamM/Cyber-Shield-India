@@ -19,41 +19,68 @@ class MockSmsSender implements SmsSender {
   }
 }
 
-interface TwilioSettings {
-  account_sid?: string;
-  phone_number?: string;
+/**
+ * Twilio OTP delivery via the Replit "twilio" connector (@replit/connectors-sdk).
+ *
+ * Two facts drive this implementation:
+ *  - The connector's proxy injects Twilio auth automatically, so all REST calls
+ *    must go through `connectors.proxy("twilio", ...)`. Direct calls to
+ *    api.twilio.com with the connection's api_key fail (the key is scoped to
+ *    the proxy).
+ *  - The SDK's `listConnections` does NOT return credential settings, so the
+ *    Account SID and the verified "from" number are read from the connectors
+ *    "connection" endpoint with `include_secrets=true`.
+ */
+interface TwilioConfig {
+  accountSid: string;
+  from: string;
 }
 
-/**
- * Sends OTP codes via Twilio using the Replit Twilio connector.
- * Integration: Replit connector "twilio" (@replit/connectors-sdk). The proxy
- * injects authentication automatically; we only need the account SID (for the
- * REST path) and the verified "from" number from the connection settings.
- */
 class TwilioSmsSender implements SmsSender {
   private readonly connectors = new ReplitConnectors();
+  private cached: TwilioConfig | null = null;
 
-  private async getSettings(): Promise<{ accountSid: string; from: string }> {
-    const connections = await this.connectors.listConnections({
-      connector_names: "twilio",
-    });
-    const connection = connections[0] as
-      | { settings?: TwilioSettings }
-      | undefined;
-    const settings = connection?.settings ?? {};
-    const accountSid = settings.account_sid;
-    const from = settings.phone_number;
-    if (!accountSid || !from) {
+  private async loadConfig(): Promise<TwilioConfig> {
+    if (this.cached) return this.cached;
+
+    const host = process.env.REPLIT_CONNECTORS_HOSTNAME ?? "connectors.replit.com";
+    const identity = process.env.REPL_IDENTITY
+      ? `repl ${process.env.REPL_IDENTITY}`
+      : process.env.WEB_REPL_RENEWAL
+        ? `depl ${process.env.WEB_REPL_RENEWAL}`
+        : null;
+    if (!identity) {
+      throw new Error(
+        "Replit identity token not found; cannot read Twilio connection settings.",
+      );
+    }
+
+    const res = await fetch(
+      `https://${host}/api/v2/connection?include_secrets=true&connector_names=twilio`,
+      { headers: { Accept: "application/json", "X-Replit-Token": identity } },
+    );
+    if (!res.ok) {
+      throw new Error(
+        `Failed to load Twilio connection settings (status ${res.status}). ` +
+          "Reconnect the Twilio integration.",
+      );
+    }
+    const data = (await res.json()) as {
+      items?: Array<{ settings?: { account_sid?: string; phone_number?: string } }>;
+    };
+    const settings = data.items?.[0]?.settings ?? {};
+    if (!settings.account_sid || !settings.phone_number) {
       throw new Error(
         "Twilio connection is missing account_sid or phone_number. " +
           "Reconnect the Twilio integration.",
       );
     }
-    return { accountSid, from };
+    this.cached = { accountSid: settings.account_sid, from: settings.phone_number };
+    return this.cached;
   }
 
   async sendOtp(phone: string, code: string): Promise<void> {
-    const { accountSid, from } = await this.getSettings();
+    const { accountSid, from } = await this.loadConfig();
     const minutes = Math.max(1, Math.round(config.otpTtlSeconds / 60));
     const body = new URLSearchParams({
       To: phone,
@@ -75,12 +102,19 @@ class TwilioSmsSender implements SmsSender {
     );
 
     if (!res.ok) {
-      const detail = await res.text().catch(() => "");
-      logger.error(
-        { phone, status: res.status, detail },
-        "Twilio SMS send failed",
+      // Surface Twilio's own error message so delivery failures are diagnosable
+      // (e.g. trial-account unverified recipient, DLT/registration issues).
+      let detail = "";
+      try {
+        const err = (await res.json()) as { message?: string; code?: number };
+        detail = err.message ? `${err.message} (Twilio code ${err.code})` : "";
+      } catch {
+        detail = await res.text().catch(() => "");
+      }
+      logger.error({ phone, status: res.status, detail }, "Twilio SMS send failed");
+      throw new Error(
+        `Twilio SMS send failed (status ${res.status})${detail ? `: ${detail}` : ""}.`,
       );
-      throw new Error(`Twilio SMS send failed (status ${res.status}).`);
     }
   }
 }

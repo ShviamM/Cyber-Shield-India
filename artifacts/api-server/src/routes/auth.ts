@@ -64,10 +64,25 @@ router.post("/auth/request-otp", async (req, res) => {
 
   const code = generateOtp();
   const expiresAt = new Date(now + config.otpTtlSeconds * 1000);
-  await db
+  const [otpRow] = await db
     .insert(otpCodesTable)
-    .values({ phone, codeHash: hashOtp(phone, code), expiresAt });
-  await smsSender.sendOtp(phone, code);
+    .values({ phone, codeHash: hashOtp(phone, code), expiresAt })
+    .returning({ id: otpCodesTable.id });
+
+  try {
+    await smsSender.sendOtp(phone, code);
+  } catch {
+    // Delivery failed (e.g. Twilio trial-account/unverified recipient, DLT
+    // registration, provider outage). Remove the OTP row so this failed attempt
+    // doesn't count toward the resend cooldown or hourly cap — otherwise the
+    // user gets rate-limited without ever receiving a code.
+    await db.delete(otpCodesTable).where(eq(otpCodesTable.id, otpRow.id));
+    throw new HttpError(
+      502,
+      "sms_delivery_failed",
+      "Couldn't send the verification code right now. Please try again shortly.",
+    );
+  }
 
   const [existing] = await db
     .select({ id: usersTable.id })
