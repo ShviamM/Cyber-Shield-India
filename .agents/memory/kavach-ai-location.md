@@ -20,3 +20,9 @@ hooks/useNearbyCity.ts in sync with the city strings in constants/data.ts
 (LIVE_THREATS.city / CITY_HOTSPOTS.city) or the match will render an empty
 section. Hyderabad intentionally has a hotspot but no LIVE_THREATS entry —
 the empty-city fallback text covers that case.
+
+**Snapping pitfall:** any location not in KNOWN_CITIES snaps to the nearest
+metro, which can be far/wrong (e.g. Kanpur snapped to Delhi NCR ~440km until
+Kanpur was added). When a user reports a wrong city, add their city (coords +
+data entries) rather than reworking the matcher. The Home "Hotspots This Week"
+list pins the detected city's hotspot even when it's outside the national top 4.

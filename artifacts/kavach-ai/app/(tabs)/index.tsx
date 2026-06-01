@@ -445,8 +445,15 @@ export default function HomeScreen() {
           </View>
         </View>
         <View style={s.hotspotsCard}>
-          {CITY_HOTSPOTS.slice(0, 4).map((hs, i) => (
-            <View key={hs.city} style={[s.hotspotRow, i < 3 && s.hotspotRowBorder]}>
+          {(() => {
+            const top = CITY_HOTSPOTS.slice(0, 4);
+            const mine =
+              nearbyStatus === "granted" && cityHotspot && !top.includes(cityHotspot)
+                ? [cityHotspot]
+                : [];
+            const rows = [...top, ...mine];
+            return rows.map((hs, i) => (
+            <View key={hs.city} style={[s.hotspotRow, i < rows.length - 1 && s.hotspotRowBorder]}>
               <View style={s.hotspotRank}>
                 <Text style={s.hotspotRankTxt}>{hs.rank}</Text>
               </View>
@@ -458,7 +465,8 @@ export default function HomeScreen() {
                 <Text style={s.hotspotBadgeTxt}>{hs.change}</Text>
               </View>
             </View>
-          ))}
+            ));
+          })()}
         </View>
 
         {/* Protect Your Circle CTA */}

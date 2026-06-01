@@ -99,6 +99,26 @@ export const LIVE_THREATS: Threat[] = [
       "Calls claiming Aadhaar will be deactivated unless details verified",
     time: "8 hr ago",
   },
+  {
+    id: "7",
+    type: "Fake Army / OLX Personnel Scam",
+    city: "Kanpur",
+    count: 1287,
+    trend: "high",
+    description:
+      "Fraudsters posing as Army officers on OLX demand UPI advance for 'urgent' sales",
+    time: "20 min ago",
+  },
+  {
+    id: "8",
+    type: "Instant Loan App Harassment",
+    city: "Lucknow",
+    count: 974,
+    trend: "high",
+    description:
+      "Predatory loan apps threaten victims and leak contacts to extort repayment",
+    time: "45 min ago",
+  },
 ];
 
 export const CITY_HOTSPOTS: CityHotspot[] = [
@@ -106,8 +126,10 @@ export const CITY_HOTSPOTS: CityHotspot[] = [
   { rank: 2, city: "Delhi NCR", cases: 7841, change: "+18%", up: true },
   { rank: 3, city: "Bengaluru", cases: 5632, change: "+31%", up: true },
   { rank: 4, city: "Hyderabad", cases: 4129, change: "-5%", up: false },
-  { rank: 5, city: "Pune", cases: 3087, change: "+9%", up: true },
-  { rank: 6, city: "Chennai", cases: 2941, change: "-2%", up: false },
+  { rank: 5, city: "Lucknow", cases: 3918, change: "+34%", up: true },
+  { rank: 6, city: "Kanpur", cases: 3564, change: "+27%", up: true },
+  { rank: 7, city: "Pune", cases: 3087, change: "+9%", up: true },
+  { rank: 8, city: "Chennai", cases: 2941, change: "-2%", up: false },
 ];
 
 export const GOLDEN_RULES: GoldenRule[] = [

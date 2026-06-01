@@ -16,6 +16,8 @@ const KNOWN_CITIES: { city: string; lat: number; lng: number }[] = [
   { city: "Pune", lat: 18.5204, lng: 73.8567 },
   { city: "Chennai", lat: 13.0827, lng: 80.2707 },
   { city: "Kolkata", lat: 22.5726, lng: 88.3639 },
+  { city: "Kanpur", lat: 26.4499, lng: 80.3319 },
+  { city: "Lucknow", lat: 26.8467, lng: 80.9462 },
 ];
 
 function haversineKm(aLat: number, aLng: number, bLat: number, bLng: number): number {
