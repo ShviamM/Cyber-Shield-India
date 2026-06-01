@@ -12,7 +12,7 @@ export type FamilyMember = {
 
 export type CheckItem = {
   id: string;
-  type: "number" | "link" | "upi" | "qr";
+  type: "number" | "link" | "upi" | "qr" | "message";
   value: string;
   result: "safe" | "warning" | "danger" | "invalid";
   timestamp: number;

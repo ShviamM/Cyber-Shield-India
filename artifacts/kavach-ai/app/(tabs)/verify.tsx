@@ -1,9 +1,10 @@
 import { Feather } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
-import { checkNumber, listCategories } from "@workspace/api-client-react";
+import { checkNumber, fraudCheck, listCategories } from "@workspace/api-client-react";
+import type { FraudCheckRequestType, FraudVerdict } from "@workspace/api-client-react";
 import * as Haptics from "expo-haptics";
-import { router } from "expo-router";
-import React, { useState } from "react";
+import { router, useLocalSearchParams } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import {
@@ -30,6 +31,7 @@ type CheckType = CheckItem["type"];
 
 const TYPE_META: { key: CheckType; icon: string; color: string; bg: string }[] = [
   { key: "number", icon: "phone", color: NAVY, bg: "#EBF0FA" },
+  { key: "message", icon: "message-square", color: "#0891b2", bg: "#ecfeff" },
   { key: "link", icon: "link", color: "#7c3aed", bg: "#f5f3ff" },
   { key: "upi", icon: "credit-card", color: GREEN, bg: "#f0fdf4" },
   { key: "qr", icon: "maximize", color: SAFFRON, bg: "#fff7ed" },
@@ -37,15 +39,30 @@ const TYPE_META: { key: CheckType; icon: string; color: string; bg: string }[] =
 
 const TYPE_KEY: Record<CheckType, string> = {
   number: "number",
+  message: "message",
   link: "link",
   upi: "upi",
   qr: "qr",
+};
+
+/** Maps a UI check type to the engine's target type. */
+const ENGINE_TYPE: Record<Exclude<CheckType, "number">, FraudCheckRequestType> = {
+  message: "message",
+  link: "url",
+  upi: "upi",
+  qr: "message",
 };
 
 type Result = {
   status: "safe" | "warning" | "danger" | "invalid";
   headline: string;
   detail: string;
+  /** True when the check could not be completed (offline / server error). */
+  isError?: boolean;
+  /** Engine verdict fields (present for multi-signal checks). */
+  score?: number;
+  reasons?: string[];
+  category?: string | null;
   /** Present for number checks fetched from the backend. */
   phone?: string;
   reportCount?: number;
@@ -53,43 +70,35 @@ type Result = {
   categories?: string[];
 };
 
-function doLocalCheck(type: CheckType, raw: string, t: TFunction): Result {
+/** Best-effort guess of what a shared/pasted value is, for share-to-check. */
+function detectType(raw: string): CheckType {
   const v = raw.trim();
   const vl = v.toLowerCase();
-  if (!v) return { status: "invalid", headline: t("verify.enterValue"), detail: "" };
-
-  if (type === "link") {
-    if (!vl.startsWith("http"))
-      return { status: "invalid", headline: t("verify.local.linkInvalidHeadline"), detail: t("verify.local.linkInvalidDetail") };
-    const dangerKw = ["paymentupdate", "kyc-verify", "account-suspended", "win-prize", "free-recharge", "refund-process", "aadhaar-link", "update-kyc", "claimreward"];
-    const warnKw = ["free", "winner", "prize", "lucky", "cashback", "lottery", "offer"];
-    if (dangerKw.some((k) => vl.includes(k)))
-      return { status: "danger", headline: t("verify.local.linkDangerHeadline"), detail: t("verify.local.linkDangerDetail") };
-    if (!vl.startsWith("https://"))
-      return { status: "warning", headline: t("verify.local.linkHttpHeadline"), detail: t("verify.local.linkHttpDetail") };
-    if (warnKw.some((k) => vl.includes(k)))
-      return { status: "warning", headline: t("verify.local.linkWarnHeadline"), detail: t("verify.local.linkWarnDetail") };
-    return { status: "safe", headline: t("verify.local.linkSafeHeadline"), detail: t("verify.local.linkSafeDetail") };
+  if (vl.startsWith("http://") || vl.startsWith("https://") || vl.startsWith("upi://")) {
+    return vl.startsWith("upi://") ? "upi" : "link";
   }
+  if (/^[\w.\-]+@[\w]+$/.test(v)) return "upi";
+  if (isValidIndianPhone(v)) return "number";
+  return "message";
+}
 
-  if (type === "upi") {
-    if (!/^[\w.\-]+@[\w]+$/.test(v))
-      return { status: "invalid", headline: t("verify.local.upiInvalidHeadline"), detail: t("verify.local.upiInvalidDetail") };
-    if (["support", "help", "refund", "paymentgateway", "service", "agent", "care"].some((p) => vl.includes(p)))
-      return { status: "danger", headline: t("verify.local.upiDangerHeadline"), detail: t("verify.local.upiDangerDetail") };
-    return { status: "safe", headline: t("verify.local.upiSafeHeadline"), detail: t("verify.local.upiSafeDetail") };
-  }
-
-  if (type === "qr") {
-    if (vl.includes("upi://pay") || vl.startsWith("upi://")) {
-      if (["refund", "support", "payment"].some((p) => vl.includes("pn=" + p)))
-        return { status: "danger", headline: t("verify.local.qrDangerHeadline"), detail: t("verify.local.qrDangerDetail") };
-      return { status: "warning", headline: t("verify.local.qrWarnHeadline"), detail: t("verify.local.qrWarnDetail") };
-    }
-    return { status: "safe", headline: t("verify.local.qrSafeHeadline"), detail: t("verify.local.qrSafeDetail") };
-  }
-
-  return { status: "invalid", headline: t("verify.local.unknownHeadline"), detail: "" };
+function verdictToResult(v: FraudVerdict, t: TFunction): Result {
+  const status: Result["status"] =
+    v.riskLevel === "high"
+      ? "danger"
+      : v.riskLevel === "medium"
+        ? "warning"
+        : v.riskLevel === "low"
+          ? "safe"
+          : "invalid";
+  return {
+    status,
+    headline: t(`verify.verdict.${v.riskLevel}.headline`),
+    detail: v.reasons.length === 0 ? t(`verify.verdict.${v.riskLevel}.detail`) : "",
+    score: v.score,
+    reasons: v.reasons,
+    category: v.category,
+  };
 }
 
 const STATUS_CONFIG = {
@@ -104,6 +113,7 @@ export default function VerifyScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const { recentChecks, addCheck } = useAppContext();
+  const params = useLocalSearchParams<{ q?: string | string[]; kind?: string | string[] }>();
 
   const [selectedType, setSelectedType] = useState<CheckType>("number");
   const [input, setInput] = useState("");
@@ -127,19 +137,22 @@ export default function VerifyScreen() {
   const bottomPad = (Platform.OS === "web" ? 34 : insets.bottom) + 80;
   const activePlaceholder = types.find((x) => x.key === selectedType)?.hint ?? "";
   const activeType = types.find((x) => x.key === selectedType)!;
+  const isMessage = selectedType === "message";
 
-  async function handleCheck() {
-    if (!input.trim()) return;
+  async function runCheck(type: CheckType, raw: string) {
+    const value = raw.trim();
+    if (!value) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setResult(null);
     setChecking(true);
 
     let r: Result;
-    if (selectedType === "number") {
-      if (!isValidIndianPhone(input)) {
+    if (type === "number") {
+      if (!isValidIndianPhone(value)) {
         r = { status: "invalid", headline: t("verify.risk.unknown.headline"), detail: t("report.invalidPhone") };
       } else {
         try {
-          const res = await checkNumber(phoneForApi(input) as string);
+          const res = await checkNumber(phoneForApi(value) as string);
           const status =
             res.riskLevel === "high" ? "danger" : res.riskLevel === "medium" ? "warning" : "safe";
           r = {
@@ -149,26 +162,51 @@ export default function VerifyScreen() {
             phone: res.phone,
             reportCount: res.reportCount,
             verifiedScam: res.verifiedScam,
-            categories: res.categories,
+            categories: res.categories.map((c) => c.key),
           };
         } catch {
-          r = { status: "invalid", headline: t("verify.checkFailed"), detail: "" };
+          r = { status: "invalid", isError: true, headline: t("verify.checkFailedGeneric"), detail: t("verify.checkFailedDetail") };
         }
       }
     } else {
-      await new Promise((res) => setTimeout(res, 700));
-      r = doLocalCheck(selectedType, input.trim(), t);
+      try {
+        const verdict = await fraudCheck({ type: ENGINE_TYPE[type], value });
+        r = verdictToResult(verdict, t);
+      } catch {
+        r = { status: "invalid", isError: true, headline: t("verify.checkFailedGeneric"), detail: t("verify.checkFailedDetail") };
+      }
     }
 
     setResult(r);
     setChecking(false);
-    if (r.status !== "invalid") {
-      addCheck({ type: selectedType, value: input.trim(), result: r.status });
+    if (!r.isError && r.status !== "invalid") {
+      addCheck({ type, value, result: r.status });
     }
-    if (r.status === "danger") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    if (r.isError) Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    else if (r.status === "danger") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     else if (r.status === "warning") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
     else Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   }
+
+  function handleCheck() {
+    runCheck(selectedType, input);
+  }
+
+  // Share-to-check / deep-link prefill: kavach-ai://verify?q=...&kind=...
+  const autoRan = useRef<string | null>(null);
+  useEffect(() => {
+    const q = Array.isArray(params.q) ? params.q[0] : params.q;
+    if (!q || !q.trim()) return;
+    if (autoRan.current === q) return;
+    autoRan.current = q;
+    const kindRaw = Array.isArray(params.kind) ? params.kind[0] : params.kind;
+    const kind =
+      kindRaw && TYPE_META.some((m) => m.key === kindRaw) ? (kindRaw as CheckType) : detectType(q);
+    setSelectedType(kind);
+    setInput(q);
+    runCheck(kind, q);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.q, params.kind]);
 
   function handleClear() {
     setInput("");
@@ -204,7 +242,7 @@ export default function VerifyScreen() {
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: bottomPad, paddingTop: 16 }}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Tool type selector — 2×2 grid */}
+        {/* Tool type selector — grid */}
         <View style={s.typeGrid}>
           {types.map((tp) => (
             <TouchableOpacity
@@ -237,23 +275,25 @@ export default function VerifyScreen() {
         </View>
 
         {/* Input field */}
-        <View style={s.inputWrapper}>
-          <View style={[s.inputPill, { backgroundColor: activeType.bg }]}>
+        <View style={[s.inputWrapper, isMessage && s.inputWrapperMulti]}>
+          <View style={[s.inputPill, { backgroundColor: activeType.bg }, isMessage && s.inputPillTop]}>
             <Feather name={activeType.icon as any} size={16} color={activeType.color} />
           </View>
           <TextInput
-            style={s.textInput}
+            style={[s.textInput, isMessage && s.textInputMulti]}
             placeholder={activePlaceholder}
             placeholderTextColor="#94a3b8"
             value={input}
             onChangeText={(v) => { setInput(v); setResult(null); }}
             autoCapitalize="none"
             autoCorrect={false}
-            returnKeyType="search"
-            onSubmitEditing={handleCheck}
+            multiline={isMessage}
+            textAlignVertical={isMessage ? "top" : "center"}
+            returnKeyType={isMessage ? "default" : "search"}
+            onSubmitEditing={isMessage ? undefined : handleCheck}
           />
           {input.length > 0 && (
-            <TouchableOpacity onPress={handleClear} style={s.clearBtn}>
+            <TouchableOpacity onPress={handleClear} style={[s.clearBtn, isMessage && s.clearBtnTop]}>
               <Feather name="x" size={16} color="#94a3b8" />
             </TouchableOpacity>
           )}
@@ -284,11 +324,48 @@ export default function VerifyScreen() {
                 <Feather name={cfg.icon} size={20} color={cfg.color} />
               </View>
               <Text style={[s.resultHeadline, { color: cfg.color }]}>{result.headline}</Text>
+              {result.score !== undefined && !result.isError && (
+                <View style={[s.scoreBadge, { backgroundColor: cfg.color }]}>
+                  <Text style={s.scoreTxt}>{result.score}</Text>
+                  <Text style={s.scoreMax}>/100</Text>
+                </View>
+              )}
             </View>
             {result.detail ? (
               <Text style={s.resultDetail}>{result.detail}</Text>
             ) : null}
 
+            {/* Engine category */}
+            {result.category && (
+              <View style={s.catChips}>
+                <View style={s.catChip}>
+                  <Text style={s.catChipTxt}>{categoryName(result.category)}</Text>
+                </View>
+              </View>
+            )}
+
+            {/* Engine reasons */}
+            {result.reasons && result.reasons.length > 0 && (
+              <View style={s.reasonsBox}>
+                <Text style={s.reasonsTitle}>{t("verify.verdict.whyTitle")}</Text>
+                {result.reasons.map((reason, i) => (
+                  <View key={i} style={s.reasonRow}>
+                    <Feather name="chevron-right" size={14} color={cfg.color} style={s.reasonIcon} />
+                    <Text style={s.reasonTxt}>{reason}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {/* Error / offline retry */}
+            {result.isError && (
+              <TouchableOpacity style={s.retryBtn} onPress={handleCheck} activeOpacity={0.8}>
+                <Feather name="refresh-cw" size={14} color={NAVY} />
+                <Text style={s.retryBtnTxt}>{t("verify.tryAgain")}</Text>
+              </TouchableOpacity>
+            )}
+
+            {/* Number reputation meta */}
             {result.reportCount !== undefined && (
               <View style={s.numberMeta}>
                 <View style={s.metaRow}>
@@ -403,9 +480,13 @@ const s = StyleSheet.create({
     shadowColor: NAVY, shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 2 },
     elevation: 1,
   },
+  inputWrapperMulti: { height: undefined, minHeight: 120, alignItems: "flex-start", paddingVertical: 12 },
   inputPill: { width: 32, height: 32, borderRadius: 8, alignItems: "center", justifyContent: "center", marginRight: 10 },
+  inputPillTop: { marginTop: 2 },
   textInput: { flex: 1, fontSize: 15, height: "100%" as any, color: "#0f172a" },
+  textInputMulti: { height: undefined, minHeight: 96, paddingTop: 4, lineHeight: 21 },
   clearBtn: { padding: 4 },
+  clearBtnTop: { marginTop: 2 },
   checkBtn: {
     flexDirection: "row", alignItems: "center", justifyContent: "center",
     gap: 8, height: 52, borderRadius: 16, marginBottom: 16,
@@ -419,7 +500,26 @@ const s = StyleSheet.create({
   resultTop: { flexDirection: "row", alignItems: "center", gap: 10 },
   resultIconBox: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
   resultHeadline: { fontSize: 15, fontWeight: "700" as const, flex: 1 },
+  scoreBadge: {
+    flexDirection: "row", alignItems: "baseline", borderRadius: 10,
+    paddingHorizontal: 9, paddingVertical: 4,
+  },
+  scoreTxt: { fontSize: 14, fontWeight: "800" as const, color: "#fff" },
+  scoreMax: { fontSize: 9, fontWeight: "700" as const, color: "rgba(255,255,255,0.8)" },
   resultDetail: { fontSize: 13, color: "#334155", lineHeight: 20, marginLeft: 50 },
+  reasonsBox: { gap: 7, marginTop: 2 },
+  reasonsTitle: {
+    fontSize: 10, fontWeight: "700" as const, letterSpacing: 0.8,
+    color: "#64748b", textTransform: "uppercase" as const,
+  },
+  reasonRow: { flexDirection: "row", alignItems: "flex-start", gap: 6 },
+  reasonIcon: { marginTop: 2 },
+  reasonTxt: { flex: 1, fontSize: 13, color: "#334155", lineHeight: 19 },
+  retryBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
+    backgroundColor: "#EBF0FA", borderRadius: 12, paddingVertical: 11, marginTop: 2,
+  },
+  retryBtnTxt: { fontSize: 14, fontWeight: "700" as const, color: NAVY },
   numberMeta: { marginTop: 4, gap: 10 },
   metaRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   metaTxt: { fontSize: 13, color: "#475569", fontWeight: "600" as const },

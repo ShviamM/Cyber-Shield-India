@@ -17,7 +17,20 @@
       "supportsTablet": false
     },
     "android": {
-      "backgroundColor": "#060b18"
+      "backgroundColor": "#060b18",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [{ "scheme": "kavach-ai" }],
+          "category": ["BROWSABLE", "DEFAULT"]
+        },
+        {
+          "action": "SEND",
+          "data": [{ "mimeType": "text/plain" }],
+          "category": ["DEFAULT"]
+        }
+      ]
     },
     "web": {
       "favicon": "./assets/images/icon.png"

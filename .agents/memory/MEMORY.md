@@ -2,3 +2,4 @@
 - [Twilio connector quirks](twilio-connector.md) — send via connectors.proxy only; restricted key (no accounts/read); creds from /connection?include_secrets, not listConnections.
 - [Orval schema naming](orval-schema-naming.md) — a component schema named like an operationId's response collides in generated zod; name response schemas noun-first (e.g. FraudVerdict not FraudCheckResponse).
 - [Fraud engine fusion vs reputation scales](fraud-engine-fusion-vs-reputation.md) — engine fuse() weights/thresholds make a lone "medium" computeRiskLevel reputation render as "low"; the two risk scales don't line up.
+- [API client codegen staleness](api-client-codegen.md) — generated api.ts can lag the spec (schema present, operation fn missing); run lib/api-spec codegen after adding endpoints.

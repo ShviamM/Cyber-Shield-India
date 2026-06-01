@@ -155,7 +155,34 @@ const en = {
     noReports: "No community reports yet",
     relatedCategories: "Reported for",
     checkFailed: "Couldn't check this number. Please try again.",
+    checkFailedGeneric: "Couldn't complete the check",
+    checkFailedDetail:
+      "You may be offline, or the service is busy. Check your connection and try again.",
+    tryAgain: "Try again",
     recentChecks: "RECENT CHECKS",
+    verdict: {
+      whyTitle: "Why this verdict",
+      high: {
+        headline: "HIGH RISK — Likely Scam",
+        detail:
+          "Strong scam signals detected. Do NOT share OTP/PIN, click links, or pay. Verify through official channels.",
+      },
+      medium: {
+        headline: "Caution — Be Careful",
+        detail:
+          "Some suspicious signals were found. Slow down and verify independently before acting.",
+      },
+      low: {
+        headline: "Likely Safe",
+        detail:
+          "No strong scam signals found. Stay alert — never share OTP or money on an unverified request.",
+      },
+      unknown: {
+        headline: "Not Enough Signals",
+        detail:
+          "We couldn't find clear signals either way. Stay cautious and verify through official channels.",
+      },
+    },
     risk: {
       high: {
         headline: "HIGH RISK — Likely Fraud",
@@ -182,6 +209,8 @@ const en = {
     types: {
       numberLabel: "Check Number",
       numberHint: "+91 98765 43210",
+      messageLabel: "Check Message",
+      messageHint: "Paste a suspicious SMS or WhatsApp message…",
       linkLabel: "Check Link",
       linkHint: "https://example.com",
       upiLabel: "Check UPI ID",
