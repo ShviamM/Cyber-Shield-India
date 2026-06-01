@@ -17,221 +17,164 @@ import {
 } from "@/constants/data";
 import { useColors } from "@/hooks/useColors";
 
+const NAVY = "#0B3D91";
+const SAFFRON = "#FF6713";
+const GREEN = "#138808";
+
 const TREND_COLOR = {
   critical: "#dc2626",
-  high: "#f97316",
-  medium: "#eab308",
+  high: "#ea580c",
+  medium: "#d97706",
+};
+const TREND_BG = {
+  critical: "#fee2e2",
+  high: "#fff7ed",
+  medium: "#fefce8",
 };
 
 const SEVERITY_COLOR = {
   critical: "#dc2626",
-  important: "#f97316",
-  tip: "#3b82f6",
+  important: SAFFRON,
+  tip: NAVY,
+};
+const SEVERITY_BG = {
+  critical: "#fee2e2",
+  important: "#fff7ed",
+  tip: "#EBF0FA",
 };
 
 export default function ThreatsScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const topInset = Platform.OS === "web" ? 67 : insets.top;
+  const topInset = Platform.OS === "web" ? 0 : insets.top;
   const bottomPad = (Platform.OS === "web" ? 34 : insets.bottom) + 80;
 
   return (
     <View style={[s.root, { backgroundColor: colors.background }]}>
-      <View style={[s.header, { paddingTop: topInset + 16 }]}>
-        <Text style={[s.headerTitle, { color: colors.text }]}>Threat Feed</Text>
-        <View style={[s.liveBadge, { backgroundColor: "rgba(220,38,38,0.15)" }]}>
-          <View style={s.liveDot} />
-          <Text style={s.liveTxt}>LIVE</Text>
+      {/* Navy header */}
+      <View style={[s.headerBg, { paddingTop: topInset }]}>
+        <View style={s.tricolor}>
+          <View style={[s.triStrip, { backgroundColor: SAFFRON }]} />
+          <View style={[s.triStrip, { backgroundColor: "#fff" }]} />
+          <View style={[s.triStrip, { backgroundColor: GREEN }]} />
+        </View>
+        <View style={s.headerContent}>
+          <View style={s.headerLeft}>
+            <View style={s.threatIconBox}>
+              <Feather name="alert-triangle" size={20} color={SAFFRON} />
+            </View>
+            <View>
+              <Text style={s.headerTitle}>Threat Feed</Text>
+              <Text style={s.headerSub}>Real-time cyber crime intelligence</Text>
+            </View>
+          </View>
+          <View style={s.liveBadge}>
+            <View style={s.liveDot} />
+            <Text style={s.liveTxt}>LIVE</Text>
+          </View>
         </View>
       </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: bottomPad }}
+        contentContainerStyle={{ paddingBottom: bottomPad }}
       >
-        {/* Scam of the Day */}
-        <View
-          style={[
-            s.featuredCard,
-            { backgroundColor: "#0B2D6E", borderColor: "rgba(255,103,19,0.4)" },
-          ]}
-        >
-          <View style={s.featuredTag}>
-            <View style={[s.featTagBg, { backgroundColor: colors.primary }]}>
-              <Text style={s.featTagTxt}>{SCAM_OF_DAY.tag}</Text>
-            </View>
-            <Text style={[s.featReports, { color: "rgba(255,255,255,0.6)" }]}>
-              {SCAM_OF_DAY.reports.toLocaleString()} reports
-            </Text>
-          </View>
-          <Text style={[s.featTitle, { color: "#FFFFFF" }]}>
-            {SCAM_OF_DAY.titleHindi}
-          </Text>
-          <Text style={[s.featTitleEn, { color: "rgba(255,255,255,0.7)" }]}>
-            {SCAM_OF_DAY.title}
-          </Text>
-          <Text style={[s.featDesc, { color: "rgba(255,255,255,0.8)" }]}>
-            {SCAM_OF_DAY.description}
-          </Text>
-          <View
-            style={[
-              s.featTip,
-              { backgroundColor: "rgba(255,103,19,0.12)", borderColor: "rgba(255,103,19,0.3)" },
-            ]}
-          >
-            <Feather name="shield" size={14} color={colors.primary} />
-            <Text style={[s.featTipTxt, { color: colors.primary }]}>
-              {SCAM_OF_DAY.tip}
-            </Text>
-          </View>
-          <View style={s.citiesRow}>
-            {SCAM_OF_DAY.cities.map((c) => (
-              <View
-                key={c}
-                style={[s.cityChip, { backgroundColor: "rgba(255,255,255,0.08)" }]}
-              >
-                <Text style={[s.cityChipTxt, { color: "rgba(255,255,255,0.7)" }]}>
-                  {c}
-                </Text>
+        {/* Scam of the Day — featured */}
+        <View style={s.featuredCard}>
+          <View style={s.featuredInner}>
+            <View style={s.featTop}>
+              <View style={[s.featTagPill, { backgroundColor: "#fee2e2" }]}>
+                <Text style={[s.featTagTxt, { color: "#dc2626" }]}>{SCAM_OF_DAY.tag}</Text>
               </View>
-            ))}
+              <Text style={s.featReports}>{SCAM_OF_DAY.reports.toLocaleString()} reports</Text>
+            </View>
+            <Text style={s.featTitleHindi}>{SCAM_OF_DAY.titleHindi}</Text>
+            <Text style={s.featTitleEn}>{SCAM_OF_DAY.title}</Text>
+            <Text style={s.featDesc}>{SCAM_OF_DAY.description}</Text>
+            <View style={s.featTip}>
+              <Feather name="shield" size={13} color={GREEN} />
+              <Text style={s.featTipTxt}>{SCAM_OF_DAY.tip}</Text>
+            </View>
+            <View style={s.citiesRow}>
+              {SCAM_OF_DAY.cities.map((c) => (
+                <View key={c} style={s.cityChip}>
+                  <Feather name="map-pin" size={9} color={NAVY} />
+                  <Text style={s.cityChipTxt}>{c}</Text>
+                </View>
+              ))}
+            </View>
           </View>
         </View>
 
-        {/* All live threats */}
-        <Text style={[s.sectionTitle, { color: colors.text }]}>
-          Active Scams Right Now
-        </Text>
+        {/* Trending threats */}
+        <View style={s.sectionHeader}>
+          <Text style={s.sectionTitle}>Active Scams Right Now</Text>
+          <View style={s.liveBadgeSmall}>
+            <View style={s.liveDotSmall} />
+            <Text style={s.liveTxtSmall}>LIVE</Text>
+          </View>
+        </View>
         {LIVE_THREATS.map((t) => (
-          <View
-            key={t.id}
-            style={[
-              s.threatCard,
-              { backgroundColor: colors.card, borderColor: colors.border },
-            ]}
-          >
+          <View key={t.id} style={s.threatCard}>
             <View style={s.threatCardTop}>
-              <View
-                style={[
-                  s.trendBadge,
-                  { backgroundColor: TREND_COLOR[t.trend] + "20" },
-                ]}
-              >
-                <View
-                  style={[
-                    s.trendDot,
-                    { backgroundColor: TREND_COLOR[t.trend] },
-                  ]}
-                />
-                <Text
-                  style={[
-                    s.trendTxt,
-                    { color: TREND_COLOR[t.trend] },
-                  ]}
-                >
-                  {t.trend.toUpperCase()}
-                </Text>
+              <View style={[s.trendPill, { backgroundColor: TREND_BG[t.trend] }]}>
+                <View style={[s.trendDot, { backgroundColor: TREND_COLOR[t.trend] }]} />
+                <Text style={[s.trendTxt, { color: TREND_COLOR[t.trend] }]}>{t.trend.toUpperCase()}</Text>
               </View>
-              <Text style={[s.threatTime, { color: colors.mutedForeground }]}>
-                {t.time}
-              </Text>
+              <Text style={s.threatTime}>{t.time}</Text>
             </View>
-            <Text style={[s.threatType, { color: colors.text }]}>{t.type}</Text>
-            <Text style={[s.threatCity, { color: colors.mutedForeground }]}>
-              <Feather name="map-pin" size={11} /> {t.city} ·{" "}
-              {t.count.toLocaleString()} community reports
-            </Text>
-            <Text style={[s.threatDesc, { color: colors.mutedForeground }]}>
-              {t.description}
-            </Text>
+            <Text style={s.threatType}>{t.type}</Text>
+            <View style={s.threatMetaRow}>
+              <Feather name="map-pin" size={11} color="#94a3b8" />
+              <Text style={s.threatMeta}>{t.city} · {t.count.toLocaleString()} community reports</Text>
+            </View>
+            <Text style={s.threatDesc}>{t.description}</Text>
           </View>
         ))}
 
         {/* City Hotspots */}
-        <Text style={[s.sectionTitle, { color: colors.text }]}>
-          City Hotspots
-        </Text>
-        <View
-          style={[
-            s.hotspotsCard,
-            { backgroundColor: colors.card, borderColor: colors.border },
-          ]}
-        >
+        <View style={s.sectionHeader}>
+          <View style={s.sectionTitleRow}>
+            <Feather name="map-pin" size={14} color={NAVY} />
+            <Text style={[s.sectionTitle, { marginLeft: 6 }]}>City Hotspots</Text>
+          </View>
+        </View>
+        <View style={s.hotspotsCard}>
           {CITY_HOTSPOTS.map((hs, i) => (
             <View
               key={hs.city}
-              style={[
-                s.hotspotRow,
-                i < CITY_HOTSPOTS.length - 1 && {
-                  borderBottomWidth: 1,
-                  borderBottomColor: colors.border,
-                },
-              ]}
+              style={[s.hotspotRow, i < CITY_HOTSPOTS.length - 1 && s.hotspotBorder]}
             >
-              <Text style={[s.hsRank, { color: colors.mutedForeground }]}>
-                #{hs.rank}
-              </Text>
-              <Text style={[s.hsCity, { color: colors.text }]}>{hs.city}</Text>
-              <Text style={[s.hsCases, { color: colors.mutedForeground }]}>
-                {hs.cases.toLocaleString()}
-              </Text>
-              <View style={s.hsChange}>
-                <Feather
-                  name={hs.up ? "trending-up" : "trending-down"}
-                  size={13}
-                  color={hs.up ? "#dc2626" : "#22c55e"}
-                />
-                <Text
-                  style={[
-                    s.hsChangeTxt,
-                    { color: hs.up ? "#dc2626" : "#22c55e" },
-                  ]}
-                >
-                  {hs.change}
-                </Text>
+              <View style={s.hsRankBox}>
+                <Text style={s.hsRank}>{hs.rank}</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={s.hsCity}>{hs.city}</Text>
+                <Text style={s.hsCases}>{hs.cases.toLocaleString()} cases</Text>
+              </View>
+              <View style={s.hsChangePill}>
+                <Feather name={hs.up ? "trending-up" : "trending-down"} size={11} color={hs.up ? "#dc2626" : GREEN} />
+                <Text style={[s.hsChange, { color: hs.up ? "#dc2626" : GREEN }]}>{hs.change}</Text>
               </View>
             </View>
           ))}
         </View>
 
         {/* Golden Safety Rules */}
-        <Text style={[s.sectionTitle, { color: colors.text }]}>
-          Golden Safety Rules
-        </Text>
+        <View style={s.sectionHeader}>
+          <View style={s.sectionTitleRow}>
+            <Feather name="book-open" size={14} color={NAVY} />
+            <Text style={[s.sectionTitle, { marginLeft: 6 }]}>Golden Rules of Safety</Text>
+          </View>
+        </View>
         {GOLDEN_RULES.map((rule) => (
-          <View
-            key={rule.id}
-            style={[
-              s.ruleCard,
-              {
-                backgroundColor: colors.card,
-                borderColor: colors.border,
-                borderLeftColor: SEVERITY_COLOR[rule.severity],
-              },
-            ]}
-          >
-            <View
-              style={[
-                s.ruleIcon,
-                {
-                  backgroundColor:
-                    SEVERITY_COLOR[rule.severity] + "18",
-                },
-              ]}
-            >
-              <Feather
-                name={rule.icon as any}
-                size={18}
-                color={SEVERITY_COLOR[rule.severity]}
-              />
+          <View key={rule.id} style={[s.ruleCard, { borderLeftColor: SEVERITY_COLOR[rule.severity] }]}>
+            <View style={[s.ruleIcon, { backgroundColor: SEVERITY_BG[rule.severity] }]}>
+              <Feather name={rule.icon as any} size={16} color={SEVERITY_COLOR[rule.severity]} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[s.ruleHindi, { color: colors.text }]}>
-                {rule.hindi}
-              </Text>
-              <Text style={[s.ruleEnglish, { color: colors.mutedForeground }]}>
-                {rule.english}
-              </Text>
+              <Text style={s.ruleHindi}>{rule.hindi}</Text>
+              <Text style={s.ruleEnglish}>{rule.english}</Text>
             </View>
           </View>
         ))}
@@ -242,113 +185,131 @@ export default function ThreatsScreen() {
 
 const s = StyleSheet.create({
   root: { flex: 1 },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+  headerBg: { backgroundColor: NAVY, paddingBottom: 18 },
+  tricolor: { flexDirection: "row", height: 3 },
+  triStrip: { flex: 1 },
+  headerContent: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    paddingHorizontal: 16, paddingTop: 14, marginTop: 6,
   },
-  headerTitle: { fontSize: 28, fontWeight: "700" as const },
+  headerLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
+  threatIconBox: {
+    width: 40, height: 40, borderRadius: 12,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    alignItems: "center", justifyContent: "center",
+  },
+  headerTitle: { fontSize: 18, fontWeight: "800" as const, color: "#fff", letterSpacing: -0.3 },
+  headerSub: { fontSize: 10, color: "rgba(255,255,255,0.6)", marginTop: 2 },
   liveBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
+    flexDirection: "row", alignItems: "center", gap: 6,
+    backgroundColor: "rgba(220,38,38,0.2)",
+    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20,
   },
-  liveDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: "#dc2626" },
-  liveTxt: { fontSize: 11, fontWeight: "700" as const, color: "#dc2626", letterSpacing: 1 },
+  liveDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: "#f87171" },
+  liveTxt: { fontSize: 11, fontWeight: "700" as const, color: "#fca5a5", letterSpacing: 1 },
+
+  // Featured scam card
   featuredCard: {
+    margin: 16,
     borderRadius: 18,
+    overflow: "hidden",
+    shadowColor: NAVY, shadowOpacity: 0.12, shadowRadius: 16, shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
+  },
+  featuredInner: {
+    backgroundColor: "#fff",
+    borderRadius: 18,
+    padding: 18,
     borderWidth: 1.5,
-    padding: 20,
-    marginBottom: 24,
+    borderColor: "rgba(220,38,38,0.2)",
     gap: 10,
   },
-  featuredTag: { flexDirection: "row", alignItems: "center", gap: 10 },
-  featTagBg: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
-  featTagTxt: { fontSize: 9, color: "#FFFFFF", fontWeight: "700" as const, letterSpacing: 1 },
-  featReports: { fontSize: 12 },
-  featTitle: { fontSize: 20, fontWeight: "700" as const },
-  featTitleEn: { fontSize: 14, fontWeight: "500" as const },
-  featDesc: { fontSize: 13, lineHeight: 20 },
+  featTop: { flexDirection: "row", alignItems: "center", gap: 10 },
+  featTagPill: { paddingHorizontal: 9, paddingVertical: 4, borderRadius: 20 },
+  featTagTxt: { fontSize: 9, fontWeight: "800" as const, letterSpacing: 1 },
+  featReports: { fontSize: 11, color: "#94a3b8" },
+  featTitleHindi: { fontSize: 20, fontWeight: "800" as const, color: "#0f172a", lineHeight: 26 },
+  featTitleEn: { fontSize: 13, fontWeight: "500" as const, color: "#64748b" },
+  featDesc: { fontSize: 13, color: "#334155", lineHeight: 20 },
   featTip: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 8,
-    padding: 12,
-    borderRadius: 10,
-    borderWidth: 1,
+    flexDirection: "row", alignItems: "flex-start", gap: 8,
+    backgroundColor: "#f0fdf4", padding: 10, borderRadius: 10,
+    borderWidth: 1, borderColor: "#bbf7d0",
   },
-  featTipTxt: { flex: 1, fontSize: 13, fontWeight: "500" as const, lineHeight: 18 },
+  featTipTxt: { flex: 1, fontSize: 12, fontWeight: "500" as const, color: "#166534", lineHeight: 17 },
   citiesRow: { flexDirection: "row", gap: 8, flexWrap: "wrap" },
-  cityChip: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
-  cityChipTxt: { fontSize: 12 },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "700" as const,
-    marginBottom: 12,
-    marginTop: 4,
+  cityChip: {
+    flexDirection: "row", alignItems: "center", gap: 4,
+    backgroundColor: "#EBF0FA", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20,
   },
+  cityChipTxt: { fontSize: 11, color: NAVY, fontWeight: "500" as const },
+
+  // Section headers
+  sectionHeader: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    paddingHorizontal: 16, marginTop: 8, marginBottom: 10,
+  },
+  sectionTitleRow: { flexDirection: "row", alignItems: "center" },
+  sectionTitle: { fontSize: 14, fontWeight: "800" as const, color: "#0f172a" },
+  liveBadgeSmall: {
+    flexDirection: "row", alignItems: "center", gap: 4,
+    backgroundColor: "#fee2e2", paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20,
+  },
+  liveDotSmall: { width: 6, height: 6, borderRadius: 3, backgroundColor: "#dc2626" },
+  liveTxtSmall: { fontSize: 9, fontWeight: "700" as const, color: "#dc2626", letterSpacing: 1 },
+
+  // Threat cards
   threatCard: {
-    borderRadius: 14,
-    borderWidth: 1,
-    padding: 16,
-    marginBottom: 10,
-    gap: 6,
+    marginHorizontal: 16, marginBottom: 10,
+    backgroundColor: "#fff", borderRadius: 16,
+    borderWidth: 1, borderColor: "rgba(11,61,145,0.07)",
+    padding: 14, gap: 6,
+    shadowColor: NAVY, shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
   },
   threatCardTop: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
-  trendBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-  },
+  trendPill: { flexDirection: "row", alignItems: "center", gap: 5, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },
   trendDot: { width: 6, height: 6, borderRadius: 3 },
   trendTxt: { fontSize: 10, fontWeight: "700" as const, letterSpacing: 0.5 },
-  threatTime: { fontSize: 11 },
-  threatType: { fontSize: 16, fontWeight: "700" as const },
-  threatCity: { fontSize: 12 },
-  threatDesc: { fontSize: 13, lineHeight: 19 },
+  threatTime: { fontSize: 11, color: "#94a3b8" },
+  threatType: { fontSize: 15, fontWeight: "700" as const, color: "#0f172a" },
+  threatMetaRow: { flexDirection: "row", alignItems: "center", gap: 4 },
+  threatMeta: { fontSize: 12, color: "#94a3b8" },
+  threatDesc: { fontSize: 12, color: "#64748b", lineHeight: 18 },
+
+  // Hotspots
   hotspotsCard: {
-    borderRadius: 16,
-    borderWidth: 1,
-    marginBottom: 24,
+    marginHorizontal: 16, marginBottom: 16,
+    backgroundColor: "#fff", borderRadius: 16,
+    borderWidth: 1, borderColor: "rgba(11,61,145,0.07)",
     overflow: "hidden",
+    shadowColor: NAVY, shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
   },
-  hotspotRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 13,
-    gap: 12,
+  hotspotRow: { flexDirection: "row", alignItems: "center", paddingHorizontal: 16, paddingVertical: 12, gap: 12 },
+  hotspotBorder: { borderBottomWidth: 1, borderBottomColor: "#f8fafc" },
+  hsRankBox: {
+    width: 26, height: 26, borderRadius: 7,
+    backgroundColor: "#EBF0FA", alignItems: "center", justifyContent: "center",
   },
-  hsRank: { width: 28, fontSize: 13, fontWeight: "600" as const },
-  hsCity: { flex: 1, fontSize: 15, fontWeight: "600" as const },
-  hsCases: { fontSize: 13 },
-  hsChange: { flexDirection: "row", alignItems: "center", gap: 3, width: 56 },
-  hsChangeTxt: { fontSize: 13, fontWeight: "600" as const },
+  hsRank: { fontSize: 11, fontWeight: "800" as const, color: NAVY },
+  hsCity: { fontSize: 13, fontWeight: "700" as const, color: "#1e293b" },
+  hsCases: { fontSize: 11, color: "#94a3b8", marginTop: 1 },
+  hsChangePill: { flexDirection: "row", alignItems: "center", gap: 3 },
+  hsChange: { fontSize: 12, fontWeight: "700" as const },
+
+  // Golden rules
   ruleCard: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 14,
-    borderRadius: 14,
-    borderWidth: 1,
+    flexDirection: "row", alignItems: "flex-start", gap: 12,
+    marginHorizontal: 16, marginBottom: 8,
+    backgroundColor: "#fff", borderRadius: 14,
+    borderWidth: 1, borderColor: "rgba(11,61,145,0.07)",
     borderLeftWidth: 3,
-    padding: 16,
-    marginBottom: 10,
+    padding: 14,
+    shadowColor: NAVY, shadowOpacity: 0.04, shadowRadius: 6, shadowOffset: { width: 0, height: 1 },
+    elevation: 1,
   },
-  ruleIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  ruleHindi: { fontSize: 15, fontWeight: "700" as const, marginBottom: 3 },
-  ruleEnglish: { fontSize: 13, lineHeight: 18 },
+  ruleIcon: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
+  ruleHindi: { fontSize: 14, fontWeight: "700" as const, color: "#0f172a", marginBottom: 3 },
+  ruleEnglish: { fontSize: 12, color: "#64748b", lineHeight: 17 },
 });

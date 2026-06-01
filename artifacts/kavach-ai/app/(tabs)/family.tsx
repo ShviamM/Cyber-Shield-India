@@ -17,6 +17,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FamilyMember, useAppContext } from "@/context/AppContext";
 import { useColors } from "@/hooks/useColors";
 
+const NAVY = "#0B3D91";
+const SAFFRON = "#FF6713";
+const GREEN = "#138808";
+
 const RELATIONS = ["Mother", "Father", "Spouse", "Child", "Sibling", "Other"];
 
 export default function FamilyScreen() {
@@ -29,7 +33,7 @@ export default function FamilyScreen() {
   const [phone, setPhone] = useState("");
   const [relation, setRelation] = useState("Mother");
 
-  const topInset = Platform.OS === "web" ? 67 : insets.top;
+  const topInset = Platform.OS === "web" ? 0 : insets.top;
   const bottomPad = (Platform.OS === "web" ? 34 : insets.bottom) + 80;
 
   function handleAdd() {
@@ -71,50 +75,50 @@ export default function FamilyScreen() {
       style={[s.root, { backgroundColor: colors.background }]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <View style={[s.header, { paddingTop: topInset + 16 }]}>
-        <View>
-          <Text style={[s.headerTitle, { color: colors.text }]}>
-            Family Shield
-          </Text>
-          <Text style={[s.headerSub, { color: colors.mutedForeground }]}>
-            {familyMembers.length} member{familyMembers.length !== 1 ? "s" : ""}{" "}
-            protected
-          </Text>
+      {/* Navy header */}
+      <View style={[s.headerBg, { paddingTop: topInset }]}>
+        <View style={s.tricolor}>
+          <View style={[s.triStrip, { backgroundColor: SAFFRON }]} />
+          <View style={[s.triStrip, { backgroundColor: "#fff" }]} />
+          <View style={[s.triStrip, { backgroundColor: GREEN }]} />
         </View>
-        <TouchableOpacity
-          style={[s.addBtn, { backgroundColor: colors.primary }]}
-          onPress={() => {
-            Haptics.selectionAsync();
-            setShowAdd((v) => !v);
-          }}
-          activeOpacity={0.8}
-        >
-          <Feather name={showAdd ? "x" : "user-plus"} size={18} color="#FFFFFF" />
-        </TouchableOpacity>
+        <View style={s.headerContent}>
+          <View style={s.headerLeft}>
+            <View style={s.headerIconBox}>
+              <Feather name="users" size={20} color={SAFFRON} />
+            </View>
+            <View>
+              <Text style={s.headerTitle}>Family Shield</Text>
+              <Text style={s.headerSub}>
+                {familyMembers.length} member{familyMembers.length !== 1 ? "s" : ""} protected
+              </Text>
+            </View>
+          </View>
+          <TouchableOpacity
+            style={[s.addBtn, { backgroundColor: showAdd ? "rgba(255,255,255,0.2)" : SAFFRON }]}
+            onPress={() => { Haptics.selectionAsync(); setShowAdd((v) => !v); }}
+            activeOpacity={0.8}
+          >
+            <Feather name={showAdd ? "x" : "user-plus"} size={18} color="#fff" />
+          </TouchableOpacity>
+        </View>
       </View>
 
-      {/* Add member form */}
+      {/* Add form */}
       {showAdd && (
-        <View
-          style={[
-            s.addForm,
-            { backgroundColor: colors.card, borderColor: colors.border },
-          ]}
-        >
-          <Text style={[s.formTitle, { color: colors.text }]}>
-            Add Family Member
-          </Text>
+        <View style={s.addForm}>
+          <Text style={s.formTitle}>Add Family Member</Text>
           <TextInput
-            style={[s.formInput, { color: colors.text, borderColor: colors.border, backgroundColor: colors.surface }]}
+            style={s.formInput}
             placeholder="Name (e.g. Mummy)"
-            placeholderTextColor={colors.mutedForeground}
+            placeholderTextColor="#94a3b8"
             value={name}
             onChangeText={setName}
           />
           <TextInput
-            style={[s.formInput, { color: colors.text, borderColor: colors.border, backgroundColor: colors.surface }]}
+            style={s.formInput}
             placeholder="+91 98765 43210"
-            placeholderTextColor={colors.mutedForeground}
+            placeholderTextColor="#94a3b8"
             value={phone}
             onChangeText={setPhone}
             keyboardType="phone-pad"
@@ -125,39 +129,24 @@ export default function FamilyScreen() {
                 key={r}
                 style={[
                   s.relChip,
-                  {
-                    backgroundColor:
-                      relation === r ? colors.primary : colors.surface,
-                    borderColor:
-                      relation === r ? colors.primary : colors.border,
-                  },
+                  relation === r
+                    ? { backgroundColor: NAVY, borderColor: NAVY }
+                    : { backgroundColor: "#f8f9ff", borderColor: "rgba(11,61,145,0.15)" },
                 ]}
                 onPress={() => { Haptics.selectionAsync(); setRelation(r); }}
                 activeOpacity={0.75}
               >
-                <Text
-                  style={[
-                    s.relChipTxt,
-                    { color: relation === r ? "#FFFFFF" : colors.mutedForeground },
-                  ]}
-                >
-                  {r}
-                </Text>
+                <Text style={[s.relChipTxt, { color: relation === r ? "#fff" : "#64748b" }]}>{r}</Text>
               </TouchableOpacity>
             ))}
           </View>
           <TouchableOpacity
-            style={[
-              s.saveBtn,
-              {
-                backgroundColor:
-                  name.trim() && phone.trim() ? colors.primary : colors.muted,
-              },
-            ]}
+            style={[s.saveBtn, { backgroundColor: name.trim() && phone.trim() ? NAVY : "#e2e8f0" }]}
             onPress={handleAdd}
             disabled={!name.trim() || !phone.trim()}
-            activeOpacity={0.8}
+            activeOpacity={0.85}
           >
+            <Feather name="shield" size={16} color="#fff" />
             <Text style={s.saveBtnTxt}>Add to Shield</Text>
           </TouchableOpacity>
         </View>
@@ -170,111 +159,67 @@ export default function FamilyScreen() {
           paddingHorizontal: 16,
           paddingBottom: bottomPad,
           gap: 10,
-          paddingTop: 8,
+          paddingTop: 14,
         }}
         showsVerticalScrollIndicator={false}
-        scrollEnabled={!!familyMembers.length}
+        scrollEnabled
         ListEmptyComponent={
           <View style={s.emptyState}>
-            <View
-              style={[
-                s.emptyIcon,
-                { backgroundColor: "rgba(255,103,19,0.1)" },
-              ]}
-            >
-              <Feather name="users" size={32} color={colors.primary} />
+            <View style={s.emptyIconBox}>
+              <Feather name="users" size={32} color={SAFFRON} />
             </View>
-            <Text style={[s.emptyTitle, { color: colors.text }]}>
-              No members yet
+            <Text style={s.emptyTitle}>No members yet</Text>
+            <Text style={s.emptyDesc}>
+              Add family members to monitor their protection status and get alerts when they may be at risk.
             </Text>
-            <Text style={[s.emptyDesc, { color: colors.mutedForeground }]}>
-              Add family members to monitor their protection status and get
-              alerts when they may be at risk.
-            </Text>
+            <TouchableOpacity
+              style={s.emptyBtn}
+              onPress={() => { Haptics.selectionAsync(); setShowAdd(true); }}
+              activeOpacity={0.85}
+            >
+              <Feather name="user-plus" size={16} color="#fff" />
+              <Text style={s.emptyBtnTxt}>Add First Member</Text>
+            </TouchableOpacity>
           </View>
         }
         renderItem={({ item }) => (
-          <MemberCard
-            member={item}
-            colors={colors}
-            onDelete={() => handleDelete(item)}
-          />
+          <MemberCard member={item} onDelete={() => handleDelete(item)} />
         )}
       />
     </KeyboardAvoidingView>
   );
 }
 
-function MemberCard({
-  member,
-  colors,
-  onDelete,
-}: {
-  member: FamilyMember;
-  colors: ReturnType<typeof import("@/hooks/useColors").useColors>;
-  onDelete: () => void;
-}) {
+function MemberCard({ member, onDelete }: { member: FamilyMember; onDelete: () => void }) {
   const isWarning = member.status === "warning";
-  const statusColor = isWarning ? "#f97316" : "#22c55e";
-  const statusBg = isWarning ? "rgba(249,115,22,0.12)" : "rgba(34,197,94,0.1)";
-  const avatarBg = isWarning ? "rgba(249,115,22,0.15)" : "rgba(34,197,94,0.1)";
+  const statusColor = isWarning ? "#ea580c" : GREEN;
+  const statusBg = isWarning ? "rgba(234,88,12,0.08)" : "rgba(19,136,8,0.08)";
+  const avatarBg = isWarning ? "rgba(234,88,12,0.12)" : "rgba(19,136,8,0.1)";
 
   return (
-    <View
-      style={[
-        mc.card,
-        {
-          backgroundColor: colors.card,
-          borderColor: isWarning
-            ? "rgba(249,115,22,0.35)"
-            : colors.border,
-          borderWidth: isWarning ? 1.5 : 1,
-        },
-      ]}
-    >
+    <View style={[mc.card, isWarning && mc.cardWarning]}>
       {isWarning && (
-        <View
-          style={[
-            mc.warningBanner,
-            { backgroundColor: "rgba(249,115,22,0.1)" },
-          ]}
-        >
-          <Feather name="alert-triangle" size={13} color="#f97316" />
-          <Text style={mc.warningTxt}>
-            Receiving a suspicious call right now!
-          </Text>
+        <View style={mc.warningBanner}>
+          <Feather name="alert-triangle" size={13} color="#ea580c" />
+          <Text style={mc.warningTxt}>Receiving a suspicious call right now!</Text>
         </View>
       )}
       <View style={mc.body}>
         <View style={[mc.avatar, { backgroundColor: avatarBg }]}>
-          <Text style={[mc.avatarTxt, { color: statusColor }]}>
-            {member.name[0]}
-          </Text>
+          <Text style={[mc.avatarTxt, { color: statusColor }]}>{member.name[0]}</Text>
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={[mc.name, { color: colors.text }]}>{member.name}</Text>
-          <Text style={[mc.relation, { color: colors.mutedForeground }]}>
-            {member.relation} · {member.phone}
-          </Text>
-          <Text style={[mc.lastSeen, { color: colors.mutedForeground }]}>
-            Last activity: {member.lastSeen}
-          </Text>
+          <Text style={mc.name}>{member.name}</Text>
+          <Text style={mc.relation}>{member.relation} · {member.phone}</Text>
+          <Text style={mc.lastSeen}>Last activity: {member.lastSeen}</Text>
         </View>
-        <TouchableOpacity
-          style={[mc.deleteBtn, { backgroundColor: "rgba(220,38,38,0.08)" }]}
-          onPress={onDelete}
-          activeOpacity={0.75}
-        >
+        <TouchableOpacity style={mc.deleteBtn} onPress={onDelete} activeOpacity={0.75}>
           <Feather name="trash-2" size={15} color="#dc2626" />
         </TouchableOpacity>
       </View>
       <View style={mc.footer}>
         <View style={[mc.statusBadge, { backgroundColor: statusBg }]}>
-          <Feather
-            name={isWarning ? "alert-triangle" : "shield"}
-            size={12}
-            color={statusColor}
-          />
+          <Feather name={isWarning ? "alert-triangle" : "shield"} size={12} color={statusColor} />
           <Text style={[mc.statusTxt, { color: statusColor }]}>
             {isWarning ? "Alert — Possible Scam Call" : "Protected & Safe"}
           </Text>
@@ -286,104 +231,103 @@ function MemberCard({
 
 const s = StyleSheet.create({
   root: { flex: 1 },
-  header: {
-    flexDirection: "row",
-    alignItems: "flex-end",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+  headerBg: { backgroundColor: NAVY, paddingBottom: 18 },
+  tricolor: { flexDirection: "row", height: 3 },
+  triStrip: { flex: 1 },
+  headerContent: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    paddingHorizontal: 16, paddingTop: 14, marginTop: 6,
   },
-  headerTitle: { fontSize: 28, fontWeight: "700" as const },
-  headerSub: { fontSize: 14, marginTop: 2 },
+  headerLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
+  headerIconBox: {
+    width: 40, height: 40, borderRadius: 12,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    alignItems: "center", justifyContent: "center",
+  },
+  headerTitle: { fontSize: 18, fontWeight: "800" as const, color: "#fff", letterSpacing: -0.3 },
+  headerSub: { fontSize: 11, color: "rgba(255,255,255,0.6)", marginTop: 2 },
   addBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: "center",
-    justifyContent: "center",
+    width: 42, height: 42, borderRadius: 21,
+    alignItems: "center", justifyContent: "center",
+    shadowColor: SAFFRON, shadowOpacity: 0.4, shadowRadius: 10, shadowOffset: { width: 0, height: 3 },
+    elevation: 4,
   },
   addForm: {
-    marginHorizontal: 16,
-    borderRadius: 16,
-    borderWidth: 1,
-    padding: 16,
-    gap: 10,
-    marginBottom: 12,
+    marginHorizontal: 16, marginTop: 14,
+    backgroundColor: "#fff", borderRadius: 18,
+    borderWidth: 1, borderColor: "rgba(11,61,145,0.1)",
+    padding: 16, gap: 10,
+    shadowColor: NAVY, shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 4 },
+    elevation: 2,
   },
-  formTitle: { fontSize: 16, fontWeight: "700" as const, marginBottom: 4 },
+  formTitle: { fontSize: 15, fontWeight: "700" as const, color: "#0f172a", marginBottom: 2 },
   formInput: {
-    height: 46,
-    borderRadius: 12,
-    borderWidth: 1,
-    paddingHorizontal: 14,
-    fontSize: 15,
+    height: 48, borderRadius: 12, borderWidth: 1.5,
+    borderColor: "rgba(11,61,145,0.12)",
+    paddingHorizontal: 14, fontSize: 15,
+    backgroundColor: "#f8f9ff", color: "#0f172a",
   },
   relRow: { flexDirection: "row", gap: 8, flexWrap: "wrap" },
-  relChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    borderWidth: 1,
-  },
+  relChip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, borderWidth: 1 },
   relChipTxt: { fontSize: 13, fontWeight: "500" as const },
   saveBtn: {
-    height: 48,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 4,
+    height: 48, borderRadius: 14,
+    alignItems: "center", justifyContent: "center",
+    flexDirection: "row", gap: 8, marginTop: 4,
+    shadowColor: NAVY, shadowOpacity: 0.2, shadowRadius: 10, shadowOffset: { width: 0, height: 3 },
+    elevation: 3,
   },
-  saveBtnTxt: { fontSize: 15, fontWeight: "700" as const, color: "#FFFFFF" },
+  saveBtnTxt: { fontSize: 15, fontWeight: "700" as const, color: "#fff" },
   emptyState: { alignItems: "center", paddingTop: 60, paddingHorizontal: 32, gap: 14 },
-  emptyIcon: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    alignItems: "center",
-    justifyContent: "center",
+  emptyIconBox: {
+    width: 80, height: 80, borderRadius: 40,
+    backgroundColor: "rgba(255,103,19,0.1)",
+    alignItems: "center", justifyContent: "center",
   },
-  emptyTitle: { fontSize: 20, fontWeight: "700" as const },
-  emptyDesc: { fontSize: 14, textAlign: "center", lineHeight: 22 },
+  emptyTitle: { fontSize: 20, fontWeight: "700" as const, color: "#0f172a" },
+  emptyDesc: { fontSize: 14, color: "#64748b", textAlign: "center", lineHeight: 22 },
+  emptyBtn: {
+    flexDirection: "row", alignItems: "center", gap: 8,
+    backgroundColor: NAVY, paddingHorizontal: 20, paddingVertical: 12,
+    borderRadius: 14, marginTop: 4,
+    shadowColor: NAVY, shadowOpacity: 0.25, shadowRadius: 10, shadowOffset: { width: 0, height: 3 },
+    elevation: 3,
+  },
+  emptyBtnTxt: { fontSize: 14, fontWeight: "700" as const, color: "#fff" },
 });
 
 const mc = StyleSheet.create({
-  card: { borderRadius: 16, overflow: "hidden" },
+  card: {
+    backgroundColor: "#fff", borderRadius: 18,
+    borderWidth: 1, borderColor: "rgba(11,61,145,0.08)",
+    overflow: "hidden",
+    shadowColor: NAVY, shadowOpacity: 0.06, shadowRadius: 12, shadowOffset: { width: 0, height: 3 },
+    elevation: 2,
+  },
+  cardWarning: {
+    borderColor: "rgba(234,88,12,0.3)", borderWidth: 1.5,
+  },
   warningBanner: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 7,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    flexDirection: "row", alignItems: "center", gap: 7,
+    paddingHorizontal: 14, paddingVertical: 8,
+    backgroundColor: "rgba(234,88,12,0.07)",
   },
-  warningTxt: { fontSize: 12, fontWeight: "600" as const, color: "#f97316" },
+  warningTxt: { fontSize: 12, fontWeight: "600" as const, color: "#ea580c" },
   body: { flexDirection: "row", alignItems: "center", padding: 14, gap: 12 },
-  avatar: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  avatar: { width: 48, height: 48, borderRadius: 24, alignItems: "center", justifyContent: "center" },
   avatarTxt: { fontSize: 18, fontWeight: "700" as const },
-  name: { fontSize: 16, fontWeight: "700" as const },
-  relation: { fontSize: 12, marginTop: 2 },
-  lastSeen: { fontSize: 11, marginTop: 2 },
+  name: { fontSize: 15, fontWeight: "700" as const, color: "#0f172a" },
+  relation: { fontSize: 12, color: "#64748b", marginTop: 2 },
+  lastSeen: { fontSize: 11, color: "#94a3b8", marginTop: 2 },
   deleteBtn: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    alignItems: "center",
-    justifyContent: "center",
+    width: 34, height: 34, borderRadius: 17,
+    backgroundColor: "rgba(220,38,38,0.07)",
+    alignItems: "center", justifyContent: "center",
   },
   footer: { paddingHorizontal: 14, paddingBottom: 12 },
   statusBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 8,
-    alignSelf: "flex-start",
+    flexDirection: "row", alignItems: "center", gap: 6,
+    paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, alignSelf: "flex-start",
   },
   statusTxt: { fontSize: 12, fontWeight: "600" as const },
 });

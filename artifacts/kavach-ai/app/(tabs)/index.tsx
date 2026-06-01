@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import React from "react";
 import {
   Dimensions,
+  Linking,
   Platform,
   ScrollView,
   StyleSheet,
@@ -14,275 +15,239 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useAppContext } from "@/context/AppContext";
-import { LIVE_THREATS, SCAM_OF_DAY } from "@/constants/data";
+import { CITY_HOTSPOTS, GOLDEN_RULES, LIVE_THREATS, SCAM_OF_DAY } from "@/constants/data";
 import { useColors } from "@/hooks/useColors";
 
+const SAFFRON = "#FF6713";
+const NAVY = "#0B3D91";
+const GREEN = "#138808";
+
 const { width } = Dimensions.get("window");
+
+const QUICK_TOOLS = [
+  { icon: "phone" as const, label: "Check Number", sublabel: "Spam / Safe?", bg: "#EBF0FA", color: NAVY },
+  { icon: "link" as const, label: "Check Link", sublabel: "Phishing URL?", bg: "#f5f3ff", color: "#7c3aed" },
+  { icon: "credit-card" as const, label: "Check UPI ID", sublabel: "Legit account?", bg: "#f0fdf4", color: GREEN },
+  { icon: "maximize" as const, label: "Check QR Code", sublabel: "Safe to scan?", bg: "#fff7ed", color: SAFFRON },
+];
 
 export default function HomeScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { guardianActive, familyMembers, recentChecks } = useAppContext();
+  const { guardianActive, familyMembers, recentChecks, toggleGuardian } = useAppContext();
 
-  const topInset = Platform.OS === "web" ? 67 : insets.top;
+  const topInset = Platform.OS === "web" ? 0 : insets.top;
   const bottomPad = (Platform.OS === "web" ? 34 : insets.bottom) + 80;
 
-  const todayChecks = recentChecks.filter(
-    (c) => Date.now() - c.timestamp < 86400000
-  );
+  const todayChecks = recentChecks.filter((c) => Date.now() - c.timestamp < 86400000);
   const threatsFound = todayChecks.filter((c) => c.result === "danger").length;
+
+  function callSOS() {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    Linking.openURL("tel:1930").catch(() => {});
+  }
 
   return (
     <View style={[s.root, { backgroundColor: colors.background }]}>
-      <View style={[s.header, { paddingTop: topInset + 16 }]}>
-        <View style={s.headerLeft}>
-          <Feather name="shield" size={22} color={colors.primary} />
-          <Text style={[s.headerTitle, { color: colors.text }]}>KavachAI</Text>
-        </View>
-        <TouchableOpacity
-          style={[s.bellBtn, { backgroundColor: colors.card }]}
-          onPress={() => {
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-            router.push("/call-alert");
-          }}
-          activeOpacity={0.75}
-        >
-          <Feather name="bell" size={18} color={colors.text} />
-          <View style={[s.badge, { backgroundColor: colors.primary }]} />
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: bottomPad }}
-      >
-        {/* Guardian hero card */}
-        <View
-          style={[
-            s.guardianCard,
-            {
-              backgroundColor: guardianActive ? "#0B2D6E" : colors.card,
-              borderColor: guardianActive
-                ? "rgba(255,103,19,0.5)"
-                : colors.border,
-            },
-          ]}
-        >
-          <View style={s.guardianTop}>
-            <View
-              style={[
-                s.shieldCircle,
-                {
-                  backgroundColor: guardianActive
-                    ? colors.primary
-                    : colors.muted,
-                },
-              ]}
-            >
-              <Feather name="shield" size={28} color="#FFFFFF" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <View style={s.statusRow}>
-                <View
-                  style={[
-                    s.dot,
-                    {
-                      backgroundColor: guardianActive ? "#4ade80" : "#94a3b8",
-                    },
-                  ]}
-                />
-                <Text
-                  style={[
-                    s.statusLabel,
-                    {
-                      color: guardianActive ? "#4ade80" : colors.mutedForeground,
-                    },
-                  ]}
-                >
-                  {guardianActive ? "GUARDIAN ACTIVE" : "GUARDIAN PAUSED"}
-                </Text>
-              </View>
-              <Text style={[s.guardianDesc, { color: "#ffffff" }]}>
-                {guardianActive
-                  ? "KavachAI is watching out for you"
-                  : "Tap Shield to reactivate protection"}
-              </Text>
-            </View>
-          </View>
-          <View style={s.statsRow}>
-            <View style={s.stat}>
-              <Text style={s.statNum}>{todayChecks.length}</Text>
-              <Text style={s.statLbl}>Checked Today</Text>
-            </View>
-            <View style={[s.statDiv, { backgroundColor: "rgba(255,255,255,0.12)" }]} />
-            <View style={s.stat}>
-              <Text style={[s.statNum, threatsFound > 0 ? { color: "#f87171" } : {}]}>
-                {threatsFound}
-              </Text>
-              <Text style={s.statLbl}>Threats Found</Text>
-            </View>
-            <View style={[s.statDiv, { backgroundColor: "rgba(255,255,255,0.12)" }]} />
-            <View style={s.stat}>
-              <Text style={[s.statNum, { color: "#4ade80" }]}>
-                {familyMembers.length}
-              </Text>
-              <Text style={s.statLbl}>Protected</Text>
-            </View>
-          </View>
+      {/* ── Navy Header ── */}
+      <View style={[s.headerBg, { paddingTop: topInset }]}>
+        {/* Tricolor strip */}
+        <View style={s.tricolor}>
+          <View style={[s.triStrip, { backgroundColor: SAFFRON }]} />
+          <View style={[s.triStrip, { backgroundColor: "#FFFFFF" }]} />
+          <View style={[s.triStrip, { backgroundColor: GREEN }]} />
         </View>
 
-        {/* SOS + Scam of Day */}
-        <View style={s.actionRow}>
-          <TouchableOpacity
-            style={[s.sosBtn, { backgroundColor: "#dc2626" }]}
-            onPress={() =>
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy)
-            }
-            activeOpacity={0.75}
-          >
-            <Feather name="phone-call" size={22} color="#FFFFFF" />
-            <Text style={s.sosLabel}>SOS</Text>
-            <Text style={s.sosNum}>1930</Text>
-          </TouchableOpacity>
-
-          <View
-            style={[
-              s.scamCard,
-              { backgroundColor: colors.card, borderColor: colors.border },
-            ]}
-          >
-            <View style={[s.scamTag, { backgroundColor: colors.primary }]}>
-              <Text style={s.scamTagTxt}>{SCAM_OF_DAY.tag}</Text>
+        {/* Branding row */}
+        <View style={s.brandRow}>
+          <View style={s.brandLeft}>
+            <View style={s.logoBox}>
+              <Feather name="shield" size={20} color={SAFFRON} />
             </View>
-            <Text
-              style={[s.scamTitle, { color: colors.text }]}
-              numberOfLines={2}
-            >
-              {SCAM_OF_DAY.titleHindi}
-            </Text>
-            <Text style={[s.scamReports, { color: colors.mutedForeground }]}>
-              {SCAM_OF_DAY.reports.toLocaleString()} reports today
-            </Text>
+            <View>
+              <Text style={s.logoTitle}>
+                Kavach<Text style={{ color: SAFFRON }}>AI</Text>
+              </Text>
+              <Text style={s.logoSub}>CYBER CRIME PREVENTION · INDIA</Text>
+            </View>
           </View>
-        </View>
-
-        {/* Quick Verify */}
-        <Text style={[s.sectionTitle, { color: colors.text }]}>
-          Verify Before You Act
-        </Text>
-        <View style={s.quickGrid}>
-          {QUICK_TOOLS.map((tool) => (
+          <View style={s.headerIcons}>
             <TouchableOpacity
-              key={tool.label}
-              style={[
-                s.quickItem,
-                { backgroundColor: colors.card, borderColor: colors.border },
-              ]}
               onPress={() => {
-                Haptics.selectionAsync();
-                router.push("/(tabs)/verify");
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+                router.push("/call-alert");
               }}
+              style={s.headerIconBtn}
               activeOpacity={0.75}
             >
-              <View
-                style={[
-                  s.quickIcon,
-                  { backgroundColor: "rgba(255,103,19,0.12)" },
-                ]}
-              >
-                <Feather name={tool.icon as any} size={20} color={colors.primary} />
-              </View>
-              <Text style={[s.quickLabel, { color: colors.text }]}>
-                {tool.label}
+              <View style={s.bellDot} />
+              <Feather name="bell" size={18} color="rgba(255,255,255,0.8)" />
+            </TouchableOpacity>
+            <Feather name="user" size={18} color="rgba(255,255,255,0.8)" />
+          </View>
+        </View>
+
+        {/* SOS + Stats */}
+        <View style={s.sosRow}>
+          <TouchableOpacity style={s.sosBtn} onPress={callSOS} activeOpacity={0.85}>
+            <Feather name="phone-call" size={20} color="#fff" fill="rgba(255,255,255,0.3)" />
+            <Text style={s.sosBigNum}>1930</Text>
+            <Text style={s.sosSubLabel}>Cyber Helpline</Text>
+          </TouchableOpacity>
+          <View style={s.statsBox}>
+            <TouchableOpacity
+              style={[s.guardianToggle, { borderColor: guardianActive ? "rgba(74,222,128,0.4)" : "rgba(255,255,255,0.15)" }]}
+              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); toggleGuardian(); }}
+              activeOpacity={0.8}
+            >
+              <View style={[s.guardianDot, { backgroundColor: guardianActive ? "#4ade80" : "#94a3b8" }]} />
+              <Text style={s.guardianLabel}>
+                {guardianActive ? "Guardian Active" : "Guardian Paused"}
               </Text>
             </TouchableOpacity>
-          ))}
+            <View style={s.headerStats}>
+              <View style={s.hStat}>
+                <Text style={s.hStatNum}>{todayChecks.length}</Text>
+                <Text style={s.hStatLbl}>Checked</Text>
+              </View>
+              <View style={s.hStatDiv} />
+              <View style={s.hStat}>
+                <Text style={[s.hStatNum, threatsFound > 0 && { color: "#fca5a5" }]}>{threatsFound}</Text>
+                <Text style={s.hStatLbl}>Threats</Text>
+              </View>
+              <View style={s.hStatDiv} />
+              <View style={s.hStat}>
+                <Text style={[s.hStatNum, { color: "#86efac" }]}>{familyMembers.length}</Text>
+                <Text style={s.hStatLbl}>Protected</Text>
+              </View>
+            </View>
+          </View>
         </View>
+      </View>
+
+      {/* ── Scrollable content ── */}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: bottomPad }}
+      >
+        {/* Verify Before You Act */}
+        <View style={[s.section, s.verifyCard]}>
+          <View style={s.sectionHeader}>
+            <View style={[s.sectionIconBox, { backgroundColor: "#EBF0FA" }]}>
+              <Feather name="search" size={14} color={NAVY} />
+            </View>
+            <View>
+              <Text style={[s.sectionTitle, { color: "#0f172a" }]}>Verify Before You Act</Text>
+              <Text style={[s.sectionSub, { color: "#64748b" }]}>Check anything suspicious instantly</Text>
+            </View>
+          </View>
+          <View style={s.toolGrid}>
+            {QUICK_TOOLS.map((t) => (
+              <TouchableOpacity
+                key={t.label}
+                style={[s.toolBtn, { backgroundColor: t.bg }]}
+                onPress={() => { Haptics.selectionAsync(); router.push("/(tabs)/verify"); }}
+                activeOpacity={0.75}
+              >
+                <View style={[s.toolIconBox, { shadowColor: t.color }]}>
+                  <Feather name={t.icon} size={16} color={t.color} />
+                </View>
+                <Text style={s.toolLabel}>{t.label}</Text>
+                <Text style={s.toolSublabel}>{t.sublabel}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* Active Scams Today */}
+        <View style={s.sectionOuterHeader}>
+          <View style={s.liveRow}>
+            <View style={s.livePulse} />
+            <Text style={s.outerSectionTitle}>Active Scams Today</Text>
+          </View>
+          <TouchableOpacity onPress={() => router.push("/(tabs)/threats")}>
+            <Text style={[s.seeAll, { color: NAVY }]}>All 23 →</Text>
+          </TouchableOpacity>
+        </View>
+
+        {LIVE_THREATS.slice(0, 2).map((t) => {
+          const color = t.trend === "critical" ? "#dc2626" : t.trend === "high" ? "#ea580c" : "#d97706";
+          const bg = t.trend === "critical" ? "#fff1f1" : t.trend === "high" ? "#fff7ed" : "#fefce8";
+          return (
+            <View key={t.id} style={[s.scamCard, { borderColor: color + "30" }]}>
+              <View style={s.scamCardTop}>
+                <View style={[s.scamIconBox, { backgroundColor: bg }]}>
+                  <Feather name="phone-off" size={18} color={color} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <View style={s.scamTagRow}>
+                    <View style={[s.scamTag, { backgroundColor: bg }]}>
+                      <Text style={[s.scamTagTxt, { color }]}>{t.trend.toUpperCase()}</Text>
+                    </View>
+                    <Feather name="chevron-right" size={14} color="#94a3b8" />
+                  </View>
+                  <Text style={s.scamType}>{t.type}</Text>
+                  <Text style={s.scamDesc} numberOfLines={2}>{t.description}</Text>
+                  <View style={s.scamMeta}>
+                    <Feather name="alert-triangle" size={10} color={color} />
+                    <Text style={[s.scamMetaTxt, { color }]}>
+                      {t.count.toLocaleString()} reports · {t.city}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+              <View style={s.scamTip}>
+                <Feather name="check-circle" size={13} color={GREEN} />
+                <Text style={s.scamTipTxt}>
+                  {t.trend === "critical"
+                    ? "Real couriers never ask for payment over the phone."
+                    : "Hang up immediately and verify through official channels."}
+                </Text>
+              </View>
+            </View>
+          );
+        })}
 
         {/* Family Shield preview */}
         {familyMembers.length > 0 && (
           <>
-            <View style={s.sectionHeader}>
-              <Text style={[s.sectionTitle, { color: colors.text, marginTop: 0, marginBottom: 0 }]}>
-                Family Shield
-              </Text>
+            <View style={s.sectionOuterHeader}>
+              <Text style={s.outerSectionTitle}>Family Shield</Text>
               <TouchableOpacity onPress={() => router.push("/(tabs)/family")}>
-                <Text style={[s.seeAll, { color: colors.primary }]}>See All</Text>
+                <Text style={[s.seeAll, { color: NAVY }]}>See All</Text>
               </TouchableOpacity>
             </View>
-            <View
-              style={[
-                s.familyCard,
-                { backgroundColor: colors.card, borderColor: colors.border },
-              ]}
-            >
+            <View style={s.familyCard}>
               {familyMembers.slice(0, 3).map((m, i) => (
                 <View
                   key={m.id}
                   style={[
                     s.memberRow,
-                    i < Math.min(familyMembers.length, 3) - 1 && {
-                      borderBottomWidth: 1,
-                      borderBottomColor: colors.border,
-                    },
+                    i < Math.min(familyMembers.length, 3) - 1 && s.memberRowBorder,
                   ]}
                 >
-                  <View
-                    style={[
-                      s.avatar,
-                      {
-                        backgroundColor:
-                          m.status === "warning"
-                            ? "rgba(249,115,22,0.18)"
-                            : "rgba(74,222,128,0.12)",
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        s.avatarText,
-                        {
-                          color:
-                            m.status === "warning" ? "#f97316" : "#4ade80",
-                        },
-                      ]}
-                    >
-                      {m.name[0]}
-                    </Text>
+                  <View style={[s.memberAvatar, {
+                    backgroundColor: m.status === "warning" ? "rgba(249,115,22,0.15)" : "rgba(19,136,8,0.1)",
+                  }]}>
+                    <Text style={[s.memberAvatarTxt, {
+                      color: m.status === "warning" ? "#ea580c" : GREEN,
+                    }]}>{m.name[0]}</Text>
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={[s.memberName, { color: colors.text }]}>
-                      {m.name}
-                    </Text>
-                    <Text style={[s.memberRel, { color: colors.mutedForeground }]}>
-                      {m.relation}
-                    </Text>
+                    <Text style={s.memberName}>{m.name}</Text>
+                    <Text style={s.memberRel}>{m.relation}</Text>
                   </View>
-                  <View
-                    style={[
-                      s.statusBadge,
-                      {
-                        backgroundColor:
-                          m.status === "warning"
-                            ? "rgba(249,115,22,0.15)"
-                            : "rgba(74,222,128,0.1)",
-                      },
-                    ]}
-                  >
+                  <View style={[s.memberBadge, {
+                    backgroundColor: m.status === "warning" ? "rgba(249,115,22,0.12)" : "rgba(19,136,8,0.08)",
+                  }]}>
                     <Feather
                       name={m.status === "warning" ? "alert-triangle" : "shield"}
                       size={11}
-                      color={m.status === "warning" ? "#f97316" : "#4ade80"}
+                      color={m.status === "warning" ? "#ea580c" : GREEN}
                     />
-                    <Text
-                      style={[
-                        s.statusBadgeTxt,
-                        {
-                          color:
-                            m.status === "warning" ? "#f97316" : "#4ade80",
-                        },
-                      ]}
-                    >
+                    <Text style={[s.memberBadgeTxt, {
+                      color: m.status === "warning" ? "#ea580c" : GREEN,
+                    }]}>
                       {m.status === "warning" ? "Alert" : "Safe"}
                     </Text>
                   </View>
@@ -292,251 +257,314 @@ export default function HomeScreen() {
           </>
         )}
 
-        {/* Live threats */}
-        <View style={[s.sectionHeader, { marginTop: 4 }]}>
-          <Text style={[s.sectionTitle, { color: colors.text, marginTop: 0, marginBottom: 0 }]}>
-            Live Threat Feed
-          </Text>
-          <TouchableOpacity onPress={() => router.push("/(tabs)/threats")}>
-            <Text style={[s.seeAll, { color: colors.primary }]}>See All</Text>
-          </TouchableOpacity>
-        </View>
-        {LIVE_THREATS.slice(0, 3).map((t) => (
-          <View
-            key={t.id}
-            style={[
-              s.threatRow,
-              { backgroundColor: colors.card, borderColor: colors.border },
-            ]}
-          >
-            <View
-              style={[
-                s.threatDot,
-                {
-                  backgroundColor:
-                    t.trend === "critical"
-                      ? "#dc2626"
-                      : t.trend === "high"
-                      ? "#f97316"
-                      : "#eab308",
-                },
-              ]}
-            />
-            <View style={{ flex: 1 }}>
-              <Text style={[s.threatType, { color: colors.text }]}>
-                {t.type}
-              </Text>
-              <Text style={[s.threatMeta, { color: colors.mutedForeground }]}>
-                {t.city} · {t.count.toLocaleString()} reports
-              </Text>
-            </View>
-            <Text style={[s.threatTime, { color: colors.mutedForeground }]}>
-              {t.time}
-            </Text>
+        {/* Golden Rules */}
+        <View style={s.sectionOuterHeader}>
+          <View style={s.rowCenter}>
+            <Feather name="book-open" size={14} color={NAVY} />
+            <Text style={[s.outerSectionTitle, { marginLeft: 6 }]}>Golden Rules of Safety</Text>
           </View>
-        ))}
+        </View>
+        <View style={s.rulesCard}>
+          {GOLDEN_RULES.slice(0, 4).map((r, i) => {
+            const c = r.severity === "critical" ? "#dc2626" : r.severity === "important" ? SAFFRON : GREEN;
+            const bg = r.severity === "critical" ? "#fee2e2" : r.severity === "important" ? "#fff7ed" : "#f0fdf4";
+            return (
+              <View key={r.id} style={[s.ruleRow, i < 3 && s.ruleRowBorder]}>
+                <View style={[s.ruleIcon, { backgroundColor: bg }]}>
+                  <Feather name={r.icon as any} size={14} color={c} />
+                </View>
+                <Text style={s.ruleTxt} numberOfLines={2}>{r.english}</Text>
+                <View style={[s.ruleDot, { backgroundColor: c }]} />
+              </View>
+            );
+          })}
+        </View>
+
+        {/* City Hotspots */}
+        <View style={s.sectionOuterHeader}>
+          <View style={s.rowCenter}>
+            <Feather name="map-pin" size={14} color={NAVY} />
+            <Text style={[s.outerSectionTitle, { marginLeft: 6 }]}>Hotspots This Week</Text>
+          </View>
+        </View>
+        <View style={s.hotspotsCard}>
+          {CITY_HOTSPOTS.slice(0, 4).map((hs, i) => (
+            <View key={hs.city} style={[s.hotspotRow, i < 3 && s.hotspotRowBorder]}>
+              <View style={s.hotspotRank}>
+                <Text style={s.hotspotRankTxt}>{hs.rank}</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={s.hotspotCity}>{hs.city}</Text>
+                <Text style={s.hotspotCases}>{hs.cases.toLocaleString()} cases reported</Text>
+              </View>
+              <View style={s.hotspotBadge}>
+                <Text style={s.hotspotBadgeTxt}>{hs.change}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
+
+        {/* Protect Your Circle CTA */}
+        <TouchableOpacity
+          style={s.ctaCard}
+          onPress={() => router.push("/(tabs)/family")}
+          activeOpacity={0.85}
+        >
+          <View style={s.ctaGlow} />
+          <View style={s.ctaIconBox}>
+            <Feather name="users" size={22} color={SAFFRON} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={s.ctaTitle}>Protect Your Circle</Text>
+            <Text style={s.ctaSub}>Warn family & friends. Share scam alerts directly.</Text>
+          </View>
+          <Feather name="arrow-right" size={18} color={SAFFRON} />
+        </TouchableOpacity>
 
         {/* Demo call alert */}
         <TouchableOpacity
-          style={[
-            s.demoBtn,
-            { backgroundColor: colors.card, borderColor: "rgba(249,115,22,0.3)" },
-          ]}
+          style={s.demoBtn}
           onPress={() => {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
             router.push("/call-alert");
           }}
           activeOpacity={0.8}
         >
-          <View style={[s.demoBtnIcon, { backgroundColor: "rgba(249,115,22,0.15)" }]}>
-            <Feather name="phone-incoming" size={18} color="#f97316" />
+          <View style={s.demoBtnIcon}>
+            <Feather name="phone-incoming" size={18} color={SAFFRON} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={[s.demoBtnTitle, { color: colors.text }]}>
-              Demo: Incoming Scam Call
-            </Text>
-            <Text style={[s.demoBtnSub, { color: colors.mutedForeground }]}>
-              See how KavachAI warns you in real-time
-            </Text>
+            <Text style={s.demoBtnTitle}>Demo: Incoming Scam Call</Text>
+            <Text style={s.demoBtnSub}>See how KavachAI warns you in real-time</Text>
           </View>
-          <Feather name="chevron-right" size={16} color={colors.mutedForeground} />
+          <Feather name="chevron-right" size={16} color="#94a3b8" />
         </TouchableOpacity>
       </ScrollView>
     </View>
   );
 }
 
-const QUICK_TOOLS = [
-  { icon: "phone", label: "Number" },
-  { icon: "link", label: "Link" },
-  { icon: "credit-card", label: "UPI" },
-  { icon: "maximize", label: "QR Code" },
-];
-
-const ITEM_W = (width - 32 - 30) / 4;
-
 const s = StyleSheet.create({
   root: { flex: 1 },
-  header: {
+
+  // Header
+  headerBg: {
+    backgroundColor: NAVY,
+    paddingBottom: 16,
+    paddingHorizontal: 0,
+  },
+  tricolor: { flexDirection: "row", height: 3 },
+  triStrip: { flex: 1 },
+  brandRow: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
-    paddingBottom: 12,
+    paddingTop: 12,
+    marginTop: 6,
   },
-  headerLeft: { flexDirection: "row", alignItems: "center", gap: 8 },
-  headerTitle: { fontSize: 20, fontWeight: "700" as const },
-  bellBtn: { padding: 10, borderRadius: 12 },
-  badge: {
-    position: "absolute",
-    top: 8,
-    right: 8,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+  brandLeft: { flexDirection: "row", alignItems: "center", gap: 10 },
+  logoBox: {
+    width: 38, height: 38, borderRadius: 12,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    alignItems: "center", justifyContent: "center",
   },
-  guardianCard: {
-    borderRadius: 18,
-    borderWidth: 1.5,
-    padding: 20,
-    marginBottom: 16,
+  logoTitle: { fontSize: 18, fontWeight: "900" as const, color: "#fff", letterSpacing: -0.4 },
+  logoSub: { fontSize: 9, color: "rgba(255,255,255,0.55)", letterSpacing: 1, marginTop: 1 },
+  headerIcons: { flexDirection: "row", alignItems: "center", gap: 14 },
+  headerIconBtn: { position: "relative" },
+  bellDot: {
+    position: "absolute", top: -3, right: -3,
+    width: 8, height: 8, borderRadius: 4,
+    backgroundColor: "#fbbf24", borderWidth: 2, borderColor: NAVY, zIndex: 1,
   },
-  guardianTop: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
-    marginBottom: 16,
-  },
-  shieldCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  statusRow: { flexDirection: "row", alignItems: "center", gap: 6, marginBottom: 4 },
-  dot: { width: 8, height: 8, borderRadius: 4 },
-  statusLabel: { fontSize: 11, fontWeight: "700" as const, letterSpacing: 1 },
-  guardianDesc: { fontSize: 14, fontWeight: "500" as const },
-  statsRow: {
-    flexDirection: "row",
-    backgroundColor: "rgba(0,0,0,0.25)",
-    borderRadius: 12,
-    paddingVertical: 12,
-  },
-  stat: { flex: 1, alignItems: "center" },
-  statNum: { fontSize: 26, fontWeight: "700" as const, color: "#FFFFFF" },
-  statLbl: { fontSize: 10, color: "rgba(255,255,255,0.55)", marginTop: 2 },
-  statDiv: { width: 1, marginVertical: 4 },
-  actionRow: { flexDirection: "row", gap: 12, marginBottom: 24 },
+  sosRow: { flexDirection: "row", gap: 10, paddingHorizontal: 16, marginTop: 16 },
   sosBtn: {
-    width: 96,
-    borderRadius: 16,
-    padding: 14,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 2,
+    width: 80, borderRadius: 14,
+    backgroundColor: "#dc2626",
+    alignItems: "center", justifyContent: "center",
+    paddingVertical: 12, gap: 2,
+    shadowColor: "#dc2626", shadowOpacity: 0.45, shadowRadius: 12, shadowOffset: { width: 0, height: 4 },
+    elevation: 6,
   },
-  sosLabel: { fontSize: 10, color: "#FFFFFF", fontWeight: "700" as const, letterSpacing: 2 },
-  sosNum: { fontSize: 24, color: "#FFFFFF", fontWeight: "800" as const },
-  scamCard: {
-    flex: 1,
-    borderRadius: 16,
-    borderWidth: 1,
-    padding: 14,
-    gap: 6,
-    justifyContent: "center",
-  },
-  scamTag: {
+  sosBigNum: { fontSize: 20, fontWeight: "900" as const, color: "#fff" },
+  sosSubLabel: { fontSize: 8, color: "rgba(255,255,255,0.8)", textAlign: "center" },
+  statsBox: { flex: 1, borderRadius: 14, backgroundColor: "rgba(255,255,255,0.08)", padding: 12, gap: 8 },
+  guardianToggle: {
+    flexDirection: "row", alignItems: "center", gap: 6,
+    borderWidth: 1, borderRadius: 8, paddingHorizontal: 10, paddingVertical: 5,
     alignSelf: "flex-start",
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
   },
-  scamTagTxt: { fontSize: 9, color: "#FFFFFF", fontWeight: "700" as const, letterSpacing: 1 },
-  scamTitle: { fontSize: 14, fontWeight: "600" as const, lineHeight: 20 },
-  scamReports: { fontSize: 12 },
-  sectionTitle: { fontSize: 16, fontWeight: "700" as const, marginTop: 8, marginBottom: 12 },
-  sectionHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 12,
-    marginTop: 8,
+  guardianDot: { width: 7, height: 7, borderRadius: 4 },
+  guardianLabel: { fontSize: 11, fontWeight: "700" as const, color: "#fff" },
+  headerStats: { flexDirection: "row", alignItems: "center" },
+  hStat: { flex: 1, alignItems: "center" },
+  hStatNum: { fontSize: 18, fontWeight: "800" as const, color: "#fff" },
+  hStatLbl: { fontSize: 9, color: "rgba(255,255,255,0.5)", marginTop: 1 },
+  hStatDiv: { width: 1, height: 24, backgroundColor: "rgba(255,255,255,0.15)" },
+
+  // Section wrappers
+  section: { marginHorizontal: 16, marginTop: 16 },
+  sectionOuterHeader: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    marginHorizontal: 16, marginTop: 20, marginBottom: 10,
   },
-  seeAll: { fontSize: 13, fontWeight: "500" as const },
-  quickGrid: { flexDirection: "row", gap: 10, marginBottom: 24 },
-  quickItem: {
-    width: ITEM_W,
-    alignItems: "center",
-    borderRadius: 14,
-    borderWidth: 1,
-    paddingVertical: 14,
-    gap: 8,
+  sectionHeader: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 14 },
+  sectionIconBox: {
+    width: 28, height: 28, borderRadius: 8,
+    alignItems: "center", justifyContent: "center",
   },
-  quickIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: "center",
-    justifyContent: "center",
+  sectionTitle: { fontSize: 13, fontWeight: "800" as const },
+  sectionSub: { fontSize: 10, marginTop: 1 },
+  outerSectionTitle: { fontSize: 13, fontWeight: "800" as const, color: "#0f172a" },
+  seeAll: { fontSize: 11, fontWeight: "600" as const },
+  liveRow: { flexDirection: "row", alignItems: "center", gap: 8 },
+  livePulse: {
+    width: 7, height: 7, borderRadius: 4, backgroundColor: "#dc2626",
+    shadowColor: "#dc2626", shadowOpacity: 0.4, shadowRadius: 4, shadowOffset: { width: 0, height: 0 },
   },
-  quickLabel: { fontSize: 11, fontWeight: "500" as const },
-  familyCard: { borderRadius: 16, borderWidth: 1, marginBottom: 20, overflow: "hidden" },
-  memberRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 14,
-    gap: 12,
+  rowCenter: { flexDirection: "row", alignItems: "center" },
+
+  // Verify card
+  verifyCard: {
+    backgroundColor: "#fff",
+    borderRadius: 18, padding: 16,
+    shadowColor: NAVY, shadowOpacity: 0.07, shadowRadius: 16, shadowOffset: { width: 0, height: 2 },
+    elevation: 2, borderWidth: 1, borderColor: "rgba(11,61,145,0.08)",
   },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
+  toolGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  toolBtn: {
+    width: "48.5%",
+    borderRadius: 12, padding: 12, gap: 6,
   },
-  avatarText: { fontSize: 16, fontWeight: "700" as const },
-  memberName: { fontSize: 15, fontWeight: "600" as const },
-  memberRel: { fontSize: 12, marginTop: 1 },
-  statusBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
+  toolIconBox: {
+    width: 32, height: 32, borderRadius: 8, backgroundColor: "#fff",
+    alignItems: "center", justifyContent: "center",
+    shadowOpacity: 0.15, shadowRadius: 6, shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
   },
-  statusBadgeTxt: { fontSize: 11, fontWeight: "600" as const },
-  threatRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 12,
-    borderWidth: 1,
-    padding: 14,
-    marginBottom: 8,
-    gap: 12,
+  toolLabel: { fontSize: 11, fontWeight: "700" as const, color: "#1e293b" },
+  toolSublabel: { fontSize: 9, color: "#64748b" },
+
+  // Scam cards
+  scamCard: {
+    marginHorizontal: 16, marginBottom: 10,
+    backgroundColor: "#fff", borderRadius: 16,
+    borderWidth: 1.5, padding: 14,
+    shadowColor: "#000", shadowOpacity: 0.04, shadowRadius: 8, shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
   },
-  threatDot: { width: 10, height: 10, borderRadius: 5 },
-  threatType: { fontSize: 14, fontWeight: "600" as const },
-  threatMeta: { fontSize: 12, marginTop: 2 },
-  threatTime: { fontSize: 11 },
+  scamCardTop: { flexDirection: "row", gap: 12 },
+  scamIconBox: {
+    width: 40, height: 40, borderRadius: 12,
+    alignItems: "center", justifyContent: "center", flexShrink: 0,
+  },
+  scamTagRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  scamTag: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20 },
+  scamTagTxt: { fontSize: 9, fontWeight: "800" as const, letterSpacing: 0.8 },
+  scamType: { fontSize: 13, fontWeight: "700" as const, color: "#0f172a", marginTop: 4, lineHeight: 18 },
+  scamDesc: { fontSize: 11, color: "#64748b", lineHeight: 16, marginTop: 2 },
+  scamMeta: { flexDirection: "row", alignItems: "center", gap: 5, marginTop: 6 },
+  scamMetaTxt: { fontSize: 10, fontWeight: "600" as const },
+  scamTip: {
+    flexDirection: "row", alignItems: "center", gap: 8,
+    marginTop: 10, padding: 8, backgroundColor: "#f0fdf4",
+    borderRadius: 10, borderWidth: 1, borderColor: "#bbf7d0",
+  },
+  scamTipTxt: { fontSize: 10, color: "#166534", fontWeight: "600" as const, flex: 1, lineHeight: 14 },
+
+  // Family card
+  familyCard: {
+    marginHorizontal: 16,
+    backgroundColor: "#fff", borderRadius: 16,
+    borderWidth: 1, borderColor: "rgba(11,61,145,0.08)",
+    overflow: "hidden",
+    shadowColor: NAVY, shadowOpacity: 0.06, shadowRadius: 10, shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
+  },
+  memberRow: { flexDirection: "row", alignItems: "center", padding: 14, gap: 12 },
+  memberRowBorder: { borderBottomWidth: 1, borderBottomColor: "#f8fafc" },
+  memberAvatar: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
+  memberAvatarTxt: { fontSize: 16, fontWeight: "700" as const },
+  memberName: { fontSize: 14, fontWeight: "600" as const, color: "#0f172a" },
+  memberRel: { fontSize: 11, color: "#64748b", marginTop: 1 },
+  memberBadge: {
+    flexDirection: "row", alignItems: "center", gap: 4,
+    paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8,
+  },
+  memberBadgeTxt: { fontSize: 11, fontWeight: "600" as const },
+
+  // Rules card
+  rulesCard: {
+    marginHorizontal: 16, backgroundColor: "#fff",
+    borderRadius: 16, borderWidth: 1, borderColor: "rgba(11,61,145,0.08)",
+    overflow: "hidden",
+    shadowColor: NAVY, shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
+  },
+  ruleRow: { flexDirection: "row", alignItems: "center", padding: 12, gap: 12 },
+  ruleRowBorder: { borderBottomWidth: 1, borderBottomColor: "#f8fafc" },
+  ruleIcon: { width: 30, height: 30, borderRadius: 8, alignItems: "center", justifyContent: "center", flexShrink: 0 },
+  ruleTxt: { flex: 1, fontSize: 11, color: "#334155", lineHeight: 15 },
+  ruleDot: { width: 6, height: 6, borderRadius: 3, flexShrink: 0 },
+
+  // Hotspots card
+  hotspotsCard: {
+    marginHorizontal: 16, backgroundColor: "#fff",
+    borderRadius: 16, borderWidth: 1, borderColor: "rgba(11,61,145,0.08)",
+    overflow: "hidden",
+    shadowColor: NAVY, shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
+  },
+  hotspotRow: { flexDirection: "row", alignItems: "center", padding: 12, gap: 12 },
+  hotspotRowBorder: { borderBottomWidth: 1, borderBottomColor: "#f8fafc" },
+  hotspotRank: {
+    width: 24, height: 24, borderRadius: 6,
+    backgroundColor: "#EBF0FA", alignItems: "center", justifyContent: "center", flexShrink: 0,
+  },
+  hotspotRankTxt: { fontSize: 11, fontWeight: "800" as const, color: NAVY },
+  hotspotCity: { fontSize: 12, fontWeight: "700" as const, color: "#1e293b" },
+  hotspotCases: { fontSize: 10, color: "#94a3b8", marginTop: 1 },
+  hotspotBadge: { backgroundColor: "#fee2e2", paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20 },
+  hotspotBadgeTxt: { fontSize: 10, fontWeight: "800" as const, color: "#dc2626" },
+
+  // CTA card
+  ctaCard: {
+    marginHorizontal: 16, marginTop: 20,
+    backgroundColor: NAVY, borderRadius: 18, padding: 18,
+    flexDirection: "row", alignItems: "center", gap: 14,
+    overflow: "hidden", position: "relative",
+    shadowColor: NAVY, shadowOpacity: 0.3, shadowRadius: 16, shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+  },
+  ctaGlow: {
+    position: "absolute", right: -20, top: -20,
+    width: 100, height: 100, borderRadius: 50,
+    backgroundColor: "rgba(255,103,19,0.15)",
+  },
+  ctaIconBox: {
+    width: 44, height: 44, borderRadius: 12,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    alignItems: "center", justifyContent: "center", flexShrink: 0,
+  },
+  ctaTitle: { fontSize: 13, fontWeight: "800" as const, color: "#fff" },
+  ctaSub: { fontSize: 10, color: "rgba(255,255,255,0.65)", marginTop: 3, lineHeight: 14 },
+
+  // Demo btn
   demoBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    borderRadius: 16,
-    borderWidth: 1,
-    padding: 16,
-    marginTop: 8,
+    marginHorizontal: 16, marginTop: 12,
+    flexDirection: "row", alignItems: "center", gap: 12,
+    backgroundColor: "#fff", borderRadius: 16,
+    borderWidth: 1, borderColor: "rgba(255,103,19,0.2)",
+    padding: 14,
+    shadowColor: "#000", shadowOpacity: 0.04, shadowRadius: 6, shadowOffset: { width: 0, height: 1 },
+    elevation: 1,
   },
   demoBtnIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
+    width: 40, height: 40, borderRadius: 20,
+    backgroundColor: "rgba(255,103,19,0.1)",
+    alignItems: "center", justifyContent: "center",
   },
-  demoBtnTitle: { fontSize: 14, fontWeight: "600" as const },
-  demoBtnSub: { fontSize: 12, marginTop: 2 },
+  demoBtnTitle: { fontSize: 13, fontWeight: "600" as const, color: "#0f172a" },
+  demoBtnSub: { fontSize: 11, color: "#64748b", marginTop: 2 },
 });

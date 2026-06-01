@@ -1,3 +1,31 @@
+const light = {
+  text: "#0f172a",
+  tint: "#FF6713",
+  background: "#f8f9ff",
+  foreground: "#0f172a",
+  card: "#ffffff",
+  cardForeground: "#0f172a",
+  primary: "#FF6713",
+  primaryForeground: "#ffffff",
+  secondary: "#0B3D91",
+  secondaryForeground: "#ffffff",
+  muted: "#e2e8f0",
+  mutedForeground: "#64748b",
+  accent: "#138808",
+  accentForeground: "#ffffff",
+  destructive: "#dc2626",
+  destructiveForeground: "#ffffff",
+  border: "rgba(11,61,145,0.08)",
+  input: "#f1f5f9",
+  surface: "#f1f5f9",
+  surfaceElevated: "#ffffff",
+  danger: "#dc2626",
+  warning: "#ea580c",
+  navy: "#0B3D91",
+  saffron: "#FF6713",
+  green: "#138808",
+};
+
 const dark = {
   text: "#FFFFFF",
   tint: "#FF6713",
@@ -27,7 +55,7 @@ const dark = {
 };
 
 const colors = {
-  light: dark,
+  light,
   dark,
   radius: 14,
 };

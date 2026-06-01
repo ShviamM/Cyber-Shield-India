@@ -16,13 +16,17 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CheckItem, useAppContext } from "@/context/AppContext";
 import { useColors } from "@/hooks/useColors";
 
+const NAVY = "#0B3D91";
+const SAFFRON = "#FF6713";
+const GREEN = "#138808";
+
 type CheckType = CheckItem["type"];
 
-const TYPES: { key: CheckType; label: string; icon: string; hint: string }[] = [
-  { key: "number", label: "Number", icon: "phone", hint: "+91 98765 43210" },
-  { key: "link", label: "Link / URL", icon: "link", hint: "https://example.com" },
-  { key: "upi", label: "UPI ID", icon: "credit-card", hint: "name@paytm" },
-  { key: "qr", label: "QR Data", icon: "maximize", hint: "Paste QR content here" },
+const TYPES: { key: CheckType; label: string; icon: string; hint: string; color: string; bg: string }[] = [
+  { key: "number", label: "Check Number", icon: "phone", hint: "+91 98765 43210", color: NAVY, bg: "#EBF0FA" },
+  { key: "link", label: "Check Link", icon: "link", hint: "https://example.com", color: "#7c3aed", bg: "#f5f3ff" },
+  { key: "upi", label: "Check UPI ID", icon: "credit-card", hint: "name@paytm", color: GREEN, bg: "#f0fdf4" },
+  { key: "qr", label: "Check QR Code", icon: "maximize", hint: "Paste QR content here", color: SAFFRON, bg: "#fff7ed" },
 ];
 
 type Result = {
@@ -82,10 +86,10 @@ function doCheck(type: CheckType, raw: string): Result {
 }
 
 const STATUS_CONFIG = {
-  safe: { color: "#22c55e", bg: "rgba(34,197,94,0.1)", icon: "check-circle" as const },
-  warning: { color: "#f97316", bg: "rgba(249,115,22,0.12)", icon: "alert-triangle" as const },
-  danger: { color: "#dc2626", bg: "rgba(220,38,38,0.12)", icon: "alert-octagon" as const },
-  invalid: { color: "#94a3b8", bg: "rgba(148,163,184,0.1)", icon: "info" as const },
+  safe: { color: GREEN, bg: "rgba(19,136,8,0.08)", border: "rgba(19,136,8,0.2)", icon: "check-circle" as const },
+  warning: { color: "#ea580c", bg: "rgba(234,88,12,0.08)", border: "rgba(234,88,12,0.2)", icon: "alert-triangle" as const },
+  danger: { color: "#dc2626", bg: "rgba(220,38,38,0.08)", border: "rgba(220,38,38,0.2)", icon: "alert-octagon" as const },
+  invalid: { color: "#64748b", bg: "rgba(100,116,139,0.06)", border: "rgba(100,116,139,0.15)", icon: "info" as const },
 };
 
 export default function VerifyScreen() {
@@ -98,10 +102,10 @@ export default function VerifyScreen() {
   const [result, setResult] = useState<Result | null>(null);
   const [checking, setChecking] = useState(false);
 
-  const topInset = Platform.OS === "web" ? 67 : insets.top;
+  const topInset = Platform.OS === "web" ? 0 : insets.top;
   const bottomPad = (Platform.OS === "web" ? 34 : insets.bottom) + 80;
-
   const activePlaceholder = TYPES.find((t) => t.key === selectedType)?.hint ?? "";
+  const activeType = TYPES.find((t) => t.key === selectedType)!;
 
   async function handleCheck() {
     if (!input.trim()) return;
@@ -112,10 +116,8 @@ export default function VerifyScreen() {
     setResult(r);
     setChecking(false);
     addCheck({ type: selectedType, value: input.trim(), result: r.status });
-    if (r.status === "danger")
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-    else if (r.status === "warning")
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    if (r.status === "danger") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    else if (r.status === "warning") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
     else Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   }
 
@@ -130,74 +132,70 @@ export default function VerifyScreen() {
 
   return (
     <View style={[s.root, { backgroundColor: colors.background }]}>
-      <View style={[s.header, { paddingTop: topInset + 16 }]}>
-        <Text style={[s.headerTitle, { color: colors.text }]}>Verify</Text>
-        <Text style={[s.headerSub, { color: colors.mutedForeground }]}>
-          Check before you act
-        </Text>
+      {/* Navy header */}
+      <View style={[s.headerBg, { paddingTop: topInset }]}>
+        <View style={s.tricolor}>
+          <View style={[s.triStrip, { backgroundColor: SAFFRON }]} />
+          <View style={[s.triStrip, { backgroundColor: "#fff" }]} />
+          <View style={[s.triStrip, { backgroundColor: GREEN }]} />
+        </View>
+        <View style={s.headerContent}>
+          <View style={s.searchIconBox}>
+            <Feather name="search" size={20} color={SAFFRON} />
+          </View>
+          <View>
+            <Text style={s.headerTitle}>Verify Before You Act</Text>
+            <Text style={s.headerSub}>Check anything suspicious instantly</Text>
+          </View>
+        </View>
       </View>
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: bottomPad }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: bottomPad, paddingTop: 16 }}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Type selector */}
-        <View style={s.typePills}>
+        {/* Tool type selector — 2×2 grid */}
+        <View style={s.typeGrid}>
           {TYPES.map((t) => (
             <TouchableOpacity
               key={t.key}
               style={[
-                s.pill,
-                {
-                  backgroundColor:
-                    selectedType === t.key
-                      ? colors.primary
-                      : colors.card,
-                  borderColor:
-                    selectedType === t.key
-                      ? colors.primary
-                      : colors.border,
-                },
+                s.typeCard,
+                selectedType === t.key
+                  ? { backgroundColor: t.bg, borderColor: t.color + "40", borderWidth: 1.5 }
+                  : { backgroundColor: "#fff", borderColor: "rgba(11,61,145,0.08)", borderWidth: 1 },
               ]}
-              onPress={() => {
-                Haptics.selectionAsync();
-                setSelectedType(t.key);
-                setResult(null);
-              }}
+              onPress={() => { Haptics.selectionAsync(); setSelectedType(t.key); setResult(null); }}
               activeOpacity={0.75}
             >
-              <Feather
-                name={t.icon as any}
-                size={14}
-                color={selectedType === t.key ? "#FFFFFF" : colors.mutedForeground}
-              />
-              <Text
-                style={[
-                  s.pillText,
-                  {
-                    color:
-                      selectedType === t.key ? "#FFFFFF" : colors.mutedForeground,
-                  },
-                ]}
-              >
+              <View style={[
+                s.typeIconBox,
+                { backgroundColor: selectedType === t.key ? "#fff" : t.bg, shadowColor: t.color }
+              ]}>
+                <Feather name={t.icon as any} size={16} color={t.color} />
+              </View>
+              <Text style={[s.typeLabel, { color: selectedType === t.key ? "#1e293b" : "#64748b" }]}>
                 {t.label}
               </Text>
+              {selectedType === t.key && (
+                <View style={[s.typeCheck, { backgroundColor: t.color }]}>
+                  <Feather name="check" size={9} color="#fff" />
+                </View>
+              )}
             </TouchableOpacity>
           ))}
         </View>
 
         {/* Input field */}
-        <View
-          style={[
-            s.inputCard,
-            { backgroundColor: colors.card, borderColor: colors.border },
-          ]}
-        >
+        <View style={s.inputWrapper}>
+          <View style={[s.inputPill, { backgroundColor: activeType.bg }]}>
+            <Feather name={activeType.icon as any} size={16} color={activeType.color} />
+          </View>
           <TextInput
-            style={[s.textInput, { color: colors.text }]}
+            style={s.textInput}
             placeholder={activePlaceholder}
-            placeholderTextColor={colors.mutedForeground}
+            placeholderTextColor="#94a3b8"
             value={input}
             onChangeText={(v) => { setInput(v); setResult(null); }}
             autoCapitalize="none"
@@ -207,23 +205,17 @@ export default function VerifyScreen() {
           />
           {input.length > 0 && (
             <TouchableOpacity onPress={handleClear} style={s.clearBtn}>
-              <Feather name="x" size={18} color={colors.mutedForeground} />
+              <Feather name="x" size={16} color="#94a3b8" />
             </TouchableOpacity>
           )}
         </View>
 
         {/* Check button */}
         <TouchableOpacity
-          style={[
-            s.checkBtn,
-            {
-              backgroundColor:
-                input.trim() ? colors.primary : colors.muted,
-            },
-          ]}
+          style={[s.checkBtn, { backgroundColor: input.trim() ? NAVY : "#e2e8f0" }]}
           onPress={handleCheck}
           disabled={!input.trim() || checking}
-          activeOpacity={0.8}
+          activeOpacity={0.85}
         >
           {checking ? (
             <ActivityIndicator color="#FFFFFF" size="small" />
@@ -237,22 +229,15 @@ export default function VerifyScreen() {
 
         {/* Result card */}
         {result && cfg && (
-          <View
-            style={[
-              s.resultCard,
-              { backgroundColor: cfg.bg, borderColor: cfg.color + "40" },
-            ]}
-          >
+          <View style={[s.resultCard, { backgroundColor: cfg.bg, borderColor: cfg.border }]}>
             <View style={s.resultTop}>
-              <Feather name={cfg.icon} size={22} color={cfg.color} />
-              <Text style={[s.resultHeadline, { color: cfg.color }]}>
-                {result.headline}
-              </Text>
+              <View style={[s.resultIconBox, { backgroundColor: cfg.color + "18" }]}>
+                <Feather name={cfg.icon} size={20} color={cfg.color} />
+              </View>
+              <Text style={[s.resultHeadline, { color: cfg.color }]}>{result.headline}</Text>
             </View>
             {result.detail ? (
-              <Text style={[s.resultDetail, { color: colors.text }]}>
-                {result.detail}
-              </Text>
+              <Text style={s.resultDetail}>{result.detail}</Text>
             ) : null}
           </View>
         )}
@@ -260,46 +245,22 @@ export default function VerifyScreen() {
         {/* History */}
         {history.length > 0 && (
           <>
-            <Text
-              style={[
-                s.historyTitle,
-                { color: colors.mutedForeground, marginTop: result ? 24 : 16 },
-              ]}
-            >
-              RECENT CHECKS
-            </Text>
+            <Text style={s.historyTitle}>RECENT CHECKS</Text>
             {history.map((item) => {
               const sc = STATUS_CONFIG[item.result];
               return (
                 <TouchableOpacity
                   key={item.id}
-                  style={[
-                    s.historyRow,
-                    { backgroundColor: colors.card, borderColor: colors.border },
-                  ]}
-                  onPress={() => {
-                    setSelectedType(item.type);
-                    setInput(item.value);
-                    setResult(null);
-                  }}
+                  style={s.historyRow}
+                  onPress={() => { setSelectedType(item.type); setInput(item.value); setResult(null); }}
                   activeOpacity={0.75}
                 >
-                  <Feather name={sc.icon} size={16} color={sc.color} />
-                  <Text
-                    style={[s.historyValue, { color: colors.text }]}
-                    numberOfLines={1}
-                  >
-                    {item.value}
-                  </Text>
-                  <View
-                    style={[
-                      s.historyBadge,
-                      { backgroundColor: sc.bg },
-                    ]}
-                  >
-                    <Text style={[s.historyBadgeTxt, { color: sc.color }]}>
-                      {item.result}
-                    </Text>
+                  <View style={[s.historyDot, { backgroundColor: sc.color + "18" }]}>
+                    <Feather name={sc.icon} size={14} color={sc.color} />
+                  </View>
+                  <Text style={s.historyValue} numberOfLines={1}>{item.value}</Text>
+                  <View style={[s.historyBadge, { backgroundColor: sc.bg }]}>
+                    <Text style={[s.historyBadgeTxt, { color: sc.color }]}>{item.result}</Text>
                   </View>
                 </TouchableOpacity>
               );
@@ -313,63 +274,76 @@ export default function VerifyScreen() {
 
 const s = StyleSheet.create({
   root: { flex: 1 },
-  header: { paddingHorizontal: 16, paddingBottom: 16 },
-  headerTitle: { fontSize: 28, fontWeight: "700" as const },
-  headerSub: { fontSize: 14, marginTop: 2 },
-  typePills: { flexDirection: "row", gap: 8, marginBottom: 16, flexWrap: "wrap" },
-  pill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 40,
-    borderWidth: 1,
+  headerBg: { backgroundColor: NAVY, paddingBottom: 20 },
+  tricolor: { flexDirection: "row", height: 3 },
+  triStrip: { flex: 1 },
+  headerContent: {
+    flexDirection: "row", alignItems: "center", gap: 12,
+    paddingHorizontal: 16, paddingTop: 16, marginTop: 6,
   },
-  pillText: { fontSize: 13, fontWeight: "500" as const },
-  inputCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 16,
-    borderWidth: 1,
-    paddingHorizontal: 16,
-    marginBottom: 12,
-    height: 54,
+  searchIconBox: {
+    width: 44, height: 44, borderRadius: 12,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    alignItems: "center", justifyContent: "center",
   },
-  textInput: { flex: 1, fontSize: 16, height: "100%" as any },
+  headerTitle: { fontSize: 18, fontWeight: "800" as const, color: "#fff", letterSpacing: -0.3 },
+  headerSub: { fontSize: 11, color: "rgba(255,255,255,0.6)", marginTop: 2 },
+  typeGrid: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 16 },
+  typeCard: {
+    width: "48.5%", borderRadius: 14, padding: 14, gap: 8, position: "relative",
+    shadowColor: NAVY, shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
+  },
+  typeIconBox: {
+    width: 36, height: 36, borderRadius: 10,
+    alignItems: "center", justifyContent: "center",
+    shadowOpacity: 0.15, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 1,
+  },
+  typeLabel: { fontSize: 12, fontWeight: "700" as const },
+  typeCheck: {
+    position: "absolute", top: 10, right: 10,
+    width: 18, height: 18, borderRadius: 9,
+    alignItems: "center", justifyContent: "center",
+  },
+  inputWrapper: {
+    flexDirection: "row", alignItems: "center",
+    backgroundColor: "#fff", borderRadius: 16,
+    borderWidth: 1.5, borderColor: "rgba(11,61,145,0.12)",
+    paddingHorizontal: 14, marginBottom: 12, height: 54,
+    shadowColor: NAVY, shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
+  },
+  inputPill: { width: 32, height: 32, borderRadius: 8, alignItems: "center", justifyContent: "center", marginRight: 10 },
+  textInput: { flex: 1, fontSize: 15, height: "100%" as any, color: "#0f172a" },
   clearBtn: { padding: 4 },
   checkBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    height: 52,
-    borderRadius: 16,
-    marginBottom: 16,
+    flexDirection: "row", alignItems: "center", justifyContent: "center",
+    gap: 8, height: 52, borderRadius: 16, marginBottom: 16,
+    shadowColor: NAVY, shadowOpacity: 0.25, shadowRadius: 12, shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
   },
-  checkBtnText: { fontSize: 16, fontWeight: "700" as const, color: "#FFFFFF" },
+  checkBtnText: { fontSize: 16, fontWeight: "700" as const, color: "#fff" },
   resultCard: {
-    borderRadius: 16,
-    borderWidth: 1.5,
-    padding: 18,
-    gap: 10,
-    marginBottom: 8,
+    borderRadius: 16, borderWidth: 1.5, padding: 16, gap: 10, marginBottom: 8,
   },
   resultTop: { flexDirection: "row", alignItems: "center", gap: 10 },
-  resultHeadline: { fontSize: 16, fontWeight: "700" as const, flex: 1 },
-  resultDetail: { fontSize: 14, lineHeight: 22, opacity: 0.85 },
-  historyTitle: { fontSize: 11, fontWeight: "700" as const, letterSpacing: 1, marginBottom: 10 },
-  historyRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    borderRadius: 12,
-    borderWidth: 1,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    marginBottom: 8,
+  resultIconBox: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
+  resultHeadline: { fontSize: 15, fontWeight: "700" as const, flex: 1 },
+  resultDetail: { fontSize: 13, color: "#334155", lineHeight: 20, marginLeft: 50 },
+  historyTitle: {
+    fontSize: 11, fontWeight: "700" as const, letterSpacing: 1,
+    color: "#94a3b8", marginBottom: 10, marginTop: 8,
   },
-  historyValue: { flex: 1, fontSize: 14 },
+  historyRow: {
+    flexDirection: "row", alignItems: "center", gap: 10,
+    backgroundColor: "#fff", borderRadius: 12,
+    borderWidth: 1, borderColor: "rgba(11,61,145,0.07)",
+    paddingHorizontal: 14, paddingVertical: 11, marginBottom: 8,
+    shadowColor: NAVY, shadowOpacity: 0.04, shadowRadius: 4, shadowOffset: { width: 0, height: 1 },
+    elevation: 1,
+  },
+  historyDot: { width: 32, height: 32, borderRadius: 16, alignItems: "center", justifyContent: "center", flexShrink: 0 },
+  historyValue: { flex: 1, fontSize: 13, color: "#0f172a" },
   historyBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 },
-  historyBadgeTxt: { fontSize: 11, fontWeight: "600" as const, textTransform: "capitalize" as const },
+  historyBadgeTxt: { fontSize: 10, fontWeight: "600" as const, textTransform: "capitalize" as const },
 });

@@ -16,15 +16,17 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAppContext } from "@/context/AppContext";
 import { useColors } from "@/hooks/useColors";
 
+const NAVY = "#0B3D91";
+const SAFFRON = "#FF6713";
+const GREEN = "#138808";
+
 export default function ProfileScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { guardianActive, language, toggleGuardian, toggleLanguage } =
-    useAppContext();
+  const { guardianActive, language, toggleGuardian, toggleLanguage } = useAppContext();
 
-  const topInset = Platform.OS === "web" ? 67 : insets.top;
+  const topInset = Platform.OS === "web" ? 0 : insets.top;
   const bottomPad = (Platform.OS === "web" ? 34 : insets.bottom) + 80;
-
   const [notifications, setNotifications] = React.useState(true);
 
   function callHelpline() {
@@ -34,103 +36,67 @@ export default function ProfileScreen() {
 
   return (
     <View style={[s.root, { backgroundColor: colors.background }]}>
-      <View style={[s.header, { paddingTop: topInset + 16 }]}>
-        <Text style={[s.headerTitle, { color: colors.text }]}>Profile</Text>
-      </View>
-
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: bottomPad }}
-      >
-        {/* User card */}
-        <View
-          style={[
-            s.userCard,
-            { backgroundColor: colors.card, borderColor: colors.border },
-          ]}
-        >
-          <View style={[s.userAvatar, { backgroundColor: "rgba(255,103,19,0.15)" }]}>
-            <Text style={[s.userAvatarTxt, { color: colors.primary }]}>R</Text>
+      {/* Navy header */}
+      <View style={[s.headerBg, { paddingTop: topInset }]}>
+        <View style={s.tricolor}>
+          <View style={[s.triStrip, { backgroundColor: SAFFRON }]} />
+          <View style={[s.triStrip, { backgroundColor: "#fff" }]} />
+          <View style={[s.triStrip, { backgroundColor: GREEN }]} />
+        </View>
+        <View style={s.headerContent}>
+          <View style={s.headerLeft}>
+            <View style={[s.userAvatar, { backgroundColor: "rgba(255,255,255,0.15)" }]}>
+              <Text style={s.userAvatarTxt}>R</Text>
+            </View>
+            <View>
+              <Text style={s.headerTitle}>Rahul Sharma</Text>
+              <Text style={s.headerSub}>+91 98765 43210</Text>
+            </View>
           </View>
-          <View style={{ flex: 1 }}>
-            <Text style={[s.userName, { color: colors.text }]}>
-              Rahul Sharma
-            </Text>
-            <Text style={[s.userPhone, { color: colors.mutedForeground }]}>
-              +91 98765 43210
-            </Text>
-          </View>
-          <View
-            style={[
-              s.userBadge,
-              {
-                backgroundColor: guardianActive
-                  ? "rgba(34,197,94,0.1)"
-                  : "rgba(100,116,139,0.12)",
-              },
-            ]}
-          >
-            <Feather
-              name="shield"
-              size={14}
-              color={guardianActive ? "#4ade80" : colors.mutedForeground}
-            />
-            <Text
-              style={[
-                s.userBadgeTxt,
-                {
-                  color: guardianActive ? "#4ade80" : colors.mutedForeground,
-                },
-              ]}
-            >
+          <View style={[
+            s.guardianBadge,
+            { backgroundColor: guardianActive ? "rgba(74,222,128,0.2)" : "rgba(255,255,255,0.12)" },
+          ]}>
+            <Feather name="shield" size={13} color={guardianActive ? "#4ade80" : "rgba(255,255,255,0.5)"} />
+            <Text style={[s.guardianBadgeTxt, {
+              color: guardianActive ? "#4ade80" : "rgba(255,255,255,0.5)",
+            }]}>
               {guardianActive ? "Protected" : "Paused"}
             </Text>
           </View>
         </View>
+      </View>
 
-        {/* SOS button */}
-        <TouchableOpacity
-          style={[s.sosCard, { backgroundColor: "#7f1d1d", borderColor: "#dc262640" }]}
-          onPress={callHelpline}
-          activeOpacity={0.8}
-        >
-          <View style={[s.sosIconBg, { backgroundColor: "#dc2626" }]}>
-            <Feather name="phone-call" size={24} color="#FFFFFF" />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: bottomPad, paddingTop: 16 }}
+      >
+        {/* SOS card */}
+        <TouchableOpacity style={s.sosCard} onPress={callHelpline} activeOpacity={0.85}>
+          <View style={s.sosIconBg}>
+            <Feather name="phone-call" size={24} color="#fff" />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={[s.sosTitle, { color: "#FFFFFF" }]}>
-              Cyber Crime Helpline
-            </Text>
-            <Text style={[s.sosNumber, { color: "#fca5a5" }]}>
-              Call 1930 immediately if you've been scammed
-            </Text>
+            <Text style={s.sosTitle}>Cyber Crime Helpline</Text>
+            <Text style={s.sosDesc}>Call immediately if you've been scammed</Text>
           </View>
-          <Text style={[s.sosBigNum, { color: "#FFFFFF" }]}>1930</Text>
+          <Text style={s.sosBigNum}>1930</Text>
         </TouchableOpacity>
 
-        {/* Settings */}
-        <Text style={[s.sectionLabel, { color: colors.mutedForeground }]}>
-          PROTECTION
-        </Text>
-        <View
-          style={[
-            s.settingsCard,
-            { backgroundColor: colors.card, borderColor: colors.border },
-          ]}
-        >
+        {/* Protection section */}
+        <Text style={s.sectionLabel}>PROTECTION</Text>
+        <View style={s.settingsCard}>
           <SettingRow
             icon="shield"
+            iconColor={NAVY}
+            iconBg="#EBF0FA"
             label="Guardian Mode"
             sub="Real-time scam call warnings"
-            colors={colors}
             right={
               <Switch
                 value={guardianActive}
-                onValueChange={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                  toggleGuardian();
-                }}
-                trackColor={{ false: colors.muted, true: colors.primary }}
+                onValueChange={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); toggleGuardian(); }}
+                trackColor={{ false: "#e2e8f0", true: NAVY }}
                 thumbColor="#FFFFFF"
               />
             }
@@ -138,17 +104,15 @@ export default function ProfileScreen() {
           />
           <SettingRow
             icon="bell"
+            iconColor={SAFFRON}
+            iconBg="#fff7ed"
             label="Threat Notifications"
             sub="Alerts for new scams in your city"
-            colors={colors}
             right={
               <Switch
                 value={notifications}
-                onValueChange={(v) => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                  setNotifications(v);
-                }}
-                trackColor={{ false: colors.muted, true: colors.primary }}
+                onValueChange={(v) => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setNotifications(v); }}
+                trackColor={{ false: "#e2e8f0", true: NAVY }}
                 thumbColor="#FFFFFF"
               />
             }
@@ -156,157 +120,108 @@ export default function ProfileScreen() {
           />
         </View>
 
-        <Text style={[s.sectionLabel, { color: colors.mutedForeground }]}>
-          LANGUAGE
-        </Text>
-        <View
-          style={[
-            s.settingsCard,
-            { backgroundColor: colors.card, borderColor: colors.border },
-          ]}
-        >
+        {/* Language section */}
+        <Text style={s.sectionLabel}>LANGUAGE</Text>
+        <View style={s.settingsCard}>
           <TouchableOpacity
             style={s.settingRow}
-            onPress={() => {
-              Haptics.selectionAsync();
-              toggleLanguage();
-            }}
+            onPress={() => { Haptics.selectionAsync(); toggleLanguage(); }}
             activeOpacity={0.75}
           >
-            <View
-              style={[
-                s.settingIconBg,
-                { backgroundColor: "rgba(255,103,19,0.1)" },
-              ]}
-            >
-              <Feather name="globe" size={18} color={colors.primary} />
+            <View style={[s.settingIconBg, { backgroundColor: "#f0fdf4" }]}>
+              <Feather name="globe" size={18} color={GREEN} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={[s.settingLabel, { color: colors.text }]}>
-                Display Language
-              </Text>
-              <Text style={[s.settingSub, { color: colors.mutedForeground }]}>
-                {language === "hi" ? "हिंदी (Hindi)" : "English"}
-              </Text>
+              <Text style={s.settingLabel}>Display Language</Text>
+              <Text style={s.settingSub}>{language === "hi" ? "हिंदी (Hindi)" : "English"}</Text>
             </View>
-            <View
-              style={[
-                s.langToggle,
-                { backgroundColor: colors.surface },
-              ]}
-            >
-              <View
-                style={[
-                  s.langOption,
-                  language === "hi" && { backgroundColor: colors.primary },
-                ]}
-              >
-                <Text
-                  style={[
-                    s.langTxt,
-                    { color: language === "hi" ? "#FFFFFF" : colors.mutedForeground },
-                  ]}
-                >
-                  हि
-                </Text>
+            <View style={s.langToggle}>
+              <View style={[s.langOption, language === "hi" && { backgroundColor: NAVY }]}>
+                <Text style={[s.langTxt, { color: language === "hi" ? "#fff" : "#94a3b8" }]}>हि</Text>
               </View>
-              <View
-                style={[
-                  s.langOption,
-                  language === "en" && { backgroundColor: colors.primary },
-                ]}
-              >
-                <Text
-                  style={[
-                    s.langTxt,
-                    { color: language === "en" ? "#FFFFFF" : colors.mutedForeground },
-                  ]}
-                >
-                  EN
-                </Text>
+              <View style={[s.langOption, language === "en" && { backgroundColor: NAVY }]}>
+                <Text style={[s.langTxt, { color: language === "en" ? "#fff" : "#94a3b8" }]}>EN</Text>
               </View>
             </View>
           </TouchableOpacity>
         </View>
 
-        <Text style={[s.sectionLabel, { color: colors.mutedForeground }]}>
-          ABOUT
-        </Text>
-        <View
-          style={[
-            s.settingsCard,
-            { backgroundColor: colors.card, borderColor: colors.border },
-          ]}
-        >
+        {/* Quick services */}
+        <Text style={s.sectionLabel}>QUICK SERVICES</Text>
+        <View style={s.servicesGrid}>
+          {[
+            { icon: "file-text" as const, label: "File Complaint", sublabel: "Cyber crime portal", color: "#7c3aed", bg: "#f5f3ff" },
+            { icon: "phone-off" as const, label: "DND Registry", sublabel: "Block telemarketing", color: "#b45309", bg: "#fffbeb" },
+            { icon: "flag" as const, label: "Report Spam", sublabel: "Report a number", color: GREEN, bg: "#f0fdf4" },
+            { icon: "info" as const, label: "Safety Tips", sublabel: "Stay protected", color: NAVY, bg: "#EBF0FA" },
+          ].map((svc, i) => (
+            <TouchableOpacity key={i} style={[s.svcCard, { backgroundColor: svc.bg }]} activeOpacity={0.75}>
+              <View style={[s.svcIconBox, { shadowColor: svc.color }]}>
+                <Feather name={svc.icon} size={18} color={svc.color} />
+              </View>
+              <Text style={s.svcLabel}>{svc.label}</Text>
+              <Text style={s.svcSublabel}>{svc.sublabel}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* About section */}
+        <Text style={s.sectionLabel}>ABOUT</Text>
+        <View style={s.settingsCard}>
           <SettingRow
             icon="info"
+            iconColor={NAVY}
+            iconBg="#EBF0FA"
             label="About KavachAI"
             sub="Prevention-first cyber safety for India"
-            colors={colors}
-            right={<Feather name="chevron-right" size={16} color={colors.mutedForeground} />}
+            right={<Feather name="chevron-right" size={16} color="#94a3b8" />}
             isLast={false}
           />
           <SettingRow
             icon="file-text"
+            iconColor="#7c3aed"
+            iconBg="#f5f3ff"
             label="Privacy Policy"
             sub="How we protect your data"
-            colors={colors}
-            right={<Feather name="chevron-right" size={16} color={colors.mutedForeground} />}
+            right={<Feather name="chevron-right" size={16} color="#94a3b8" />}
             isLast={false}
           />
           <SettingRow
             icon="star"
+            iconColor={SAFFRON}
+            iconBg="#fff7ed"
             label="Rate KavachAI"
             sub="Help us protect more Indians"
-            colors={colors}
-            right={<Feather name="chevron-right" size={16} color={colors.mutedForeground} />}
+            right={<Feather name="chevron-right" size={16} color="#94a3b8" />}
             isLast={true}
           />
         </View>
 
-        <Text style={[s.version, { color: colors.mutedForeground }]}>
-          KavachAI v1.0.0 · Made with ❤️ for India
-        </Text>
+        <Text style={s.version}>KavachAI v1.0.0 · Made with ❤️ for India</Text>
       </ScrollView>
     </View>
   );
 }
 
 function SettingRow({
-  icon,
-  label,
-  sub,
-  colors,
-  right,
-  isLast,
+  icon, iconColor, iconBg, label, sub, right, isLast,
 }: {
   icon: string;
+  iconColor: string;
+  iconBg: string;
   label: string;
   sub: string;
-  colors: ReturnType<typeof import("@/hooks/useColors").useColors>;
   right: React.ReactNode;
   isLast: boolean;
 }) {
   return (
-    <View
-      style={[
-        s.settingRow,
-        !isLast && { borderBottomWidth: 1, borderBottomColor: colors.border },
-      ]}
-    >
-      <View
-        style={[
-          s.settingIconBg,
-          { backgroundColor: "rgba(255,103,19,0.1)" },
-        ]}
-      >
-        <Feather name={icon as any} size={18} color={colors.primary} />
+    <View style={[s.settingRow, !isLast && s.settingRowBorder]}>
+      <View style={[s.settingIconBg, { backgroundColor: iconBg }]}>
+        <Feather name={icon as any} size={18} color={iconColor} />
       </View>
       <View style={{ flex: 1 }}>
-        <Text style={[s.settingLabel, { color: colors.text }]}>{label}</Text>
-        <Text style={[s.settingSub, { color: colors.mutedForeground }]}>
-          {sub}
-        </Text>
+        <Text style={s.settingLabel}>{label}</Text>
+        <Text style={s.settingSub}>{sub}</Text>
       </View>
       {right}
     </View>
@@ -315,102 +230,84 @@ function SettingRow({
 
 const s = StyleSheet.create({
   root: { flex: 1 },
-  header: { paddingHorizontal: 16, paddingBottom: 16 },
-  headerTitle: { fontSize: 28, fontWeight: "700" as const },
-  userCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 18,
-    borderWidth: 1,
-    padding: 18,
-    gap: 14,
-    marginBottom: 14,
+  headerBg: { backgroundColor: NAVY, paddingBottom: 20 },
+  tricolor: { flexDirection: "row", height: 3 },
+  triStrip: { flex: 1 },
+  headerContent: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    paddingHorizontal: 16, paddingTop: 14, marginTop: 6,
   },
+  headerLeft: { flexDirection: "row", alignItems: "center", gap: 12 },
   userAvatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: "center",
-    justifyContent: "center",
+    width: 46, height: 46, borderRadius: 23,
+    alignItems: "center", justifyContent: "center",
   },
-  userAvatarTxt: { fontSize: 22, fontWeight: "700" as const },
-  userName: { fontSize: 18, fontWeight: "700" as const },
-  userPhone: { fontSize: 13, marginTop: 2 },
-  userBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
+  userAvatarTxt: { fontSize: 18, fontWeight: "800" as const, color: "#fff" },
+  headerTitle: { fontSize: 17, fontWeight: "800" as const, color: "#fff", letterSpacing: -0.3 },
+  headerSub: { fontSize: 12, color: "rgba(255,255,255,0.6)", marginTop: 2 },
+  guardianBadge: {
+    flexDirection: "row", alignItems: "center", gap: 5,
+    paddingHorizontal: 10, paddingVertical: 6, borderRadius: 20,
   },
-  userBadgeTxt: { fontSize: 12, fontWeight: "600" as const },
+  guardianBadgeTxt: { fontSize: 12, fontWeight: "600" as const },
+
   sosCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 14,
-    borderRadius: 18,
-    borderWidth: 1,
-    padding: 16,
-    marginBottom: 24,
+    flexDirection: "row", alignItems: "center", gap: 14,
+    backgroundColor: "#7f1d1d", borderRadius: 18,
+    borderWidth: 1, borderColor: "rgba(220,38,38,0.3)",
+    padding: 16, marginBottom: 24,
+    shadowColor: "#dc2626", shadowOpacity: 0.25, shadowRadius: 16, shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
   },
   sosIconBg: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    alignItems: "center",
-    justifyContent: "center",
+    width: 52, height: 52, borderRadius: 26,
+    backgroundColor: "#dc2626",
+    alignItems: "center", justifyContent: "center",
+    shadowColor: "#dc2626", shadowOpacity: 0.4, shadowRadius: 10, shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
   },
-  sosTitle: { fontSize: 16, fontWeight: "700" as const },
-  sosNumber: { fontSize: 12, marginTop: 2 },
-  sosBigNum: { fontSize: 28, fontWeight: "800" as const },
+  sosTitle: { fontSize: 15, fontWeight: "700" as const, color: "#fff" },
+  sosDesc: { fontSize: 12, color: "#fca5a5", marginTop: 2 },
+  sosBigNum: { fontSize: 28, fontWeight: "900" as const, color: "#fff" },
+
   sectionLabel: {
-    fontSize: 11,
-    fontWeight: "700" as const,
-    letterSpacing: 1,
-    marginBottom: 10,
-    marginTop: 4,
+    fontSize: 11, fontWeight: "700" as const, letterSpacing: 1,
+    color: "#94a3b8", marginBottom: 10, marginTop: 4,
   },
   settingsCard: {
-    borderRadius: 16,
-    borderWidth: 1,
-    marginBottom: 20,
-    overflow: "hidden",
+    backgroundColor: "#fff", borderRadius: 18,
+    borderWidth: 1, borderColor: "rgba(11,61,145,0.08)",
+    marginBottom: 20, overflow: "hidden",
+    shadowColor: NAVY, shadowOpacity: 0.06, shadowRadius: 12, shadowOffset: { width: 0, height: 3 },
+    elevation: 2,
   },
-  settingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 14,
-    gap: 12,
-  },
-  settingIconBg: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  settingLabel: { fontSize: 15, fontWeight: "600" as const },
-  settingSub: { fontSize: 12, marginTop: 1 },
+  settingRow: { flexDirection: "row", alignItems: "center", padding: 14, gap: 12 },
+  settingRowBorder: { borderBottomWidth: 1, borderBottomColor: "#f8fafc" },
+  settingIconBg: { width: 38, height: 38, borderRadius: 10, alignItems: "center", justifyContent: "center" },
+  settingLabel: { fontSize: 14, fontWeight: "600" as const, color: "#0f172a" },
+  settingSub: { fontSize: 12, color: "#64748b", marginTop: 1 },
   langToggle: {
-    flexDirection: "row",
-    borderRadius: 8,
-    overflow: "hidden",
-    gap: 2,
-    padding: 2,
+    flexDirection: "row", borderRadius: 10, overflow: "hidden",
+    backgroundColor: "#f1f5f9", gap: 2, padding: 2,
   },
-  langOption: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 6,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  langOption: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, alignItems: "center", justifyContent: "center" },
   langTxt: { fontSize: 13, fontWeight: "700" as const },
-  version: {
-    textAlign: "center",
-    fontSize: 12,
-    marginTop: 8,
-    marginBottom: 8,
+
+  servicesGrid: {
+    flexDirection: "row", flexWrap: "wrap", gap: 10, marginBottom: 20,
   },
+  svcCard: {
+    width: "47.5%", borderRadius: 16, padding: 14, gap: 8,
+    shadowColor: NAVY, shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
+  },
+  svcIconBox: {
+    width: 38, height: 38, borderRadius: 10,
+    backgroundColor: "#fff", alignItems: "center", justifyContent: "center",
+    shadowOpacity: 0.15, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 2,
+  },
+  svcLabel: { fontSize: 12, fontWeight: "700" as const, color: "#1e293b" },
+  svcSublabel: { fontSize: 10, color: "#64748b" },
+
+  version: { textAlign: "center", fontSize: 12, color: "#94a3b8", marginTop: 8, marginBottom: 8 },
 });
