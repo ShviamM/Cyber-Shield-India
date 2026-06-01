@@ -243,7 +243,7 @@ export default function HomeScreen() {
         {familyMembers.length > 0 && (
           <>
             <View style={s.sectionOuterHeader}>
-              <Text style={s.outerSectionTitle}>{t("home.familyShield")}</Text>
+              <Text style={[s.outerSectionTitle, { color: colors.text }]}>{t("home.familyShield")}</Text>
               <TouchableOpacity onPress={() => router.push("/(tabs)/family")}>
                 <Text style={[s.seeAll, { color: NAVY }]}>{t("home.seeAll")}</Text>
               </TouchableOpacity>
@@ -294,7 +294,7 @@ export default function HomeScreen() {
         <View style={s.sectionOuterHeader}>
           <View style={s.rowCenter}>
             <Feather name="book-open" size={14} color={NAVY} />
-            <Text style={[s.outerSectionTitle, { marginLeft: 6 }]}>{t("home.goldenRules")}</Text>
+            <Text style={[s.outerSectionTitle, { marginLeft: 6, color: colors.text }]}>{t("home.goldenRules")}</Text>
           </View>
         </View>
         <View style={s.rulesCard}>
@@ -317,7 +317,7 @@ export default function HomeScreen() {
         <View style={s.sectionOuterHeader}>
           <View style={s.rowCenter}>
             <Feather name="map-pin" size={14} color={NAVY} />
-            <Text style={[s.outerSectionTitle, { marginLeft: 6 }]}>{t("home.hotspots")}</Text>
+            <Text style={[s.outerSectionTitle, { marginLeft: 6, color: colors.text }]}>{t("home.hotspots")}</Text>
           </View>
         </View>
         <View style={s.hotspotsCard}>
