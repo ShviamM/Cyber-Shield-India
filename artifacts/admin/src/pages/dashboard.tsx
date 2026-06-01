@@ -12,6 +12,15 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationPrevious,
+  PaginationNext,
+  PaginationEllipsis,
+} from "@/components/ui/pagination";
 import { NumberReputation } from "@/components/number-reputation";
 import {
   AlertDialog,
@@ -35,7 +44,8 @@ export default function Dashboard() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [searchPhone, setSearchPhone] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [offset, setOffset] = useState(0);
+  const [page, setPage] = useState(1);
+  const [jumpValue, setJumpValue] = useState("");
   const [reports, setReports] = useState<AdminReport[]>([]);
   const [pendingVerify, setPendingVerify] = useState<{ phone: string; verifiedScam: boolean } | null>(null);
 
@@ -50,18 +60,17 @@ export default function Dashboard() {
     return () => clearTimeout(handler);
   }, [searchPhone]);
 
-  // Reset paging whenever the active filter or search changes
+  // Reset to the first page whenever the active filter or search changes
   const filterKey = `${statusFilter}|${debouncedSearch}`;
   useEffect(() => {
-    setOffset(0);
-    setReports([]);
+    setPage(1);
   }, [filterKey]);
 
   const params = {
     status: statusFilter === "all" ? undefined : statusFilter,
     phone: debouncedSearch || undefined,
     limit: PAGE_SIZE,
-    offset,
+    offset: (page - 1) * PAGE_SIZE,
   };
 
   const { data, isLoading, isFetching } = useAdminListReports(params, {
@@ -70,19 +79,45 @@ export default function Dashboard() {
     }
   });
 
-  // Accumulate pages as they load (replace on first page, append otherwise)
+  // Mirror the current page's reports into local state (supports optimistic edits)
   useEffect(() => {
     if (!data) return;
-    setReports((prev) => {
-      if (offset === 0) return data.reports;
-      const seen = new Set(prev.map((r) => r.id));
-      return [...prev, ...data.reports.filter((r) => !seen.has(r.id))];
-    });
-  }, [data, offset]);
+    setReports(data.reports);
+  }, [data]);
 
   const total = data?.total ?? 0;
-  const hasMore = reports.length < total;
-  const isLoadingMore = isFetching && offset > 0;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  // If the current page no longer exists (e.g. items removed), clamp it
+  useEffect(() => {
+    if (page > totalPages) setPage(totalPages);
+  }, [page, totalPages]);
+
+  const goToPage = (target: number) => {
+    const clamped = Math.min(Math.max(1, target), totalPages);
+    setPage(clamped);
+  };
+
+  const handleJump = () => {
+    const parsed = parseInt(jumpValue, 10);
+    if (!Number.isNaN(parsed)) goToPage(parsed);
+    setJumpValue("");
+  };
+
+  // Build the list of page numbers to show, with ellipsis for large ranges
+  const pageNumbers: (number | "ellipsis")[] = (() => {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    const pages: (number | "ellipsis")[] = [1];
+    const start = Math.max(2, page - 1);
+    const end = Math.min(totalPages - 1, page + 1);
+    if (start > 2) pages.push("ellipsis");
+    for (let i = start; i <= end; i++) pages.push(i);
+    if (end < totalPages - 1) pages.push("ellipsis");
+    pages.push(totalPages);
+    return pages;
+  })();
 
   const handleLogout = async () => {
     try {
@@ -163,9 +198,9 @@ export default function Dashboard() {
             <h1 className="text-2xl font-bold tracking-tight">Moderation Queue</h1>
             <p className="text-muted-foreground">
               Review and action community fraud reports.
-              {!isLoading && (
+              {!isLoading && total > 0 && (
                 <span className="ml-1">
-                  Showing {reports.length} of {total} report{total === 1 ? "" : "s"}.
+                  Showing {(page - 1) * PAGE_SIZE + 1}&ndash;{Math.min(page * PAGE_SIZE, total)} of {total} report{total === 1 ? "" : "s"} (page {page} of {totalPages}).
                 </span>
               )}
             </p>
@@ -299,15 +334,65 @@ export default function Dashboard() {
                 </Card>
               ))}
 
-              {hasMore && (
-                <div className="flex justify-center pt-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => setOffset((o) => o + PAGE_SIZE)}
-                    disabled={isLoadingMore}
-                  >
-                    {isLoadingMore ? "Loading..." : `Load more (${total - reports.length} remaining)`}
-                  </Button>
+              {totalPages > 1 && (
+                <div className="flex flex-col items-center gap-3 pt-4">
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious
+                          href="#"
+                          onClick={(e) => { e.preventDefault(); goToPage(page - 1); }}
+                          aria-disabled={page === 1}
+                          className={page === 1 ? "pointer-events-none opacity-50" : undefined}
+                        />
+                      </PaginationItem>
+
+                      {pageNumbers.map((p, i) =>
+                        p === "ellipsis" ? (
+                          <PaginationItem key={`ellipsis-${i}`}>
+                            <PaginationEllipsis />
+                          </PaginationItem>
+                        ) : (
+                          <PaginationItem key={p}>
+                            <PaginationLink
+                              href="#"
+                              isActive={p === page}
+                              onClick={(e) => { e.preventDefault(); goToPage(p); }}
+                            >
+                              {p}
+                            </PaginationLink>
+                          </PaginationItem>
+                        )
+                      )}
+
+                      <PaginationItem>
+                        <PaginationNext
+                          href="#"
+                          onClick={(e) => { e.preventDefault(); goToPage(page + 1); }}
+                          aria-disabled={page === totalPages}
+                          className={page === totalPages ? "pointer-events-none opacity-50" : undefined}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    {isFetching && <span>Loading&hellip;</span>}
+                    <span>Jump to page</span>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={totalPages}
+                      value={jumpValue}
+                      onChange={(e) => setJumpValue(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Enter") handleJump(); }}
+                      placeholder={`${page}`}
+                      className="h-8 w-20 bg-background"
+                    />
+                    <Button size="sm" variant="outline" onClick={handleJump} disabled={!jumpValue}>
+                      Go
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>
