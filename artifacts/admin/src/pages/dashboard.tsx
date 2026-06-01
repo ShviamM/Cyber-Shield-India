@@ -13,6 +13,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { NumberReputation } from "@/components/number-reputation";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import type { UpdateReportStatusRequestStatus } from "@workspace/api-client-react";
 
 export default function Dashboard() {
@@ -27,6 +37,7 @@ export default function Dashboard() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [offset, setOffset] = useState(0);
   const [reports, setReports] = useState<AdminReport[]>([]);
+  const [pendingVerify, setPendingVerify] = useState<{ phone: string; verifiedScam: boolean } | null>(null);
 
   const updateReport = useAdminUpdateReport();
   const verifyNumber = useAdminVerifyNumber();
@@ -92,7 +103,9 @@ export default function Dashboard() {
     }
   };
 
-  const handleVerifyNumber = async (phone: string, verifiedScam: boolean) => {
+  const handleVerifyNumber = async () => {
+    if (!pendingVerify) return;
+    const { phone, verifiedScam } = pendingVerify;
     try {
       await verifyNumber.mutateAsync({ phone, data: { verifiedScam } });
       toast.success(
@@ -104,6 +117,8 @@ export default function Dashboard() {
       queryClient.invalidateQueries({ queryKey: getAdminListReportsQueryKey() });
     } catch (err) {
       toast.error("Failed to update number reputation");
+    } finally {
+      setPendingVerify(null);
     }
   };
 
@@ -263,7 +278,7 @@ export default function Dashboard() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => handleVerifyNumber(report.phone, false)}
+                            onClick={() => setPendingVerify({ phone: report.phone, verifiedScam: false })}
                             disabled={verifyNumber.isPending}
                           >
                             <ShieldOff className="w-4 h-4 mr-1" /> Remove from Blacklist
@@ -272,7 +287,7 @@ export default function Dashboard() {
                           <Button
                             size="sm"
                             variant="secondary"
-                            onClick={() => handleVerifyNumber(report.phone, true)}
+                            onClick={() => setPendingVerify({ phone: report.phone, verifiedScam: true })}
                             disabled={verifyNumber.isPending}
                           >
                             <Ban className="w-4 h-4 mr-1" /> Blacklist Number
@@ -299,6 +314,40 @@ export default function Dashboard() {
           )}
         </Tabs>
       </main>
+
+      <AlertDialog open={pendingVerify !== null} onOpenChange={(open) => { if (!open) setPendingVerify(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {pendingVerify?.verifiedScam ? "Blacklist this number?" : "Remove from blacklist?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {pendingVerify?.verifiedScam ? (
+                <>
+                  This will mark <span className="font-mono font-medium text-foreground">{pendingVerify?.phone}</span> as a verified scam number, changing its public risk reputation.
+                </>
+              ) : (
+                <>
+                  This will clear the verified-scam reputation for <span className="font-mono font-medium text-foreground">{pendingVerify?.phone}</span>, marking it as no longer blacklisted.
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={verifyNumber.isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => { e.preventDefault(); handleVerifyNumber(); }}
+              disabled={verifyNumber.isPending}
+            >
+              {verifyNumber.isPending
+                ? "Saving..."
+                : pendingVerify?.verifiedScam
+                ? "Blacklist Number"
+                : "Remove from Blacklist"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
