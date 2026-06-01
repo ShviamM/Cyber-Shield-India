@@ -66,7 +66,7 @@ async function analyzePhoneTarget(phone: string): Promise<Analysis> {
     signals.push({
       source: "phone_reputation",
       severity: "high",
-      label: "Confirmed scam number verified by KavachAI moderators.",
+      label: "Confirmed scam number verified by Netraksh moderators.",
     });
   } else {
     const level = computeRiskLevel({ verifiedScam, reportCount, lastReportedAt });

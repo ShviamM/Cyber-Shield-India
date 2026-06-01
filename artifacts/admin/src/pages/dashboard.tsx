@@ -164,7 +164,7 @@ export default function Dashboard() {
           <AlertTriangle className="w-12 h-12 text-destructive mx-auto mb-4" />
           <h2 className="text-xl font-bold mb-2">Access Denied</h2>
           <p className="text-muted-foreground mb-6">
-            This console is restricted to KavachAI administrators. Your account does not have the required permissions.
+            This console is restricted to Netraksh administrators. Your account does not have the required permissions.
           </p>
           <Button variant="outline" onClick={handleLogout}>Sign Out</Button>
         </Card>
@@ -178,7 +178,7 @@ export default function Dashboard() {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Shield className="w-6 h-6 text-primary" />
-            <span className="font-bold text-lg tracking-tight">KavachAI Admin</span>
+            <span className="font-bold text-lg tracking-tight">Netraksh Admin</span>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-sm text-right hidden sm:block">

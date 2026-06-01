@@ -3,7 +3,7 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: KavachAI API — phone-OTP auth, fraud-number reporting, and trust scoring
+  description: Netraksh API — phone-OTP auth, fraud-number reporting, and trust scoring
 servers:
   - url: /api
     description: Base API path

@@ -1,5 +1,5 @@
 /**
- * Supported app languages for KavachAI.
+ * Supported app languages for Netraksh.
  *
  * `code` is the i18next language key and the value persisted to storage.
  * `label` is the English name; `native` is the endonym shown in the picker.

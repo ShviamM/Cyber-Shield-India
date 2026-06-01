@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "KavachAI — India Cyber Safety",
+    "name": "Netraksh — India Cyber Safety",
     "slug": "kavach-ai",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -51,7 +51,7 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "KavachAI uses the camera to scan QR codes so it can check them for payment scams."
+          "cameraPermission": "Netraksh uses the camera to scan QR codes so it can check them for payment scams."
         }
       ],
       [

@@ -86,7 +86,7 @@ class TwilioSmsSender implements SmsSender {
       To: phone,
       From: from,
       Body:
-        `${code} is your KavachAI verification code. ` +
+        `${code} is your Netraksh verification code. ` +
         `It expires in ${minutes} minute${minutes === 1 ? "" : "s"}. ` +
         `Never share this code with anyone.`,
     }).toString();

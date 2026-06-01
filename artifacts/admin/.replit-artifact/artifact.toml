@@ -1,6 +1,6 @@
 kind = "web"
 previewPath = "/"
-title = "KavachAI Admin"
+title = "Netraksh Admin"
 version = "1.0.0"
 id = "artifacts/admin"
 router = "path"

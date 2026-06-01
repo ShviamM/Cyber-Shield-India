@@ -22,7 +22,7 @@ export function isAiConfigured(): boolean {
   );
 }
 
-const SYSTEM_PROMPT = `You are a fraud-detection classifier for KavachAI, an Indian cyber-safety app.
+const SYSTEM_PROMPT = `You are a fraud-detection classifier for Netraksh, an Indian cyber-safety app.
 You receive a single SMS, chat, or call-transcript message and decide whether it is a scam targeting Indian consumers.
 Common scams: OTP theft, fake KYC/Aadhaar/PAN updates, lottery/prize wins, loan/credit-card offers, job/work-from-home tasks, UPI/payment tricks, digital-arrest/police impersonation, electricity-bill disconnection, courier/parcel customs holds, tech support, bank/government impersonation, investment/trading guarantees, and sextortion/blackmail.
 Respond ONLY with a JSON object: {"is_scam": boolean, "category": string|null, "confidence": number, "rationale": string}.

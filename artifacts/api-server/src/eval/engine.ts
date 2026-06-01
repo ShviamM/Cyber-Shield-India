@@ -54,7 +54,7 @@ function phoneSignals(rep: ReputationContext | undefined): {
         {
           source: "phone_reputation",
           severity: "high",
-          label: "Confirmed scam number verified by KavachAI moderators.",
+          label: "Confirmed scam number verified by Netraksh moderators.",
         },
       ],
       hasData: true,

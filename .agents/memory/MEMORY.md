@@ -3,6 +3,6 @@
 - [Orval schema naming](orval-schema-naming.md) — a component schema named like an operationId's response collides in generated zod; name response schemas noun-first (e.g. FraudVerdict not FraudCheckResponse).
 - [Fraud engine fusion vs reputation scales](fraud-engine-fusion-vs-reputation.md) — medium weight tuned to 40 so a lone "medium" signal now flags medium; weights (not computeRiskLevel) decide the verdict band.
 - [API client codegen staleness](api-client-codegen.md) — generated api.ts can lag the spec (schema present, operation fn missing); run lib/api-spec codegen after adding endpoints.
-- [KavachAI → Netraksh rename](netraksh-rename.md) — confirmed: run as final sweep AFTER all V2 tasks; rename brand/user-facing only, keep technical IDs (dir/package/slug/scheme).
+- [Brand vs technical IDs: Netraksh](netraksh-rename.md) — DONE: user-facing brand is "Netraksh"; technical IDs stay "kavach-ai" (dir/package/slug/scheme/android pkg/native module/Safe-Browsing clientId). Don't re-rename IDs.
 - [QR scan content routing](qr-scan-routing.md) — route upi:// deep links to the message engine (not upi); upi analyzer only accepts bare name@bank.
 - [Share-to-check via expo-share-intent](share-to-check-expo-share-intent.md) — native module; disable in Expo Go so preview works; give deferred share priority in the auth-gate redirect or the default tab redirect clobbers Verify (payload lost).

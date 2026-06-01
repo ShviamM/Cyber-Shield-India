@@ -1,5 +1,5 @@
 /**
- * Canonical English copy for KavachAI. This is the source of truth for all
+ * Canonical English copy for Netraksh. This is the source of truth for all
  * localizable UI chrome and static educational content. Every other locale
  * mirrors these keys exactly; missing keys fall back to English at runtime.
  *
@@ -12,7 +12,7 @@
  */
 const en = {
   common: {
-    appName: "KavachAI",
+    appName: "Netraksh",
     back: "Back",
     cancel: "Cancel",
     retry: "Try Again",
@@ -39,7 +39,7 @@ const en = {
   },
 
   auth: {
-    welcomeTitle: "Welcome to KavachAI",
+    welcomeTitle: "Welcome to Netraksh",
     welcomeSub: "India's prevention-first shield against cyber crime & scam calls.",
     phoneLabel: "Mobile Number",
     phonePlaceholder: "98765 43210",
@@ -71,7 +71,7 @@ const en = {
     signOut: "Sign Out",
     signOutConfirmTitle: "Sign Out",
     signOutConfirmMsg: "You'll need to verify your number again to sign back in.",
-    member: "KavachAI member",
+    member: "Netraksh member",
     protected: "Protected",
     paused: "Paused",
     sectionProtection: "PROTECTION",
@@ -88,13 +88,13 @@ const en = {
     displayLanguage: "Display Language",
     helplineCardTitle: "Cyber Crime Helpline",
     helplineCardSub: "Call immediately if you've been scammed",
-    aboutTitle: "About KavachAI",
+    aboutTitle: "About Netraksh",
     aboutSub: "Prevention-first cyber safety for India",
     privacyTitle: "Privacy Policy",
     privacySub: "How we protect your data",
-    rateTitle: "Rate KavachAI",
+    rateTitle: "Rate Netraksh",
     rateSub: "Help us protect more Indians",
-    version: "KavachAI v2.0.0 · Made for India",
+    version: "Netraksh v2.0.0 · Made for India",
   },
 
   services: {
@@ -130,7 +130,7 @@ const en = {
     protectCircleTitle: "Protect Your Circle",
     protectCircleSub: "Warn family & friends. Share scam alerts directly.",
     demoTitle: "Demo: Incoming Scam Call",
-    demoSub: "See how KavachAI warns you in real-time",
+    demoSub: "See how Netraksh warns you in real-time",
     quickTools: {
       numberLabel: "Check Number",
       numberSub: "Spam / Safe?",
@@ -207,7 +207,7 @@ const en = {
           "No community fraud reports for this number yet. Stay alert and never share OTP or money on an unverified call.",
       },
     },
-    verifiedScam: "Verified scam by KavachAI moderators",
+    verifiedScam: "Verified scam by Netraksh moderators",
     types: {
       numberLabel: "Check Number",
       numberHint: "+91 98765 43210",
@@ -394,13 +394,13 @@ const en = {
     stepsTitle: "If you've been scammed",
     disclaimerTitle: "Stay safe while reporting",
     disclaimer:
-      "KavachAI never asks for your OTP, PIN, or passwords. Always verify official helpline numbers and websites yourself — scammers often pose as 'support agents'. Only 1930 and cybercrime.gov.in are official Government of India channels.",
+      "Netraksh never asks for your OTP, PIN, or passwords. Always verify official helpline numbers and websites yourself — scammers often pose as 'support agents'. Only 1930 and cybercrime.gov.in are official Government of India channels.",
     steps: [
       "Call 1930 immediately — the sooner you report, the better the chance of freezing the money.",
       "File a complaint at cybercrime.gov.in with all details and screenshots.",
       "Inform your bank to block the card/account and stop further transactions.",
       "Save evidence: numbers, messages, transaction IDs, and screenshots.",
-      "Report the number in KavachAI to warn others.",
+      "Report the number in Netraksh to warn others.",
     ],
   },
 
@@ -472,7 +472,7 @@ const en = {
     title: "On-Device Screening",
     subtitle: "Real-time scam call & SMS protection",
     intro:
-      "Let KavachAI watch for scam calls and messages right on your phone and warn you the moment one arrives. Checks happen on your device.",
+      "Let Netraksh watch for scam calls and messages right on your phone and warn you the moment one arrives. Checks happen on your device.",
     unavailableTitle: "Available on Android app builds",
     unavailableBuild:
       "On-device screening needs the installed Android app. It can't run in this preview or Expo Go. You can still review the settings and privacy model here.",
@@ -483,7 +483,7 @@ const en = {
     callSub: "Warns you when a high-risk number calls",
     smsTitle: "Scam SMS Screening",
     smsSub: "Flags likely scam texts as they arrive",
-    statusCallRole: "KavachAI is your call screening app",
+    statusCallRole: "Netraksh is your call screening app",
     statusSmsPerm: "SMS access granted",
     statusNotif: "Alert notifications allowed",
     statusBlocklist: "{{n}} high-risk numbers synced on-device",
@@ -492,21 +492,21 @@ const en = {
       onDevice: "All screening runs on your phone — nothing is uploaded automatically.",
       noContent: "Message contents are never sent off your device without your tap.",
       userControl: "Turn each protection on or off any time.",
-      neverBlocks: "KavachAI warns you — it never silently blocks or answers calls.",
+      neverBlocks: "Netraksh warns you — it never silently blocks or answers calls.",
     },
     sectionHow: "HOW IT WORKS",
     how: {
-      step1: "KavachAI keeps a private list of high-risk numbers from your checks and reports.",
+      step1: "Netraksh keeps a private list of high-risk numbers from your checks and reports.",
       step2: "Incoming calls and texts are matched against it instantly, on-device.",
       step3: "If something looks risky, you get a clear warning — tap to verify it safely.",
     },
     previewWarning: "Preview a scam-call warning",
     roleDeniedTitle: "Call screening not enabled",
     roleDeniedMsg:
-      "To screen calls, allow KavachAI to be your call screening app in the system dialog.",
+      "To screen calls, allow Netraksh to be your call screening app in the system dialog.",
     smsDeniedTitle: "SMS permission needed",
     smsDeniedMsg:
-      "KavachAI needs SMS access to screen messages on your device. You can grant it in Settings.",
+      "Netraksh needs SMS access to screen messages on your device. You can grant it in Settings.",
   },
 
   language: {

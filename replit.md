@@ -47,7 +47,7 @@ _Populate as you build — sharp edges, "always run X before Y" rules._
   and the preview keeps working unchanged. To verify share-to-check:
   `pnpm --filter @workspace/kavach-ai exec expo prebuild --no-install --clean` then
   `expo run:android` (or `run:ios`), install on a device/emulator, then in another app
-  use Share → KavachAI. The shared text opens the Verify tab prefilled and auto-runs.
+  use Share → Netraksh. The shared text opens the Verify tab prefilled and auto-runs.
   Routing lives in `app/_layout.tsx` (`useShareIntentRouter`), reusing the verify
   screen's existing `q`/`kind` route-param prefill.
 - **iOS dev builds with `expo-share-intent` v5 need `patch-package`** (per the package's

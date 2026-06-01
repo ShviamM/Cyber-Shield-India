@@ -4,7 +4,7 @@ export type ScreeningStatus = {
   callScreening: boolean;
   /** Whether SMS screening is toggled on in native storage. */
   smsScreening: boolean;
-  /** Whether KavachAI currently holds the system call-screening role. */
+  /** Whether Netraksh currently holds the system call-screening role. */
   hasCallRole: boolean;
   /** Whether the RECEIVE_SMS runtime permission is granted. */
   hasSmsPermission: boolean;

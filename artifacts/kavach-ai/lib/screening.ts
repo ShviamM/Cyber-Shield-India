@@ -113,7 +113,7 @@ export function setSmsScreeningEnabled(enabled: boolean): void {
   }
 }
 
-/** Ask the system to make KavachAI the call-screening app (Android 10+). */
+/** Ask the system to make Netraksh the call-screening app (Android 10+). */
 export async function requestCallScreeningRole(): Promise<boolean> {
   if (!isScreeningSupported()) return false;
   try {

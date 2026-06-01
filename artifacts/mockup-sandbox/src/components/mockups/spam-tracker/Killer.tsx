@@ -56,7 +56,7 @@ export function Killer() {
           </div>
           <div>
             <p style={{ margin: 0, fontSize: 18, fontWeight: 900, color: "#fff", letterSpacing: -0.5 }}>
-              Kavach<span style={{ color: SAFFRON }}>AI</span>
+              Netra<span style={{ color: SAFFRON }}>ksh</span>
             </p>
             <p style={{ margin: 0, fontSize: 9, color: "rgba(255,255,255,0.4)", letterSpacing: 0.8 }}>INDIA CYBER SHIELD</p>
           </div>

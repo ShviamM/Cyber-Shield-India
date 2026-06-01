@@ -58,7 +58,7 @@ export function CallAlert() {
         <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>●●●● 5G</span>
       </div>
 
-      {/* KavachAI Badge */}
+      {/* Netraksh Badge */}
       <div style={{ display: "flex", justifyContent: "center", marginTop: 16, zIndex: 2 }}>
         <div style={{
           display: "flex", alignItems: "center", gap: 7,
@@ -67,7 +67,7 @@ export function CallAlert() {
           border: "1px solid rgba(255,255,255,0.1)"
         }}>
           <Shield size={13} color="#FF6713" fill="rgba(255,103,19,0.3)" />
-          <span style={{ fontSize: 11, fontWeight: 800, color: "#fff", letterSpacing: 0.5 }}>KavachAI</span>
+          <span style={{ fontSize: 11, fontWeight: 800, color: "#fff", letterSpacing: 0.5 }}>Netraksh</span>
           <span style={{ fontSize: 10, color: "rgba(255,255,255,0.4)" }}>is watching</span>
         </div>
       </div>

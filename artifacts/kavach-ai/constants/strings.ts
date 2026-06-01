@@ -1,5 +1,5 @@
 /**
- * Non-text constants for KavachAI.
+ * Non-text constants for Netraksh.
  *
  * All user-facing copy now lives in `i18n/locales/*` and is accessed via the
  * `t()` translation function (see `i18n/`). This file keeps only language-neutral

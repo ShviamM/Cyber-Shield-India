@@ -45,7 +45,7 @@ export function Shield_() {
             }}>
               <Shield size={16} color="#fff" />
             </div>
-            <span style={{ fontSize: 18, fontWeight: 800, letterSpacing: -0.5, color: "#fff" }}>KavachApp</span>
+            <span style={{ fontSize: 18, fontWeight: 800, letterSpacing: -0.5, color: "#fff" }}>Netraksh</span>
           </div>
           <p style={{ margin: "4px 0 0 40px", fontSize: 11, color: "#64748b" }}>Active Protection</p>
         </div>

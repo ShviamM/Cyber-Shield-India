@@ -1,20 +1,20 @@
 ---
-name: KavachAI → Netraksh rename
-description: Confirmed scope/timing decisions for the product-wide brand rename, and which identifiers must stay unchanged.
+name: Brand vs technical IDs (Netraksh)
+description: The product brand is "Netraksh" but technical identifiers stay "kavach-ai". Which is which, and why, so nobody re-renames the IDs.
 ---
 
-# KavachAI → Netraksh rename (confirmed plan, gated on V2)
+# Brand "Netraksh" vs technical IDs "kavach-ai" (rename DONE)
+
+The product-wide rename has been executed. Durable split that future work must respect:
+**user-facing brand = "Netraksh"; all hidden technical identifiers stay `kavach-ai`.**
+Do not "finish" the rename by changing technical IDs — that split is intentional and user-approved.
 
 User-approved decisions (do not re-litigate without new input):
 
-- **Timing:** Run as a single clean final sweep ONLY after all V2 tasks finish
-  (#26 Android screening + follow-ups #27–#32, plus any later-accepted V2
-  follow-ups like #33/#34). Renaming earlier collides with in-flight isolated
-  task agents, which would reintroduce "KavachAI" on merge.
-- **Scope:** Rename only user-facing/brand text + metadata. KEEP hidden technical
+- **Scope:** Renamed only user-facing/brand text + metadata. KEPT hidden technical
   identifiers as `kavach-ai`.
 
-## Rename (user-facing) — change these
+## Renamed (user-facing) — these now say "Netraksh"
 - `artifacts/kavach-ai/app.json` → `expo.name` ("Netraksh — India Cyber Safety").
 - All 12 mobile locale files `artifacts/kavach-ai/i18n/locales/*.ts` — brand
   strings (appName, welcomeTitle, member, aboutTitle, rateTitle, version,

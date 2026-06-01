@@ -143,7 +143,7 @@ export default function LoginScreen() {
             <Feather name="shield" size={30} color={SAFFRON} />
           </View>
           <Text style={s.logoTitle}>
-            Kavach<Text style={{ color: SAFFRON }}>AI</Text>
+            Netra<Text style={{ color: SAFFRON }}>ksh</Text>
           </Text>
           <View style={s.tricolor}>
             <View style={[s.triStrip, { backgroundColor: SAFFRON }]} />

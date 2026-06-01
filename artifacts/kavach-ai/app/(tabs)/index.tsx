@@ -75,7 +75,7 @@ export default function HomeScreen() {
             </View>
             <View>
               <Text style={s.logoTitle}>
-                Kavach<Text style={{ color: SAFFRON }}>AI</Text>
+                Netra<Text style={{ color: SAFFRON }}>ksh</Text>
               </Text>
               <Text style={s.logoSub}>{t("home.logoSub")}</Text>
             </View>

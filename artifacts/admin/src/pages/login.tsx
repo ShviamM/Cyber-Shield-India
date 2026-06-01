@@ -83,7 +83,7 @@ export default function Login() {
           <div className="bg-primary/10 p-3 rounded-full">
             <Shield className="w-8 h-8 text-primary" />
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">KavachAI Admin</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Netraksh Admin</h1>
           <p className="text-muted-foreground text-sm">Trust & Safety Console</p>
         </div>
 

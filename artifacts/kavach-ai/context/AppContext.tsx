@@ -40,7 +40,7 @@ type AppContextType = {
   setSmsScreening: (enabled: boolean) => void;
 };
 
-/** High-risk numbers KavachAI should screen are derived from the user's own
+/** High-risk numbers Netraksh should screen are derived from the user's own
  * danger-flagged checks and family members — kept on-device, no bulk fetch. */
 function deriveBlocklist(checks: CheckItem[], family: FamilyMember[]): string[] {
   const fromChecks = checks

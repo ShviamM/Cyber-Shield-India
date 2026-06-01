@@ -50,7 +50,7 @@ function RootLayoutNav() {
   // don't both navigate (which would otherwise let "/(tabs)" override Verify).
   const shareHandledRef = useRef(false);
 
-  // Sends a message/link shared into KavachAI from another app (WhatsApp, SMS, a
+  // Sends a message/link shared into Netraksh from another app (WhatsApp, SMS, a
   // browser, …) to the Verify tab, prefilled and auto-run. Reuses the verify
   // screen's existing `q` prefill (kind is inferred there via detectType).
   const routeShareToVerify = useCallback(() => {
