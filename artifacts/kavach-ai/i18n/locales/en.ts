@@ -466,6 +466,22 @@ const en = {
       "Do NOT share OTP or send money!",
       "Verify first, then talk",
     ],
+    reportSheetTitle: "Report this number",
+    reportSheetSubtitle: "Pick the scam type — we report it instantly.",
+    reporting: "Reporting…",
+    reportSuccessTitle: "Reported. Thank you!",
+    reportSuccessMsg: "You've helped protect others from this number.",
+    reportDuplicateTitle: "Already reported",
+    reportDuplicateMsg: "You've already reported this number recently.",
+    reportErrorTitle: "Couldn't report",
+    reportErrorMsg: "Something went wrong. Please try again.",
+    reportRateLimitedTitle: "Too many reports",
+    reportRateLimitedMsg: "You've submitted several reports recently. Please try again later.",
+    reportInvalidNumber: "This number can't be reported.",
+    reportAutoDescription:
+      "Reported from an incoming call flagged as high-risk by Netraksh.",
+    reportRetry: "Try again",
+    reportDone: "Done",
   },
 
   screening: {

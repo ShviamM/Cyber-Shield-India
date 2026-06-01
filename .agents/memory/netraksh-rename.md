@@ -34,7 +34,7 @@ User-approved decisions (do not re-litigate without new input):
 - Artifact dir `artifacts/kavach-ai/` + package `@workspace/kavach-ai`: renaming
   reshuffles imports, workflow names, artifact registration; zero user benefit.
 - `app.json` `slug` and deep-link `scheme: "kavach-ai"` (`kavach-ai://verify`):
-  wired into deep-link/share handling (verify.tsx) and Task #32; changing breaks
+  wired into the deep-link/share-to-check flow (verify.tsx); changing breaks
   existing links and must be coordinated separately.
 - No Android/iOS store bundle ID is set yet, so no store identity to disrupt.
 - DB seed (artifacts/api-server/src/lib/seed.ts) has NO brand references.
