@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { normalizeIndianPhone } from "../lib/phone";
 import { isAiConfigured } from "../lib/ai-classifier";
 import { legacyClassify } from "./legacy";
@@ -18,7 +18,7 @@ const REPORT_URL = new URL("./REPORT.md", import.meta.url);
 
 const TYPES: ExampleType[] = ["phone", "url", "upi", "message"];
 
-function loadDataset(): Example[] {
+export function loadDataset(): Example[] {
   const raw = readFileSync(DATASET_URL, "utf8");
   return raw
     .split("\n")
@@ -27,7 +27,7 @@ function loadDataset(): Example[] {
     .map((l) => JSON.parse(l) as Example);
 }
 
-function buildReputationMap(examples: Example[]): ReputationMap {
+export function buildReputationMap(examples: Example[]): ReputationMap {
   const map: ReputationMap = new Map();
   for (const ex of examples) {
     if (ex.type !== "phone" || !ex.reputation) continue;
@@ -37,7 +37,7 @@ function buildReputationMap(examples: Example[]): ReputationMap {
   return map;
 }
 
-interface Scored {
+export interface Scored {
   overall: Confusion;
   byType: Record<ExampleType, Confusion>;
 }
@@ -67,10 +67,19 @@ function metricsRow(name: string, m: Metrics): string {
   return `| ${name} | ${pct(m.precision)} | ${pct(m.recall)} | ${pct(m.f1)} | ${pct(m.accuracy)} | ${m.truePositive}/${m.falsePositive}/${m.falseNegative}/${m.trueNegative} |`;
 }
 
-async function main(): Promise<void> {
-  const useAi =
-    (process.argv.includes("--ai") || process.env.EVAL_USE_AI === "1") && isAiConfigured();
+export interface ScoreResult {
+  examples: Example[];
+  legacy: Scored;
+  engine: Scored;
+}
 
+/**
+ * Run both classifiers over the dataset and accumulate confusion matrices.
+ * With `useAi` false this is fully deterministic and side-effect-free (no DB,
+ * no network, no file writes), which is what the accuracy-regression test and
+ * the default CLI run both rely on.
+ */
+export async function scoreDataset(useAi = false): Promise<ScoreResult> {
   const examples = loadDataset();
   const repMap = buildReputationMap(examples);
 
@@ -86,6 +95,15 @@ async function main(): Promise<void> {
     tally(engine.overall, ex.label, enginePred.flagged);
     tally(engine.byType[ex.type], ex.label, enginePred.flagged);
   }
+
+  return { examples, legacy, engine };
+}
+
+async function main(): Promise<void> {
+  const useAi =
+    (process.argv.includes("--ai") || process.env.EVAL_USE_AI === "1") && isAiConfigured();
+
+  const { examples, legacy, engine } = await scoreDataset(useAi);
 
   const legacyM = metricsFrom(legacy.overall);
   const engineM = metricsFrom(engine.overall);
@@ -132,7 +150,12 @@ async function main(): Promise<void> {
   writeFileSync(fileURLToPath(REPORT_URL), report, "utf8");
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+const isCliEntrypoint =
+  process.argv[1] != null && import.meta.url === pathToFileURL(process.argv[1]).href;
+
+if (isCliEntrypoint) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

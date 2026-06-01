@@ -65,6 +65,29 @@ reputation map keyed by the normalized E.164 number).
 as the real `runFraudCheck` for the DB-free / AI-free paths, so the harness
 cannot silently drift from production.
 
+## Accuracy-regression guard (`engine-accuracy.test.ts`)
+
+The deterministic harness is also wired into the vitest suite as an automated
+check. `engine-accuracy.test.ts` calls `scoreDataset(false)` (the same
+no-AI / no-DB / no-network path the CLI uses) and fails if the engine's overall
+**F1** or **accuracy** drops below an agreed baseline. This means a future engine
+change that makes detection worse is caught by `pnpm test`, not after it ships.
+
+Current baseline (in `engine-accuracy.test.ts`):
+
+| Metric | Baseline floor |
+| --- | --- |
+| F1 | 88.2% |
+| Accuracy | 88.8% |
+
+The task that introduced this guard quoted F1 81.3% / accuracy 83.3%, but the
+dataset has since been strengthened and the deterministic engine now scores
+F1 88.235% / accuracy 88.889% — that higher level is the floor we defend.
+
+**Raise the baseline intentionally** as the engine or dataset improves (commit
+the new floor together with the change that earns it). **Never lower it** to make
+a failing run pass — a drop below the floor is a real regression to investigate.
+
 ## Repeatability
 
 The default run is fully deterministic, so re-running after an engine change
