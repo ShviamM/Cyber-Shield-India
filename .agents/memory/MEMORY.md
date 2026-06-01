@@ -1,0 +1,2 @@
+- [Orval codegen naming](orval-codegen.md) — naming an OpenAPI response component `<op>Response` clashes with orval's generated type; rename it.
+- [Drizzle raw aggregates](drizzle-raw-aggregates.md) — a raw `sql\`max(ts)\`` returns a string, not a Date; coerce before writing into a timestamp column.

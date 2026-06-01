@@ -6,6 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
+export interface ScamCategory {
+  id: string;
+  key: string;
+  nameEn: string;
+  descriptionEn?: string | null;
+  icon?: string | null;
+  sortOrder: number;
 }

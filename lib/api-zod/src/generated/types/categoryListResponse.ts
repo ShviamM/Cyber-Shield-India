@@ -5,7 +5,8 @@
  * KavachAI API — phone-OTP auth, fraud-number reporting, and trust scoring
  * OpenAPI spec version: 0.1.0
  */
+import type { ScamCategory } from './scamCategory';
 
-export interface HealthStatus {
-  status: string;
+export interface CategoryListResponse {
+  categories: ScamCategory[];
 }

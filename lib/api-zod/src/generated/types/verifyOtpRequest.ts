@@ -6,6 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
-  status: string;
+export interface VerifyOtpRequest {
+  phone: string;
+  code: string;
+  /** Required when registering a new number */
+  fullName?: string | null;
+  location?: string | null;
 }

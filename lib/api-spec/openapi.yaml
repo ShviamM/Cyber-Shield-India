@@ -3,13 +3,23 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: KavachAI API — phone-OTP auth, fraud-number reporting, and trust scoring
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: auth
+    description: Phone-OTP authentication
+  - name: reports
+    description: Fraud-number reporting
+  - name: numbers
+    description: Number trust / risk scoring
+  - name: categories
+    description: Scam categories
+  - name: admin
+    description: Moderation (admin only)
 paths:
   /healthz:
     get:
@@ -24,7 +34,290 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /auth/request-otp:
+    post:
+      operationId: requestOtp
+      tags: [auth]
+      summary: Request an OTP for a phone number
+      description: Generates and "sends" a one-time code to the given Indian mobile number. In development the code is returned in the response and logged.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestOtpRequest"
+      responses:
+        "200":
+          description: OTP generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RequestOtpResult"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /auth/verify-otp:
+    post:
+      operationId: verifyOtp
+      tags: [auth]
+      summary: Verify an OTP and authenticate
+      description: Verifies the code. For a new phone number, fullName is required and an account is created. Returns a session token and the user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyOtpRequest"
+      responses:
+        "200":
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get the current authenticated user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Invalidate the current session
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /categories:
+    get:
+      operationId: listCategories
+      tags: [categories]
+      summary: List scam categories
+      responses:
+        "200":
+          description: Categories
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CategoryListResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /reports:
+    post:
+      operationId: createReport
+      tags: [reports]
+      summary: Submit a fraud report
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReportRequest"
+      responses:
+        "200":
+          description: Report created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Report"
+        default:
+          $ref: "#/components/responses/Error"
+    get:
+      operationId: listReports
+      tags: [reports]
+      summary: Search fraud reports
+      parameters:
+        - name: phone
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Reports
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReportListResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /numbers/{phone}/check:
+    get:
+      operationId: checkNumber
+      tags: [numbers]
+      summary: Check the risk level of a phone number
+      parameters:
+        - name: phone
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Risk assessment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NumberCheckResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /admin/reports:
+    get:
+      operationId: adminListReports
+      tags: [admin]
+      summary: List reports for moderation
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: phone
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 100
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Reports
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminReportListResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /admin/reports/{id}:
+    patch:
+      operationId: adminUpdateReport
+      tags: [admin]
+      summary: Update a report's moderation status
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateReportStatusRequest"
+      responses:
+        "200":
+          description: Updated report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminReport"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /admin/numbers/{phone}/verify:
+    post:
+      operationId: adminVerifyNumber
+      tags: [admin]
+      summary: Mark a number as verified scam (or clear it)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: phone
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyNumberRequest"
+      responses:
+        "200":
+          description: Updated reputation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NumberReputation"
+        default:
+          $ref: "#/components/responses/Error"
+
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
   schemas:
     HealthStatus:
       type: object
@@ -34,3 +327,316 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+      required:
+        - error
+        - message
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+      required:
+        - success
+
+    RequestOtpRequest:
+      type: object
+      properties:
+        phone:
+          type: string
+          description: Indian mobile number in any common format
+      required:
+        - phone
+
+    RequestOtpResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        isNewUser:
+          type: boolean
+          description: True when no account exists yet for this number
+        expiresInSeconds:
+          type: integer
+        devOtp:
+          type: string
+          nullable: true
+          description: Present only in development to ease testing
+      required:
+        - success
+        - isNewUser
+        - expiresInSeconds
+
+    VerifyOtpRequest:
+      type: object
+      properties:
+        phone:
+          type: string
+        code:
+          type: string
+        fullName:
+          type: string
+          nullable: true
+          description: Required when registering a new number
+        location:
+          type: string
+          nullable: true
+      required:
+        - phone
+        - code
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        fullName:
+          type: string
+        phone:
+          type: string
+        location:
+          type: string
+          nullable: true
+        isAdmin:
+          type: boolean
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - fullName
+        - phone
+        - isAdmin
+        - status
+        - createdAt
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+      required:
+        - token
+        - user
+
+    ScamCategory:
+      type: object
+      properties:
+        id:
+          type: string
+        key:
+          type: string
+        nameEn:
+          type: string
+        descriptionEn:
+          type: string
+          nullable: true
+        icon:
+          type: string
+          nullable: true
+        sortOrder:
+          type: integer
+      required:
+        - id
+        - key
+        - nameEn
+        - sortOrder
+
+    CategoryListResponse:
+      type: object
+      properties:
+        categories:
+          type: array
+          items:
+            $ref: "#/components/schemas/ScamCategory"
+      required:
+        - categories
+
+    CreateReportRequest:
+      type: object
+      properties:
+        phone:
+          type: string
+        categoryKey:
+          type: string
+        description:
+          type: string
+        incidentDate:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - phone
+        - categoryKey
+        - description
+
+    Report:
+      type: object
+      properties:
+        id:
+          type: string
+        phone:
+          type: string
+        categoryKey:
+          type: string
+        description:
+          type: string
+        incidentDate:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+        reporterName:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - phone
+        - categoryKey
+        - description
+        - status
+        - createdAt
+
+    ReportListResponse:
+      type: object
+      properties:
+        reports:
+          type: array
+          items:
+            $ref: "#/components/schemas/Report"
+        total:
+          type: integer
+      required:
+        - reports
+        - total
+
+    AdminReport:
+      type: object
+      properties:
+        id:
+          type: string
+        phone:
+          type: string
+        categoryKey:
+          type: string
+        description:
+          type: string
+        incidentDate:
+          type: string
+          format: date-time
+          nullable: true
+        status:
+          type: string
+        reporterId:
+          type: string
+        reporterName:
+          type: string
+          nullable: true
+        reporterPhone:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - phone
+        - categoryKey
+        - description
+        - status
+        - reporterId
+        - createdAt
+        - updatedAt
+
+    AdminReportListResponse:
+      type: object
+      properties:
+        reports:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminReport"
+        total:
+          type: integer
+      required:
+        - reports
+        - total
+
+    NumberCheckResponse:
+      type: object
+      properties:
+        phone:
+          type: string
+        riskLevel:
+          type: string
+          enum: [low, medium, high, unknown]
+        reportCount:
+          type: integer
+        verifiedScam:
+          type: boolean
+        lastReportedAt:
+          type: string
+          format: date-time
+          nullable: true
+        categories:
+          type: array
+          items:
+            type: string
+      required:
+        - phone
+        - riskLevel
+        - reportCount
+        - verifiedScam
+        - categories
+
+    UpdateReportStatusRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [pending, verified, rejected, spam]
+      required:
+        - status
+
+    VerifyNumberRequest:
+      type: object
+      properties:
+        verifiedScam:
+          type: boolean
+      required:
+        - verifiedScam
+
+    NumberReputation:
+      type: object
+      properties:
+        phone:
+          type: string
+        reportCount:
+          type: integer
+        verifiedScam:
+          type: boolean
+        lastReportedAt:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - phone
+        - reportCount
+        - verifiedScam

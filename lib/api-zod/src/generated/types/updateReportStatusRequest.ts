@@ -5,7 +5,8 @@
  * KavachAI API — phone-OTP auth, fraud-number reporting, and trust scoring
  * OpenAPI spec version: 0.1.0
  */
+import type { UpdateReportStatusRequestStatus } from './updateReportStatusRequestStatus';
 
-export interface HealthStatus {
-  status: string;
+export interface UpdateReportStatusRequest {
+  status: UpdateReportStatusRequestStatus;
 }

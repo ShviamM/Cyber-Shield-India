@@ -6,6 +6,13 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface HealthStatus {
+export interface Report {
+  id: string;
+  phone: string;
+  categoryKey: string;
+  description: string;
+  incidentDate?: Date | null;
   status: string;
+  reporterName?: string | null;
+  createdAt: Date;
 }
