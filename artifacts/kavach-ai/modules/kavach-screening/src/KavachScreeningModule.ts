@@ -1,4 +1,4 @@
-import { NativeModule, requireNativeModule } from "expo";
+import { NativeModule, requireOptionalNativeModule } from "expo";
 
 import type {
   KavachScreeningEvents,
@@ -16,4 +16,12 @@ declare class KavachScreeningModule extends NativeModule<KavachScreeningEvents> 
 }
 
 // Loads the native module backing the JS `KavachScreening` API on Android.
-export default requireNativeModule<KavachScreeningModule>("KavachScreening");
+// Uses the *optional* loader so unsupported platforms (web preview, iOS, and
+// Expo Go) resolve to `null` instead of throwing "Cannot find native module"
+// at import time — that import throw previously crashed every route during
+// bundling. lib/screening.ts gates every native call behind
+// isScreeningSupported() (false off-Android) and wraps each call in try/catch,
+// so a null instance is never dereferenced on unsupported platforms.
+export default requireOptionalNativeModule<KavachScreeningModule>(
+  "KavachScreening"
+) as KavachScreeningModule;

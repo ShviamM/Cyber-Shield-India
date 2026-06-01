@@ -6,3 +6,4 @@
 - [Brand vs technical IDs: Netraksh](netraksh-rename.md) — DONE: user-facing brand is "Netraksh"; technical IDs stay "kavach-ai" (dir/package/slug/scheme/android pkg/native module/Safe-Browsing clientId). Don't re-rename IDs.
 - [QR scan content routing](qr-scan-routing.md) — route upi:// deep links to the message engine (not upi); upi analyzer only accepts bare name@bank.
 - [Share-to-check via expo-share-intent](share-to-check-expo-share-intent.md) — native module; disable in Expo Go so preview works; give deferred share priority in the auth-gate redirect or the default tab redirect clobbers Verify (payload lost).
+- [Expo native modules crash web preview](expo-native-module-web-preview.md) — load custom native modules with requireOptionalNativeModule (returns null), not requireNativeModule (throws at import → blanks whole preview, "missing default export" on every route).
