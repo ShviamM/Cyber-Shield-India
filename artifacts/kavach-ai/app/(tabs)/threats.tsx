@@ -110,7 +110,7 @@ export default function ThreatsScreen() {
 
         {/* Trending threats */}
         <View style={s.sectionHeader}>
-          <Text style={s.sectionTitle}>{t("threats.activeScamsNow")}</Text>
+          <Text style={[s.sectionTitle, { color: colors.text }]}>{t("threats.activeScamsNow")}</Text>
           <View style={s.liveBadgeSmall}>
             <View style={s.liveDotSmall} />
             <Text style={s.liveTxtSmall}>{t("threats.live")}</Text>
@@ -138,7 +138,7 @@ export default function ThreatsScreen() {
         <View style={s.sectionHeader}>
           <View style={s.sectionTitleRow}>
             <Feather name="map-pin" size={14} color={NAVY} />
-            <Text style={[s.sectionTitle, { marginLeft: 6 }]}>{t("threats.cityHotspots")}</Text>
+            <Text style={[s.sectionTitle, { marginLeft: 6, color: colors.text }]}>{t("threats.cityHotspots")}</Text>
           </View>
         </View>
         <View style={s.hotspotsCard}>
@@ -166,7 +166,7 @@ export default function ThreatsScreen() {
         <View style={s.sectionHeader}>
           <View style={s.sectionTitleRow}>
             <Feather name="book-open" size={14} color={NAVY} />
-            <Text style={[s.sectionTitle, { marginLeft: 6 }]}>{t("threats.goldenRules")}</Text>
+            <Text style={[s.sectionTitle, { marginLeft: 6, color: colors.text }]}>{t("threats.goldenRules")}</Text>
           </View>
         </View>
         {GOLDEN_RULES.map((rule) => (
