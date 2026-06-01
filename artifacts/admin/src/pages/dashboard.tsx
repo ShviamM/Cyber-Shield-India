@@ -3,6 +3,7 @@ import { Shield, LogOut, CheckCircle2, XCircle, AlertTriangle, ShieldAlert, Shie
 import { format } from "date-fns";
 import { useAuth } from "@/hooks/use-auth";
 import { useLogout, useAdminListReports, getAdminListReportsQueryKey, useAdminUpdateReport, useAdminVerifyNumber } from "@workspace/api-client-react";
+import type { AdminReport } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,9 +20,13 @@ export default function Dashboard() {
   const doLogout = useLogout();
   const queryClient = useQueryClient();
   
+  const PAGE_SIZE = 20;
+
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [searchPhone, setSearchPhone] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [offset, setOffset] = useState(0);
+  const [reports, setReports] = useState<AdminReport[]>([]);
 
   const updateReport = useAdminUpdateReport();
   const verifyNumber = useAdminVerifyNumber();
@@ -34,17 +39,39 @@ export default function Dashboard() {
     return () => clearTimeout(handler);
   }, [searchPhone]);
 
+  // Reset paging whenever the active filter or search changes
+  const filterKey = `${statusFilter}|${debouncedSearch}`;
+  useEffect(() => {
+    setOffset(0);
+    setReports([]);
+  }, [filterKey]);
+
   const params = {
     status: statusFilter === "all" ? undefined : statusFilter,
     phone: debouncedSearch || undefined,
-    limit: 50,
+    limit: PAGE_SIZE,
+    offset,
   };
 
-  const { data, isLoading } = useAdminListReports(params, {
+  const { data, isLoading, isFetching } = useAdminListReports(params, {
     query: {
       queryKey: getAdminListReportsQueryKey(params),
     }
   });
+
+  // Accumulate pages as they load (replace on first page, append otherwise)
+  useEffect(() => {
+    if (!data) return;
+    setReports((prev) => {
+      if (offset === 0) return data.reports;
+      const seen = new Set(prev.map((r) => r.id));
+      return [...prev, ...data.reports.filter((r) => !seen.has(r.id))];
+    });
+  }, [data, offset]);
+
+  const total = data?.total ?? 0;
+  const hasMore = reports.length < total;
+  const isLoadingMore = isFetching && offset > 0;
 
   const handleLogout = async () => {
     try {
@@ -58,6 +85,7 @@ export default function Dashboard() {
     try {
       await updateReport.mutateAsync({ id, data: { status } });
       toast.success(`Report marked as ${status}`);
+      setReports((prev) => prev.map((r) => (r.id === id ? { ...r, status } : r)));
       queryClient.invalidateQueries({ queryKey: getAdminListReportsQueryKey() });
     } catch (err) {
       toast.error("Failed to update status");
@@ -72,6 +100,7 @@ export default function Dashboard() {
           ? `Number ${phone} added to blacklist`
           : `Number ${phone} removed from blacklist`,
       );
+      setReports((prev) => prev.map((r) => (r.phone === phone ? { ...r, verifiedScam } : r)));
       queryClient.invalidateQueries({ queryKey: getAdminListReportsQueryKey() });
     } catch (err) {
       toast.error("Failed to update number reputation");
@@ -117,7 +146,14 @@ export default function Dashboard() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Moderation Queue</h1>
-            <p className="text-muted-foreground">Review and action community fraud reports.</p>
+            <p className="text-muted-foreground">
+              Review and action community fraud reports.
+              {!isLoading && (
+                <span className="ml-1">
+                  Showing {reports.length} of {total} report{total === 1 ? "" : "s"}.
+                </span>
+              )}
+            </p>
           </div>
           
           <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -146,7 +182,7 @@ export default function Dashboard() {
             <div className="space-y-4">
               {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-32 w-full" />)}
             </div>
-          ) : data?.reports.length === 0 ? (
+          ) : reports.length === 0 ? (
             <Card className="border-dashed bg-transparent shadow-none">
               <CardContent className="flex flex-col items-center justify-center py-12 text-center">
                 <ShieldAlert className="w-12 h-12 text-muted-foreground mb-4 opacity-50" />
@@ -156,7 +192,7 @@ export default function Dashboard() {
             </Card>
           ) : (
             <div className="space-y-4">
-              {data?.reports.map(report => (
+              {reports.map(report => (
                 <Card key={report.id} className="overflow-hidden transition-all hover:border-primary/20">
                   <div className="flex flex-col md:flex-row border-b md:border-b-0 border-border">
                     <div className="p-4 md:w-64 border-r border-border bg-muted/10 flex flex-col justify-between">
@@ -247,6 +283,18 @@ export default function Dashboard() {
                   </div>
                 </Card>
               ))}
+
+              {hasMore && (
+                <div className="flex justify-center pt-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setOffset((o) => o + PAGE_SIZE)}
+                    disabled={isLoadingMore}
+                  >
+                    {isLoadingMore ? "Loading..." : `Load more (${total - reports.length} remaining)`}
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </Tabs>
