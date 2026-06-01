@@ -194,7 +194,7 @@ export default function HomeScreen() {
         <View style={s.sectionOuterHeader}>
           <View style={s.liveRow}>
             <View style={s.livePulse} />
-            <Text style={s.outerSectionTitle}>{t("home.activeScamsToday")}</Text>
+            <Text style={[s.outerSectionTitle, { color: colors.text }]}>{t("home.activeScamsToday")}</Text>
           </View>
           <TouchableOpacity onPress={() => router.push("/(tabs)/threats")}>
             <Text style={[s.seeAll, { color: NAVY }]}>{t("home.allCount", { n: 23 })}</Text>
@@ -449,7 +449,7 @@ const s = StyleSheet.create({
   },
   sectionTitle: { fontSize: 13, fontWeight: "800" as const },
   sectionSub: { fontSize: 10, marginTop: 1 },
-  outerSectionTitle: { fontSize: 13, fontWeight: "800" as const, color: "#0f172a" },
+  outerSectionTitle: { fontSize: 13, fontWeight: "800" as const },
   seeAll: { fontSize: 11, fontWeight: "600" as const },
   liveRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   livePulse: {
