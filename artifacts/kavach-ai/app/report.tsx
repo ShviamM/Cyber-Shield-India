@@ -4,6 +4,7 @@ import { checkNumber, listCategories, useCreateReport } from "@workspace/api-cli
 import * as Haptics from "expo-haptics";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -18,7 +19,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ErrorState, LoadingState } from "@/components/StateViews";
-import { STRINGS, categoryIcon } from "@/constants/strings";
+import { categoryIcon } from "@/constants/strings";
 import { useColors } from "@/hooks/useColors";
 import { isValidIndianPhone, phoneForApi } from "@/lib/phone";
 
@@ -29,6 +30,7 @@ const GREEN = "#138808";
 export default function ReportScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const params = useLocalSearchParams<{ categoryKey?: string; phone?: string }>();
 
   const [phone, setPhone] = useState(params.phone ?? "");
@@ -60,20 +62,20 @@ export default function ReportScreen() {
 
   async function handleSubmit() {
     if (!phoneValid) {
-      setError(STRINGS.report.invalidPhone);
+      setError(t("report.invalidPhone"));
       return;
     }
     if (!categoryKey) {
-      setError(STRINGS.report.categoryRequired);
+      setError(t("report.categoryRequired"));
       return;
     }
     const desc = description.trim();
     if (!desc) {
-      setError(STRINGS.report.descriptionRequired);
+      setError(t("report.descriptionRequired"));
       return;
     }
     if (desc.length < 10) {
-      setError(STRINGS.report.descriptionTooShort);
+      setError(t("report.descriptionTooShort"));
       return;
     }
     setError(null);
@@ -89,7 +91,7 @@ export default function ReportScreen() {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setSubmitted(true);
     } catch {
-      setError(STRINGS.report.submitFailed);
+      setError(t("report.submitFailed"));
     }
   }
 
@@ -99,10 +101,10 @@ export default function ReportScreen() {
         <View style={s.successIcon}>
           <Feather name="check-circle" size={44} color={GREEN} />
         </View>
-        <Text style={s.successTitle}>{STRINGS.report.successTitle}</Text>
-        <Text style={s.successMsg}>{STRINGS.report.successMsg}</Text>
+        <Text style={s.successTitle}>{t("report.successTitle")}</Text>
+        <Text style={s.successMsg}>{t("report.successMsg")}</Text>
         <TouchableOpacity style={s.doneBtn} onPress={() => router.back()} activeOpacity={0.85}>
-          <Text style={s.doneBtnTxt}>{STRINGS.report.done}</Text>
+          <Text style={s.doneBtnTxt}>{t("report.done")}</Text>
         </TouchableOpacity>
       </View>
     );
@@ -122,17 +124,17 @@ export default function ReportScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <Text style={s.intro}>{STRINGS.report.intro}</Text>
+        <Text style={s.intro}>{t("report.intro")}</Text>
 
         {/* Phone */}
-        <Text style={s.label}>{STRINGS.report.phoneLabel}</Text>
+        <Text style={s.label}>{t("report.phoneLabel")}</Text>
         <View style={s.phoneRow}>
           <View style={s.prefixBox}>
             <Text style={s.prefixTxt}>+91</Text>
           </View>
           <TextInput
             style={s.phoneInput}
-            placeholder={STRINGS.report.phonePlaceholder}
+            placeholder={t("report.phonePlaceholder")}
             placeholderTextColor="#94a3b8"
             value={phone}
             onChangeText={(v) => {
@@ -147,24 +149,26 @@ export default function ReportScreen() {
           <View style={[s.notice, s.noticeDanger]}>
             <Feather name="alert-octagon" size={14} color="#dc2626" />
             <Text style={[s.noticeTxt, { color: "#991b1b" }]}>
-              {STRINGS.report.verifiedScamWarning}
+              {t("report.verifiedScamWarning")}
             </Text>
           </View>
         ) : alreadyReported ? (
           <View style={[s.notice, s.noticeWarn]}>
             <Feather name="users" size={14} color="#ea580c" />
             <Text style={[s.noticeTxt, { color: "#9a3412" }]}>
-              {STRINGS.report.alreadyReported(rep!.reportCount)}
+              {rep!.reportCount === 1
+                ? t("report.alreadyReportedOne")
+                : t("report.alreadyReported", { n: rep!.reportCount })}
             </Text>
           </View>
         ) : null}
 
         {/* Category */}
-        <Text style={s.label}>{STRINGS.report.categoryLabel}</Text>
+        <Text style={s.label}>{t("report.categoryLabel")}</Text>
         {categoriesQuery.isLoading ? (
           <LoadingState />
         ) : categoriesQuery.isError ? (
-          <ErrorState message={STRINGS.report.categoryLoadError} onRetry={categoriesQuery.refetch} />
+          <ErrorState message={t("report.categoryLoadError")} onRetry={categoriesQuery.refetch} />
         ) : (
           <View style={s.catGrid}>
             {categories.map((c) => {
@@ -195,10 +199,10 @@ export default function ReportScreen() {
         )}
 
         {/* Description */}
-        <Text style={s.label}>{STRINGS.report.descriptionLabel}</Text>
+        <Text style={s.label}>{t("report.descriptionLabel")}</Text>
         <TextInput
           style={s.textArea}
-          placeholder={STRINGS.report.descriptionPlaceholder}
+          placeholder={t("report.descriptionPlaceholder")}
           placeholderTextColor="#94a3b8"
           value={description}
           onChangeText={(v) => {
@@ -211,16 +215,16 @@ export default function ReportScreen() {
         />
 
         {/* Incident date (optional) */}
-        <Text style={s.label}>{STRINGS.report.incidentDateLabel}</Text>
+        <Text style={s.label}>{t("report.incidentDateLabel")}</Text>
         <TextInput
           style={s.input}
-          placeholder="YYYY-MM-DD"
+          placeholder={t("report.datePlaceholder")}
           placeholderTextColor="#94a3b8"
           value={incidentDate}
           onChangeText={setIncidentDate}
           maxLength={10}
         />
-        <Text style={s.hint}>{STRINGS.report.incidentDateHint}</Text>
+        <Text style={s.hint}>{t("report.incidentDateHint")}</Text>
 
         {error ? <Text style={s.error}>{error}</Text> : null}
 
@@ -235,12 +239,12 @@ export default function ReportScreen() {
           ) : (
             <>
               <Feather name="flag" size={17} color="#fff" />
-              <Text style={s.submitBtnTxt}>{STRINGS.report.submit}</Text>
+              <Text style={s.submitBtnTxt}>{t("report.submit")}</Text>
             </>
           )}
         </TouchableOpacity>
 
-        <Text style={s.disclaimer}>{STRINGS.report.disclaimer}</Text>
+        <Text style={s.disclaimer}>{t("report.disclaimer")}</Text>
       </ScrollView>
     </KeyboardAvoidingView>
   );

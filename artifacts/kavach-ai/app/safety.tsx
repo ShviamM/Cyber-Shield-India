@@ -1,20 +1,26 @@
 import { Feather } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { SAFETY_TOPICS, STRINGS } from "@/constants/strings";
+import { SAFETY_TOPIC_META } from "@/constants/strings";
 import { useColors } from "@/hooks/useColors";
 
 const NAVY = "#0B3D91";
 const GREEN = "#138808";
 const SAFFRON = "#FF6713";
 
+type SafetyTopicCopy = { id: string; title: string; summary: string; tips: string[] };
+
 export default function SafetyScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const bottomPad = (insets.bottom || 0) + 24;
+
+  const topics = t("safety.topics", { returnObjects: true }) as SafetyTopicCopy[];
 
   return (
     <View style={[s.root, { backgroundColor: colors.background }]}>
@@ -22,26 +28,30 @@ export default function SafetyScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ padding: 16, paddingBottom: bottomPad }}
       >
-        <Text style={s.intro}>{STRINGS.safety.intro}</Text>
+        <Text style={s.intro}>{t("safety.intro")}</Text>
 
-        {SAFETY_TOPICS.map((topic) => (
-          <View key={topic.id} style={s.card}>
-            <View style={s.cardTop}>
-              <View style={s.iconBox}>
-                <Feather name={topic.icon} size={20} color={NAVY} />
+        {SAFETY_TOPIC_META.map((meta, i) => {
+          const topic = topics[i];
+          if (!topic) return null;
+          return (
+            <View key={meta.id} style={s.card}>
+              <View style={s.cardTop}>
+                <View style={s.iconBox}>
+                  <Feather name={meta.icon} size={20} color={NAVY} />
+                </View>
+                <Text style={s.cardTitle}>{topic.title}</Text>
               </View>
-              <Text style={s.cardTitle}>{topic.title}</Text>
+              <Text style={s.cardSummary}>{topic.summary}</Text>
+              <Text style={s.tipsHeading}>{t("safety.tipsHeading")}</Text>
+              {topic.tips.map((tip, ti) => (
+                <View key={ti} style={s.tipRow}>
+                  <Feather name="check-circle" size={14} color={GREEN} style={{ marginTop: 2 }} />
+                  <Text style={s.tipTxt}>{tip}</Text>
+                </View>
+              ))}
             </View>
-            <Text style={s.cardSummary}>{topic.summary}</Text>
-            <Text style={s.tipsHeading}>{STRINGS.safety.tipsHeading}</Text>
-            {topic.tips.map((tip, i) => (
-              <View key={i} style={s.tipRow}>
-                <Feather name="check-circle" size={14} color={GREEN} style={{ marginTop: 2 }} />
-                <Text style={s.tipTxt}>{tip}</Text>
-              </View>
-            ))}
-          </View>
-        ))}
+          );
+        })}
 
         <TouchableOpacity
           style={s.helplineCta}
@@ -49,7 +59,7 @@ export default function SafetyScreen() {
           activeOpacity={0.85}
         >
           <Feather name="phone-call" size={18} color={SAFFRON} />
-          <Text style={s.helplineCtaTxt}>{STRINGS.services.helpline}</Text>
+          <Text style={s.helplineCtaTxt}>{t("services.helpline")}</Text>
           <Feather name="arrow-right" size={16} color={SAFFRON} />
         </TouchableOpacity>
       </ScrollView>

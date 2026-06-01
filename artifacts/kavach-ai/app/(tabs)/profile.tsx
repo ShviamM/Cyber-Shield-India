@@ -2,6 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   Linking,
@@ -15,7 +16,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { STRINGS } from "@/constants/strings";
+import { LANGUAGES } from "@/i18n/languages";
 import { useAppContext } from "@/context/AppContext";
 import { useAuth } from "@/context/AuthContext";
 import { useColors } from "@/hooks/useColors";
@@ -30,16 +31,19 @@ const GREEN = "#138808";
 export default function ProfileScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { guardianActive, language, toggleGuardian, toggleLanguage } = useAppContext();
+  const { t, i18n } = useTranslation();
+  const { guardianActive, toggleGuardian } = useAppContext();
   const { user, signOut } = useAuth();
 
   const topInset = Platform.OS === "web" ? 0 : insets.top;
   const bottomPad = (Platform.OS === "web" ? 34 : insets.bottom) + 80;
   const [notifications, setNotifications] = React.useState(true);
 
-  const displayName = user?.fullName ?? STRINGS.profile.member;
+  const displayName = user?.fullName ?? t("profile.member");
   const displayPhone = user ? formatIndianPhone(user.phone) : "";
   const initial = displayName.trim().charAt(0).toUpperCase() || "K";
+
+  const activeLang = LANGUAGES.find((l) => l.code === i18n.language) ?? LANGUAGES[0];
 
   function callHelpline() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
@@ -48,17 +52,17 @@ export default function ProfileScreen() {
 
   function confirmSignOut() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    Alert.alert(STRINGS.profile.signOutConfirmTitle, STRINGS.profile.signOutConfirmMsg, [
-      { text: STRINGS.common.cancel, style: "cancel" },
-      { text: STRINGS.profile.signOut, style: "destructive", onPress: () => signOut() },
+    Alert.alert(t("profile.signOutConfirmTitle"), t("profile.signOutConfirmMsg"), [
+      { text: t("common.cancel"), style: "cancel" },
+      { text: t("profile.signOut"), style: "destructive", onPress: () => signOut() },
     ]);
   }
 
   const QUICK_SERVICES = [
-    { icon: "flag" as const, label: STRINGS.services.reportFraud, sublabel: STRINGS.services.reportFraudSub, color: "#dc2626", bg: "#fef2f2", route: "/report" },
-    { icon: "grid" as const, label: STRINGS.services.scamCategories, sublabel: STRINGS.services.scamCategoriesSub, color: "#7c3aed", bg: "#f5f3ff", route: "/categories" },
-    { icon: "book-open" as const, label: STRINGS.services.safetyTips, sublabel: STRINGS.services.safetyTipsSub, color: GREEN, bg: "#f0fdf4", route: "/safety" },
-    { icon: "phone-call" as const, label: STRINGS.services.helpline, sublabel: STRINGS.services.helplineSub, color: NAVY, bg: "#EBF0FA", route: "/helpline" },
+    { icon: "flag" as const, label: t("services.reportFraud"), sublabel: t("services.reportFraudSub"), color: "#dc2626", bg: "#fef2f2", route: "/report" },
+    { icon: "grid" as const, label: t("services.scamCategories"), sublabel: t("services.scamCategoriesSub"), color: "#7c3aed", bg: "#f5f3ff", route: "/categories" },
+    { icon: "book-open" as const, label: t("services.safetyTips"), sublabel: t("services.safetyTipsSub"), color: GREEN, bg: "#f0fdf4", route: "/safety" },
+    { icon: "phone-call" as const, label: t("services.helpline"), sublabel: t("services.helplineSub"), color: NAVY, bg: "#EBF0FA", route: "/helpline" },
   ];
 
   return (
@@ -88,7 +92,7 @@ export default function ProfileScreen() {
             <Text style={[s.guardianBadgeTxt, {
               color: guardianActive ? "#4ade80" : "rgba(255,255,255,0.5)",
             }]}>
-              {guardianActive ? "Protected" : "Paused"}
+              {guardianActive ? t("profile.protected") : t("profile.paused")}
             </Text>
           </View>
         </View>
@@ -104,21 +108,21 @@ export default function ProfileScreen() {
             <Feather name="phone-call" size={24} color="#fff" />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={s.sosTitle}>Cyber Crime Helpline</Text>
-            <Text style={s.sosDesc}>Call immediately if you've been scammed</Text>
+            <Text style={s.sosTitle}>{t("profile.helplineCardTitle")}</Text>
+            <Text style={s.sosDesc}>{t("profile.helplineCardSub")}</Text>
           </View>
           <Text style={s.sosBigNum}>1930</Text>
         </TouchableOpacity>
 
         {/* Protection section */}
-        <Text style={s.sectionLabel}>PROTECTION</Text>
+        <Text style={s.sectionLabel}>{t("profile.sectionProtection")}</Text>
         <View style={s.settingsCard}>
           <SettingRow
             icon="shield"
             iconColor={NAVY}
             iconBg="#EBF0FA"
-            label="Guardian Mode"
-            sub="Real-time scam call warnings"
+            label={t("profile.guardianMode")}
+            sub={t("profile.guardianModeSub")}
             right={
               <Switch
                 value={guardianActive}
@@ -133,8 +137,8 @@ export default function ProfileScreen() {
             icon="bell"
             iconColor={SAFFRON}
             iconBg="#fff7ed"
-            label="Threat Notifications"
-            sub="Alerts for new scams in your city"
+            label={t("profile.notifications")}
+            sub={t("profile.notificationsSub")}
             right={
               <Switch
                 value={notifications}
@@ -148,33 +152,29 @@ export default function ProfileScreen() {
         </View>
 
         {/* Language section */}
-        <Text style={s.sectionLabel}>LANGUAGE</Text>
+        <Text style={s.sectionLabel}>{t("profile.sectionLanguage")}</Text>
         <View style={s.settingsCard}>
           <TouchableOpacity
             style={s.settingRow}
-            onPress={() => { Haptics.selectionAsync(); toggleLanguage(); }}
+            onPress={() => { Haptics.selectionAsync(); router.push("/language"); }}
             activeOpacity={0.75}
           >
             <View style={[s.settingIconBg, { backgroundColor: "#f0fdf4" }]}>
               <Feather name="globe" size={18} color={GREEN} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={s.settingLabel}>Display Language</Text>
-              <Text style={s.settingSub}>{language === "hi" ? "हिंदी (Hindi)" : "English"}</Text>
+              <Text style={s.settingLabel}>{t("profile.displayLanguage")}</Text>
+              <Text style={s.settingSub}>
+                {activeLang.native}
+                {activeLang.code !== "en" ? ` (${activeLang.label})` : ""}
+              </Text>
             </View>
-            <View style={s.langToggle}>
-              <View style={[s.langOption, language === "hi" && { backgroundColor: NAVY }]}>
-                <Text style={[s.langTxt, { color: language === "hi" ? "#fff" : "#94a3b8" }]}>हि</Text>
-              </View>
-              <View style={[s.langOption, language === "en" && { backgroundColor: NAVY }]}>
-                <Text style={[s.langTxt, { color: language === "en" ? "#fff" : "#94a3b8" }]}>EN</Text>
-              </View>
-            </View>
+            <Feather name="chevron-right" size={16} color="#94a3b8" />
           </TouchableOpacity>
         </View>
 
         {/* Quick services */}
-        <Text style={s.sectionLabel}>{STRINGS.profile.sectionLearn}</Text>
+        <Text style={s.sectionLabel}>{t("profile.sectionLearn")}</Text>
         <View style={s.servicesGrid}>
           {QUICK_SERVICES.map((svc, i) => (
             <TouchableOpacity
@@ -193,14 +193,14 @@ export default function ProfileScreen() {
         </View>
 
         {/* About section */}
-        <Text style={s.sectionLabel}>ABOUT</Text>
+        <Text style={s.sectionLabel}>{t("profile.sectionAbout")}</Text>
         <View style={s.settingsCard}>
           <SettingRow
             icon="info"
             iconColor={NAVY}
             iconBg="#EBF0FA"
-            label="About KavachAI"
-            sub="Prevention-first cyber safety for India"
+            label={t("profile.aboutTitle")}
+            sub={t("profile.aboutSub")}
             right={<Feather name="chevron-right" size={16} color="#94a3b8" />}
             isLast={false}
           />
@@ -208,8 +208,8 @@ export default function ProfileScreen() {
             icon="file-text"
             iconColor="#7c3aed"
             iconBg="#f5f3ff"
-            label="Privacy Policy"
-            sub="How we protect your data"
+            label={t("profile.privacyTitle")}
+            sub={t("profile.privacySub")}
             right={<Feather name="chevron-right" size={16} color="#94a3b8" />}
             isLast={false}
           />
@@ -217,8 +217,8 @@ export default function ProfileScreen() {
             icon="star"
             iconColor={SAFFRON}
             iconBg="#fff7ed"
-            label="Rate KavachAI"
-            sub="Help us protect more Indians"
+            label={t("profile.rateTitle")}
+            sub={t("profile.rateSub")}
             right={<Feather name="chevron-right" size={16} color="#94a3b8" />}
             isLast={true}
           />
@@ -226,10 +226,10 @@ export default function ProfileScreen() {
 
         <TouchableOpacity style={s.signOutBtn} onPress={confirmSignOut} activeOpacity={0.8}>
           <Feather name="log-out" size={17} color="#dc2626" />
-          <Text style={s.signOutTxt}>{STRINGS.profile.signOut}</Text>
+          <Text style={s.signOutTxt}>{t("profile.signOut")}</Text>
         </TouchableOpacity>
 
-        <Text style={s.version}>{STRINGS.profile.version}</Text>
+        <Text style={s.version}>{t("profile.version")}</Text>
       </ScrollView>
     </View>
   );
@@ -318,12 +318,6 @@ const s = StyleSheet.create({
   settingIconBg: { width: 38, height: 38, borderRadius: 10, alignItems: "center", justifyContent: "center" },
   settingLabel: { fontSize: 14, fontWeight: "600" as const, color: "#0f172a" },
   settingSub: { fontSize: 12, color: "#64748b", marginTop: 1 },
-  langToggle: {
-    flexDirection: "row", borderRadius: 10, overflow: "hidden",
-    backgroundColor: "#f1f5f9", gap: 2, padding: 2,
-  },
-  langOption: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, alignItems: "center", justifyContent: "center" },
-  langTxt: { fontSize: 13, fontWeight: "700" as const },
 
   servicesGrid: {
     flexDirection: "row", flexWrap: "wrap", gap: 10, marginBottom: 20,

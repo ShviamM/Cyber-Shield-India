@@ -1,0 +1,435 @@
+/**
+ * Canonical English copy for KavachAI. This is the source of truth for all
+ * localizable UI chrome and static educational content. Every other locale
+ * mirrors these keys exactly; missing keys fall back to English at runtime.
+ *
+ * Interpolation uses {{placeholder}} tokens. Plurals are handled in-component
+ * (a base key + a *One variant) rather than via the i18next plural engine, to
+ * avoid relying on Intl.PluralRules in the Hermes runtime.
+ *
+ * Out of scope (stays in source language, lives in constants/data.ts):
+ * the live threat feed, scam-of-the-day, city hotspots, and golden rules.
+ */
+const en = {
+  common: {
+    appName: "KavachAI",
+    back: "Back",
+    cancel: "Cancel",
+    retry: "Try Again",
+    continue: "Continue",
+    submit: "Submit",
+    loading: "Loading…",
+    somethingWrong: "Something went wrong",
+    checkConnection: "Please check your connection and try again.",
+    optional: "Optional",
+    required: "Required",
+    trend: {
+      critical: "CRITICAL",
+      high: "HIGH",
+      medium: "MEDIUM",
+    },
+  },
+
+  tabs: {
+    home: "Home",
+    verify: "Verify",
+    threats: "Threats",
+    family: "Family",
+    profile: "Profile",
+  },
+
+  auth: {
+    welcomeTitle: "Welcome to KavachAI",
+    welcomeSub: "India's prevention-first shield against cyber crime & scam calls.",
+    phoneLabel: "Mobile Number",
+    phonePlaceholder: "98765 43210",
+    phoneHint: "We'll send a one-time code to verify it's you.",
+    sendOtp: "Send OTP",
+    invalidPhone: "Enter a valid 10-digit Indian mobile number.",
+    detailsTitle: "Create your account",
+    detailsSub: "Tell us a little about you to finish signing up.",
+    nameLabel: "Full Name",
+    namePlaceholder: "e.g. Rahul Sharma",
+    locationLabel: "City / Location",
+    locationPlaceholder: "e.g. Mumbai, Maharashtra",
+    nameRequired: "Please enter your name.",
+    otpTitle: "Enter the code",
+    otpSubPrefix: "We sent a 6-digit code to ",
+    otpPlaceholder: "6-digit code",
+    verify: "Verify & Continue",
+    invalidOtp: "Enter the 6-digit code.",
+    resend: "Resend code",
+    resendIn: "Resend code in {{seconds}}s",
+    devOtpPrefix: "Dev code: ",
+    changeNumber: "Change number",
+    otpSent: "Code sent",
+    requestFailed: "Could not send the code. Please try again.",
+    verifyFailed: "Could not verify the code. Please try again.",
+  },
+
+  profile: {
+    signOut: "Sign Out",
+    signOutConfirmTitle: "Sign Out",
+    signOutConfirmMsg: "You'll need to verify your number again to sign back in.",
+    member: "KavachAI member",
+    protected: "Protected",
+    paused: "Paused",
+    sectionProtection: "PROTECTION",
+    sectionLanguage: "LANGUAGE",
+    sectionServices: "QUICK SERVICES",
+    sectionLearn: "LEARN & REPORT",
+    sectionAbout: "ABOUT",
+    guardianMode: "Guardian Mode",
+    guardianModeSub: "Real-time scam call warnings",
+    notifications: "Threat Notifications",
+    notificationsSub: "Alerts for new scams in your city",
+    displayLanguage: "Display Language",
+    helplineCardTitle: "Cyber Crime Helpline",
+    helplineCardSub: "Call immediately if you've been scammed",
+    aboutTitle: "About KavachAI",
+    aboutSub: "Prevention-first cyber safety for India",
+    privacyTitle: "Privacy Policy",
+    privacySub: "How we protect your data",
+    rateTitle: "Rate KavachAI",
+    rateSub: "Help us protect more Indians",
+    version: "KavachAI v2.0.0 · Made for India",
+  },
+
+  services: {
+    reportFraud: "Report a Fraud Number",
+    reportFraudSub: "Warn the community",
+    scamCategories: "Scam Categories",
+    scamCategoriesSub: "Know the tricks",
+    safetyTips: "Cyber Safety Tips",
+    safetyTipsSub: "Stay protected",
+    helpline: "Emergency & Helpline",
+    helplineSub: "1930 · Report cyber crime",
+  },
+
+  home: {
+    logoSub: "CYBER CRIME PREVENTION · INDIA",
+    sosHelpline: "Cyber Helpline",
+    guardianActive: "Guardian Active",
+    guardianPaused: "Guardian Paused",
+    statChecked: "Checked",
+    statThreats: "Threats",
+    statProtected: "Protected",
+    verifyTitle: "Verify Before You Act",
+    verifySub: "Check anything suspicious instantly",
+    activeScamsToday: "Active Scams Today",
+    allCount: "All {{n}} →",
+    tipCritical: "Real couriers never ask for payment over the phone.",
+    tipDefault: "Hang up immediately and verify through official channels.",
+    familyShield: "Family Shield",
+    seeAll: "See All",
+    goldenRules: "Golden Rules of Safety",
+    hotspots: "Hotspots This Week",
+    casesReported: "{{n}} cases reported",
+    protectCircleTitle: "Protect Your Circle",
+    protectCircleSub: "Warn family & friends. Share scam alerts directly.",
+    demoTitle: "Demo: Incoming Scam Call",
+    demoSub: "See how KavachAI warns you in real-time",
+    quickTools: {
+      numberLabel: "Check Number",
+      numberSub: "Spam / Safe?",
+      linkLabel: "Check Link",
+      linkSub: "Phishing URL?",
+      upiLabel: "Check UPI ID",
+      upiSub: "Legit account?",
+      qrLabel: "Check QR Code",
+      qrSub: "Safe to scan?",
+    },
+  },
+
+  verify: {
+    title: "Verify Before You Act",
+    sub: "Check anything suspicious instantly",
+    checkBeforeAnswering: "Check a number before answering",
+    checkBeforeAnsweringSub: "See community reports before you pick up",
+    checkNow: "Check Now",
+    checking: "Checking…",
+    enterValue: "Enter a value to check",
+    reportThisNumber: "Report this number",
+    reportCount: "{{n}} community reports",
+    reportCountOne: "1 community report",
+    noReports: "No community reports yet",
+    relatedCategories: "Reported for",
+    checkFailed: "Couldn't check this number. Please try again.",
+    recentChecks: "RECENT CHECKS",
+    risk: {
+      high: {
+        headline: "HIGH RISK — Likely Fraud",
+        detail:
+          "This number has multiple community reports. Do NOT share OTP, PIN, or make any payment. Hang up and verify through official channels.",
+      },
+      medium: {
+        headline: "Suspicious — Be Careful",
+        detail:
+          "This number has been reported. Proceed with caution and never share personal details, OTP, or money.",
+      },
+      low: {
+        headline: "Low Risk",
+        detail:
+          "Only a few or no recent reports. Still, always verify the caller's identity before sharing anything.",
+      },
+      unknown: {
+        headline: "No Reports Found",
+        detail:
+          "No community fraud reports for this number yet. Stay alert and never share OTP or money on an unverified call.",
+      },
+    },
+    verifiedScam: "Verified scam by KavachAI moderators",
+    types: {
+      numberLabel: "Check Number",
+      numberHint: "+91 98765 43210",
+      linkLabel: "Check Link",
+      linkHint: "https://example.com",
+      upiLabel: "Check UPI ID",
+      upiHint: "name@paytm",
+      qrLabel: "Check QR Code",
+      qrHint: "Paste QR content here",
+    },
+    status: {
+      safe: "Safe",
+      warning: "Warning",
+      danger: "Danger",
+      invalid: "Invalid",
+    },
+    local: {
+      linkInvalidHeadline: "Enter a valid URL",
+      linkInvalidDetail: "Must start with http:// or https://",
+      linkDangerHeadline: "PHISHING LINK DETECTED",
+      linkDangerDetail:
+        "This URL matches known phishing patterns. Do NOT click or enter any personal details on this page.",
+      linkHttpHeadline: "Unsafe Connection (HTTP)",
+      linkHttpDetail:
+        "No encryption. Avoid entering passwords, card numbers, or OTP on this page.",
+      linkWarnHeadline: "Suspicious URL",
+      linkWarnDetail:
+        "URL contains patterns common in scam offers. Verify the domain carefully before proceeding.",
+      linkSafeHeadline: "No Threats Detected",
+      linkSafeDetail:
+        "This URL appears safe. Always double-check the domain name spelling before entering personal info.",
+      upiInvalidHeadline: "Invalid UPI ID format",
+      upiInvalidDetail: "Valid examples: name@upi, 9876543210@paytm, user@oksbi",
+      upiDangerHeadline: "SUSPICIOUS UPI ID",
+      upiDangerDetail:
+        "Legitimate banks and companies never use these keywords in their UPI IDs. This is likely a fraud account.",
+      upiSafeHeadline: "Valid UPI Format",
+      upiSafeDetail:
+        "Format is valid. Always confirm the recipient's identity through a separate channel before sending money.",
+      qrDangerHeadline: "QR PAYMENT SCAM",
+      qrDangerDetail:
+        "This QR is disguised as a 'receive money' code but actually requests a payment FROM you.",
+      qrWarnHeadline: "Payment QR Detected",
+      qrWarnDetail:
+        "This QR initiates a UPI payment. Confirm the recipient's identity before scanning on your phone.",
+      qrSafeHeadline: "No Threats in QR",
+      qrSafeDetail:
+        "No payment requests detected in this QR data. Verify the destination URL or content before acting.",
+      unknownHeadline: "Unknown error",
+    },
+  },
+
+  report: {
+    title: "Report a Fraud Number",
+    intro: "Your report helps warn millions of Indians. It takes less than a minute.",
+    phoneLabel: "Fraud Number",
+    phonePlaceholder: "98765 43210",
+    invalidPhone: "Enter a valid 10-digit Indian mobile number.",
+    alreadyReported:
+      "This number already has {{n}} reports. Adding yours strengthens the warning.",
+    alreadyReportedOne:
+      "This number already has 1 report. Adding yours strengthens the warning.",
+    verifiedScamWarning: "This number is already flagged as a verified scam.",
+    categoryLabel: "Type of Scam",
+    categoryRequired: "Please choose a scam type.",
+    categoryLoadError: "Couldn't load scam types. Pull to retry.",
+    descriptionLabel: "What happened?",
+    descriptionPlaceholder:
+      "Describe the call or message — what they claimed, what they asked for…",
+    descriptionRequired: "Please add a short description.",
+    descriptionTooShort: "Please add a little more detail (at least 10 characters).",
+    incidentDateLabel: "When did it happen?",
+    incidentDateHint: "Optional — helps moderators verify",
+    datePlaceholder: "YYYY-MM-DD",
+    today: "Today",
+    submit: "Submit Report",
+    submitting: "Submitting…",
+    successTitle: "Report submitted",
+    successMsg: "Thank you for helping protect the community.",
+    submitFailed: "Couldn't submit your report. Please try again.",
+    done: "Done",
+    disclaimer:
+      "Reports are reviewed by moderators. False reports may be removed. For financial loss, also call 1930.",
+  },
+
+  categories: {
+    title: "Scam Categories",
+    intro: "Learn how the most common scams in India work so you can spot them early.",
+    empty: "No categories available yet.",
+    loadError: "Couldn't load scam categories.",
+    reportCta: "Report a number in this category",
+  },
+
+  safety: {
+    title: "Cyber Safety",
+    intro: "Quick, practical guidance to keep you and your family safe online.",
+    tipsHeading: "What to do",
+    topics: [
+      {
+        id: "phishing",
+        title: "Phishing Links & Fake Websites",
+        summary:
+          "Fraudsters send links that look official (banks, KYC, refunds) to steal your login or card details.",
+        tips: [
+          "Never click links in unexpected SMS, WhatsApp, or email.",
+          "Type bank and government website addresses yourself.",
+          "Check for spelling tricks in the domain (e.g. sbi-kyc-update.com).",
+          "Use the Verify tab to check a link before opening it.",
+        ],
+      },
+      {
+        id: "otp",
+        title: "OTP & PIN Theft",
+        summary:
+          "No genuine bank, company, or government office will EVER ask for your OTP, PIN, or CVV.",
+        tips: [
+          "Never share an OTP — not even with 'bank staff' or 'police'.",
+          "An OTP for a refund is actually authorising a payment FROM you.",
+          "Don't read codes aloud on a call.",
+          "Enable transaction alerts on your bank account.",
+        ],
+      },
+      {
+        id: "upi",
+        title: "UPI & Payment Scams",
+        summary:
+          "You never enter a UPI PIN to RECEIVE money. Requests to 'approve to receive' are scams.",
+        tips: [
+          "Entering your UPI PIN always means money LEAVES your account.",
+          "Verify the receiver's name before sending money.",
+          "Be wary of 'wrong transfer, please return' tricks.",
+          "Scan only QR codes you trust — a QR can request a payment.",
+        ],
+      },
+      {
+        id: "loan_apps",
+        title: "Fake Loan & Credit Apps",
+        summary:
+          "Instant-loan apps lure you with quick money, then harass and blackmail using your contacts and photos.",
+        tips: [
+          "Only borrow from RBI-registered banks or NBFCs.",
+          "Don't grant apps access to contacts, gallery, or messages.",
+          "Avoid apps demanding fees before disbursing a loan.",
+          "Check reviews and the developer before installing.",
+        ],
+      },
+      {
+        id: "impersonation",
+        title: "Police, Bank & Govt Impersonation",
+        summary:
+          "Scammers pose as police ('digital arrest'), bank officers, or officials to frighten you into paying.",
+        tips: [
+          "Real police never arrest or 'fine' you over a video call.",
+          "Hang up and call the official number from the bank's website.",
+          "Urgency + threats + secrecy = scam. Pause and verify.",
+          "Talk to family before acting on any scary call.",
+        ],
+      },
+    ],
+  },
+
+  helpline: {
+    title: "Emergency & Helpline",
+    sosTitle: "Cyber Crime Helpline 1930",
+    sosSub: "Call now if you've lost money or shared sensitive details.",
+    callNow: "Call 1930",
+    portalTitle: "National Cyber Crime Portal",
+    portalSub: "File a detailed complaint online",
+    portalCta: "Open cybercrime.gov.in",
+    stepsTitle: "If you've been scammed",
+    disclaimerTitle: "Stay safe while reporting",
+    disclaimer:
+      "KavachAI never asks for your OTP, PIN, or passwords. Always verify official helpline numbers and websites yourself — scammers often pose as 'support agents'. Only 1930 and cybercrime.gov.in are official Government of India channels.",
+    steps: [
+      "Call 1930 immediately — the sooner you report, the better the chance of freezing the money.",
+      "File a complaint at cybercrime.gov.in with all details and screenshots.",
+      "Inform your bank to block the card/account and stop further transactions.",
+      "Save evidence: numbers, messages, transaction IDs, and screenshots.",
+      "Report the number in KavachAI to warn others.",
+    ],
+  },
+
+  threats: {
+    headerTitle: "Threat Feed",
+    headerSub: "Real-time cyber crime intelligence",
+    live: "LIVE",
+    reports: "{{n}} reports",
+    activeScamsNow: "Active Scams Right Now",
+    communityReports: "{{city}} · {{n}} community reports",
+    cityHotspots: "City Hotspots",
+    cases: "{{n}} cases",
+    goldenRules: "Golden Rules of Safety",
+  },
+
+  family: {
+    headerTitle: "Family Shield",
+    membersProtected: "{{n}} members protected",
+    membersProtectedOne: "1 member protected",
+    addMember: "Add Family Member",
+    namePlaceholder: "Name (e.g. Mummy)",
+    phonePlaceholder: "+91 98765 43210",
+    addToShield: "Add to Shield",
+    emptyTitle: "No members yet",
+    emptyDesc:
+      "Add family members to monitor their protection status and get alerts when they may be at risk.",
+    addFirst: "Add First Member",
+    suspiciousCallNow: "Receiving a suspicious call right now!",
+    statusAlert: "Alert — Possible Scam Call",
+    statusSafe: "Protected & Safe",
+    statusShortAlert: "Alert",
+    statusShortSafe: "Safe",
+    lastActivity: "Last activity: {{value}}",
+    justAdded: "Just added",
+    justNow: "Just now",
+    oneHourAgo: "1 hr ago",
+    removeTitle: "Remove Member",
+    removeMessage: "Remove {{name}} from Family Shield?",
+    remove: "Remove",
+    relations: {
+      mother: "Mother",
+      father: "Father",
+      spouse: "Spouse",
+      child: "Child",
+      sibling: "Sibling",
+      other: "Other",
+    },
+  },
+
+  callAlert: {
+    incoming: "INCOMING CALL",
+    unknownCaller: "Unknown Caller · No Contact Match",
+    scamReports: "Scam Reports",
+    victimsReported: "Victims Reported",
+    topCity: "Top City",
+    scamType: "FAKE FEDEX / COURIER SCAM",
+    block: "Block",
+    report: "Report",
+    answer: "Answer",
+    highRisk: "High Risk",
+    warnings: [
+      "STOP! This could be a scammer",
+      "Do NOT share OTP or send money!",
+      "Verify first, then talk",
+    ],
+  },
+
+  language: {
+    title: "Display Language",
+    intro: "Choose the language for the app. Live scam-feed content stays in its original language.",
+  },
+};
+
+export default en;
+export type Resources = typeof en;

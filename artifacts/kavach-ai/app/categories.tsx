@@ -3,11 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { listCategories } from "@workspace/api-client-react";
 import { router } from "expo-router";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { EmptyState, ErrorState, LoadingState } from "@/components/StateViews";
-import { STRINGS, categoryIcon } from "@/constants/strings";
+import { categoryIcon } from "@/constants/strings";
 import { useColors } from "@/hooks/useColors";
 
 const NAVY = "#0B3D91";
@@ -16,6 +17,7 @@ const SAFFRON = "#FF6713";
 export default function CategoriesScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const bottomPad = (insets.bottom || 0) + 24;
 
   const { data, isLoading, isError, refetch } = useQuery({
@@ -31,14 +33,14 @@ export default function CategoriesScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ padding: 16, paddingBottom: bottomPad }}
       >
-        <Text style={s.intro}>{STRINGS.categories.intro}</Text>
+        <Text style={s.intro}>{t("categories.intro")}</Text>
 
         {isLoading ? (
           <LoadingState />
         ) : isError ? (
-          <ErrorState message={STRINGS.categories.loadError} onRetry={refetch} />
+          <ErrorState message={t("categories.loadError")} onRetry={refetch} />
         ) : categories.length === 0 ? (
-          <EmptyState icon="grid" title={STRINGS.categories.empty} />
+          <EmptyState icon="grid" title={t("categories.empty")} />
         ) : (
           categories.map((c) => (
             <View key={c.id} style={s.card}>
@@ -57,7 +59,7 @@ export default function CategoriesScreen() {
                 activeOpacity={0.7}
               >
                 <Feather name="flag" size={13} color={NAVY} />
-                <Text style={s.reportLinkTxt}>{STRINGS.categories.reportCta}</Text>
+                <Text style={s.reportLinkTxt}>{t("categories.reportCta")}</Text>
                 <Feather name="chevron-right" size={14} color={NAVY} />
               </TouchableOpacity>
             </View>

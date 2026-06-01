@@ -20,11 +20,9 @@ export type CheckItem = {
 
 type AppContextType = {
   guardianActive: boolean;
-  language: "hi" | "en";
   familyMembers: FamilyMember[];
   recentChecks: CheckItem[];
   toggleGuardian: () => void;
-  toggleLanguage: () => void;
   addFamilyMember: (member: Omit<FamilyMember, "id">) => void;
   removeFamilyMember: (id: string) => void;
   addCheck: (check: Omit<CheckItem, "id" | "timestamp">) => void;
@@ -37,7 +35,7 @@ const DEFAULT_MEMBERS: FamilyMember[] = [
     phone: "+91 98765-43210",
     relation: "Mother",
     status: "warning",
-    lastSeen: "Just now",
+    lastSeen: "justNow",
   },
   {
     id: "m2",
@@ -45,7 +43,7 @@ const DEFAULT_MEMBERS: FamilyMember[] = [
     phone: "+91 87654-32109",
     relation: "Father",
     status: "safe",
-    lastSeen: "1 hr ago",
+    lastSeen: "oneHourAgo",
   },
 ];
 
@@ -53,7 +51,6 @@ const AppContext = createContext<AppContextType>({} as AppContextType);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [guardianActive, setGuardianActive] = useState(true);
-  const [language, setLanguage] = useState<"hi" | "en">("hi");
   const [familyMembers, setFamilyMembers] =
     useState<FamilyMember[]>(DEFAULT_MEMBERS);
   const [recentChecks, setRecentChecks] = useState<CheckItem[]>([]);
@@ -62,14 +59,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     (async () => {
       try {
-        const [g, l, fm, rc] = await Promise.all([
+        const [g, fm, rc] = await Promise.all([
           AsyncStorage.getItem("kv_guardian"),
-          AsyncStorage.getItem("kv_lang"),
           AsyncStorage.getItem("kv_family"),
           AsyncStorage.getItem("kv_checks"),
         ]);
         if (g !== null) setGuardianActive(JSON.parse(g));
-        if (l) setLanguage(l as "hi" | "en");
         if (fm) setFamilyMembers(JSON.parse(fm));
         if (rc) setRecentChecks(JSON.parse(rc));
       } catch {}
@@ -81,18 +76,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (!loaded) return;
     AsyncStorage.multiSet([
       ["kv_guardian", JSON.stringify(guardianActive)],
-      ["kv_lang", language],
       ["kv_family", JSON.stringify(familyMembers)],
       ["kv_checks", JSON.stringify(recentChecks)],
     ]).catch(() => {});
-  }, [guardianActive, language, familyMembers, recentChecks, loaded]);
+  }, [guardianActive, familyMembers, recentChecks, loaded]);
 
   function toggleGuardian() {
     setGuardianActive((v) => !v);
-  }
-
-  function toggleLanguage() {
-    setLanguage((l) => (l === "hi" ? "en" : "hi"));
   }
 
   function addFamilyMember(member: Omit<FamilyMember, "id">) {
@@ -117,11 +107,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     <AppContext.Provider
       value={{
         guardianActive,
-        language,
         familyMembers,
         recentChecks,
         toggleGuardian,
-        toggleLanguage,
         addFamilyMember,
         removeFamilyMember,
         addCheck,

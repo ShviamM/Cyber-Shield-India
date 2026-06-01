@@ -1,2 +1,1 @@
-- [Orval codegen naming](orval-codegen.md) — naming an OpenAPI response component `<op>Response` clashes with orval's generated type; rename it.
-- [Drizzle raw aggregates](drizzle-raw-aggregates.md) — a raw `sql\`max(ts)\`` returns a string, not a Date; coerce before writing into a timestamp column.
+- [KavachAI i18n](kavach-ai-i18n.md) — locale files aren't type-checked against en; verify key parity with a runtime flatten script, and rely on i18next fallbackLng (no manual deep-merge).

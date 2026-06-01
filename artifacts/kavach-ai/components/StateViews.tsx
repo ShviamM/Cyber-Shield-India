@@ -1,17 +1,17 @@
 import { Feather } from "@expo/vector-icons";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-
-import { STRINGS } from "@/constants/strings";
 
 const NAVY = "#0B3D91";
 const SAFFRON = "#FF6713";
 
 export function LoadingState({ label }: { label?: string }) {
+  const { t } = useTranslation();
   return (
     <View style={s.wrap}>
       <ActivityIndicator color={NAVY} size="large" />
-      <Text style={s.muted}>{label ?? STRINGS.common.loading}</Text>
+      <Text style={s.muted}>{label ?? t("common.loading")}</Text>
     </View>
   );
 }
@@ -23,17 +23,18 @@ export function ErrorState({
   message?: string;
   onRetry?: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <View style={s.wrap}>
       <View style={[s.iconBox, { backgroundColor: "#fee2e2" }]}>
         <Feather name="wifi-off" size={26} color="#dc2626" />
       </View>
-      <Text style={s.title}>{STRINGS.common.somethingWrong}</Text>
-      <Text style={s.muted}>{message ?? STRINGS.common.checkConnection}</Text>
+      <Text style={s.title}>{t("common.somethingWrong")}</Text>
+      <Text style={s.muted}>{message ?? t("common.checkConnection")}</Text>
       {onRetry && (
         <TouchableOpacity style={s.retryBtn} onPress={onRetry} activeOpacity={0.85}>
           <Feather name="refresh-cw" size={15} color="#fff" />
-          <Text style={s.retryTxt}>{STRINGS.common.retry}</Text>
+          <Text style={s.retryTxt}>{t("common.retry")}</Text>
         </TouchableOpacity>
       )}
     </View>

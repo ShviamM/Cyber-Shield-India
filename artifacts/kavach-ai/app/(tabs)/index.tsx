@@ -2,6 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dimensions,
   Linking,
@@ -15,16 +16,8 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useAppContext } from "@/context/AppContext";
-import { CITY_HOTSPOTS, GOLDEN_RULES, LIVE_THREATS, SCAM_OF_DAY } from "@/constants/data";
-import { STRINGS } from "@/constants/strings";
+import { CITY_HOTSPOTS, GOLDEN_RULES, LIVE_THREATS } from "@/constants/data";
 import { useColors } from "@/hooks/useColors";
-
-const SERVICE_LINKS = [
-  { icon: "flag" as const, label: STRINGS.services.reportFraud, color: "#dc2626", bg: "#fef2f2", route: "/report" },
-  { icon: "grid" as const, label: STRINGS.services.scamCategories, color: "#7c3aed", bg: "#f5f3ff", route: "/categories" },
-  { icon: "book-open" as const, label: STRINGS.services.safetyTips, color: "#138808", bg: "#f0fdf4", route: "/safety" },
-  { icon: "phone-call" as const, label: STRINGS.services.helpline, color: "#0B3D91", bg: "#EBF0FA", route: "/helpline" },
-];
 
 const SAFFRON = "#FF6713";
 const NAVY = "#0B3D91";
@@ -32,20 +25,28 @@ const GREEN = "#138808";
 
 const { width } = Dimensions.get("window");
 
-const QUICK_TOOLS = [
-  { icon: "phone" as const, label: "Check Number", sublabel: "Spam / Safe?", bg: "#EBF0FA", color: NAVY },
-  { icon: "link" as const, label: "Check Link", sublabel: "Phishing URL?", bg: "#f5f3ff", color: "#7c3aed" },
-  { icon: "credit-card" as const, label: "Check UPI ID", sublabel: "Legit account?", bg: "#f0fdf4", color: GREEN },
-  { icon: "maximize" as const, label: "Check QR Code", sublabel: "Safe to scan?", bg: "#fff7ed", color: SAFFRON },
-];
-
 export default function HomeScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const { guardianActive, familyMembers, recentChecks, toggleGuardian } = useAppContext();
 
   const topInset = Platform.OS === "web" ? 0 : insets.top;
   const bottomPad = (Platform.OS === "web" ? 34 : insets.bottom) + 80;
+
+  const SERVICE_LINKS = [
+    { icon: "flag" as const, label: t("services.reportFraud"), color: "#dc2626", bg: "#fef2f2", route: "/report" },
+    { icon: "grid" as const, label: t("services.scamCategories"), color: "#7c3aed", bg: "#f5f3ff", route: "/categories" },
+    { icon: "book-open" as const, label: t("services.safetyTips"), color: "#138808", bg: "#f0fdf4", route: "/safety" },
+    { icon: "phone-call" as const, label: t("services.helpline"), color: "#0B3D91", bg: "#EBF0FA", route: "/helpline" },
+  ];
+
+  const QUICK_TOOLS = [
+    { icon: "phone" as const, label: t("home.quickTools.numberLabel"), sublabel: t("home.quickTools.numberSub"), bg: "#EBF0FA", color: NAVY },
+    { icon: "link" as const, label: t("home.quickTools.linkLabel"), sublabel: t("home.quickTools.linkSub"), bg: "#f5f3ff", color: "#7c3aed" },
+    { icon: "credit-card" as const, label: t("home.quickTools.upiLabel"), sublabel: t("home.quickTools.upiSub"), bg: "#f0fdf4", color: GREEN },
+    { icon: "maximize" as const, label: t("home.quickTools.qrLabel"), sublabel: t("home.quickTools.qrSub"), bg: "#fff7ed", color: SAFFRON },
+  ];
 
   const todayChecks = recentChecks.filter((c) => Date.now() - c.timestamp < 86400000);
   const threatsFound = todayChecks.filter((c) => c.result === "danger").length;
@@ -76,7 +77,7 @@ export default function HomeScreen() {
               <Text style={s.logoTitle}>
                 Kavach<Text style={{ color: SAFFRON }}>AI</Text>
               </Text>
-              <Text style={s.logoSub}>CYBER CRIME PREVENTION · INDIA</Text>
+              <Text style={s.logoSub}>{t("home.logoSub")}</Text>
             </View>
           </View>
           <View style={s.headerIcons}>
@@ -105,7 +106,7 @@ export default function HomeScreen() {
           <TouchableOpacity style={s.sosBtn} onPress={callSOS} activeOpacity={0.85}>
             <Feather name="phone-call" size={20} color="#fff" fill="rgba(255,255,255,0.3)" />
             <Text style={s.sosBigNum}>1930</Text>
-            <Text style={s.sosSubLabel}>Cyber Helpline</Text>
+            <Text style={s.sosSubLabel}>{t("home.sosHelpline")}</Text>
           </TouchableOpacity>
           <View style={s.statsBox}>
             <TouchableOpacity
@@ -115,23 +116,23 @@ export default function HomeScreen() {
             >
               <View style={[s.guardianDot, { backgroundColor: guardianActive ? "#4ade80" : "#94a3b8" }]} />
               <Text style={s.guardianLabel}>
-                {guardianActive ? "Guardian Active" : "Guardian Paused"}
+                {guardianActive ? t("home.guardianActive") : t("home.guardianPaused")}
               </Text>
             </TouchableOpacity>
             <View style={s.headerStats}>
               <View style={s.hStat}>
                 <Text style={s.hStatNum}>{todayChecks.length}</Text>
-                <Text style={s.hStatLbl}>Checked</Text>
+                <Text style={s.hStatLbl}>{t("home.statChecked")}</Text>
               </View>
               <View style={s.hStatDiv} />
               <View style={s.hStat}>
                 <Text style={[s.hStatNum, threatsFound > 0 && { color: "#fca5a5" }]}>{threatsFound}</Text>
-                <Text style={s.hStatLbl}>Threats</Text>
+                <Text style={s.hStatLbl}>{t("home.statThreats")}</Text>
               </View>
               <View style={s.hStatDiv} />
               <View style={s.hStat}>
                 <Text style={[s.hStatNum, { color: "#86efac" }]}>{familyMembers.length}</Text>
-                <Text style={s.hStatLbl}>Protected</Text>
+                <Text style={s.hStatLbl}>{t("home.statProtected")}</Text>
               </View>
             </View>
           </View>
@@ -150,23 +151,23 @@ export default function HomeScreen() {
               <Feather name="search" size={14} color={NAVY} />
             </View>
             <View>
-              <Text style={[s.sectionTitle, { color: "#0f172a" }]}>Verify Before You Act</Text>
-              <Text style={[s.sectionSub, { color: "#64748b" }]}>Check anything suspicious instantly</Text>
+              <Text style={[s.sectionTitle, { color: "#0f172a" }]}>{t("home.verifyTitle")}</Text>
+              <Text style={[s.sectionSub, { color: "#64748b" }]}>{t("home.verifySub")}</Text>
             </View>
           </View>
           <View style={s.toolGrid}>
-            {QUICK_TOOLS.map((t) => (
+            {QUICK_TOOLS.map((tool) => (
               <TouchableOpacity
-                key={t.label}
-                style={[s.toolBtn, { backgroundColor: t.bg }]}
+                key={tool.label}
+                style={[s.toolBtn, { backgroundColor: tool.bg }]}
                 onPress={() => { Haptics.selectionAsync(); router.push("/(tabs)/verify"); }}
                 activeOpacity={0.75}
               >
-                <View style={[s.toolIconBox, { shadowColor: t.color }]}>
-                  <Feather name={t.icon} size={16} color={t.color} />
+                <View style={[s.toolIconBox, { shadowColor: tool.color }]}>
+                  <Feather name={tool.icon} size={16} color={tool.color} />
                 </View>
-                <Text style={s.toolLabel}>{t.label}</Text>
-                <Text style={s.toolSublabel}>{t.sublabel}</Text>
+                <Text style={s.toolLabel}>{tool.label}</Text>
+                <Text style={s.toolSublabel}>{tool.sublabel}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -193,18 +194,18 @@ export default function HomeScreen() {
         <View style={s.sectionOuterHeader}>
           <View style={s.liveRow}>
             <View style={s.livePulse} />
-            <Text style={s.outerSectionTitle}>Active Scams Today</Text>
+            <Text style={s.outerSectionTitle}>{t("home.activeScamsToday")}</Text>
           </View>
           <TouchableOpacity onPress={() => router.push("/(tabs)/threats")}>
-            <Text style={[s.seeAll, { color: NAVY }]}>All 23 →</Text>
+            <Text style={[s.seeAll, { color: NAVY }]}>{t("home.allCount", { n: 23 })}</Text>
           </TouchableOpacity>
         </View>
 
-        {LIVE_THREATS.slice(0, 2).map((t) => {
-          const color = t.trend === "critical" ? "#dc2626" : t.trend === "high" ? "#ea580c" : "#d97706";
-          const bg = t.trend === "critical" ? "#fff1f1" : t.trend === "high" ? "#fff7ed" : "#fefce8";
+        {LIVE_THREATS.slice(0, 2).map((item) => {
+          const color = item.trend === "critical" ? "#dc2626" : item.trend === "high" ? "#ea580c" : "#d97706";
+          const bg = item.trend === "critical" ? "#fff1f1" : item.trend === "high" ? "#fff7ed" : "#fefce8";
           return (
-            <View key={t.id} style={[s.scamCard, { borderColor: color + "30" }]}>
+            <View key={item.id} style={[s.scamCard, { borderColor: color + "30" }]}>
               <View style={s.scamCardTop}>
                 <View style={[s.scamIconBox, { backgroundColor: bg }]}>
                   <Feather name="phone-off" size={18} color={color} />
@@ -212,16 +213,16 @@ export default function HomeScreen() {
                 <View style={{ flex: 1 }}>
                   <View style={s.scamTagRow}>
                     <View style={[s.scamTag, { backgroundColor: bg }]}>
-                      <Text style={[s.scamTagTxt, { color }]}>{t.trend.toUpperCase()}</Text>
+                      <Text style={[s.scamTagTxt, { color }]}>{item.trend.toUpperCase()}</Text>
                     </View>
                     <Feather name="chevron-right" size={14} color="#94a3b8" />
                   </View>
-                  <Text style={s.scamType}>{t.type}</Text>
-                  <Text style={s.scamDesc} numberOfLines={2}>{t.description}</Text>
+                  <Text style={s.scamType}>{item.type}</Text>
+                  <Text style={s.scamDesc} numberOfLines={2}>{item.description}</Text>
                   <View style={s.scamMeta}>
                     <Feather name="alert-triangle" size={10} color={color} />
                     <Text style={[s.scamMetaTxt, { color }]}>
-                      {t.count.toLocaleString()} reports · {t.city}
+                      {t("threats.reports", { n: item.count.toLocaleString() })} · {item.city}
                     </Text>
                   </View>
                 </View>
@@ -229,9 +230,9 @@ export default function HomeScreen() {
               <View style={s.scamTip}>
                 <Feather name="check-circle" size={13} color={GREEN} />
                 <Text style={s.scamTipTxt}>
-                  {t.trend === "critical"
-                    ? "Real couriers never ask for payment over the phone."
-                    : "Hang up immediately and verify through official channels."}
+                  {item.trend === "critical"
+                    ? t("home.tipCritical")
+                    : t("home.tipDefault")}
                 </Text>
               </View>
             </View>
@@ -242,9 +243,9 @@ export default function HomeScreen() {
         {familyMembers.length > 0 && (
           <>
             <View style={s.sectionOuterHeader}>
-              <Text style={s.outerSectionTitle}>Family Shield</Text>
+              <Text style={s.outerSectionTitle}>{t("home.familyShield")}</Text>
               <TouchableOpacity onPress={() => router.push("/(tabs)/family")}>
-                <Text style={[s.seeAll, { color: NAVY }]}>See All</Text>
+                <Text style={[s.seeAll, { color: NAVY }]}>{t("home.seeAll")}</Text>
               </TouchableOpacity>
             </View>
             <View style={s.familyCard}>
@@ -265,7 +266,9 @@ export default function HomeScreen() {
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={s.memberName}>{m.name}</Text>
-                    <Text style={s.memberRel}>{m.relation}</Text>
+                    <Text style={s.memberRel}>
+                      {t(`family.relations.${m.relation.toLowerCase()}`, { defaultValue: m.relation })}
+                    </Text>
                   </View>
                   <View style={[s.memberBadge, {
                     backgroundColor: m.status === "warning" ? "rgba(249,115,22,0.12)" : "rgba(19,136,8,0.08)",
@@ -278,7 +281,7 @@ export default function HomeScreen() {
                     <Text style={[s.memberBadgeTxt, {
                       color: m.status === "warning" ? "#ea580c" : GREEN,
                     }]}>
-                      {m.status === "warning" ? "Alert" : "Safe"}
+                      {m.status === "warning" ? t("family.statusShortAlert") : t("family.statusShortSafe")}
                     </Text>
                   </View>
                 </View>
@@ -291,7 +294,7 @@ export default function HomeScreen() {
         <View style={s.sectionOuterHeader}>
           <View style={s.rowCenter}>
             <Feather name="book-open" size={14} color={NAVY} />
-            <Text style={[s.outerSectionTitle, { marginLeft: 6 }]}>Golden Rules of Safety</Text>
+            <Text style={[s.outerSectionTitle, { marginLeft: 6 }]}>{t("home.goldenRules")}</Text>
           </View>
         </View>
         <View style={s.rulesCard}>
@@ -314,7 +317,7 @@ export default function HomeScreen() {
         <View style={s.sectionOuterHeader}>
           <View style={s.rowCenter}>
             <Feather name="map-pin" size={14} color={NAVY} />
-            <Text style={[s.outerSectionTitle, { marginLeft: 6 }]}>Hotspots This Week</Text>
+            <Text style={[s.outerSectionTitle, { marginLeft: 6 }]}>{t("home.hotspots")}</Text>
           </View>
         </View>
         <View style={s.hotspotsCard}>
@@ -325,7 +328,7 @@ export default function HomeScreen() {
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={s.hotspotCity}>{hs.city}</Text>
-                <Text style={s.hotspotCases}>{hs.cases.toLocaleString()} cases reported</Text>
+                <Text style={s.hotspotCases}>{t("home.casesReported", { n: hs.cases.toLocaleString() })}</Text>
               </View>
               <View style={s.hotspotBadge}>
                 <Text style={s.hotspotBadgeTxt}>{hs.change}</Text>
@@ -345,8 +348,8 @@ export default function HomeScreen() {
             <Feather name="users" size={22} color={SAFFRON} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={s.ctaTitle}>Protect Your Circle</Text>
-            <Text style={s.ctaSub}>Warn family & friends. Share scam alerts directly.</Text>
+            <Text style={s.ctaTitle}>{t("home.protectCircleTitle")}</Text>
+            <Text style={s.ctaSub}>{t("home.protectCircleSub")}</Text>
           </View>
           <Feather name="arrow-right" size={18} color={SAFFRON} />
         </TouchableOpacity>
@@ -364,8 +367,8 @@ export default function HomeScreen() {
             <Feather name="phone-incoming" size={18} color={SAFFRON} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={s.demoBtnTitle}>Demo: Incoming Scam Call</Text>
-            <Text style={s.demoBtnSub}>See how KavachAI warns you in real-time</Text>
+            <Text style={s.demoBtnTitle}>{t("home.demoTitle")}</Text>
+            <Text style={s.demoBtnSub}>{t("home.demoSub")}</Text>
           </View>
           <Feather name="chevron-right" size={16} color="#94a3b8" />
         </TouchableOpacity>

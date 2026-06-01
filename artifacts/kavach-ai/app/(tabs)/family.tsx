@@ -1,6 +1,8 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import type { TFunction } from "i18next";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   FlatList,
@@ -23,10 +25,27 @@ const GREEN = "#138808";
 
 const RELATIONS = ["Mother", "Father", "Spouse", "Child", "Sibling", "Other"];
 
+// Member lastSeen is stored as a stable semantic token so it can be localized at
+// render time. Unknown values (e.g. legacy persisted strings) display verbatim.
+const LAST_SEEN_TOKENS: Record<string, string> = {
+  "Just added": "family.justAdded",
+  justNow: "family.justNow",
+  oneHourAgo: "family.oneHourAgo",
+};
+
+function resolveLastSeen(lastSeen: string, t: TFunction): string {
+  const key = LAST_SEEN_TOKENS[lastSeen];
+  return key ? t(key) : lastSeen;
+}
+
 export default function FamilyScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const { familyMembers, addFamilyMember, removeFamilyMember } = useAppContext();
+
+  const relationLabel = (rel: string) =>
+    t(`family.relations.${rel.toLowerCase()}`, { defaultValue: rel });
 
   const [showAdd, setShowAdd] = useState(false);
   const [name, setName] = useState("");
@@ -57,10 +76,10 @@ export default function FamilyScreen() {
       removeFamilyMember(m.id);
       return;
     }
-    Alert.alert("Remove Member", `Remove ${m.name} from Family Shield?`, [
-      { text: "Cancel", style: "cancel" },
+    Alert.alert(t("family.removeTitle"), t("family.removeMessage", { name: m.name }), [
+      { text: t("common.cancel"), style: "cancel" },
       {
-        text: "Remove",
+        text: t("family.remove"),
         style: "destructive",
         onPress: () => {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
@@ -88,9 +107,11 @@ export default function FamilyScreen() {
               <Feather name="users" size={20} color={SAFFRON} />
             </View>
             <View>
-              <Text style={s.headerTitle}>Family Shield</Text>
+              <Text style={s.headerTitle}>{t("family.headerTitle")}</Text>
               <Text style={s.headerSub}>
-                {familyMembers.length} member{familyMembers.length !== 1 ? "s" : ""} protected
+                {familyMembers.length === 1
+                  ? t("family.membersProtectedOne")
+                  : t("family.membersProtected", { n: familyMembers.length })}
               </Text>
             </View>
           </View>
@@ -107,17 +128,17 @@ export default function FamilyScreen() {
       {/* Add form */}
       {showAdd && (
         <View style={s.addForm}>
-          <Text style={s.formTitle}>Add Family Member</Text>
+          <Text style={s.formTitle}>{t("family.addMember")}</Text>
           <TextInput
             style={s.formInput}
-            placeholder="Name (e.g. Mummy)"
+            placeholder={t("family.namePlaceholder")}
             placeholderTextColor="#94a3b8"
             value={name}
             onChangeText={setName}
           />
           <TextInput
             style={s.formInput}
-            placeholder="+91 98765 43210"
+            placeholder={t("family.phonePlaceholder")}
             placeholderTextColor="#94a3b8"
             value={phone}
             onChangeText={setPhone}
@@ -136,7 +157,7 @@ export default function FamilyScreen() {
                 onPress={() => { Haptics.selectionAsync(); setRelation(r); }}
                 activeOpacity={0.75}
               >
-                <Text style={[s.relChipTxt, { color: relation === r ? "#fff" : "#64748b" }]}>{r}</Text>
+                <Text style={[s.relChipTxt, { color: relation === r ? "#fff" : "#64748b" }]}>{relationLabel(r)}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -147,7 +168,7 @@ export default function FamilyScreen() {
             activeOpacity={0.85}
           >
             <Feather name="shield" size={16} color="#fff" />
-            <Text style={s.saveBtnTxt}>Add to Shield</Text>
+            <Text style={s.saveBtnTxt}>{t("family.addToShield")}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -168,9 +189,9 @@ export default function FamilyScreen() {
             <View style={s.emptyIconBox}>
               <Feather name="users" size={32} color={SAFFRON} />
             </View>
-            <Text style={s.emptyTitle}>No members yet</Text>
+            <Text style={s.emptyTitle}>{t("family.emptyTitle")}</Text>
             <Text style={s.emptyDesc}>
-              Add family members to monitor their protection status and get alerts when they may be at risk.
+              {t("family.emptyDesc")}
             </Text>
             <TouchableOpacity
               style={s.emptyBtn}
@@ -178,19 +199,32 @@ export default function FamilyScreen() {
               activeOpacity={0.85}
             >
               <Feather name="user-plus" size={16} color="#fff" />
-              <Text style={s.emptyBtnTxt}>Add First Member</Text>
+              <Text style={s.emptyBtnTxt}>{t("family.addFirst")}</Text>
             </TouchableOpacity>
           </View>
         }
         renderItem={({ item }) => (
-          <MemberCard member={item} onDelete={() => handleDelete(item)} />
+          <MemberCard
+            member={item}
+            relationLabel={relationLabel}
+            onDelete={() => handleDelete(item)}
+          />
         )}
       />
     </KeyboardAvoidingView>
   );
 }
 
-function MemberCard({ member, onDelete }: { member: FamilyMember; onDelete: () => void }) {
+function MemberCard({
+  member,
+  relationLabel,
+  onDelete,
+}: {
+  member: FamilyMember;
+  relationLabel: (rel: string) => string;
+  onDelete: () => void;
+}) {
+  const { t } = useTranslation();
   const isWarning = member.status === "warning";
   const statusColor = isWarning ? "#ea580c" : GREEN;
   const statusBg = isWarning ? "rgba(234,88,12,0.08)" : "rgba(19,136,8,0.08)";
@@ -201,7 +235,7 @@ function MemberCard({ member, onDelete }: { member: FamilyMember; onDelete: () =
       {isWarning && (
         <View style={mc.warningBanner}>
           <Feather name="alert-triangle" size={13} color="#ea580c" />
-          <Text style={mc.warningTxt}>Receiving a suspicious call right now!</Text>
+          <Text style={mc.warningTxt}>{t("family.suspiciousCallNow")}</Text>
         </View>
       )}
       <View style={mc.body}>
@@ -210,8 +244,10 @@ function MemberCard({ member, onDelete }: { member: FamilyMember; onDelete: () =
         </View>
         <View style={{ flex: 1 }}>
           <Text style={mc.name}>{member.name}</Text>
-          <Text style={mc.relation}>{member.relation} · {member.phone}</Text>
-          <Text style={mc.lastSeen}>Last activity: {member.lastSeen}</Text>
+          <Text style={mc.relation}>{relationLabel(member.relation)} · {member.phone}</Text>
+          <Text style={mc.lastSeen}>
+            {t("family.lastActivity", { value: resolveLastSeen(member.lastSeen, t) })}
+          </Text>
         </View>
         <TouchableOpacity style={mc.deleteBtn} onPress={onDelete} activeOpacity={0.75}>
           <Feather name="trash-2" size={15} color="#dc2626" />
@@ -221,7 +257,7 @@ function MemberCard({ member, onDelete }: { member: FamilyMember; onDelete: () =
         <View style={[mc.statusBadge, { backgroundColor: statusBg }]}>
           <Feather name={isWarning ? "alert-triangle" : "shield"} size={12} color={statusColor} />
           <Text style={[mc.statusTxt, { color: statusColor }]}>
-            {isWarning ? "Alert — Possible Scam Call" : "Protected & Safe"}
+            {isWarning ? t("family.statusAlert") : t("family.statusSafe")}
           </Text>
         </View>
       </View>

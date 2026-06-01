@@ -9,7 +9,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { setAuthTokenGetter, setBaseUrl } from "@workspace/api-client-react";
 import { Stack, useRouter, useSegments } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ActivityIndicator, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
@@ -18,6 +19,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AppProvider } from "@/context/AppContext";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { initI18n } from "@/i18n";
 import { getToken } from "@/lib/session";
 
 SplashScreen.preventAutoHideAsync();
@@ -36,6 +38,7 @@ function RootLayoutNav() {
   const { status } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (status === "loading") return;
@@ -56,7 +59,7 @@ function RootLayoutNav() {
   }
 
   return (
-    <Stack screenOptions={{ headerBackTitle: "Back" }}>
+    <Stack screenOptions={{ headerBackTitle: t("common.back") }}>
       <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen
@@ -67,10 +70,11 @@ function RootLayoutNav() {
           animation: "slide_from_bottom",
         }}
       />
-      <Stack.Screen name="report" options={{ title: "Report a Fraud Number" }} />
-      <Stack.Screen name="categories" options={{ title: "Scam Categories" }} />
-      <Stack.Screen name="safety" options={{ title: "Cyber Safety" }} />
-      <Stack.Screen name="helpline" options={{ title: "Emergency & Helpline" }} />
+      <Stack.Screen name="report" options={{ title: t("report.title") }} />
+      <Stack.Screen name="categories" options={{ title: t("categories.title") }} />
+      <Stack.Screen name="safety" options={{ title: t("safety.title") }} />
+      <Stack.Screen name="helpline" options={{ title: t("helpline.title") }} />
+      <Stack.Screen name="language" options={{ title: t("language.title") }} />
     </Stack>
   );
 }
@@ -82,14 +86,19 @@ export default function RootLayout() {
     Inter_600SemiBold,
     Inter_700Bold,
   });
+  const [i18nReady, setI18nReady] = useState(false);
 
   useEffect(() => {
-    if (fontsLoaded || fontError) {
+    initI18n().finally(() => setI18nReady(true));
+  }, []);
+
+  useEffect(() => {
+    if ((fontsLoaded || fontError) && i18nReady) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded, fontError]);
+  }, [fontsLoaded, fontError, i18nReady]);
 
-  if (!fontsLoaded && !fontError) return null;
+  if ((!fontsLoaded && !fontError) || !i18nReady) return null;
 
   return (
     <SafeAreaProvider>

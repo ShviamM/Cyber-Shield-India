@@ -2,14 +2,13 @@ import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Linking, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
   CYBERCRIME_PORTAL_URL,
   HELPLINE_NUMBER,
-  HELPLINE_STEPS,
-  STRINGS,
 } from "@/constants/strings";
 import { useColors } from "@/hooks/useColors";
 
@@ -19,7 +18,10 @@ const SAFFRON = "#FF6713";
 export default function HelplineScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const bottomPad = (insets.bottom || 0) + 24;
+
+  const steps = t("helpline.steps", { returnObjects: true }) as string[];
 
   function call1930() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
@@ -41,11 +43,11 @@ export default function HelplineScreen() {
           <View style={s.sosIconBg}>
             <Feather name="phone-call" size={26} color="#fff" />
           </View>
-          <Text style={s.sosTitle}>{STRINGS.helpline.sosTitle}</Text>
-          <Text style={s.sosSub}>{STRINGS.helpline.sosSub}</Text>
+          <Text style={s.sosTitle}>{t("helpline.sosTitle")}</Text>
+          <Text style={s.sosSub}>{t("helpline.sosSub")}</Text>
           <View style={s.callBtn}>
             <Feather name="phone" size={16} color="#fff" />
-            <Text style={s.callBtnTxt}>{STRINGS.helpline.callNow}</Text>
+            <Text style={s.callBtnTxt}>{t("helpline.callNow")}</Text>
           </View>
         </TouchableOpacity>
 
@@ -55,17 +57,17 @@ export default function HelplineScreen() {
             <Feather name="globe" size={20} color={NAVY} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={s.portalTitle}>{STRINGS.helpline.portalTitle}</Text>
-            <Text style={s.portalSub}>{STRINGS.helpline.portalSub}</Text>
+            <Text style={s.portalTitle}>{t("helpline.portalTitle")}</Text>
+            <Text style={s.portalSub}>{t("helpline.portalSub")}</Text>
           </View>
           <Feather name="external-link" size={18} color={NAVY} />
         </TouchableOpacity>
 
         {/* Steps */}
-        <Text style={s.sectionLabel}>{STRINGS.helpline.stepsTitle}</Text>
+        <Text style={s.sectionLabel}>{t("helpline.stepsTitle")}</Text>
         <View style={s.stepsCard}>
-          {HELPLINE_STEPS.map((step, i) => (
-            <View key={i} style={[s.stepRow, i < HELPLINE_STEPS.length - 1 && s.stepRowBorder]}>
+          {steps.map((step, i) => (
+            <View key={i} style={[s.stepRow, i < steps.length - 1 && s.stepRowBorder]}>
               <View style={s.stepNum}>
                 <Text style={s.stepNumTxt}>{i + 1}</Text>
               </View>
@@ -81,7 +83,7 @@ export default function HelplineScreen() {
           activeOpacity={0.85}
         >
           <Feather name="flag" size={18} color={SAFFRON} />
-          <Text style={s.reportCtaTxt}>{STRINGS.services.reportFraud}</Text>
+          <Text style={s.reportCtaTxt}>{t("services.reportFraud")}</Text>
           <Feather name="arrow-right" size={16} color={SAFFRON} />
         </TouchableOpacity>
 
@@ -89,9 +91,9 @@ export default function HelplineScreen() {
         <View style={s.disclaimer}>
           <View style={s.disclaimerTop}>
             <Feather name="shield" size={15} color={NAVY} />
-            <Text style={s.disclaimerTitle}>{STRINGS.helpline.disclaimerTitle}</Text>
+            <Text style={s.disclaimerTitle}>{t("helpline.disclaimerTitle")}</Text>
           </View>
-          <Text style={s.disclaimerTxt}>{STRINGS.helpline.disclaimer}</Text>
+          <Text style={s.disclaimerTxt}>{t("helpline.disclaimer")}</Text>
         </View>
       </ScrollView>
     </View>

@@ -4,6 +4,8 @@ import { checkNumber, listCategories } from "@workspace/api-client-react";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import {
   ActivityIndicator,
   Platform,
@@ -17,7 +19,6 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CheckItem, useAppContext } from "@/context/AppContext";
-import { STRINGS } from "@/constants/strings";
 import { useColors } from "@/hooks/useColors";
 import { isValidIndianPhone, phoneForApi } from "@/lib/phone";
 
@@ -27,12 +28,19 @@ const GREEN = "#138808";
 
 type CheckType = CheckItem["type"];
 
-const TYPES: { key: CheckType; label: string; icon: string; hint: string; color: string; bg: string }[] = [
-  { key: "number", label: "Check Number", icon: "phone", hint: "+91 98765 43210", color: NAVY, bg: "#EBF0FA" },
-  { key: "link", label: "Check Link", icon: "link", hint: "https://example.com", color: "#7c3aed", bg: "#f5f3ff" },
-  { key: "upi", label: "Check UPI ID", icon: "credit-card", hint: "name@paytm", color: GREEN, bg: "#f0fdf4" },
-  { key: "qr", label: "Check QR Code", icon: "maximize", hint: "Paste QR content here", color: SAFFRON, bg: "#fff7ed" },
+const TYPE_META: { key: CheckType; icon: string; color: string; bg: string }[] = [
+  { key: "number", icon: "phone", color: NAVY, bg: "#EBF0FA" },
+  { key: "link", icon: "link", color: "#7c3aed", bg: "#f5f3ff" },
+  { key: "upi", icon: "credit-card", color: GREEN, bg: "#f0fdf4" },
+  { key: "qr", icon: "maximize", color: SAFFRON, bg: "#fff7ed" },
 ];
+
+const TYPE_KEY: Record<CheckType, string> = {
+  number: "number",
+  link: "link",
+  upi: "upi",
+  qr: "qr",
+};
 
 type Result = {
   status: "safe" | "warning" | "danger" | "invalid";
@@ -45,43 +53,43 @@ type Result = {
   categories?: string[];
 };
 
-function doLocalCheck(type: CheckType, raw: string): Result {
+function doLocalCheck(type: CheckType, raw: string, t: TFunction): Result {
   const v = raw.trim();
   const vl = v.toLowerCase();
-  if (!v) return { status: "invalid", headline: STRINGS.verify.enterValue, detail: "" };
+  if (!v) return { status: "invalid", headline: t("verify.enterValue"), detail: "" };
 
   if (type === "link") {
     if (!vl.startsWith("http"))
-      return { status: "invalid", headline: "Enter a valid URL", detail: "Must start with http:// or https://" };
+      return { status: "invalid", headline: t("verify.local.linkInvalidHeadline"), detail: t("verify.local.linkInvalidDetail") };
     const dangerKw = ["paymentupdate", "kyc-verify", "account-suspended", "win-prize", "free-recharge", "refund-process", "aadhaar-link", "update-kyc", "claimreward"];
     const warnKw = ["free", "winner", "prize", "lucky", "cashback", "lottery", "offer"];
     if (dangerKw.some((k) => vl.includes(k)))
-      return { status: "danger", headline: "PHISHING LINK DETECTED", detail: "This URL matches known phishing patterns. Do NOT click or enter any personal details on this page." };
+      return { status: "danger", headline: t("verify.local.linkDangerHeadline"), detail: t("verify.local.linkDangerDetail") };
     if (!vl.startsWith("https://"))
-      return { status: "warning", headline: "Unsafe Connection (HTTP)", detail: "No encryption. Avoid entering passwords, card numbers, or OTP on this page." };
+      return { status: "warning", headline: t("verify.local.linkHttpHeadline"), detail: t("verify.local.linkHttpDetail") };
     if (warnKw.some((k) => vl.includes(k)))
-      return { status: "warning", headline: "Suspicious URL", detail: "URL contains patterns common in scam offers. Verify the domain carefully before proceeding." };
-    return { status: "safe", headline: "No Threats Detected", detail: "This URL appears safe. Always double-check the domain name spelling before entering personal info." };
+      return { status: "warning", headline: t("verify.local.linkWarnHeadline"), detail: t("verify.local.linkWarnDetail") };
+    return { status: "safe", headline: t("verify.local.linkSafeHeadline"), detail: t("verify.local.linkSafeDetail") };
   }
 
   if (type === "upi") {
     if (!/^[\w.\-]+@[\w]+$/.test(v))
-      return { status: "invalid", headline: "Invalid UPI ID format", detail: "Valid examples: name@upi, 9876543210@paytm, user@oksbi" };
+      return { status: "invalid", headline: t("verify.local.upiInvalidHeadline"), detail: t("verify.local.upiInvalidDetail") };
     if (["support", "help", "refund", "paymentgateway", "service", "agent", "care"].some((p) => vl.includes(p)))
-      return { status: "danger", headline: "SUSPICIOUS UPI ID", detail: "Legitimate banks and companies never use these keywords in their UPI IDs. This is likely a fraud account." };
-    return { status: "safe", headline: "Valid UPI Format", detail: "Format is valid. Always confirm the recipient's identity through a separate channel before sending money." };
+      return { status: "danger", headline: t("verify.local.upiDangerHeadline"), detail: t("verify.local.upiDangerDetail") };
+    return { status: "safe", headline: t("verify.local.upiSafeHeadline"), detail: t("verify.local.upiSafeDetail") };
   }
 
   if (type === "qr") {
     if (vl.includes("upi://pay") || vl.startsWith("upi://")) {
       if (["refund", "support", "payment"].some((p) => vl.includes("pn=" + p)))
-        return { status: "danger", headline: "QR PAYMENT SCAM", detail: "This QR is disguised as a 'receive money' code but actually requests a payment FROM you." };
-      return { status: "warning", headline: "Payment QR Detected", detail: "This QR initiates a UPI payment. Confirm the recipient's identity before scanning on your phone." };
+        return { status: "danger", headline: t("verify.local.qrDangerHeadline"), detail: t("verify.local.qrDangerDetail") };
+      return { status: "warning", headline: t("verify.local.qrWarnHeadline"), detail: t("verify.local.qrWarnDetail") };
     }
-    return { status: "safe", headline: "No Threats in QR", detail: "No payment requests detected in this QR data. Verify the destination URL or content before acting." };
+    return { status: "safe", headline: t("verify.local.qrSafeHeadline"), detail: t("verify.local.qrSafeDetail") };
   }
 
-  return { status: "invalid", headline: "Unknown error", detail: "" };
+  return { status: "invalid", headline: t("verify.local.unknownHeadline"), detail: "" };
 }
 
 const STATUS_CONFIG = {
@@ -94,6 +102,7 @@ const STATUS_CONFIG = {
 export default function VerifyScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const { recentChecks, addCheck } = useAppContext();
 
   const [selectedType, setSelectedType] = useState<CheckType>("number");
@@ -108,10 +117,16 @@ export default function VerifyScreen() {
   const categoryName = (key: string) =>
     catData?.categories.find((c) => c.key === key)?.nameEn ?? key;
 
+  const types = TYPE_META.map((m) => ({
+    ...m,
+    label: t(`verify.types.${TYPE_KEY[m.key]}Label`),
+    hint: t(`verify.types.${TYPE_KEY[m.key]}Hint`),
+  }));
+
   const topInset = Platform.OS === "web" ? 0 : insets.top;
   const bottomPad = (Platform.OS === "web" ? 34 : insets.bottom) + 80;
-  const activePlaceholder = TYPES.find((t) => t.key === selectedType)?.hint ?? "";
-  const activeType = TYPES.find((t) => t.key === selectedType)!;
+  const activePlaceholder = types.find((x) => x.key === selectedType)?.hint ?? "";
+  const activeType = types.find((x) => x.key === selectedType)!;
 
   async function handleCheck() {
     if (!input.trim()) return;
@@ -121,29 +136,28 @@ export default function VerifyScreen() {
     let r: Result;
     if (selectedType === "number") {
       if (!isValidIndianPhone(input)) {
-        r = { status: "invalid", headline: STRINGS.verify.risk.unknown.headline, detail: STRINGS.report.invalidPhone };
+        r = { status: "invalid", headline: t("verify.risk.unknown.headline"), detail: t("report.invalidPhone") };
       } else {
         try {
           const res = await checkNumber(phoneForApi(input) as string);
-          const copy = STRINGS.verify.risk[res.riskLevel];
           const status =
             res.riskLevel === "high" ? "danger" : res.riskLevel === "medium" ? "warning" : "safe";
           r = {
             status,
-            headline: copy.headline,
-            detail: copy.detail,
+            headline: t(`verify.risk.${res.riskLevel}.headline`),
+            detail: t(`verify.risk.${res.riskLevel}.detail`),
             phone: res.phone,
             reportCount: res.reportCount,
             verifiedScam: res.verifiedScam,
             categories: res.categories,
           };
         } catch {
-          r = { status: "invalid", headline: STRINGS.verify.checkFailed, detail: "" };
+          r = { status: "invalid", headline: t("verify.checkFailed"), detail: "" };
         }
       }
     } else {
       await new Promise((res) => setTimeout(res, 700));
-      r = doLocalCheck(selectedType, input.trim());
+      r = doLocalCheck(selectedType, input.trim(), t);
     }
 
     setResult(r);
@@ -179,8 +193,8 @@ export default function VerifyScreen() {
             <Feather name="search" size={20} color={SAFFRON} />
           </View>
           <View>
-            <Text style={s.headerTitle}>Verify Before You Act</Text>
-            <Text style={s.headerSub}>Check anything suspicious instantly</Text>
+            <Text style={s.headerTitle}>{t("verify.title")}</Text>
+            <Text style={s.headerSub}>{t("verify.sub")}</Text>
           </View>
         </View>
       </View>
@@ -192,29 +206,29 @@ export default function VerifyScreen() {
       >
         {/* Tool type selector — 2×2 grid */}
         <View style={s.typeGrid}>
-          {TYPES.map((t) => (
+          {types.map((tp) => (
             <TouchableOpacity
-              key={t.key}
+              key={tp.key}
               style={[
                 s.typeCard,
-                selectedType === t.key
-                  ? { backgroundColor: t.bg, borderColor: t.color + "40", borderWidth: 1.5 }
+                selectedType === tp.key
+                  ? { backgroundColor: tp.bg, borderColor: tp.color + "40", borderWidth: 1.5 }
                   : { backgroundColor: "#fff", borderColor: "rgba(11,61,145,0.08)", borderWidth: 1 },
               ]}
-              onPress={() => { Haptics.selectionAsync(); setSelectedType(t.key); setResult(null); }}
+              onPress={() => { Haptics.selectionAsync(); setSelectedType(tp.key); setResult(null); }}
               activeOpacity={0.75}
             >
               <View style={[
                 s.typeIconBox,
-                { backgroundColor: selectedType === t.key ? "#fff" : t.bg, shadowColor: t.color }
+                { backgroundColor: selectedType === tp.key ? "#fff" : tp.bg, shadowColor: tp.color }
               ]}>
-                <Feather name={t.icon as any} size={16} color={t.color} />
+                <Feather name={tp.icon as any} size={16} color={tp.color} />
               </View>
-              <Text style={[s.typeLabel, { color: selectedType === t.key ? "#1e293b" : "#64748b" }]}>
-                {t.label}
+              <Text style={[s.typeLabel, { color: selectedType === tp.key ? "#1e293b" : "#64748b" }]}>
+                {tp.label}
               </Text>
-              {selectedType === t.key && (
-                <View style={[s.typeCheck, { backgroundColor: t.color }]}>
+              {selectedType === tp.key && (
+                <View style={[s.typeCheck, { backgroundColor: tp.color }]}>
                   <Feather name="check" size={9} color="#fff" />
                 </View>
               )}
@@ -257,7 +271,7 @@ export default function VerifyScreen() {
           ) : (
             <>
               <Feather name="search" size={18} color="#FFFFFF" />
-              <Text style={s.checkBtnText}>Check Now</Text>
+              <Text style={s.checkBtnText}>{t("verify.checkNow")}</Text>
             </>
           )}
         </TouchableOpacity>
@@ -281,14 +295,16 @@ export default function VerifyScreen() {
                   <Feather name="users" size={13} color="#475569" />
                   <Text style={s.metaTxt}>
                     {result.reportCount > 0
-                      ? STRINGS.verify.reportCount(result.reportCount)
-                      : STRINGS.verify.noReports}
+                      ? result.reportCount === 1
+                        ? t("verify.reportCountOne")
+                        : t("verify.reportCount", { n: result.reportCount })
+                      : t("verify.noReports")}
                   </Text>
                 </View>
                 {result.verifiedScam && (
                   <View style={s.verifiedBadge}>
                     <Feather name="alert-octagon" size={11} color="#dc2626" />
-                    <Text style={s.verifiedTxt}>{STRINGS.verify.verifiedScam}</Text>
+                    <Text style={s.verifiedTxt}>{t("verify.verifiedScam")}</Text>
                   </View>
                 )}
                 {result.categories && result.categories.length > 0 && (
@@ -309,7 +325,7 @@ export default function VerifyScreen() {
                   activeOpacity={0.8}
                 >
                   <Feather name="flag" size={14} color={SAFFRON} />
-                  <Text style={s.reportBtnTxt}>{STRINGS.verify.reportThisNumber}</Text>
+                  <Text style={s.reportBtnTxt}>{t("verify.reportThisNumber")}</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -319,7 +335,7 @@ export default function VerifyScreen() {
         {/* History */}
         {history.length > 0 && (
           <>
-            <Text style={s.historyTitle}>RECENT CHECKS</Text>
+            <Text style={s.historyTitle}>{t("verify.recentChecks")}</Text>
             {history.map((item) => {
               const sc = STATUS_CONFIG[item.result];
               return (
@@ -334,7 +350,7 @@ export default function VerifyScreen() {
                   </View>
                   <Text style={s.historyValue} numberOfLines={1}>{item.value}</Text>
                   <View style={[s.historyBadge, { backgroundColor: sc.bg }]}>
-                    <Text style={[s.historyBadgeTxt, { color: sc.color }]}>{item.result}</Text>
+                    <Text style={[s.historyBadgeTxt, { color: sc.color }]}>{t(`verify.status.${item.result}`)}</Text>
                   </View>
                 </TouchableOpacity>
               );

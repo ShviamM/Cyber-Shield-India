@@ -1,7 +1,9 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
+import i18n from "i18next";
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Animated,
   Platform,
@@ -14,25 +16,16 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const SCAMMER_NUMBER = "+91 87654-32100";
 
-const WARNINGS = [
-  {
-    hindi: "रुको! यह Scammer हो सकता है",
-    english: "STOP! This could be a scammer",
-  },
-  {
-    hindi: "OTP या पैसे मत दो!",
-    english: "Do NOT share OTP or send money!",
-  },
-  {
-    hindi: "पहले जाँचो, फिर बात करो",
-    english: "Verify first, then talk",
-  },
-];
-
 export default function CallAlertScreen() {
   const insets = useSafeAreaInsets();
+  const { t, i18n: i18nInstance } = useTranslation();
   const topInset = Platform.OS === "web" ? 67 : insets.top;
   const bottomInset = (Platform.OS === "web" ? 34 : insets.bottom) + 20;
+
+  const warnings = t("callAlert.warnings", { returnObjects: true }) as string[];
+  const tEn = i18n.getFixedT("en");
+  const englishWarnings = tEn("callAlert.warnings", { returnObjects: true }) as string[];
+  const showEnglish = i18nInstance.language !== "en";
 
   const [warningIndex, setWarningIndex] = useState(0);
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -63,7 +56,7 @@ export default function CallAlertScreen() {
         duration: 200,
         useNativeDriver: true,
       }).start(() => {
-        setWarningIndex((i) => (i + 1) % WARNINGS.length);
+        setWarningIndex((i) => (i + 1) % warnings.length);
         Animated.timing(warningOpacity, {
           toValue: 1,
           duration: 300,
@@ -93,7 +86,8 @@ export default function CallAlertScreen() {
     router.back();
   }
 
-  const w = WARNINGS[warningIndex];
+  const w = warnings[warningIndex];
+  const wEn = englishWarnings[warningIndex];
 
   return (
     <View style={[s.root, { paddingTop: topInset, paddingBottom: bottomInset }]}>
@@ -109,7 +103,7 @@ export default function CallAlertScreen() {
       {/* Incoming tag */}
       <View style={s.incomingRow}>
         <View style={s.incomingDot} />
-        <Text style={s.incomingTxt}>INCOMING CALL</Text>
+        <Text style={s.incomingTxt}>{t("callAlert.incoming")}</Text>
       </View>
 
       {/* Caller */}
@@ -122,7 +116,7 @@ export default function CallAlertScreen() {
           </View>
         </Animated.View>
         <Text style={s.callerNumber}>{SCAMMER_NUMBER}</Text>
-        <Text style={s.callerUnknown}>Unknown Caller · No Contact Match</Text>
+        <Text style={s.callerUnknown}>{t("callAlert.unknownCaller")}</Text>
       </View>
 
       {/* Reports stats */}
@@ -130,32 +124,32 @@ export default function CallAlertScreen() {
         <View style={s.statItem}>
           <Feather name="alert-octagon" size={16} color="#f87171" />
           <Text style={s.statNum}>2,341</Text>
-          <Text style={s.statLbl}>Scam Reports</Text>
+          <Text style={s.statLbl}>{t("callAlert.scamReports")}</Text>
         </View>
         <View style={s.statDiv} />
         <View style={s.statItem}>
           <Feather name="users" size={16} color="#fb923c" />
           <Text style={s.statNum}>892</Text>
-          <Text style={s.statLbl}>Victims Reported</Text>
+          <Text style={s.statLbl}>{t("callAlert.victimsReported")}</Text>
         </View>
         <View style={s.statDiv} />
         <View style={s.statItem}>
           <Feather name="map-pin" size={16} color="#fbbf24" />
           <Text style={s.statNum}>Mumbai</Text>
-          <Text style={s.statLbl}>Top City</Text>
+          <Text style={s.statLbl}>{t("callAlert.topCity")}</Text>
         </View>
       </View>
 
       {/* Rotating warning */}
       <Animated.View style={[s.warningBox, { opacity: warningOpacity }]}>
-        <Text style={s.warningHindi}>{w.hindi}</Text>
-        <Text style={s.warningEnglish}>{w.english}</Text>
+        <Text style={s.warningHindi}>{w}</Text>
+        {showEnglish && <Text style={s.warningEnglish}>{wEn}</Text>}
       </Animated.View>
 
       {/* Scam type tag */}
       <View style={s.scamTypeRow}>
         <View style={s.scamTypeBadge}>
-          <Text style={s.scamTypeTxt}>FAKE FEDEX / COURIER SCAM</Text>
+          <Text style={s.scamTypeTxt}>{t("callAlert.scamType")}</Text>
         </View>
       </View>
 
@@ -167,7 +161,7 @@ export default function CallAlertScreen() {
           activeOpacity={0.8}
         >
           <Feather name="shield-off" size={22} color="#FFFFFF" />
-          <Text style={s.blockTxt}>Block</Text>
+          <Text style={s.blockTxt}>{t("callAlert.block")}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -176,7 +170,7 @@ export default function CallAlertScreen() {
           activeOpacity={0.8}
         >
           <Feather name="flag" size={22} color="#FFFFFF" />
-          <Text style={s.reportTxt}>Report</Text>
+          <Text style={s.reportTxt}>{t("callAlert.report")}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -185,8 +179,8 @@ export default function CallAlertScreen() {
           activeOpacity={0.8}
         >
           <Feather name="phone" size={22} color="rgba(255,255,255,0.5)" />
-          <Text style={s.answerTxt}>Answer</Text>
-          <Text style={s.answerRisk}>High Risk</Text>
+          <Text style={s.answerTxt}>{t("callAlert.answer")}</Text>
+          <Text style={s.answerRisk}>{t("callAlert.highRisk")}</Text>
         </TouchableOpacity>
       </View>
     </View>

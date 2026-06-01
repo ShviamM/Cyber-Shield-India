@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   Platform,
   ScrollView,
@@ -46,6 +47,7 @@ const SEVERITY_BG = {
 export default function ThreatsScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const topInset = Platform.OS === "web" ? 0 : insets.top;
   const bottomPad = (Platform.OS === "web" ? 34 : insets.bottom) + 80;
 
@@ -64,13 +66,13 @@ export default function ThreatsScreen() {
               <Feather name="alert-triangle" size={20} color={SAFFRON} />
             </View>
             <View>
-              <Text style={s.headerTitle}>Threat Feed</Text>
-              <Text style={s.headerSub}>Real-time cyber crime intelligence</Text>
+              <Text style={s.headerTitle}>{t("threats.headerTitle")}</Text>
+              <Text style={s.headerSub}>{t("threats.headerSub")}</Text>
             </View>
           </View>
           <View style={s.liveBadge}>
             <View style={s.liveDot} />
-            <Text style={s.liveTxt}>LIVE</Text>
+            <Text style={s.liveTxt}>{t("threats.live")}</Text>
           </View>
         </View>
       </View>
@@ -86,7 +88,7 @@ export default function ThreatsScreen() {
               <View style={[s.featTagPill, { backgroundColor: "#fee2e2" }]}>
                 <Text style={[s.featTagTxt, { color: "#dc2626" }]}>{SCAM_OF_DAY.tag}</Text>
               </View>
-              <Text style={s.featReports}>{SCAM_OF_DAY.reports.toLocaleString()} reports</Text>
+              <Text style={s.featReports}>{t("threats.reports", { n: SCAM_OF_DAY.reports.toLocaleString() })}</Text>
             </View>
             <Text style={s.featTitleHindi}>{SCAM_OF_DAY.titleHindi}</Text>
             <Text style={s.featTitleEn}>{SCAM_OF_DAY.title}</Text>
@@ -108,27 +110,27 @@ export default function ThreatsScreen() {
 
         {/* Trending threats */}
         <View style={s.sectionHeader}>
-          <Text style={s.sectionTitle}>Active Scams Right Now</Text>
+          <Text style={s.sectionTitle}>{t("threats.activeScamsNow")}</Text>
           <View style={s.liveBadgeSmall}>
             <View style={s.liveDotSmall} />
-            <Text style={s.liveTxtSmall}>LIVE</Text>
+            <Text style={s.liveTxtSmall}>{t("threats.live")}</Text>
           </View>
         </View>
-        {LIVE_THREATS.map((t) => (
-          <View key={t.id} style={s.threatCard}>
+        {LIVE_THREATS.map((item) => (
+          <View key={item.id} style={s.threatCard}>
             <View style={s.threatCardTop}>
-              <View style={[s.trendPill, { backgroundColor: TREND_BG[t.trend] }]}>
-                <View style={[s.trendDot, { backgroundColor: TREND_COLOR[t.trend] }]} />
-                <Text style={[s.trendTxt, { color: TREND_COLOR[t.trend] }]}>{t.trend.toUpperCase()}</Text>
+              <View style={[s.trendPill, { backgroundColor: TREND_BG[item.trend] }]}>
+                <View style={[s.trendDot, { backgroundColor: TREND_COLOR[item.trend] }]} />
+                <Text style={[s.trendTxt, { color: TREND_COLOR[item.trend] }]}>{item.trend.toUpperCase()}</Text>
               </View>
-              <Text style={s.threatTime}>{t.time}</Text>
+              <Text style={s.threatTime}>{item.time}</Text>
             </View>
-            <Text style={s.threatType}>{t.type}</Text>
+            <Text style={s.threatType}>{item.type}</Text>
             <View style={s.threatMetaRow}>
               <Feather name="map-pin" size={11} color="#94a3b8" />
-              <Text style={s.threatMeta}>{t.city} · {t.count.toLocaleString()} community reports</Text>
+              <Text style={s.threatMeta}>{t("threats.communityReports", { city: item.city, n: item.count.toLocaleString() })}</Text>
             </View>
-            <Text style={s.threatDesc}>{t.description}</Text>
+            <Text style={s.threatDesc}>{item.description}</Text>
           </View>
         ))}
 
@@ -136,7 +138,7 @@ export default function ThreatsScreen() {
         <View style={s.sectionHeader}>
           <View style={s.sectionTitleRow}>
             <Feather name="map-pin" size={14} color={NAVY} />
-            <Text style={[s.sectionTitle, { marginLeft: 6 }]}>City Hotspots</Text>
+            <Text style={[s.sectionTitle, { marginLeft: 6 }]}>{t("threats.cityHotspots")}</Text>
           </View>
         </View>
         <View style={s.hotspotsCard}>
@@ -150,7 +152,7 @@ export default function ThreatsScreen() {
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={s.hsCity}>{hs.city}</Text>
-                <Text style={s.hsCases}>{hs.cases.toLocaleString()} cases</Text>
+                <Text style={s.hsCases}>{t("threats.cases", { n: hs.cases.toLocaleString() })}</Text>
               </View>
               <View style={s.hsChangePill}>
                 <Feather name={hs.up ? "trending-up" : "trending-down"} size={11} color={hs.up ? "#dc2626" : GREEN} />
@@ -164,7 +166,7 @@ export default function ThreatsScreen() {
         <View style={s.sectionHeader}>
           <View style={s.sectionTitleRow}>
             <Feather name="book-open" size={14} color={NAVY} />
-            <Text style={[s.sectionTitle, { marginLeft: 6 }]}>Golden Rules of Safety</Text>
+            <Text style={[s.sectionTitle, { marginLeft: 6 }]}>{t("threats.goldenRules")}</Text>
           </View>
         </View>
         {GOLDEN_RULES.map((rule) => (

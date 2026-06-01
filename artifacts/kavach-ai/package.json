@@ -54,5 +54,10 @@
     "typescript": "~5.9.2",
     "zod": "catalog:",
     "zod-validation-error": "^3.4.0"
+  },
+  "dependencies": {
+    "expo-localization": "~17.0.9",
+    "i18next": "^26.3.0",
+    "react-i18next": "^17.0.8"
   }
 }

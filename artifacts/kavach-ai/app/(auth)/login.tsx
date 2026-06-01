@@ -2,6 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import { useRequestOtp, useVerifyOtp } from "@workspace/api-client-react";
 import * as Haptics from "expo-haptics";
 import React, { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -17,7 +18,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useAuth } from "@/context/AuthContext";
 import { isValidIndianPhone, formatIndianPhone } from "@/lib/phone";
-import { STRINGS } from "@/constants/strings";
 
 const NAVY = "#0B3D91";
 const SAFFRON = "#FF6713";
@@ -29,6 +29,7 @@ type Step = "phone" | "details" | "otp";
 
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const { signIn } = useAuth();
   const requestOtp = useRequestOtp();
   const verifyOtp = useVerifyOtp();
@@ -66,7 +67,7 @@ export default function LoginScreen() {
 
   async function sendOtp(advance: boolean) {
     if (!isValidIndianPhone(phone)) {
-      setError(STRINGS.auth.invalidPhone);
+      setError(t("auth.invalidPhone"));
       return;
     }
     setError(null);
@@ -78,13 +79,13 @@ export default function LoginScreen() {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       if (advance) setStep(res.isNewUser ? "details" : "otp");
     } catch {
-      setError(STRINGS.auth.requestFailed);
+      setError(t("auth.requestFailed"));
     }
   }
 
   function goToOtpFromDetails() {
     if (!fullName.trim()) {
-      setError(STRINGS.auth.nameRequired);
+      setError(t("auth.nameRequired"));
       return;
     }
     setError(null);
@@ -93,7 +94,7 @@ export default function LoginScreen() {
 
   async function handleVerify() {
     if (code.trim().length !== 6) {
-      setError(STRINGS.auth.invalidOtp);
+      setError(t("auth.invalidOtp"));
       return;
     }
     setError(null);
@@ -110,7 +111,7 @@ export default function LoginScreen() {
       await signIn(auth);
       // root layout's auth gate redirects into the app
     } catch {
-      setError(STRINGS.auth.verifyFailed);
+      setError(t("auth.verifyFailed"));
     }
   }
 
@@ -153,17 +154,17 @@ export default function LoginScreen() {
 
         {step === "phone" && (
           <View style={s.card}>
-            <Text style={s.title}>{STRINGS.auth.welcomeTitle}</Text>
-            <Text style={s.sub}>{STRINGS.auth.welcomeSub}</Text>
+            <Text style={s.title}>{t("auth.welcomeTitle")}</Text>
+            <Text style={s.sub}>{t("auth.welcomeSub")}</Text>
 
-            <Text style={s.label}>{STRINGS.auth.phoneLabel}</Text>
+            <Text style={s.label}>{t("auth.phoneLabel")}</Text>
             <View style={s.phoneRow}>
               <View style={s.prefixBox}>
                 <Text style={s.prefixTxt}>+91</Text>
               </View>
               <TextInput
                 style={s.phoneInput}
-                placeholder={STRINGS.auth.phonePlaceholder}
+                placeholder={t("auth.phonePlaceholder")}
                 placeholderTextColor="#94a3b8"
                 value={phone}
                 onChangeText={(v) => {
@@ -176,12 +177,12 @@ export default function LoginScreen() {
                 onSubmitEditing={() => sendOtp(true)}
               />
             </View>
-            <Text style={s.hint}>{STRINGS.auth.phoneHint}</Text>
+            <Text style={s.hint}>{t("auth.phoneHint")}</Text>
 
             {error ? <Text style={s.error}>{error}</Text> : null}
 
             <PrimaryButton
-              label={STRINGS.auth.sendOtp}
+              label={t("auth.sendOtp")}
               loading={sending}
               onPress={() => sendOtp(true)}
             />
@@ -190,13 +191,13 @@ export default function LoginScreen() {
 
         {step === "details" && (
           <View style={s.card}>
-            <Text style={s.title}>{STRINGS.auth.detailsTitle}</Text>
-            <Text style={s.sub}>{STRINGS.auth.detailsSub}</Text>
+            <Text style={s.title}>{t("auth.detailsTitle")}</Text>
+            <Text style={s.sub}>{t("auth.detailsSub")}</Text>
 
-            <Text style={s.label}>{STRINGS.auth.nameLabel}</Text>
+            <Text style={s.label}>{t("auth.nameLabel")}</Text>
             <TextInput
               style={s.input}
-              placeholder={STRINGS.auth.namePlaceholder}
+              placeholder={t("auth.namePlaceholder")}
               placeholderTextColor="#94a3b8"
               value={fullName}
               onChangeText={(v) => {
@@ -207,10 +208,10 @@ export default function LoginScreen() {
               returnKeyType="next"
             />
 
-            <Text style={s.label}>{STRINGS.auth.locationLabel}</Text>
+            <Text style={s.label}>{t("auth.locationLabel")}</Text>
             <TextInput
               style={s.input}
-              placeholder={STRINGS.auth.locationPlaceholder}
+              placeholder={t("auth.locationPlaceholder")}
               placeholderTextColor="#94a3b8"
               value={location}
               onChangeText={setLocation}
@@ -218,22 +219,22 @@ export default function LoginScreen() {
               returnKeyType="done"
               onSubmitEditing={goToOtpFromDetails}
             />
-            <Text style={s.hint}>{STRINGS.common.optional}</Text>
+            <Text style={s.hint}>{t("common.optional")}</Text>
 
             {error ? <Text style={s.error}>{error}</Text> : null}
 
-            <PrimaryButton label={STRINGS.common.continue} onPress={goToOtpFromDetails} />
+            <PrimaryButton label={t("common.continue")} onPress={goToOtpFromDetails} />
             <TouchableOpacity style={s.linkBtn} onPress={resetToPhone}>
-              <Text style={s.linkTxt}>{STRINGS.auth.changeNumber}</Text>
+              <Text style={s.linkTxt}>{t("auth.changeNumber")}</Text>
             </TouchableOpacity>
           </View>
         )}
 
         {step === "otp" && (
           <View style={s.card}>
-            <Text style={s.title}>{STRINGS.auth.otpTitle}</Text>
+            <Text style={s.title}>{t("auth.otpTitle")}</Text>
             <Text style={s.sub}>
-              {STRINGS.auth.otpSubPrefix}
+              {t("auth.otpSubPrefix")}
               <Text style={s.bold}>{formatIndianPhone(phone)}</Text>
             </Text>
 
@@ -241,7 +242,7 @@ export default function LoginScreen() {
               <View style={s.devBox}>
                 <Feather name="info" size={13} color={NAVY} />
                 <Text style={s.devTxt}>
-                  {STRINGS.auth.devOtpPrefix}
+                  {t("auth.devOtpPrefix")}
                   {devOtp}
                 </Text>
               </View>
@@ -249,7 +250,7 @@ export default function LoginScreen() {
 
             <TextInput
               style={s.otpInput}
-              placeholder={STRINGS.auth.otpPlaceholder}
+              placeholder={t("auth.otpPlaceholder")}
               placeholderTextColor="#94a3b8"
               value={code}
               onChangeText={(v) => {
@@ -264,7 +265,7 @@ export default function LoginScreen() {
 
             {error ? <Text style={s.error}>{error}</Text> : null}
 
-            <PrimaryButton label={STRINGS.auth.verify} loading={verifying} onPress={handleVerify} />
+            <PrimaryButton label={t("auth.verify")} loading={verifying} onPress={handleVerify} />
 
             <TouchableOpacity
               style={s.linkBtn}
@@ -272,11 +273,11 @@ export default function LoginScreen() {
               onPress={() => sendOtp(false)}
             >
               <Text style={[s.linkTxt, resendIn > 0 && { color: "#94a3b8" }]}>
-                {resendIn > 0 ? STRINGS.auth.resendIn(resendIn) : STRINGS.auth.resend}
+                {resendIn > 0 ? t("auth.resendIn", { seconds: resendIn }) : t("auth.resend")}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity style={s.linkBtn} onPress={resetToPhone}>
-              <Text style={s.linkTxt}>{STRINGS.auth.changeNumber}</Text>
+              <Text style={s.linkTxt}>{t("auth.changeNumber")}</Text>
             </TouchableOpacity>
           </View>
         )}

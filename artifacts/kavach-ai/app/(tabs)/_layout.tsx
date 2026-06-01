@@ -5,39 +5,42 @@ import { Icon, Label, NativeTabs } from "expo-router/unstable-native-tabs";
 import { SymbolView } from "expo-symbols";
 import { Feather } from "@expo/vector-icons";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Platform, StyleSheet, View, useColorScheme } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useColors } from "@/hooks/useColors";
 
 function NativeTabLayout() {
+  const { t } = useTranslation();
   return (
     <NativeTabs>
       <NativeTabs.Trigger name="index">
         <Icon sf={{ default: "house", selected: "house.fill" }} />
-        <Label>Home</Label>
+        <Label>{t("tabs.home")}</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="verify">
         <Icon sf={{ default: "checkmark.shield", selected: "checkmark.shield.fill" }} />
-        <Label>Verify</Label>
+        <Label>{t("tabs.verify")}</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="threats">
         <Icon sf={{ default: "exclamationmark.shield", selected: "exclamationmark.shield.fill" }} />
-        <Label>Threats</Label>
+        <Label>{t("tabs.threats")}</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="family">
         <Icon sf={{ default: "person.2", selected: "person.2.fill" }} />
-        <Label>Family</Label>
+        <Label>{t("tabs.family")}</Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="profile">
         <Icon sf={{ default: "person.circle", selected: "person.circle.fill" }} />
-        <Label>Profile</Label>
+        <Label>{t("tabs.profile")}</Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );
 }
 
 function ClassicTabLayout() {
+  const { t } = useTranslation();
   const colors = useColors();
   const colorScheme = useColorScheme();
   const insets = useSafeAreaInsets();
@@ -84,7 +87,7 @@ function ClassicTabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: t("tabs.home"),
           tabBarIcon: ({ color }) =>
             isIOS ? (
               <SymbolView name="house" tintColor={color} size={24} />
@@ -96,7 +99,7 @@ function ClassicTabLayout() {
       <Tabs.Screen
         name="verify"
         options={{
-          title: "Verify",
+          title: t("tabs.verify"),
           tabBarIcon: ({ color }) =>
             isIOS ? (
               <SymbolView name="checkmark.shield" tintColor={color} size={24} />
@@ -108,7 +111,7 @@ function ClassicTabLayout() {
       <Tabs.Screen
         name="threats"
         options={{
-          title: "Threats",
+          title: t("tabs.threats"),
           tabBarIcon: ({ color }) =>
             isIOS ? (
               <SymbolView name="exclamationmark.shield" tintColor={color} size={24} />
@@ -120,7 +123,7 @@ function ClassicTabLayout() {
       <Tabs.Screen
         name="family"
         options={{
-          title: "Family",
+          title: t("tabs.family"),
           tabBarIcon: ({ color }) =>
             isIOS ? (
               <SymbolView name="person.2" tintColor={color} size={24} />
@@ -132,7 +135,7 @@ function ClassicTabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: "Profile",
+          title: t("tabs.profile"),
           tabBarIcon: ({ color }) =>
             isIOS ? (
               <SymbolView name="person.circle" tintColor={color} size={24} />
