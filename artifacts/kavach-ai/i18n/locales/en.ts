@@ -208,6 +208,11 @@ const en = {
       },
     },
     verifiedScam: "Verified scam by Netraksh moderators",
+    officialCheck: {
+      title: "Cross-check on the official portal",
+      body: "Before you act, verify this on the Government of India National Cybercrime suspect repository.",
+      button: "Search on cybercrime.gov.in",
+    },
     types: {
       numberLabel: "Check Number",
       numberHint: "+91 98765 43210",

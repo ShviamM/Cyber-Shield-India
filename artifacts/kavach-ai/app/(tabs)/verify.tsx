@@ -5,6 +5,7 @@ import type { FraudCheckRequestType, FraudVerdict } from "@workspace/api-client-
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as Haptics from "expo-haptics";
 import * as Linking from "expo-linking";
+import * as WebBrowser from "expo-web-browser";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -29,6 +30,9 @@ import { isValidIndianPhone, phoneForApi } from "@/lib/phone";
 const NAVY = "#0B3D91";
 const SAFFRON = "#FF6713";
 const GREEN = "#138808";
+
+/** Government of India National Cybercrime Portal — "Search a Suspect" repository. */
+const SUSPECT_REPO_URL = "https://cybercrime.gov.in/Webform/suspect_search_repository.aspx";
 
 type CheckType = CheckItem["type"];
 
@@ -243,6 +247,19 @@ export default function VerifyScreen() {
       await Linking.openSettings();
     } catch {
       // no-op: settings may be unavailable on some devices
+    }
+  }
+
+  async function openSuspectRepository() {
+    Haptics.selectionAsync();
+    try {
+      await WebBrowser.openBrowserAsync(SUSPECT_REPO_URL);
+    } catch {
+      try {
+        await Linking.openURL(SUSPECT_REPO_URL);
+      } catch {
+        // no-op: no browser available
+      }
     }
   }
 
@@ -494,6 +511,29 @@ export default function VerifyScreen() {
           </View>
         )}
 
+        {/* Official portal cross-check — "Before you act" */}
+        {result && !result.isError && result.status !== "invalid" && (
+          <View style={s.officialCard}>
+            <View style={s.officialTop}>
+              <View style={s.officialIconBox}>
+                <Feather name="shield" size={16} color={NAVY} />
+              </View>
+              <View style={s.officialTextWrap}>
+                <Text style={s.officialTitle}>{t("verify.officialCheck.title")}</Text>
+                <Text style={s.officialBody}>{t("verify.officialCheck.body")}</Text>
+              </View>
+            </View>
+            <TouchableOpacity
+              style={s.officialBtn}
+              onPress={openSuspectRepository}
+              activeOpacity={0.85}
+            >
+              <Feather name="external-link" size={15} color="#fff" />
+              <Text style={s.officialBtnTxt}>{t("verify.officialCheck.button")}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
         {/* History */}
         {history.length > 0 && (
           <>
@@ -696,6 +736,25 @@ const s = StyleSheet.create({
     borderRadius: 12, paddingVertical: 12, marginTop: 2,
   },
   reportBtnTxt: { fontSize: 14, fontWeight: "700" as const, color: "#9a3412" },
+  officialCard: {
+    backgroundColor: "#fff", borderRadius: 16, padding: 16, marginTop: 12, gap: 12,
+    borderColor: "rgba(11,61,145,0.12)", borderWidth: 1,
+    shadowColor: NAVY, shadowOpacity: 0.05, shadowRadius: 8, shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
+  },
+  officialTop: { flexDirection: "row", alignItems: "flex-start", gap: 12 },
+  officialIconBox: {
+    width: 36, height: 36, borderRadius: 10, backgroundColor: "#EBF0FA",
+    alignItems: "center", justifyContent: "center",
+  },
+  officialTextWrap: { flex: 1, gap: 3 },
+  officialTitle: { fontSize: 14, fontWeight: "800" as const, color: "#1e293b", letterSpacing: -0.2 },
+  officialBody: { fontSize: 12, color: "#64748b", lineHeight: 17 },
+  officialBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
+    backgroundColor: NAVY, borderRadius: 12, paddingVertical: 13,
+  },
+  officialBtnTxt: { fontSize: 14, fontWeight: "700" as const, color: "#fff" },
   historyTitle: {
     fontSize: 11, fontWeight: "700" as const, letterSpacing: 1,
     color: "#94a3b8", marginBottom: 10, marginTop: 8,
