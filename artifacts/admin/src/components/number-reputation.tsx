@@ -1,7 +1,7 @@
 import { useCheckNumber, getCheckNumberQueryKey, NumberCheckResponseRiskLevel } from "@workspace/api-client-react";
 import type { NumberCheckResponseRiskLevel as RiskLevel } from "@workspace/api-client-react";
 import { format } from "date-fns";
-import { Activity, Clock, ShieldQuestion } from "lucide-react";
+import { Activity, Clock, ShieldQuestion, Tags } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -58,6 +58,7 @@ export function NumberReputation({ phone }: NumberReputationProps) {
   }
 
   const risk = RISK_CONFIG[data.riskLevel] ?? RISK_CONFIG[NumberCheckResponseRiskLevel.unknown];
+  const categories = Array.from(new Set(data.categories ?? []));
 
   return (
     <div className="mt-4 rounded-md border border-border/60 bg-background/60 p-3 space-y-2">
@@ -83,6 +84,26 @@ export function NumberReputation({ phone }: NumberReputationProps) {
           Last reported {format(new Date(data.lastReportedAt), "MMM d, yyyy")}
         </div>
       )}
+      <div className="space-y-1.5 pt-0.5">
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Tags className="w-3.5 h-3.5" />
+          Reported categories
+        </div>
+        {categories.length > 0 ? (
+          <div className="flex flex-wrap gap-1.5">
+            {categories.map((category) => (
+              <span
+                key={category}
+                className="rounded-full border border-border/60 bg-muted px-2 py-0.5 text-[11px] font-medium text-foreground"
+              >
+                {category}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground">No categories reported yet</p>
+        )}
+      </div>
     </div>
   );
 }
