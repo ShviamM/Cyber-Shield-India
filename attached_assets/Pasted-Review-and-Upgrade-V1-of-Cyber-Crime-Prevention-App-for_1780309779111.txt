@@ -1,0 +1,185 @@
+Review and Upgrade V1 of Cyber Crime Prevention App for India
+
+I have already built Version 1 of a mobile app in Replit for Cyber Crime Prevention in India. I want you to review the existing V1 app completely, identify issues, improve the product structure if needed, and then upgrade it with the features below. If you have a better product or technical approach, suggest it first and then implement the best version.
+Main Goal
+
+Make the app more useful, secure, reliable, and ready for real users in India.
+First Task: Review V1
+
+Please start by reviewing the current V1 app and provide:
+
+    What is already working
+    What is incomplete or broken
+    UI/UX issues
+    Security issues
+    Database issues
+    Mobile responsiveness/performance issues
+    Code quality issues
+    What should be improved before adding new features
+
+After the review, upgrade the app.
+Features to Add / Improve
+1. User Registration with OTP
+
+Add user registration/login with:
+
+    Full name
+    Mobile number
+    Location
+    OTP verification system
+
+Requirements:
+
+    OTP-based authentication for Indian mobile users
+    Store user profile securely
+    Validate phone number format
+    Prevent duplicate registrations
+    Add proper error handling for invalid OTP, expired OTP, network issues, etc.
+    If live OTP integration is complex for now, create a clean production-ready structure and use a mock OTP fallback for development
+
+2. Report a Fraud Number
+
+Add a feature where users can report a phone number as fraudulent.
+
+Requirements:
+
+    User can submit:
+        Fraud phone number
+        Fraud type/category
+        Short description
+        Optional screenshot/evidence if supported
+        Date/time of incident if useful
+    Save reported numbers in a database
+    Prevent spam/duplicate reports
+    Add admin-friendly structure for later moderation
+    Show a warning if a number has already been reported multiple times
+    Create a searchable fraud number database/checker if possible
+
+3. Ensure All Functionalities Work Properly
+
+Please check and fix all app functions end-to-end:
+
+    Authentication flow
+    Database reads/writes
+    Form validation
+    Error states
+    Navigation
+    API integration
+    State handling
+    Input sanitization
+    Edge cases
+    Mobile performance
+
+Also:
+
+    Remove broken code
+    Refactor where needed
+    Make the code cleaner and maintainable
+    Add comments only where useful
+    Make the app stable enough for V2
+
+4. Multi-language Support for Major Indian Languages
+
+Add language support for major Indian languages.
+
+Include at least:
+
+    English
+    Hindi
+    Bengali
+    Telugu
+    Marathi
+    Tamil
+    Urdu
+    Gujarati
+    Kannada
+    Malayalam
+    Punjabi
+    Odia
+
+Requirements:
+
+    Add a language selector in the app
+    Use a proper localization/i18n structure
+    Keep text externalized for easy translation
+    Make UI work properly for longer translated strings
+    Default to English if translation is missing
+
+Suggest Better Product Ideas If Appropriate
+
+If you think the app can be significantly improved, suggest and optionally add the following:
+Recommended Enhancements
+
+    Check Number Before Answering
+        Search if a number is already reported as fraud
+        Show risk level: low / medium / high
+
+    Cyber Safety Education Section
+        Short tips on phishing, OTP scams, UPI fraud, fake loan apps, impersonation scams, etc.
+
+    Emergency / Helpline Section
+        Include India cyber crime helpline info such as 1930 and official reporting guidance
+        Add disclaimer to verify official details
+
+    Scam Categories Dashboard
+        UPI fraud
+        KYC scam
+        Lottery scam
+        Job scam
+        Loan app scam
+        Fake customer care
+        Investment/crypto scam
+        Social media impersonation
+
+    Reputation / Trust Scoring for Reported Numbers
+        Basic score based on report count and recent activity
+
+    Admin Panel (if feasible)
+        Review reports
+        Mark verified scam numbers
+        Remove abuse/spam reports
+
+Technical Expectations
+
+Please implement this in a way suitable for Replit and mobile app development.
+
+Focus on:
+
+    Clean architecture
+    Scalable database structure
+    Secure authentication design
+    Reusable components
+    Maintainable code
+    Clear folder structure
+    Production-friendly approach
+
+If the current stack in V1 is not ideal, suggest a better stack but avoid unnecessary rewrites unless clearly beneficial.
+Expected Output
+
+Please provide the following in order:
+
+    V1 Review Summary
+    Recommended Improvements
+    Implementation Plan
+    Code Changes / Updated Structure
+    Completed Feature Additions
+    List of Bugs Fixed
+    Any Better Ideas Added
+    How to Test All Functionalities
+    Any setup steps required in Replit
+
+If possible, also generate:
+
+    sample database schema
+    localization structure
+    fraud reporting data model
+    OTP flow logic
+    testing checklist
+
+Important Notes
+
+    Prioritize security, usability, and reliability
+    Keep the UX simple for Indian users across languages
+    Make the app practical, not just visually attractive
+    Do not leave placeholder features incomplete without clearly marking them
+    If any feature cannot be fully completed, explain the best fallback implementation
