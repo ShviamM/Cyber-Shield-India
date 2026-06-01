@@ -18,6 +18,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAppContext } from "@/context/AppContext";
 import { CITY_HOTSPOTS, GOLDEN_RULES, LIVE_THREATS } from "@/constants/data";
 import { useColors } from "@/hooks/useColors";
+import { useNearbyCity } from "@/hooks/useNearbyCity";
 
 const SAFFRON = "#FF6713";
 const NAVY = "#0B3D91";
@@ -30,6 +31,19 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const { guardianActive, familyMembers, recentChecks, toggleGuardian } = useAppContext();
+  const {
+    city: nearbyCity,
+    status: nearbyStatus,
+    canAskAgain: nearbyCanAskAgain,
+    retry: retryNearby,
+  } = useNearbyCity();
+
+  const cityThreats = nearbyCity
+    ? LIVE_THREATS.filter((x) => x.city === nearbyCity)
+    : [];
+  const cityHotspot = nearbyCity
+    ? CITY_HOTSPOTS.find((h) => h.city === nearbyCity)
+    : undefined;
 
   const topInset = Platform.OS === "web" ? 0 : insets.top;
   const bottomPad = (Platform.OS === "web" ? 34 : insets.bottom) + 80;
@@ -188,6 +202,116 @@ export default function HomeScreen() {
               <Text style={s.serviceLabel} numberOfLines={2}>{svc.label}</Text>
             </TouchableOpacity>
           ))}
+        </View>
+
+        {/* Active Scams in your city (auto-detected) */}
+        <View style={s.nearbyCard}>
+          <View style={s.nearbyHeader}>
+            <View style={s.nearbyIconBox}>
+              <Feather name="map-pin" size={16} color="#fff" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={s.nearbyTitle} numberOfLines={1}>
+                {nearbyStatus === "granted" && nearbyCity
+                  ? t("home.nearbyTitle", { city: nearbyCity })
+                  : t("home.nearbyTitleGeneric")}
+              </Text>
+              {nearbyStatus === "granted" && cityHotspot && (
+                <Text style={s.nearbyCases}>
+                  {t("home.nearbyCases", { n: cityHotspot.cases.toLocaleString() })}
+                </Text>
+              )}
+            </View>
+            {nearbyStatus === "granted" && cityHotspot && (
+              <View
+                style={[
+                  s.nearbyChange,
+                  { backgroundColor: cityHotspot.up ? "#fee2e2" : "#dcfce7" },
+                ]}
+              >
+                <Feather
+                  name={cityHotspot.up ? "trending-up" : "trending-down"}
+                  size={11}
+                  color={cityHotspot.up ? "#dc2626" : GREEN}
+                />
+                <Text
+                  style={[
+                    s.nearbyChangeTxt,
+                    { color: cityHotspot.up ? "#dc2626" : GREEN },
+                  ]}
+                >
+                  {cityHotspot.change}
+                </Text>
+              </View>
+            )}
+          </View>
+
+          {nearbyStatus === "loading" && (
+            <Text style={s.nearbyHint}>{t("home.nearbyDetecting")}</Text>
+          )}
+
+          {nearbyStatus === "denied" && (
+            <View>
+              <Text style={s.nearbyHint}>{t("home.nearbyDenied")}</Text>
+              <TouchableOpacity
+                style={s.nearbyBtn}
+                onPress={() =>
+                  nearbyCanAskAgain ? retryNearby() : Linking.openSettings()
+                }
+              >
+                <Feather name="navigation" size={13} color="#fff" />
+                <Text style={s.nearbyBtnTxt}>{t("home.nearbyEnable")}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {nearbyStatus === "unavailable" && (
+            <View>
+              <Text style={s.nearbyHint}>{t("home.nearbyUnavailable")}</Text>
+              <TouchableOpacity style={s.nearbyBtn} onPress={retryNearby}>
+                <Feather name="refresh-cw" size={13} color="#fff" />
+                <Text style={s.nearbyBtnTxt}>{t("home.nearbyRetry")}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {nearbyStatus === "granted" &&
+            (cityThreats.length > 0 ? (
+              cityThreats.map((item) => {
+                const color =
+                  item.trend === "critical"
+                    ? "#dc2626"
+                    : item.trend === "high"
+                    ? "#ea580c"
+                    : "#d97706";
+                const bg =
+                  item.trend === "critical"
+                    ? "#fff1f1"
+                    : item.trend === "high"
+                    ? "#fff7ed"
+                    : "#fefce8";
+                return (
+                  <View key={item.id} style={s.nearbyThreat}>
+                    <View style={[s.nearbyThreatIcon, { backgroundColor: bg }]}>
+                      <Feather name="phone-off" size={15} color={color} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={s.nearbyThreatType}>{item.type}</Text>
+                      <Text style={s.nearbyThreatMeta}>
+                        {t("threats.reports", { n: item.count.toLocaleString() })} · {item.time}
+                      </Text>
+                    </View>
+                    <View style={[s.scamTag, { backgroundColor: bg }]}>
+                      <Text style={[s.scamTagTxt, { color }]}>
+                        {item.trend.toUpperCase()}
+                      </Text>
+                    </View>
+                  </View>
+                );
+              })
+            ) : (
+              <Text style={s.nearbyHint}>{t("home.nearbyEmpty")}</Text>
+            ))}
         </View>
 
         {/* Active Scams Today */}
@@ -489,6 +613,35 @@ const s = StyleSheet.create({
   serviceLabel: { fontSize: 10, fontWeight: "600" as const, color: "#475569", textAlign: "center", lineHeight: 13 },
 
   // Scam cards
+  nearbyCard: {
+    marginHorizontal: 16, marginTop: 4, marginBottom: 14,
+    backgroundColor: "#fff", borderRadius: 18,
+    borderWidth: 1.5, borderColor: NAVY + "22", padding: 16,
+    shadowColor: "#000", shadowOpacity: 0.05, shadowRadius: 10, shadowOffset: { width: 0, height: 3 },
+    elevation: 2,
+  },
+  nearbyHeader: { flexDirection: "row", alignItems: "center", gap: 10 },
+  nearbyIconBox: {
+    width: 32, height: 32, borderRadius: 10, backgroundColor: NAVY,
+    alignItems: "center", justifyContent: "center", flexShrink: 0,
+  },
+  nearbyTitle: { fontSize: 15, fontWeight: "800" as const, color: "#0f172a" },
+  nearbyCases: { fontSize: 11, fontWeight: "600" as const, color: "#64748b", marginTop: 1 },
+  nearbyChange: { flexDirection: "row", alignItems: "center", gap: 3, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 20 },
+  nearbyChangeTxt: { fontSize: 11, fontWeight: "800" as const },
+  nearbyHint: { fontSize: 12.5, color: "#64748b", marginTop: 10, lineHeight: 18 },
+  nearbyBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6,
+    backgroundColor: NAVY, borderRadius: 12, paddingVertical: 10, marginTop: 12,
+  },
+  nearbyBtnTxt: { fontSize: 13, fontWeight: "700" as const, color: "#fff" },
+  nearbyThreat: { flexDirection: "row", alignItems: "center", gap: 10, marginTop: 12 },
+  nearbyThreatIcon: {
+    width: 34, height: 34, borderRadius: 10,
+    alignItems: "center", justifyContent: "center", flexShrink: 0,
+  },
+  nearbyThreatType: { fontSize: 13, fontWeight: "700" as const, color: "#0f172a" },
+  nearbyThreatMeta: { fontSize: 11, color: "#64748b", marginTop: 1 },
   scamCard: {
     marginHorizontal: 16, marginBottom: 10,
     backgroundColor: "#fff", borderRadius: 16,

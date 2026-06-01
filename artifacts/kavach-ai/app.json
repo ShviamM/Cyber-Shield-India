@@ -24,7 +24,9 @@
         "android.permission.READ_CALL_LOG",
         "android.permission.RECEIVE_SMS",
         "android.permission.POST_NOTIFICATIONS",
-        "android.permission.CAMERA"
+        "android.permission.CAMERA",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
       ],
       "intentFilters": [
         {
@@ -52,6 +54,12 @@
         "expo-camera",
         {
           "cameraPermission": "Netraksh uses the camera to scan QR codes so it can check them for payment scams."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Netraksh uses your location to show scams reported in your city."
         }
       ],
       [
