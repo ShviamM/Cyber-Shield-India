@@ -58,7 +58,7 @@ export function NumberReputation({ phone }: NumberReputationProps) {
   }
 
   const risk = RISK_CONFIG[data.riskLevel] ?? RISK_CONFIG[NumberCheckResponseRiskLevel.unknown];
-  const categories = Array.from(new Set(data.categories ?? []));
+  const categories = data.categories ?? [];
 
   return (
     <div className="mt-4 rounded-md border border-border/60 bg-background/60 p-3 space-y-2">
@@ -93,10 +93,11 @@ export function NumberReputation({ phone }: NumberReputationProps) {
           <div className="flex flex-wrap gap-1.5">
             {categories.map((category) => (
               <span
-                key={category}
-                className="rounded-full border border-border/60 bg-muted px-2 py-0.5 text-[11px] font-medium text-foreground"
+                key={category.key}
+                className="flex items-center gap-1 rounded-full border border-border/60 bg-muted px-2 py-0.5 text-[11px] font-medium text-foreground"
               >
-                {category}
+                {category.key}
+                <span className="text-muted-foreground">×{category.count}</span>
               </span>
             ))}
           </div>

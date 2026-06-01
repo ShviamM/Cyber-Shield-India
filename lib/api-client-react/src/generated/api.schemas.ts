@@ -121,13 +121,20 @@ export const NumberCheckResponseRiskLevel = {
   unknown: 'unknown',
 } as const;
 
+export interface NumberCategoryCount {
+  /** The scam category key */
+  key: string;
+  /** Number of visible reports filed under this category for the number */
+  count: number;
+}
+
 export interface NumberCheckResponse {
   phone: string;
   riskLevel: NumberCheckResponseRiskLevel;
   reportCount: number;
   verifiedScam: boolean;
   lastReportedAt?: string | null;
-  categories: string[];
+  categories: NumberCategoryCount[];
 }
 
 export type UpdateReportStatusRequestStatus = typeof UpdateReportStatusRequestStatus[keyof typeof UpdateReportStatusRequestStatus];

@@ -77,15 +77,22 @@ export async function setVerifiedScam(
   return row;
 }
 
-export async function getCategoriesForNumber(phone: string): Promise<string[]> {
+export async function getCategoriesForNumber(
+  phone: string,
+): Promise<{ key: string; count: number }[]> {
   const rows = await db
-    .selectDistinct({ key: fraudReportsTable.categoryKey })
+    .select({
+      key: fraudReportsTable.categoryKey,
+      count: sql<number>`count(*)::int`,
+    })
     .from(fraudReportsTable)
     .where(
       and(
         eq(fraudReportsTable.phone, phone),
         inArray(fraudReportsTable.status, [...VISIBLE_STATUSES]),
       ),
-    );
-  return rows.map((r) => r.key);
+    )
+    .groupBy(fraudReportsTable.categoryKey)
+    .orderBy(sql`count(*) desc`);
+  return rows.map((r) => ({ key: r.key, count: r.count ?? 0 }));
 }

@@ -601,13 +601,26 @@ components:
         categories:
           type: array
           items:
-            type: string
+            $ref: "#/components/schemas/NumberCategoryCount"
       required:
         - phone
         - riskLevel
         - reportCount
         - verifiedScam
         - categories
+
+    NumberCategoryCount:
+      type: object
+      properties:
+        key:
+          type: string
+          description: The scam category key
+        count:
+          type: integer
+          description: Number of visible reports filed under this category for the number
+      required:
+        - key
+        - count
 
     UpdateReportStatusRequest:
       type: object

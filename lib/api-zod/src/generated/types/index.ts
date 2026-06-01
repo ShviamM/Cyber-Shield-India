@@ -15,6 +15,7 @@ export * from './createReportRequest';
 export * from './errorResponse';
 export * from './healthStatus';
 export * from './listReportsParams';
+export * from './numberCategoryCount';
 export * from './numberCheckResponse';
 export * from './numberCheckResponseRiskLevel';
 export * from './numberReputation';

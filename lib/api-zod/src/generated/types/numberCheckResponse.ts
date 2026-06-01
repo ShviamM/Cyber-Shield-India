@@ -5,6 +5,7 @@
  * KavachAI API — phone-OTP auth, fraud-number reporting, and trust scoring
  * OpenAPI spec version: 0.1.0
  */
+import type { NumberCategoryCount } from './numberCategoryCount';
 import type { NumberCheckResponseRiskLevel } from './numberCheckResponseRiskLevel';
 
 export interface NumberCheckResponse {
@@ -13,5 +14,5 @@ export interface NumberCheckResponse {
   reportCount: number;
   verifiedScam: boolean;
   lastReportedAt?: Date | null;
-  categories: string[];
+  categories: NumberCategoryCount[];
 }

@@ -158,7 +158,10 @@ export const CheckNumberResponse = zod.object({
   "reportCount": zod.number(),
   "verifiedScam": zod.boolean(),
   "lastReportedAt": zod.coerce.date().nullish(),
-  "categories": zod.array(zod.string())
+  "categories": zod.array(zod.object({
+  "key": zod.string().describe('The scam category key'),
+  "count": zod.number().describe('Number of visible reports filed under this category for the number')
+}))
 })
 
 
