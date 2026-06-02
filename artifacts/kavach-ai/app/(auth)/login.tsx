@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -22,6 +23,7 @@ import { isValidIndianPhone, formatIndianPhone } from "@/lib/phone";
 const NAVY = "#0B3D91";
 const SAFFRON = "#FF6713";
 const GREEN = "#138808";
+const LOGO = require("../../assets/images/icon.png");
 
 const RESEND_SECONDS = 30;
 
@@ -140,7 +142,7 @@ export default function LoginScreen() {
         {/* Brand */}
         <View style={s.brand}>
           <View style={s.logoBox}>
-            <Feather name="shield" size={30} color={SAFFRON} />
+            <Image source={LOGO} style={s.logoImg} resizeMode="cover" />
           </View>
           <Text style={s.logoTitle}>
             Netra<Text style={{ color: SAFFRON }}>ksh</Text>
@@ -319,8 +321,9 @@ const s = StyleSheet.create({
   logoBox: {
     width: 72, height: 72, borderRadius: 22,
     backgroundColor: "rgba(255,255,255,0.12)",
-    alignItems: "center", justifyContent: "center", marginBottom: 12,
+    alignItems: "center", justifyContent: "center", marginBottom: 12, overflow: "hidden",
   },
+  logoImg: { width: "100%", height: "100%" },
   logoTitle: { fontSize: 28, fontWeight: "900" as const, color: "#fff", letterSpacing: -0.5 },
   tricolor: { flexDirection: "row", height: 3, width: 60, marginTop: 10, borderRadius: 2, overflow: "hidden" },
   triStrip: { flex: 1 },

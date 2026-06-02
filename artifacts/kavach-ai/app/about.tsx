@@ -3,7 +3,7 @@ import * as Haptics from "expo-haptics";
 import { Linking } from "react-native";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useColors } from "@/hooks/useColors";
@@ -12,6 +12,7 @@ const NAVY = "#0B3D91";
 const SAFFRON = "#FF6713";
 const GREEN = "#138808";
 const BLUE = "#5AA9FF";
+const LOGO = require("../assets/images/icon.png");
 
 export default function AboutScreen() {
   const colors = useColors();
@@ -33,7 +34,7 @@ export default function AboutScreen() {
       {/* Brand header */}
       <View style={s.hero}>
         <View style={s.logoBox}>
-          <Feather name="shield" size={30} color={SAFFRON} />
+          <Image source={LOGO} style={s.logoImg} resizeMode="cover" />
         </View>
         <Text style={s.brand}>
           Netra<Text style={{ color: SAFFRON }}>ksh</Text>
@@ -107,8 +108,9 @@ const s = StyleSheet.create({
   hero: { alignItems: "center", paddingVertical: 18 },
   logoBox: {
     width: 68, height: 68, borderRadius: 20, backgroundColor: NAVY,
-    alignItems: "center", justifyContent: "center", marginBottom: 12,
+    alignItems: "center", justifyContent: "center", marginBottom: 12, overflow: "hidden",
   },
+  logoImg: { width: "100%", height: "100%" },
   brand: { fontSize: 28, fontWeight: "900", color: NAVY, letterSpacing: -0.5 },
   tricolor: { flexDirection: "row", height: 3, width: 60, marginTop: 10, borderRadius: 2, overflow: "hidden" },
   triStrip: { flex: 1 },

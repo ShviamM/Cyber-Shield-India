@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   AppState,
   Dimensions,
+  Image,
   Linking,
   Platform,
   ScrollView,
@@ -36,6 +37,7 @@ const REFETCH_MS = 60000;
 const SAFFRON = "#FF6713";
 const NAVY = "#0B3D91";
 const GREEN = "#138808";
+const LOGO = require("../../assets/images/icon.png");
 
 const { width } = Dimensions.get("window");
 
@@ -164,7 +166,7 @@ export default function HomeScreen() {
         <View style={s.brandRow}>
           <View style={s.brandLeft}>
             <View style={s.logoBox}>
-              <Feather name="shield" size={20} color={SAFFRON} />
+              <Image source={LOGO} style={s.logoImg} resizeMode="cover" />
             </View>
             <View>
               <Text style={s.logoTitle}>
@@ -692,8 +694,9 @@ const s = StyleSheet.create({
   logoBox: {
     width: 38, height: 38, borderRadius: 12,
     backgroundColor: "rgba(255,255,255,0.12)",
-    alignItems: "center", justifyContent: "center",
+    alignItems: "center", justifyContent: "center", overflow: "hidden",
   },
+  logoImg: { width: "100%", height: "100%" },
   logoTitle: { fontSize: 18, fontWeight: "900" as const, color: "#fff", letterSpacing: -0.4 },
   logoSub: { fontSize: 9, color: "rgba(255,255,255,0.55)", letterSpacing: 1, marginTop: 1 },
   headerIcons: { flexDirection: "row", alignItems: "center", gap: 14 },
