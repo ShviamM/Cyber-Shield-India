@@ -1,8 +1,67 @@
 uploads = []
-outputs = []
 
 [[generated]]
 id = "mNBJJbZCQLpSL9YPSxaeB"
 uri = "file://artifacts/kavach-ai/assets/images/icon.png"
 type = "image"
 title = "generated_image"
+
+[[generated]]
+id = "6lLxRUo2mUzJyEqibKVc_"
+uri = "file://attached_assets/logo_concepts/01_guardian_eye_shield.png"
+type = "image"
+title = "guardian eye shield logo"
+
+[[generated]]
+id = "i0FXqUvON2XwNj9tlqgph"
+uri = "file://attached_assets/logo_concepts/02_two_steps_ahead.png"
+type = "image"
+title = "two steps ahead chevron eye logo clean"
+
+[[generated]]
+id = "fgcJTsLHyFL7P-Juj3ZPV"
+uri = "file://attached_assets/logo_concepts/03_radar_scan_eye.png"
+type = "image"
+title = "radar scan eye cyber logo clean"
+
+[[generated]]
+id = "zRWm5gUQLB5ipNb8DWjxP"
+uri = "file://attached_assets/logo_concepts/04_lotus_sentinel.png"
+type = "image"
+title = "lotus sentinel eye logo"
+
+[[generated]]
+id = "0EJoUrm_rIA_wvkyulx9g"
+uri = "file://attached_assets/logo_concepts/05_tricolor_shield_eye.png"
+type = "image"
+title = "tricolor shield eye logo"
+
+[[outputs]]
+id = "_yMJQqiPPUGQxsjmFQfwi"
+uri = "file://attached_assets/logo_concepts/01_guardian_eye_shield.png"
+type = "image"
+title = "1. Guardian Eye Shield — eye inside a protective shield (most literal to the name)"
+
+[[outputs]]
+id = "WegG0UwNnZ8xKpoVs8Yl8"
+uri = "file://attached_assets/logo_concepts/05_tricolor_shield_eye.png"
+type = "image"
+title = "2. Tricolor Shield Eye — official, civic, national-safety feel"
+
+[[outputs]]
+id = "nORmKEh0upEKkT0JmRihz"
+uri = "file://attached_assets/logo_concepts/03_radar_scan_eye.png"
+type = "image"
+title = "3. Radar Scan Eye — iris as detection rings, most 'tech/cyber'"
+
+[[outputs]]
+id = "c_xDhBgOMJPvyiMxUcMny"
+uri = "file://attached_assets/logo_concepts/02_two_steps_ahead.png"
+type = "image"
+title = "4. Two Steps Ahead — fast-forward chevrons + eye (matches the tagline)"
+
+[[outputs]]
+id = "u57Zurf3Jkve9eBhXF05r"
+uri = "file://attached_assets/logo_concepts/04_lotus_sentinel.png"
+type = "image"
+title = "5. Lotus Sentinel — eye within lotus petals, Indian identity"
