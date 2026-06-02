@@ -1,0 +1,160 @@
+Act as a world-class brand strategist, creative director, logo designer, and product identity expert with experience designing brands at the level of Apple, Google, Tesla, OpenAI, and Palantir.
+
+Project Overview
+
+Create a sophisticated, memorable, and iconic visual identity for a technology platform named Netraksh.
+
+Brand Name Meaning
+
+Netra = Eye, Vision, Insight, Observation
+Raksh = Protection, Security, Guardian
+
+The brand represents:
+
+Intelligent vision
+AI-powered monitoring
+Security and protection
+Situational awareness
+Precision and trust
+Future-ready technology
+Core Logo Concept
+
+The logo should be built around the concept of an Eye of Protection.
+
+Instead of using a generic eye symbol, create a distinctive and original visual mark where:
+
+The eye symbolizes intelligence and awareness.
+The inner iris represents AI, data, or digital intelligence.
+Protective elements are subtly integrated.
+The design feels innovative rather than surveillance-focused.
+Hidden Symbolism
+
+Incorporate one or more of the following:
+
+Hidden "N"
+Hidden shield
+Hidden guardian symbol
+Circular iris made of connected nodes
+Digital pupil resembling intelligence or focus
+Negative-space protection motif
+
+The symbolism should be subtle and clever.
+
+Visual Style
+Minimalist
+Premium
+Futuristic
+Elegant
+Geometric
+Technology-focused
+Enterprise-grade
+
+Avoid:
+
+Clipart
+Generic eye icons
+Cartoon styles
+Excessive gradients
+Overly complex details
+Logo Structure
+
+Create:
+
+Primary Logo
+Symbol + wordmark
+Secondary Logo
+Horizontal version
+Icon Version
+Eye-based standalone symbol
+App Icon
+Distinctive icon recognizable at 32px size
+Color Direction
+
+Primary Colors:
+
+Midnight Navy (#081C3A)
+Electric Blue (#007BFF)
+
+Secondary Colors:
+
+Cyan (#00D4FF)
+Silver Gray (#C6D0DC)
+
+Optional Accent:
+
+Emerald (#00C896)
+
+The logo should look exceptional in:
+
+Dark mode
+Light mode
+Monochrome
+Embossed versions
+Typography
+
+Recommend fonts similar to:
+
+Inter
+SF Pro
+Sora
+Manrope
+Space Grotesk
+
+Typography should communicate:
+
+Precision
+Trust
+Innovation
+Professionalism
+App Icon Vision
+
+Design an iconic symbol that can become instantly recognizable.
+
+Imagine if:
+
+Apple has the Apple.
+Nike has the Swoosh.
+OpenAI has the knot.
+Netraksh has the Eye of Protection.
+
+The icon should be simple enough to stand alone without text.
+
+Brand Personality
+
+The visual identity should feel:
+
+Intelligent
+Protective
+Reliable
+Visionary
+Advanced
+Confident
+Premium
+Deliverables
+
+Generate:
+
+Hero Logo Concept
+Alternate Logo Concepts
+App Icon Design
+Color Palette
+Typography System
+Brand Guidelines
+Dark and Light Variations
+Favicon Version
+Monochrome Version
+Product Splash Screen Concept
+Design Inspiration
+
+Blend the design excellence of:
+
+Apple
+OpenAI
+Palantir
+Tesla
+Stripe
+Notion
+
+while creating a completely unique identity for Netraksh.
+
+Final Goal: Create a timeless technology brand where the eye represents intelligence and awareness, while subtly conveying protection, trust, and AI-powered vision through elegant modern design.
