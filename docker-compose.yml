@@ -1,0 +1,57 @@
+# Turn-key local/third-party stack: Postgres + API server + admin dashboard.
+# 1) Fill in the secrets below (or use an .env file / your host's secret store).
+# 2) docker compose up --build
+# 3) First run only — apply the database schema:
+#      docker compose run --rm api-server sh -c "echo 'run drizzle push from source, see DEPLOYMENT.md'"
+#    (drizzle-kit needs the source tree; the simplest path is to run
+#     `DATABASE_URL=... pnpm --filter @workspace/db push` once from the repo.)
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: netraksh
+      POSTGRES_PASSWORD: change-me
+      POSTGRES_DB: netraksh
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U netraksh"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api-server:
+    build:
+      context: .
+      dockerfile: artifacts/api-server/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 8080
+      DATABASE_URL: postgres://netraksh:change-me@db:5432/netraksh
+      SMS_PROVIDER: twilio
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+      TWILIO_FROM_NUMBER: ${TWILIO_FROM_NUMBER}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      ADMIN_PHONES: ${ADMIN_PHONES}
+      GOOGLE_SAFE_BROWSING_API_KEY: ${GOOGLE_SAFE_BROWSING_API_KEY}
+    ports:
+      - "8080:8080"
+
+  admin:
+    build:
+      context: .
+      dockerfile: artifacts/admin/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - api-server
+    ports:
+      - "8088:80"
+
+volumes:
+  pgdata:

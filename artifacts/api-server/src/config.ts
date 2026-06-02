@@ -18,6 +18,12 @@ const smsProvider = (process.env.SMS_PROVIDER ?? (isProduction ? "twilio" : "moc
 export const config = {
   isProduction,
   smsProvider,
+  // Standard Twilio credentials for third-party (non-Replit) hosting. When
+  // twilioAuthToken is set, the app sends OTPs directly via api.twilio.com
+  // instead of the Replit "twilio" connector proxy.
+  twilioAccountSid: (process.env.TWILIO_ACCOUNT_SID ?? "").trim(),
+  twilioAuthToken: (process.env.TWILIO_AUTH_TOKEN ?? "").trim(),
+  twilioFromNumber: (process.env.TWILIO_FROM_NUMBER ?? "").trim(),
   otpTtlSeconds: intEnv("OTP_TTL_SECONDS", 300),
   otpMaxAttempts: intEnv("OTP_MAX_ATTEMPTS", 5),
   otpResendIntervalSeconds: intEnv("OTP_RESEND_INTERVAL_SECONDS", 30),

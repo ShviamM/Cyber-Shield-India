@@ -1,0 +1,10 @@
+**/node_modules
+**/dist
+**/build
+**/.expo
+**/.turbo
+.git
+.cache
+.local
+exports
+**/*.log

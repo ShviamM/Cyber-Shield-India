@@ -17,8 +17,9 @@ export type MessageClassification = {
  */
 export function isAiConfigured(): boolean {
   return Boolean(
-    process.env.AI_INTEGRATIONS_OPENAI_BASE_URL &&
-      process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+    (process.env.AI_INTEGRATIONS_OPENAI_BASE_URL &&
+      process.env.AI_INTEGRATIONS_OPENAI_API_KEY) ||
+      process.env.OPENAI_API_KEY,
   );
 }
 
