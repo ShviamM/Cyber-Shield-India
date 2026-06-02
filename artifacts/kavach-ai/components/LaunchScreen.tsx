@@ -1,4 +1,3 @@
-import { Feather } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
@@ -19,6 +18,7 @@ const SAFFRON = "#FF6713";
 const GREEN = "#138808";
 const BLUE = "#5AA9FF";
 const BOOK = require("../assets/images/digital-dhokha.png");
+const LOGO = require("../assets/images/icon.png");
 
 /**
  * Animated cold-start splash: the shield "wakes up" with a pulsing protective
@@ -123,7 +123,7 @@ export function LaunchScreen({
         <View style={s.shieldWrap}>
           <Animated.View style={[s.ring, ringStyle]} />
           <Animated.View style={[s.logoBox, shieldStyle]}>
-            <Feather name="shield" size={38} color={SAFFRON} />
+            <Image source={LOGO} style={s.logoImg} resizeMode="cover" />
           </Animated.View>
         </View>
         <Animated.Text style={[s.title, titleStyle]}>
@@ -153,8 +153,9 @@ const s = StyleSheet.create({
   logoBox: {
     width: 84, height: 84, borderRadius: 26,
     backgroundColor: "rgba(255,255,255,0.12)",
-    alignItems: "center", justifyContent: "center",
+    alignItems: "center", justifyContent: "center", overflow: "hidden",
   },
+  logoImg: { width: "100%", height: "100%" },
   title: { fontSize: 36, fontWeight: "900", color: "#fff", letterSpacing: -0.5 },
   tricolor: { flexDirection: "row", height: 4, marginTop: 14, borderRadius: 2, overflow: "hidden" },
   triStrip: { flex: 1 },

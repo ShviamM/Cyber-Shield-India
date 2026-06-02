@@ -58,7 +58,7 @@ function RootLayoutNav() {
   const [minElapsed, setMinElapsed] = useState(false);
   const [launchHidden, setLaunchHidden] = useState(false);
   useEffect(() => {
-    const id = setTimeout(() => setMinElapsed(true), 3000);
+    const id = setTimeout(() => setMinElapsed(true), 5000);
     return () => clearTimeout(id);
   }, []);
   const launchExiting = minElapsed && status !== "loading";
