@@ -36,6 +36,12 @@ uri = "file://attached_assets/logo_concepts/05_tricolor_shield_eye.png"
 type = "image"
 title = "tricolor shield eye logo"
 
+[[generated]]
+id = "1dM4MAEtWHlvmHqzucFMA"
+uri = "file://attached_assets/logo_concepts/netraksh_app_icon.png"
+type = "image"
+title = "netraksh app icon tricolor shield eye"
+
 [[outputs]]
 id = "_yMJQqiPPUGQxsjmFQfwi"
 uri = "file://attached_assets/logo_concepts/01_guardian_eye_shield.png"
