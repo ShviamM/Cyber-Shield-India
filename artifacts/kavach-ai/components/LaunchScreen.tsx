@@ -1,5 +1,5 @@
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Image, StyleSheet, Text, View } from "react-native";
 import Animated, {
@@ -47,7 +47,16 @@ export function LaunchScreen({
   const bookOpacity = useSharedValue(0);
   const bookScale = useSharedValue(0.8);
 
+  // Hold the intro until the logo image is decoded (or a short fallback) so the
+  // app-icon mark is present from the first frame instead of popping in late.
+  const [ready, setReady] = useState(false);
   useEffect(() => {
+    const id = setTimeout(() => setReady(true), 800);
+    return () => clearTimeout(id);
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return;
     shieldOpacity.value = withTiming(1, { duration: 500, easing: Easing.out(Easing.cubic) });
     shieldScale.value = withSequence(
       withTiming(1.08, { duration: 480, easing: Easing.out(Easing.cubic) }),
@@ -77,7 +86,7 @@ export function LaunchScreen({
         withDelay(650, withTiming(0.92, { duration: 450 })),
       ),
     );
-  }, []);
+  }, [ready]);
 
   // The parent decides when the app is ready (auth resolved + minimum intro
   // time). Only then do we fade the overlay out and signal it can be unmounted,
@@ -123,7 +132,12 @@ export function LaunchScreen({
         <View style={s.shieldWrap}>
           <Animated.View style={[s.ring, ringStyle]} />
           <Animated.View style={[s.logoBox, shieldStyle]}>
-            <Image source={LOGO} style={s.logoImg} resizeMode="cover" />
+            <Image
+              source={LOGO}
+              style={s.logoImg}
+              resizeMode="cover"
+              onLoad={() => setReady(true)}
+            />
           </Animated.View>
         </View>
         <Animated.Text style={[s.title, titleStyle]}>
