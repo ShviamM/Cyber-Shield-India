@@ -16,6 +16,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { BookPromo } from "@/components/BookPromo";
 import { LANGUAGES } from "@/i18n/languages";
 import { useAppContext } from "@/context/AppContext";
 import { useAuth } from "@/context/AuthContext";
@@ -204,6 +205,12 @@ export default function ProfileScreen() {
               <Text style={s.svcSublabel}>{svc.sublabel}</Text>
             </TouchableOpacity>
           ))}
+        </View>
+
+        {/* From the founder: book */}
+        <Text style={s.sectionLabel}>{t("book.sectionLabel")}</Text>
+        <View style={{ marginBottom: 20 }}>
+          <BookPromo />
         </View>
 
         {/* About section */}

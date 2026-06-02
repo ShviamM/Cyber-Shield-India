@@ -116,6 +116,15 @@ const en = {
     helplineSub: "1930 · Report cyber crime",
   },
 
+  book: {
+    sectionLabel: "FROM THE FOUNDER",
+    eyebrow: "The book that will save 100 million Indians from cyber fraud",
+    title: "Digital Dhokha",
+    author: "by Shivam Malaviya",
+    tagline: "Unmasking the scams, frauds and lies stealing India's future.",
+    cta: "Buy on Amazon",
+  },
+
   home: {
     logoSub: "CYBER CRIME PREVENTION · INDIA",
     sosHelpline: "Cyber Helpline",
@@ -445,6 +454,7 @@ const en = {
     hotspotsEmpty: "No hotspot data yet.",
     hotspotsError: "Couldn't load hotspots.",
     scamOfDayError: "Couldn't load today's top scam.",
+    scamOfDayEmpty: "No trending scam right now. Check back soon.",
   },
 
   family: {

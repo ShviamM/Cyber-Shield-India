@@ -3,6 +3,7 @@
 - [Orval schema naming](orval-schema-naming.md) — a component schema named like an operationId's response collides in generated zod; name response schemas noun-first (e.g. FraudVerdict not FraudCheckResponse).
 - [Fraud engine fusion vs reputation scales](fraud-engine-fusion-vs-reputation.md) — medium weight tuned to 40 so a lone "medium" signal now flags medium; weights (not computeRiskLevel) decide the verdict band.
 - [API client codegen staleness](api-client-codegen.md) — generated api.ts can lag the spec (schema present, operation fn missing); run lib/api-spec codegen after adding endpoints.
+- [KavachAI e2e testing](kavach-ai-e2e-testing.md) — runTest can't reach the Expo app (lands on admin); use the screenshot tool on the kavach-ai Expo domain, rely on typecheck + clean Metro bundle for auth-gated screens.
 - [KavachAI nearby-city detection](kavach-ai-location.md) — Home "scams in your city" matches coords to a fixed city list (haversine), not reverseGeocode; keep list in sync with data.ts cities.
 - [Brand vs technical IDs: Netraksh](netraksh-rename.md) — DONE: user-facing brand is "Netraksh"; technical IDs stay "kavach-ai" (dir/package/slug/scheme/android pkg/native module/Safe-Browsing clientId). Don't re-rename IDs.
 - [QR scan content routing](qr-scan-routing.md) — route upi:// deep links to the message engine (not upi); upi analyzer only accepts bare name@bank.

@@ -24,6 +24,7 @@ import {
   useUpdateMyLocation,
 } from "@workspace/api-client-react";
 
+import { BookPromo } from "@/components/BookPromo";
 import { useAppContext } from "@/context/AppContext";
 import { GOLDEN_RULES } from "@/constants/data";
 import { useColors } from "@/hooks/useColors";
@@ -95,19 +96,30 @@ export default function HomeScreen() {
     return () => sub.remove();
   }, [trending, hotspotsQuery, cityTrending, nearbyStatus, nearbyCity]);
 
-  // Persist the detected city to the user's profile (fire-and-forget).
+  // Persist the detected city to the user's profile. Only latch the city as
+  // sent once the request actually succeeds, so transient failures (offline /
+  // signed-out) retry on the next render or foreground refresh instead of being
+  // silently dropped. An in-flight guard prevents duplicate concurrent writes.
   const lastSentCity = useRef<string | null>(null);
+  const sendingCity = useRef(false);
   useEffect(() => {
     if (
       nearbyStatus === "granted" &&
       nearbyCity &&
-      lastSentCity.current !== nearbyCity
+      lastSentCity.current !== nearbyCity &&
+      !sendingCity.current
     ) {
-      lastSentCity.current = nearbyCity;
+      sendingCity.current = true;
       updateLocation
         .mutateAsync({ data: { location: nearbyCity } })
+        .then(() => {
+          lastSentCity.current = nearbyCity;
+        })
         .catch(() => {
-          // Non-critical: ignore (e.g. signed-out or offline).
+          // Non-critical: leave the latch unset so it retries later.
+        })
+        .finally(() => {
+          sendingCity.current = false;
         });
     }
   }, [nearbyStatus, nearbyCity, updateLocation]);
@@ -611,6 +623,11 @@ export default function HomeScreen() {
             })()}
           </View>
         )}
+
+        {/* Book: Digital Dhokha */}
+        <View style={s.section}>
+          <BookPromo />
+        </View>
 
         {/* Protect Your Circle CTA */}
         <TouchableOpacity

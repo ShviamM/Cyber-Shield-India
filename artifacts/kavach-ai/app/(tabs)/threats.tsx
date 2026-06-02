@@ -80,7 +80,7 @@ export default function ThreatsScreen() {
     },
   });
 
-  const featured = scamOfDay.data;
+  const featured = scamOfDay.data?.categoryKey ? scamOfDay.data : null;
   const scams = trending.data?.scams ?? [];
   const hotspots = hotspotsQuery.data?.hotspots ?? [];
 
@@ -175,7 +175,13 @@ export default function ThreatsScreen() {
               ) : null}
             </View>
           </View>
-        ) : null}
+        ) : (
+          <View style={s.featuredCard}>
+            <View style={[s.featuredInner, s.stateBox]}>
+              <Text style={s.stateHint}>{t("threats.scamOfDayEmpty")}</Text>
+            </View>
+          </View>
+        )}
 
         {/* Trending threats */}
         <View style={s.sectionHeader}>
