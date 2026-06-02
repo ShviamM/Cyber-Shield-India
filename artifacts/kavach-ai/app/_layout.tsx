@@ -13,7 +13,8 @@ import { ShareIntentProvider, useShareIntentContext } from "expo-share-intent";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { Feather } from "@expo/vector-icons";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -101,8 +102,20 @@ function RootLayoutNav() {
 
   if (status === "loading") {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#0B3D91" }}>
-        <ActivityIndicator size="large" color="#ffffff" />
+      <View style={launch.root}>
+        <View style={launch.logoBox}>
+          <Feather name="shield" size={34} color="#FF6713" />
+        </View>
+        <Text style={launch.title}>
+          Netra<Text style={{ color: "#FF6713" }}>ksh</Text>
+        </Text>
+        <View style={launch.tricolor}>
+          <View style={[launch.triStrip, { backgroundColor: "#FF6713" }]} />
+          <View style={[launch.triStrip, { backgroundColor: "#fff" }]} />
+          <View style={[launch.triStrip, { backgroundColor: "#138808" }]} />
+        </View>
+        <Text style={launch.tagline}>{t("auth.tagline")}</Text>
+        <ActivityIndicator size="large" color="#ffffff" style={{ marginTop: 36 }} />
       </View>
     );
   }
@@ -170,3 +183,16 @@ export default function RootLayout() {
     </ShareIntentProvider>
   );
 }
+
+const launch = StyleSheet.create({
+  root: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#0B3D91" },
+  logoBox: {
+    width: 80, height: 80, borderRadius: 24,
+    backgroundColor: "rgba(255,255,255,0.12)",
+    alignItems: "center", justifyContent: "center", marginBottom: 14,
+  },
+  title: { fontSize: 32, fontWeight: "900", color: "#fff", letterSpacing: -0.5 },
+  tricolor: { flexDirection: "row", height: 3, width: 64, marginTop: 12, borderRadius: 2, overflow: "hidden" },
+  triStrip: { flex: 1 },
+  tagline: { fontSize: 15, fontWeight: "700", color: "#5AA9FF", marginTop: 14, letterSpacing: 0.2, textAlign: "center" },
+});
