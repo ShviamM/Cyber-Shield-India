@@ -119,6 +119,11 @@ const gu = {
     protectCircleSub: "પરિવાર અને મિત્રોને ચેતવો. છેતરપિંડીની ચેતવણીઓ સીધી શેર કરો.",
     demoTitle: "ડેમો: આવી રહેલો છેતરપિંડીનો કૉલ",
     demoSub: "Netraksh તમને રિયલ-ટાઇમમાં કેવી રીતે ચેતવે છે તે જુઓ",
+    cyberCellTitle: "{{state}} સાયબર પોલીસ",
+    cyberCellSub: "તમારા રાજ્યના સાયબર સેલને સાયબર છેતરપિંડીની ફરિયાદ કરો",
+    cyberCellCall: "સાયબર સેલને કૉલ કરો",
+    cyberCellEmail: "સાયબર સેલને ઈમેલ કરો",
+    cyberCellVerified: "અધિકૃત સ્રોત · ચકાસાયેલ {{date}}",
     quickTools: {
       numberLabel: "નંબર તપાસો",
       numberSub: "સ્પામ / સલામત?",

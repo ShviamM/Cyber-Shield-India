@@ -130,6 +130,11 @@ const hi = {
     protectCircleSub: "परिवार और दोस्तों को सावधान करें। ठगी अलर्ट सीधे शेयर करें।",
     demoTitle: "डेमो: आती हुई ठगी कॉल",
     demoSub: "देखें Netraksh रियल-टाइम में आपको कैसे सावधान करता है",
+    cyberCellTitle: "{{state}} साइबर पुलिस",
+    cyberCellSub: "साइबर धोखाधड़ी की शिकायत अपने राज्य साइबर सेल को करें",
+    cyberCellCall: "साइबर सेल को कॉल करें",
+    cyberCellEmail: "साइबर सेल को ईमेल करें",
+    cyberCellVerified: "आधिकारिक स्रोत · सत्यापित {{date}}",
     quickTools: {
       numberLabel: "नंबर जाँचें",
       numberSub: "स्पैम / सुरक्षित?",

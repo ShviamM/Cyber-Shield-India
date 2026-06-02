@@ -119,6 +119,11 @@ const mr = {
     protectCircleSub: "कुटुंब आणि मित्रांना सावध करा. फसवणुकीचे इशारे थेट शेअर करा.",
     demoTitle: "डेमो: येणारा फसवणुकीचा कॉल",
     demoSub: "Netraksh तुम्हाला रिअल-टाइममध्ये कसे सावध करते ते पाहा",
+    cyberCellTitle: "{{state}} सायबर पोलीस",
+    cyberCellSub: "तुमच्या राज्याच्या सायबर सेलकडे सायबर फसवणुकीची तक्रार करा",
+    cyberCellCall: "सायबर सेलला कॉल करा",
+    cyberCellEmail: "सायबर सेलला ईमेल करा",
+    cyberCellVerified: "अधिकृत स्रोत · पडताळणी {{date}}",
     quickTools: {
       numberLabel: "नंबर तपासा",
       numberSub: "स्पॅम / सुरक्षित?",

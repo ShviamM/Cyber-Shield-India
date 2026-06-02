@@ -119,6 +119,11 @@ const or = {
     protectCircleSub: "ପରିବାର ଓ ସାଙ୍ଗମାନଙ୍କୁ ସତର୍କ କରନ୍ତୁ। ଠକେଇ ସତର୍କତା ସିଧାସଳଖ ସେୟାର କରନ୍ତୁ।",
     demoTitle: "ଡେମୋ: ଆସୁଥିବା ଠକେଇ କଲ୍",
     demoSub: "Netraksh ରିଅଲ୍-ଟାଇମ୍ ରେ ଆପଣଙ୍କୁ କେମିତି ସତର୍କ କରେ ଦେଖନ୍ତୁ",
+    cyberCellTitle: "{{state}} ସାଇବର ପୋଲିସ",
+    cyberCellSub: "ଆପଣଙ୍କ ରାଜ୍ୟ ସାଇବର ସେଲ୍‌କୁ ସାଇବର ଠକାମିର ରିପୋର୍ଟ କରନ୍ତୁ",
+    cyberCellCall: "ସାଇବର ସେଲ୍‌କୁ କଲ କରନ୍ତୁ",
+    cyberCellEmail: "ସାଇବର ସେଲ୍‌କୁ ଇମେଲ କରନ୍ତୁ",
+    cyberCellVerified: "ସରକାରୀ ଉତ୍ସ · ଯାଞ୍ଚିତ {{date}}",
     quickTools: {
       numberLabel: "ନମ୍ବର ଯାଞ୍ଚ କରନ୍ତୁ",
       numberSub: "ସ୍ପାମ୍ / ସୁରକ୍ଷିତ?",

@@ -119,6 +119,11 @@ const ur = {
     protectCircleSub: "خاندان اور دوستوں کو خبردار کریں۔ فراڈ الرٹ براہ راست شیئر کریں۔",
     demoTitle: "ڈیمو: آنے والی فراڈ کال",
     demoSub: "دیکھیں Netraksh کیسے فوری طور پر آپ کو خبردار کرتا ہے",
+    cyberCellTitle: "{{state}} سائبر پولیس",
+    cyberCellSub: "اپنے ریاستی سائبر سیل کو سائبر فراڈ کی اطلاع دیں",
+    cyberCellCall: "سائبر سیل کو کال کریں",
+    cyberCellEmail: "سائبر سیل کو ای میل کریں",
+    cyberCellVerified: "سرکاری ذریعہ · تصدیق شدہ {{date}}",
     quickTools: {
       numberLabel: "نمبر چیک کریں",
       numberSub: "اسپام / محفوظ؟",

@@ -30,6 +30,7 @@ import { useAppContext } from "@/context/AppContext";
 import { GOLDEN_RULES } from "@/constants/data";
 import { useColors } from "@/hooks/useColors";
 import { useNearbyCity } from "@/hooks/useNearbyCity";
+import { getCyberCellContact } from "@/lib/cyberContacts";
 import { formatChangePct, formatTimeAgo } from "@/lib/format";
 
 const REFETCH_MS = 60000;
@@ -82,6 +83,7 @@ export default function HomeScreen() {
   const trendingTotal = trending.data?.total ?? 0;
   const cityScams = cityTrending.data?.scams ?? [];
   const hotspots = hotspotsQuery.data?.hotspots ?? [];
+  const cyberContact = getCyberCellContact(nearbyCity);
   const cityHotspot = nearbyCity
     ? hotspots.find((h) => h.city === nearbyCity)
     : undefined;
@@ -666,6 +668,72 @@ export default function HomeScreen() {
           </View>
           <Feather name="chevron-right" size={16} color="#94a3b8" />
         </TouchableOpacity>
+
+        {/* Local cyber-cell helpline for the detected state */}
+        {cyberContact && nearbyStatus === "granted" && (
+          <View style={s.cyberCard}>
+            <View style={s.cyberHeader}>
+              <View style={s.cyberIconBox}>
+                <Feather name="shield" size={18} color={NAVY} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={s.cyberTitle}>
+                  {t("home.cyberCellTitle", { state: cyberContact.state })}
+                </Text>
+                <Text style={s.cyberSub}>{t("home.cyberCellSub")}</Text>
+              </View>
+            </View>
+
+            {cyberContact.phone && (
+              <TouchableOpacity
+                style={s.cyberRow}
+                onPress={() =>
+                  Linking.openURL(
+                    `tel:${cyberContact.phone!.replace(/[^0-9+]/g, "")}`,
+                  ).catch(() => {})
+                }
+                activeOpacity={0.8}
+              >
+                <View style={[s.cyberRowIcon, { backgroundColor: GREEN + "18" }]}>
+                  <Feather name="phone-call" size={15} color={GREEN} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={s.cyberRowLabel}>{t("home.cyberCellCall")}</Text>
+                  <Text style={s.cyberRowValue}>{cyberContact.phone}</Text>
+                </View>
+                <Feather name="chevron-right" size={16} color="#94a3b8" />
+              </TouchableOpacity>
+            )}
+
+            {cyberContact.email && (
+              <TouchableOpacity
+                style={s.cyberRow}
+                onPress={() =>
+                  Linking.openURL(`mailto:${cyberContact.email}`).catch(() => {})
+                }
+                activeOpacity={0.8}
+              >
+                <View style={[s.cyberRowIcon, { backgroundColor: SAFFRON + "18" }]}>
+                  <Feather name="mail" size={15} color={SAFFRON} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={s.cyberRowLabel}>{t("home.cyberCellEmail")}</Text>
+                  <Text style={s.cyberRowValue}>{cyberContact.email}</Text>
+                </View>
+                <Feather name="chevron-right" size={16} color="#94a3b8" />
+              </TouchableOpacity>
+            )}
+
+            <TouchableOpacity
+              onPress={() => Linking.openURL(cyberContact.source).catch(() => {})}
+              activeOpacity={0.7}
+            >
+              <Text style={s.cyberVerified}>
+                {t("home.cyberCellVerified", { date: cyberContact.verified })}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -922,6 +990,29 @@ const s = StyleSheet.create({
   },
   ctaTitle: { fontSize: 13, fontWeight: "800" as const, color: "#fff" },
   ctaSub: { fontSize: 10, color: "rgba(255,255,255,0.65)", marginTop: 3, lineHeight: 14 },
+  cyberCard: {
+    marginHorizontal: 16, marginTop: 4, marginBottom: 24,
+    backgroundColor: "#fff", borderRadius: 18,
+    borderWidth: 1.5, borderColor: NAVY + "22", padding: 16,
+    shadowColor: "#000", shadowOpacity: 0.05, shadowRadius: 10, shadowOffset: { width: 0, height: 3 },
+  },
+  cyberHeader: { flexDirection: "row", alignItems: "center", gap: 12, marginBottom: 6 },
+  cyberIconBox: {
+    width: 40, height: 40, borderRadius: 12, backgroundColor: NAVY + "12",
+    alignItems: "center", justifyContent: "center",
+  },
+  cyberTitle: { fontSize: 15, fontWeight: "800" as const, color: NAVY },
+  cyberSub: { fontSize: 12, color: "#64748b", marginTop: 2, lineHeight: 16 },
+  cyberRow: {
+    flexDirection: "row", alignItems: "center", gap: 12,
+    paddingVertical: 11, borderTopWidth: 1, borderTopColor: "#f1f5f9", marginTop: 4,
+  },
+  cyberRowIcon: {
+    width: 32, height: 32, borderRadius: 9, alignItems: "center", justifyContent: "center",
+  },
+  cyberRowLabel: { fontSize: 11.5, color: "#64748b", fontWeight: "600" as const },
+  cyberRowValue: { fontSize: 14, color: "#0f172a", fontWeight: "700" as const, marginTop: 1 },
+  cyberVerified: { fontSize: 11, color: "#94a3b8", marginTop: 12, textAlign: "center" as const },
 
   // Demo btn
   demoBtn: {

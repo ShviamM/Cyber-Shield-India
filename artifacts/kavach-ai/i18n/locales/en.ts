@@ -161,6 +161,11 @@ const en = {
     protectCircleSub: "Warn family & friends. Share scam alerts directly.",
     demoTitle: "Demo: Incoming Scam Call",
     demoSub: "See how Netraksh warns you in real-time",
+    cyberCellTitle: "{{state}} Cyber Police",
+    cyberCellSub: "Report cyber fraud to your state cyber cell",
+    cyberCellCall: "Call cyber cell",
+    cyberCellEmail: "Email cyber cell",
+    cyberCellVerified: "Official source · Verified {{date}}",
     quickTools: {
       numberLabel: "Check Number",
       numberSub: "Spam / Safe?",

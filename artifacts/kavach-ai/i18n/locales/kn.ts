@@ -119,6 +119,11 @@ const kn = {
     protectCircleSub: "ಕುಟುಂಬ ಮತ್ತು ಸ್ನೇಹಿತರನ್ನು ಎಚ್ಚರಿಸಿ. ವಂಚನೆ ಎಚ್ಚರಿಕೆಗಳನ್ನು ನೇರವಾಗಿ ಹಂಚಿಕೊಳ್ಳಿ.",
     demoTitle: "ಡೆಮೋ: ಒಳಬರುವ ವಂಚನೆ ಕರೆ",
     demoSub: "Netraksh ನೈಜ-ಸಮಯದಲ್ಲಿ ನಿಮ್ಮನ್ನು ಹೇಗೆ ಎಚ್ಚರಿಸುತ್ತದೆ ಎಂದು ನೋಡಿ",
+    cyberCellTitle: "{{state}} ಸೈಬರ್ ಪೊಲೀಸ್",
+    cyberCellSub: "ನಿಮ್ಮ ರಾಜ್ಯದ ಸೈಬರ್ ಸೆಲ್‌ಗೆ ಸೈಬರ್ ವಂಚನೆಯನ್ನು ವರದಿ ಮಾಡಿ",
+    cyberCellCall: "ಸೈಬರ್ ಸೆಲ್‌ಗೆ ಕರೆ ಮಾಡಿ",
+    cyberCellEmail: "ಸೈಬರ್ ಸೆಲ್‌ಗೆ ಇಮೇಲ್ ಮಾಡಿ",
+    cyberCellVerified: "ಅಧಿಕೃತ ಮೂಲ · ಪರಿಶೀಲಿಸಲಾಗಿದೆ {{date}}",
     quickTools: {
       numberLabel: "ನಂಬರ್ ಪರಿಶೀಲಿಸಿ",
       numberSub: "ಸ್ಪ್ಯಾಮ್ / ಸುರಕ್ಷಿತ?",

@@ -119,6 +119,11 @@ const bn = {
     protectCircleSub: "পরিবার ও বন্ধুদের সতর্ক করুন। সরাসরি প্রতারণার সতর্কতা শেয়ার করুন।",
     demoTitle: "ডেমো: আসছে প্রতারণার কল",
     demoSub: "দেখুন Netraksh কীভাবে রিয়েল-টাইমে আপনাকে সতর্ক করে",
+    cyberCellTitle: "{{state}} সাইবার পুলিশ",
+    cyberCellSub: "আপনার রাজ্যের সাইবার সেলে সাইবার প্রতারণার অভিযোগ জানান",
+    cyberCellCall: "সাইবার সেলে কল করুন",
+    cyberCellEmail: "সাইবার সেলে ইমেল করুন",
+    cyberCellVerified: "সরকারি সূত্র · যাচাই {{date}}",
     quickTools: {
       numberLabel: "নম্বর যাচাই করুন",
       numberSub: "স্প্যাম / নিরাপদ?",

@@ -119,6 +119,11 @@ const pa = {
     protectCircleSub: "ਪਰਿਵਾਰ ਤੇ ਦੋਸਤਾਂ ਨੂੰ ਸਾਵਧਾਨ ਕਰੋ। ਠੱਗੀ ਦੀਆਂ ਚੇਤਾਵਨੀਆਂ ਸਿੱਧਾ ਸਾਂਝੀਆਂ ਕਰੋ।",
     demoTitle: "ਡੈਮੋ: ਆ ਰਹੀ ਫਰਾਡ ਕਾਲ",
     demoSub: "ਵੇਖੋ ਕਿ Netraksh ਤੁਹਾਨੂੰ ਮੌਕੇ 'ਤੇ ਕਿਵੇਂ ਚੇਤਾਵਨੀ ਦਿੰਦਾ ਹੈ",
+    cyberCellTitle: "{{state}} ਸਾਈਬਰ ਪੁਲਿਸ",
+    cyberCellSub: "ਆਪਣੇ ਰਾਜ ਦੇ ਸਾਈਬਰ ਸੈੱਲ ਨੂੰ ਸਾਈਬਰ ਧੋਖਾਧੜੀ ਦੀ ਰਿਪੋਰਟ ਕਰੋ",
+    cyberCellCall: "ਸਾਈਬਰ ਸੈੱਲ ਨੂੰ ਕਾਲ ਕਰੋ",
+    cyberCellEmail: "ਸਾਈਬਰ ਸੈੱਲ ਨੂੰ ਈਮੇਲ ਕਰੋ",
+    cyberCellVerified: "ਅਧਿਕਾਰਤ ਸਰੋਤ · ਤਸਦੀਕਸ਼ੁਦਾ {{date}}",
     quickTools: {
       numberLabel: "ਨੰਬਰ ਜਾਂਚੋ",
       numberSub: "ਸਪੈਮ / ਸੁਰੱਖਿਅਤ?",
