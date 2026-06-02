@@ -51,6 +51,21 @@ export default function ProfileScreen() {
     Linking.openURL(`tel:${HELPLINE_NUMBER}`).catch(() => {});
   }
 
+  // Opens the platform store so users can rate Netraksh. No numeric App Store id
+  // exists yet, so iOS falls back to an App Store search for the brand.
+  function rateApp() {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const primary =
+      Platform.OS === "ios"
+        ? "itms-apps://apps.apple.com/search?term=Netraksh"
+        : "market://details?id=com.kavachai.app";
+    const web =
+      Platform.OS === "ios"
+        ? "https://apps.apple.com/in/search?term=Netraksh"
+        : "https://play.google.com/store/apps/details?id=com.kavachai.app";
+    Linking.openURL(primary).catch(() => Linking.openURL(web).catch(() => {}));
+  }
+
   function confirmSignOut() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     Alert.alert(t("profile.signOutConfirmTitle"), t("profile.signOutConfirmMsg"), [
@@ -224,6 +239,10 @@ export default function ProfileScreen() {
             sub={t("profile.aboutSub")}
             right={<Feather name="chevron-right" size={16} color="#94a3b8" />}
             isLast={false}
+            onPress={() => {
+              Haptics.selectionAsync();
+              router.push("/about");
+            }}
           />
           <SettingRow
             icon="file-text"
@@ -233,6 +252,10 @@ export default function ProfileScreen() {
             sub={t("profile.privacySub")}
             right={<Feather name="chevron-right" size={16} color="#94a3b8" />}
             isLast={false}
+            onPress={() => {
+              Haptics.selectionAsync();
+              router.push("/privacy");
+            }}
           />
           <SettingRow
             icon="star"
@@ -242,6 +265,7 @@ export default function ProfileScreen() {
             sub={t("profile.rateSub")}
             right={<Feather name="chevron-right" size={16} color="#94a3b8" />}
             isLast={true}
+            onPress={rateApp}
           />
         </View>
 
@@ -257,7 +281,7 @@ export default function ProfileScreen() {
 }
 
 function SettingRow({
-  icon, iconColor, iconBg, label, sub, right, isLast,
+  icon, iconColor, iconBg, label, sub, right, isLast, onPress,
 }: {
   icon: string;
   iconColor: string;
@@ -266,9 +290,10 @@ function SettingRow({
   sub: string;
   right: React.ReactNode;
   isLast: boolean;
+  onPress?: () => void;
 }) {
-  return (
-    <View style={[s.settingRow, !isLast && s.settingRowBorder]}>
+  const inner = (
+    <>
       <View style={[s.settingIconBg, { backgroundColor: iconBg }]}>
         <Feather name={icon as any} size={18} color={iconColor} />
       </View>
@@ -277,8 +302,22 @@ function SettingRow({
         <Text style={s.settingSub}>{sub}</Text>
       </View>
       {right}
-    </View>
+    </>
   );
+
+  if (onPress) {
+    return (
+      <TouchableOpacity
+        style={[s.settingRow, !isLast && s.settingRowBorder]}
+        onPress={onPress}
+        activeOpacity={0.6}
+      >
+        {inner}
+      </TouchableOpacity>
+    );
+  }
+
+  return <View style={[s.settingRow, !isLast && s.settingRowBorder]}>{inner}</View>;
 }
 
 const s = StyleSheet.create({

@@ -13,13 +13,13 @@ import { ShareIntentProvider, useShareIntentContext } from "expo-share-intent";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
-import { Feather } from "@expo/vector-icons";
+import { View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { LaunchScreen } from "@/components/LaunchScreen";
 import { AppProvider } from "@/context/AppContext";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { initI18n } from "@/i18n";
@@ -50,6 +50,18 @@ function RootLayoutNav() {
   // Dedupes a single share so the auth-redirect and foreground effects below
   // don't both navigate (which would otherwise let "/(tabs)" override Verify).
   const shareHandledRef = useRef(false);
+
+  // Animated launch overlay lifecycle: it stays fully opaque (a branded loading
+  // state with a pulsing ring) until the app is actually ready — auth resolved
+  // AND a minimum intro time elapsed — then fades out and unmounts. This keeps a
+  // slow cold start from revealing the app underneath prematurely.
+  const [minElapsed, setMinElapsed] = useState(false);
+  const [launchHidden, setLaunchHidden] = useState(false);
+  useEffect(() => {
+    const id = setTimeout(() => setMinElapsed(true), 2700);
+    return () => clearTimeout(id);
+  }, []);
+  const launchExiting = minElapsed && status !== "loading";
 
   // Sends a message/link shared into Netraksh from another app (WhatsApp, SMS, a
   // browser, …) to the Verify tab, prefilled and auto-run. Reuses the verify
@@ -100,45 +112,32 @@ function RootLayoutNav() {
     routeShareToVerify();
   }, [hasShareIntent, status, segments, routeShareToVerify]);
 
-  if (status === "loading") {
-    return (
-      <View style={launch.root}>
-        <View style={launch.logoBox}>
-          <Feather name="shield" size={34} color="#FF6713" />
-        </View>
-        <Text style={launch.title}>
-          Netra<Text style={{ color: "#FF6713" }}>ksh</Text>
-        </Text>
-        <View style={launch.tricolor}>
-          <View style={[launch.triStrip, { backgroundColor: "#FF6713" }]} />
-          <View style={[launch.triStrip, { backgroundColor: "#fff" }]} />
-          <View style={[launch.triStrip, { backgroundColor: "#138808" }]} />
-        </View>
-        <Text style={launch.tagline}>{t("auth.tagline")}</Text>
-        <ActivityIndicator size="large" color="#ffffff" style={{ marginTop: 36 }} />
-      </View>
-    );
-  }
-
   return (
-    <Stack screenOptions={{ headerBackTitle: t("common.back") }}>
-      <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen
-        name="call-alert"
-        options={{
-          presentation: "modal",
-          headerShown: false,
-          animation: "slide_from_bottom",
-        }}
-      />
-      <Stack.Screen name="screening" options={{ title: t("screening.title") }} />
-      <Stack.Screen name="report" options={{ title: t("report.title") }} />
-      <Stack.Screen name="categories" options={{ title: t("categories.title") }} />
-      <Stack.Screen name="safety" options={{ title: t("safety.title") }} />
-      <Stack.Screen name="helpline" options={{ title: t("helpline.title") }} />
-      <Stack.Screen name="language" options={{ title: t("language.title") }} />
-    </Stack>
+    <View style={{ flex: 1 }}>
+      <Stack screenOptions={{ headerBackTitle: t("common.back") }}>
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="call-alert"
+          options={{
+            presentation: "modal",
+            headerShown: false,
+            animation: "slide_from_bottom",
+          }}
+        />
+        <Stack.Screen name="screening" options={{ title: t("screening.title") }} />
+        <Stack.Screen name="report" options={{ title: t("report.title") }} />
+        <Stack.Screen name="categories" options={{ title: t("categories.title") }} />
+        <Stack.Screen name="safety" options={{ title: t("safety.title") }} />
+        <Stack.Screen name="helpline" options={{ title: t("helpline.title") }} />
+        <Stack.Screen name="language" options={{ title: t("language.title") }} />
+        <Stack.Screen name="about" options={{ title: t("about.title") }} />
+        <Stack.Screen name="privacy" options={{ title: t("privacy.title") }} />
+      </Stack>
+      {launchHidden ? null : (
+        <LaunchScreen exiting={launchExiting} onHidden={() => setLaunchHidden(true)} />
+      )}
+    </View>
   );
 }
 
@@ -183,16 +182,3 @@ export default function RootLayout() {
     </ShareIntentProvider>
   );
 }
-
-const launch = StyleSheet.create({
-  root: { flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: "#0B3D91" },
-  logoBox: {
-    width: 80, height: 80, borderRadius: 24,
-    backgroundColor: "rgba(255,255,255,0.12)",
-    alignItems: "center", justifyContent: "center", marginBottom: 14,
-  },
-  title: { fontSize: 32, fontWeight: "900", color: "#fff", letterSpacing: -0.5 },
-  tricolor: { flexDirection: "row", height: 3, width: 64, marginTop: 12, borderRadius: 2, overflow: "hidden" },
-  triStrip: { flex: 1 },
-  tagline: { fontSize: 15, fontWeight: "700", color: "#5AA9FF", marginTop: 14, letterSpacing: 0.2, textAlign: "center" },
-});

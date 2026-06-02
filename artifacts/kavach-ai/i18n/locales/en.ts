@@ -570,6 +570,106 @@ const en = {
     title: "Display Language",
     intro: "Choose the language for the app. Live scam-feed content stays in its original language.",
   },
+
+  launch: {
+    bookCaption: "India's Cyber-Crime Prevention Book",
+  },
+
+  about: {
+    title: "About Netraksh",
+    tagline: "Thag se 2 kadam aage",
+    taglineEn: "Two steps ahead of fraudsters",
+    intro:
+      "Netraksh is a prevention-first cyber-safety app built for India. It helps everyday people spot and stop digital fraud — fake calls, phishing links, UPI tricks, and scam QR codes — before a single rupee is lost.",
+    whyTitle: "WHY NETRAKSH IS USEFUL",
+    why: [
+      "India faces record cyber-fraud — UPI scams, 'digital arrest' threats, fake KYC, loan and job frauds hit lakhs of families every year.",
+      "Most scams succeed in the first 30 seconds, before victims can verify. Netraksh gives you that check instantly.",
+      "It turns scattered fraud reports and official data into clear, local, real-time warnings you can act on.",
+      "Everything is bilingual and beginner-friendly, so it works for first-time smartphone users and elders too.",
+    ],
+    featuresTitle: "WHAT YOU CAN DO",
+    features: [
+      {
+        title: "Check before you trust",
+        body: "Instantly verify a phone number, link, UPI ID, or QR code against known scam patterns.",
+      },
+      {
+        title: "Live scam radar",
+        body: "See the scams trending today in your city, powered by community reports and official data.",
+      },
+      {
+        title: "One-tap helpline",
+        body: "Reach the national cyber-crime helpline 1930 and report fraud in minutes.",
+      },
+      {
+        title: "Guardian & Family Shield",
+        body: "Real-time scam-call warnings and protection you can extend to your family.",
+      },
+      {
+        title: "Learn the tricks",
+        body: "Bilingual safety tips and the Golden Rules that stop the most common frauds.",
+      },
+    ],
+    missionTitle: "OUR MISSION",
+    mission:
+      "To put cyber-safety in every Indian's pocket — simple, trustworthy, and two steps ahead of fraudsters.",
+    helplineNote:
+      "Already lost money? Call 1930 or report at cybercrime.gov.in right away. Speed matters.",
+  },
+
+  privacy: {
+    title: "Privacy Policy",
+    updated: "Last updated: 2 June 2026",
+    intro:
+      "Netraksh (\"we\", \"us\") is committed to protecting your privacy. This policy explains what personal data we collect, why we collect it, and your rights under India's Digital Personal Data Protection Act, 2023 (DPDP Act) and the Information Technology Act, 2000 and the rules made under it.",
+    sections: [
+      {
+        heading: "1. Who we are",
+        body: "Netraksh is a cyber-safety application built for users in India. For the purposes of the DPDP Act, 2023, Netraksh acts as the Data Fiduciary for the personal data you provide through the app.",
+      },
+      {
+        heading: "2. Data we collect",
+        body: "• Account data: your mobile number (used for OTP sign-in) and the name you provide.\n• Location data: the approximate city detected from your device, used to show local scam trends. You can deny location permission and still use the app.\n• Reports you submit: phone numbers, descriptions, and details of frauds you choose to report.\n• Usage and device data: basic technical information needed to keep the app secure and working.",
+      },
+      {
+        heading: "3. How we use your data",
+        body: "• To sign you in securely and run your account.\n• To show scam trends relevant to your city.\n• To process and act on the fraud reports you submit, and to improve community warnings.\n• To keep the service safe, prevent abuse, and comply with applicable law.",
+      },
+      {
+        heading: "4. Consent and legal basis",
+        body: "We process your personal data based on the consent you give when you use the app, and for the legitimate uses permitted under the DPDP Act, 2023. You may withdraw your consent at any time; doing so may limit features that rely on that data.",
+      },
+      {
+        heading: "5. How we share data",
+        body: "We do not sell your personal data. We may share data:\n• With law-enforcement agencies, CERT-In, or as otherwise required by Indian law.\n• With service providers (such as SMS and hosting partners) who process data on our behalf under appropriate safeguards.\nFraud reports may be aggregated and anonymised to produce public scam statistics. These aggregates do not identify you.",
+      },
+      {
+        heading: "6. Data security",
+        body: "We follow reasonable security practices and procedures as required under the IT Act and its rules to protect your data against unauthorised access, loss, or misuse. No system is perfectly secure, but we work to limit and contain any risk.",
+      },
+      {
+        heading: "7. Data retention",
+        body: "We keep personal data only as long as needed for the purposes described above or as required by law. When it is no longer needed, we delete or anonymise it.",
+      },
+      {
+        heading: "8. Your rights",
+        body: "Under the DPDP Act, 2023 you have the right to:\n• Access a summary of your personal data and how it is processed.\n• Correct, complete, or update your data.\n• Request erasure of your data.\n• Nominate another person to exercise your rights in case of death or incapacity.\n• Raise a grievance and seek redressal (see below).",
+      },
+      {
+        heading: "9. Children's data",
+        body: "Netraksh is intended for adults. We do not knowingly process the personal data of children under 18 without verifiable parental consent, in line with the DPDP Act.",
+      },
+      {
+        heading: "10. Grievance redressal",
+        body: "If you have any concern about your data, you may contact our Grievance Officer:\nGrievance Officer, Netraksh\nEmail: grievance@netraksh.app\nWe will acknowledge and respond within the timelines required by Indian law. You may also raise a complaint with the Data Protection Board of India.",
+      },
+      {
+        heading: "11. Changes to this policy",
+        body: "We may update this policy from time to time. Material changes will be notified within the app. Your continued use after an update means you accept the revised policy.",
+      },
+    ],
+  },
 };
 
 export default en;
