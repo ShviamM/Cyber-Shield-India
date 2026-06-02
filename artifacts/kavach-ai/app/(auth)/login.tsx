@@ -150,6 +150,7 @@ export default function LoginScreen() {
             <View style={[s.triStrip, { backgroundColor: "#fff" }]} />
             <View style={[s.triStrip, { backgroundColor: GREEN }]} />
           </View>
+          <Text style={s.tagline}>{t("auth.tagline")}</Text>
         </View>
 
         {step === "phone" && (
@@ -323,6 +324,10 @@ const s = StyleSheet.create({
   logoTitle: { fontSize: 28, fontWeight: "900" as const, color: "#fff", letterSpacing: -0.5 },
   tricolor: { flexDirection: "row", height: 3, width: 60, marginTop: 10, borderRadius: 2, overflow: "hidden" },
   triStrip: { flex: 1 },
+  tagline: {
+    fontSize: 14, fontWeight: "700" as const, color: "#5AA9FF",
+    marginTop: 12, letterSpacing: 0.2, textAlign: "center",
+  },
   card: {
     backgroundColor: "#fff", borderRadius: 22, padding: 22,
     shadowColor: "#000", shadowOpacity: 0.2, shadowRadius: 24, shadowOffset: { width: 0, height: 8 },

@@ -46,6 +46,7 @@ const en = {
   },
 
   auth: {
+    tagline: "Thag se 2 kadam aage",
     welcomeTitle: "Welcome to Netraksh",
     welcomeSub: "India's prevention-first shield against cyber crime & scam calls.",
     phoneLabel: "Mobile Number",
