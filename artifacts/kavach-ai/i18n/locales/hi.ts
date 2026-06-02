@@ -430,6 +430,7 @@ const hi = {
     statusSafe: "सुरक्षित और महफूज़",
     statusShortAlert: "अलर्ट",
     statusShortSafe: "सुरक्षित",
+    markSafe: "सुरक्षित चिह्नित करें",
     lastActivity: "आखिरी गतिविधि: {{value}}",
     justAdded: "अभी जोड़ा गया",
     justNow: "अभी",

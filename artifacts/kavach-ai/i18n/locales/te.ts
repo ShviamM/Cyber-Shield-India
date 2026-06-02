@@ -414,6 +414,7 @@ const te = {
     statusSafe: "రక్షణలో & సురక్షితం",
     statusShortAlert: "అలర్ట్",
     statusShortSafe: "సురక్షితం",
+    markSafe: "సురక్షితంగా గుర్తించండి",
     lastActivity: "చివరి కార్యకలాపం: {{value}}",
     justAdded: "ఇప్పుడే జోడించబడింది",
     justNow: "ఇప్పుడే",

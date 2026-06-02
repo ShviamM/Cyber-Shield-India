@@ -414,6 +414,7 @@ const gu = {
     statusSafe: "સુરક્ષિત અને સલામત",
     statusShortAlert: "ચેતવણી",
     statusShortSafe: "સલામત",
+    markSafe: "સલામત તરીકે ચિહ્નિત કરો",
     lastActivity: "છેલ્લી પ્રવૃત્તિ: {{value}}",
     justAdded: "હમણાં જ ઉમેર્યું",
     justNow: "હમણાં",

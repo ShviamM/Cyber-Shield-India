@@ -414,6 +414,7 @@ const bn = {
     statusSafe: "সুরক্ষিত ও নিরাপদ",
     statusShortAlert: "সতর্কতা",
     statusShortSafe: "নিরাপদ",
+    markSafe: "নিরাপদ চিহ্নিত করুন",
     lastActivity: "শেষ কার্যকলাপ: {{value}}",
     justAdded: "এইমাত্র যোগ হয়েছে",
     justNow: "এখনই",

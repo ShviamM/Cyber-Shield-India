@@ -414,6 +414,7 @@ const ur = {
     statusSafe: "محفوظ اور سلامت",
     statusShortAlert: "الرٹ",
     statusShortSafe: "محفوظ",
+    markSafe: "محفوظ نشان زد کریں",
     lastActivity: "آخری سرگرمی: {{value}}",
     justAdded: "ابھی شامل کیا گیا",
     justNow: "ابھی",

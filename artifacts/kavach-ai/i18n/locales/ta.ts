@@ -414,6 +414,7 @@ const ta = {
     statusSafe: "பாதுகாக்கப்பட்டு பத்திரமாக",
     statusShortAlert: "எச்சரிக்கை",
     statusShortSafe: "பாதுகாப்பு",
+    markSafe: "பாதுகாப்பானது எனக் குறி",
     lastActivity: "கடைசி செயல்பாடு: {{value}}",
     justAdded: "இப்போதுதான் சேர்க்கப்பட்டது",
     justNow: "இப்பொழுது",

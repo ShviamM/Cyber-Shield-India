@@ -414,6 +414,7 @@ const ml = {
     statusSafe: "സംരക്ഷിതവും സുരക്ഷിതവും",
     statusShortAlert: "അലേർട്ട്",
     statusShortSafe: "സുരക്ഷിതം",
+    markSafe: "സുരക്ഷിതമെന്ന് അടയാളപ്പെടുത്തുക",
     lastActivity: "അവസാന പ്രവർത്തനം: {{value}}",
     justAdded: "ഇപ്പോൾ ചേർത്തു",
     justNow: "ഇപ്പോൾ",

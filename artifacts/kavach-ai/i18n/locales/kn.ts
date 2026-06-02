@@ -414,6 +414,7 @@ const kn = {
     statusSafe: "ಸುರಕ್ಷಿತ ಮತ್ತು ಭದ್ರ",
     statusShortAlert: "ಎಚ್ಚರಿಕೆ",
     statusShortSafe: "ಸುರಕ್ಷಿತ",
+    markSafe: "ಸುರಕ್ಷಿತ ಎಂದು ಗುರುತಿಸಿ",
     lastActivity: "ಕೊನೆಯ ಚಟುವಟಿಕೆ: {{value}}",
     justAdded: "ಈಗ ತಾನೇ ಸೇರಿಸಲಾಗಿದೆ",
     justNow: "ಈಗ",

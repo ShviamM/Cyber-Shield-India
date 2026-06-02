@@ -42,7 +42,8 @@ export default function FamilyScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
-  const { familyMembers, addFamilyMember, removeFamilyMember } = useAppContext();
+  const { familyMembers, addFamilyMember, removeFamilyMember, markFamilyMemberSafe } =
+    useAppContext();
 
   const relationLabel = (rel: string) =>
     t(`family.relations.${rel.toLowerCase()}`, { defaultValue: rel });
@@ -208,6 +209,10 @@ export default function FamilyScreen() {
             member={item}
             relationLabel={relationLabel}
             onDelete={() => handleDelete(item)}
+            onMarkSafe={() => {
+              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              markFamilyMemberSafe(item.id);
+            }}
           />
         )}
       />
@@ -219,10 +224,12 @@ function MemberCard({
   member,
   relationLabel,
   onDelete,
+  onMarkSafe,
 }: {
   member: FamilyMember;
   relationLabel: (rel: string) => string;
   onDelete: () => void;
+  onMarkSafe: () => void;
 }) {
   const { t } = useTranslation();
   const isWarning = member.status === "warning";
@@ -260,6 +267,12 @@ function MemberCard({
             {isWarning ? t("family.statusAlert") : t("family.statusSafe")}
           </Text>
         </View>
+        {isWarning && (
+          <TouchableOpacity style={mc.markSafeBtn} onPress={onMarkSafe} activeOpacity={0.8}>
+            <Feather name="check" size={12} color={GREEN} />
+            <Text style={mc.markSafeTxt}>{t("family.markSafe")}</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -360,10 +373,20 @@ const mc = StyleSheet.create({
     backgroundColor: "rgba(220,38,38,0.07)",
     alignItems: "center", justifyContent: "center",
   },
-  footer: { paddingHorizontal: 14, paddingBottom: 12 },
+  footer: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    paddingHorizontal: 14, paddingBottom: 12, gap: 8,
+  },
   statusBadge: {
     flexDirection: "row", alignItems: "center", gap: 6,
-    paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10, alignSelf: "flex-start",
+    paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10,
   },
   statusTxt: { fontSize: 12, fontWeight: "600" as const },
+  markSafeBtn: {
+    flexDirection: "row", alignItems: "center", gap: 5,
+    paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10,
+    backgroundColor: "rgba(19,136,8,0.08)",
+    borderWidth: 1, borderColor: "rgba(19,136,8,0.25)",
+  },
+  markSafeTxt: { fontSize: 12, fontWeight: "700" as const, color: GREEN },
 });

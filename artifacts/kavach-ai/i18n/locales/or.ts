@@ -414,6 +414,7 @@ const or = {
     statusSafe: "ସୁରକ୍ଷିତ ଓ ନିରାପଦ",
     statusShortAlert: "ସତର୍କତା",
     statusShortSafe: "ସୁରକ୍ଷିତ",
+    markSafe: "ସୁରକ୍ଷିତ ଭାବେ ଚିହ୍ନଟ କରନ୍ତୁ",
     lastActivity: "ଶେଷ କାର୍ଯ୍ୟକଳାପ: {{value}}",
     justAdded: "ଏବେ ଯୋଡ଼ାଗଲା",
     justNow: "ଏବେ",

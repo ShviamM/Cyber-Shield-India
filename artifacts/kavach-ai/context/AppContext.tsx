@@ -2,10 +2,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 import {
+  onCallScreened,
+  onSmsScreened,
   setCallScreeningEnabled as nativeSetCall,
   setSmsScreeningEnabled as nativeSetSms,
   syncEngineData,
 } from "@/lib/screening";
+import { tenDigits } from "@/lib/phone";
 
 export type FamilyMember = {
   id: string;
@@ -35,6 +38,8 @@ type AppContextType = {
   toggleGuardian: () => void;
   addFamilyMember: (member: Omit<FamilyMember, "id">) => void;
   removeFamilyMember: (id: string) => void;
+  /** Reset a member auto-flagged to "warning" back to "safe". */
+  markFamilyMemberSafe: (id: string) => void;
   addCheck: (check: Omit<CheckItem, "id" | "timestamp">) => void;
   setCallScreening: (enabled: boolean) => void;
   setSmsScreening: (enabled: boolean) => void;
@@ -112,6 +117,38 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     syncEngineData(deriveBlocklist(recentChecks, familyMembers));
   }, [loaded, recentChecks, familyMembers]);
 
+  // Live Family Shield: when the on-device engine screens a risky call/SMS and
+  // the caller/sender matches a saved family contact, flag that member as
+  // "warning" so their card surfaces the alert. No-op on web / non-Android.
+  useEffect(() => {
+    if (!loaded) return;
+    const flagByPhone = (raw: string) => {
+      const key = tenDigits(raw);
+      if (!key) return;
+      setFamilyMembers((prev) => {
+        let changed = false;
+        const next = prev.map((m) => {
+          if (m.status === "safe" && tenDigits(m.phone) === key) {
+            changed = true;
+            return { ...m, status: "warning" as const, lastSeen: "justNow" };
+          }
+          return m;
+        });
+        return changed ? next : prev;
+      });
+    };
+    const callSub = onCallScreened((e) => {
+      if (e.blocked) flagByPhone(e.number);
+    });
+    // Any screened SMS reached us because it matched a blocked sender or a scam
+    // keyword — both are risk signals worth flagging the contact for.
+    const smsSub = onSmsScreened((e) => flagByPhone(e.sender));
+    return () => {
+      callSub.remove();
+      smsSub.remove();
+    };
+  }, [loaded]);
+
   function toggleGuardian() {
     setGuardianActive((v) => !v);
   }
@@ -136,6 +173,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setFamilyMembers((prev) => prev.filter((m) => m.id !== id));
   }
 
+  function markFamilyMemberSafe(id: string) {
+    setFamilyMembers((prev) => {
+      let changed = false;
+      const next = prev.map((m) => {
+        if (m.id === id && m.status === "warning") {
+          changed = true;
+          return { ...m, status: "safe" as const };
+        }
+        return m;
+      });
+      return changed ? next : prev;
+    });
+  }
+
   function addCheck(check: Omit<CheckItem, "id" | "timestamp">) {
     const id =
       Date.now().toString() + Math.random().toString(36).substring(2, 7);
@@ -155,6 +206,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         toggleGuardian,
         addFamilyMember,
         removeFamilyMember,
+        markFamilyMemberSafe,
         addCheck,
         setCallScreening,
         setSmsScreening,

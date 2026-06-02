@@ -414,6 +414,7 @@ const mr = {
     statusSafe: "संरक्षित आणि सुरक्षित",
     statusShortAlert: "इशारा",
     statusShortSafe: "सुरक्षित",
+    markSafe: "सुरक्षित म्हणून चिन्हांकित करा",
     lastActivity: "शेवटची हालचाल: {{value}}",
     justAdded: "नुकतेच जोडले",
     justNow: "आत्ता",

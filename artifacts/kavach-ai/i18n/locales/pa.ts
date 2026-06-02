@@ -414,6 +414,7 @@ const pa = {
     statusSafe: "ਸੁਰੱਖਿਅਤ ਤੇ ਠੀਕ-ਠਾਕ",
     statusShortAlert: "ਚੇਤਾਵਨੀ",
     statusShortSafe: "ਸੁਰੱਖਿਅਤ",
+    markSafe: "ਸੁਰੱਖਿਅਤ ਵਜੋਂ ਨਿਸ਼ਾਨ ਲਗਾਓ",
     lastActivity: "ਆਖ਼ਰੀ ਸਰਗਰਮੀ: {{value}}",
     justAdded: "ਹੁਣੇ ਜੋੜਿਆ",
     justNow: "ਹੁਣੇ",

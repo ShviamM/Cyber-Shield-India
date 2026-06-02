@@ -479,6 +479,7 @@ const en = {
     statusSafe: "Protected & Safe",
     statusShortAlert: "Alert",
     statusShortSafe: "Safe",
+    markSafe: "Mark safe",
     lastActivity: "Last activity: {{value}}",
     justAdded: "Just added",
     justNow: "Just now",
