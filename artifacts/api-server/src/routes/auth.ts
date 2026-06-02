@@ -20,12 +20,27 @@ import { generateOtp, hashOtp } from "../lib/otp";
 import { generateToken, hashToken } from "../lib/token";
 import { smsSender } from "../lib/sms";
 import { HttpError } from "../lib/http-error";
+import { hitRateLimit } from "../lib/rate-limit";
 import { toUserDto } from "../lib/dto";
 import { requireAuth } from "../middlewares/auth";
 
 const router: IRouter = Router();
 
 router.post("/auth/request-otp", async (req, res) => {
+  const clientKey = req.ip ?? "unknown";
+  const ipLimit = hitRateLimit(
+    `otp-request:${clientKey}`,
+    config.otpRequestMaxPerIpPerHour,
+    3_600_000,
+  );
+  if (!ipLimit.allowed) {
+    throw new HttpError(
+      429,
+      "rate_limited",
+      "Too many OTP requests from this device. Please try again later.",
+    );
+  }
+
   const body = RequestOtpBody.parse(req.body);
   const phone = normalizeIndianPhone(body.phone);
   if (!phone) {
@@ -101,6 +116,20 @@ router.post("/auth/request-otp", async (req, res) => {
 });
 
 router.post("/auth/verify-otp", async (req, res) => {
+  const clientKey = req.ip ?? "unknown";
+  const ipLimit = hitRateLimit(
+    `otp-verify:${clientKey}`,
+    config.otpVerifyMaxPerIpPerMinute,
+    60_000,
+  );
+  if (!ipLimit.allowed) {
+    throw new HttpError(
+      429,
+      "too_many_attempts",
+      "Too many attempts from this device. Please try again later.",
+    );
+  }
+
   const body = VerifyOtpBody.parse(req.body);
   const phone = normalizeIndianPhone(body.phone);
   if (!phone) {

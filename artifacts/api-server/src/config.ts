@@ -22,6 +22,10 @@ export const config = {
   otpMaxAttempts: intEnv("OTP_MAX_ATTEMPTS", 5),
   otpResendIntervalSeconds: intEnv("OTP_RESEND_INTERVAL_SECONDS", 30),
   otpMaxPerHour: intEnv("OTP_MAX_PER_HOUR", 5),
+  // Per-IP throttles on the OTP endpoints (cost/abuse protection layered on top
+  // of the per-phone caps): stops one client from spraying many phone numbers.
+  otpRequestMaxPerIpPerHour: intEnv("OTP_REQUEST_MAX_PER_IP_PER_HOUR", 10),
+  otpVerifyMaxPerIpPerMinute: intEnv("OTP_VERIFY_MAX_PER_IP_PER_MINUTE", 10),
   sessionTtlDays: intEnv("SESSION_TTL_DAYS", 60),
   reportDuplicateWindowHours: intEnv("REPORT_DUPLICATE_WINDOW_HOURS", 24),
   reportMaxPerHour: intEnv("REPORT_MAX_PER_HOUR", 20),
