@@ -50,31 +50,25 @@ function deriveBlocklist(checks: CheckItem[], family: FamilyMember[]): string[] 
   return Array.from(new Set([...fromChecks, ...fromFamily]));
 }
 
-const DEFAULT_MEMBERS: FamilyMember[] = [
-  {
-    id: "m1",
-    name: "Mummy",
-    phone: "+91 98765-43210",
-    relation: "Mother",
-    status: "warning",
-    lastSeen: "justNow",
-  },
-  {
-    id: "m2",
-    name: "Papa",
-    phone: "+91 87654-32109",
-    relation: "Father",
-    status: "safe",
-    lastSeen: "oneHourAgo",
-  },
-];
+// Older builds seeded two demo members ("Mummy"/"Papa") into kv_family. Strip
+// those legacy records on load so upgraded installs only keep real, user-added
+// members. Matches the original seed signature (id + name + phone).
+const LEGACY_SEED_SIGNATURES = new Set([
+  "m1|Mummy|+91 98765-43210",
+  "m2|Papa|+91 87654-32109",
+]);
+
+function stripLegacySeed(members: FamilyMember[]): FamilyMember[] {
+  return members.filter(
+    (m) => !LEGACY_SEED_SIGNATURES.has(`${m.id}|${m.name}|${m.phone}`)
+  );
+}
 
 const AppContext = createContext<AppContextType>({} as AppContextType);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [guardianActive, setGuardianActive] = useState(true);
-  const [familyMembers, setFamilyMembers] =
-    useState<FamilyMember[]>(DEFAULT_MEMBERS);
+  const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [recentChecks, setRecentChecks] = useState<CheckItem[]>([]);
   const [callScreening, setCallScreeningState] = useState(false);
   const [smsScreening, setSmsScreeningState] = useState(false);
@@ -91,7 +85,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           AsyncStorage.getItem("kv_sms_screening"),
         ]);
         if (g !== null) setGuardianActive(JSON.parse(g));
-        if (fm) setFamilyMembers(JSON.parse(fm));
+        if (fm) setFamilyMembers(stripLegacySeed(JSON.parse(fm)));
         if (rc) setRecentChecks(JSON.parse(rc));
         if (cs !== null) setCallScreeningState(JSON.parse(cs));
         if (ss !== null) setSmsScreeningState(JSON.parse(ss));
