@@ -1,0 +1,22 @@
+Review the current app and convert all sections that are still powered by hardcoded demo content from constants/data.ts into real live data flows. Right now, the values are only illustrative and are not being collected or populated from actual user activity. I need you to identify every screen, widget, card, dashboard, stat, list, or insight that depends on hardcoded values and replace it with proper dynamic data sourcing.
+
+Specifically, treat the current data in constants/data.ts as placeholder/demo data only. Remove the dependency on static mock values for production behavior. Build a real data pipeline so the app stores, fetches, aggregates, and displays actual data from the backend/database.
+What to do
+
+    Audit the entire project and list every feature currently using constants/data.ts or any other hardcoded mock content.
+    Replace those hardcoded values with live data from the real backend/database.
+    Create the necessary database schema, queries, API routes, hooks/services, and state management needed to support live updates.
+    Make sure new reports, registrations, fraud-number submissions, language preferences, location data, and any dashboard metrics are actually persisted and reflected in the UI.
+    If there is no backend support yet for a given metric, implement it properly instead of faking the value.
+    Remove or isolate demo/mock data so it is only used in development if absolutely needed.
+    Ensure loading states, empty states, error states, and retry behavior are implemented correctly.
+    Validate that all stats and summaries shown in the app are derived from real stored records, not static arrays.
+
+Important expectations
+
+    Do not leave any misleading “live-looking” hardcoded numbers in the production app.
+    If a section cannot be made truly live because data is not yet being captured, then either:
+        implement the missing data capture flow, or
+        hide/disable that section until real data exists.
+    Keep the architecture scalable and clean for Replit deployment.
+    Preserve existing UI/UX as much as possible while replacing the data layer.

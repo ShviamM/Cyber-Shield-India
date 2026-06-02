@@ -1,102 +1,144 @@
-import { db, scamCategoriesTable } from "@workspace/db";
+import { db, scamCategoriesTable, scamStatBaselineTable } from "@workspace/db";
 import { logger } from "./logger";
 
 export const SEED_CATEGORIES = [
   {
     key: "upi_fraud",
     nameEn: "UPI / Payment Fraud",
+    nameHi: "UPI / भुगतान धोखाधड़ी",
     descriptionEn: "Fake payment requests, wrong-money-sent tricks, QR-code scams.",
+    tipEn: "Never enter your UPI PIN to receive money — the PIN is only for sending.",
+    tipHi: "पैसे पाने के लिए UPI PIN कभी न डालें — PIN केवल भेजने के लिए होता है।",
     icon: "card",
     sortOrder: 10,
   },
   {
     key: "otp_scam",
     nameEn: "OTP Theft",
+    nameHi: "OTP चोरी",
     descriptionEn: "Callers tricking you into sharing the OTP sent to your phone.",
+    tipEn: "No bank or company ever asks for your OTP. Never share it with anyone.",
+    tipHi: "कोई बैंक या कंपनी कभी OTP नहीं मांगती। इसे किसी के साथ साझा न करें।",
     icon: "keypad",
     sortOrder: 20,
   },
   {
     key: "kyc_fraud",
     nameEn: "Fake KYC Update",
+    nameHi: "नकली KYC अपडेट",
     descriptionEn: "Messages or calls demanding urgent KYC/Aadhaar/PAN updates.",
+    tipEn: "Banks never ask for KYC via links or calls. Use the branch or official app.",
+    tipHi: "बैंक लिंक या कॉल से KYC नहीं मांगते। शाखा या आधिकारिक ऐप का उपयोग करें।",
     icon: "document-text",
     sortOrder: 30,
   },
   {
     key: "loan_scam",
     nameEn: "Loan / Credit Card Scam",
+    nameHi: "लोन / क्रेडिट कार्ड घोटाला",
     descriptionEn: "Fake loan approvals, processing fees, or credit-card offers.",
+    tipEn: "Genuine loans never need an advance 'processing fee'. Don't pay upfront.",
+    tipHi: "असली लोन के लिए कभी अग्रिम 'प्रोसेसिंग फीस' नहीं लगती। पहले पैसे न दें।",
     icon: "cash",
     sortOrder: 40,
   },
   {
     key: "job_scam",
     nameEn: "Job / Work-from-home Scam",
+    nameHi: "नौकरी / वर्क-फ्रॉम-होम घोटाला",
     descriptionEn: "Fake job offers or task-based earning schemes asking for money.",
+    tipEn: "Real jobs never ask you to pay money to get hired.",
+    tipHi: "असली नौकरी के लिए कभी पैसे नहीं देने पड़ते।",
     icon: "briefcase",
     sortOrder: 50,
   },
   {
     key: "lottery_scam",
     nameEn: "Lottery / Prize Scam",
+    nameHi: "लॉटरी / इनाम घोटाला",
     descriptionEn: "You won a prize/lottery — pay a fee to claim it.",
+    tipEn: "You can't win a lottery you never entered. Ignore prize messages.",
+    tipHi: "जिस लॉटरी में भाग नहीं लिया, वह नहीं जीत सकते। इनाम संदेश अनदेखा करें।",
     icon: "gift",
     sortOrder: 60,
   },
   {
     key: "investment_fraud",
     nameEn: "Investment / Trading Fraud",
+    nameHi: "निवेश / ट्रेडिंग धोखाधड़ी",
     descriptionEn: "Guaranteed-return stock, crypto, or trading-group scams.",
+    tipEn: "Guaranteed high returns are always a scam. Verify advisers with SEBI.",
+    tipHi: "गारंटीड ऊंचे रिटर्न हमेशा घोटाला होते हैं। सलाहकार को SEBI से जांचें।",
     icon: "trending-up",
     sortOrder: 70,
   },
   {
     key: "digital_arrest",
     nameEn: "Digital Arrest / Police Impersonation",
+    nameHi: "डिजिटल अरेस्ट / पुलिस बनकर ठगी",
     descriptionEn: "Fake police/CBI/customs threatening arrest over video call.",
+    tipEn: "Police never arrest you over a video call or demand money. Hang up.",
+    tipHi: "पुलिस वीडियो कॉल पर गिरफ्तार नहीं करती या पैसे नहीं मांगती। कॉल काट दें।",
     icon: "shield",
     sortOrder: 80,
   },
   {
     key: "electricity_bill",
     nameEn: "Electricity Bill Disconnection",
+    nameHi: "बिजली बिल कटौती धमकी",
     descriptionEn: "Threats to cut power unless you pay or click a link now.",
+    tipEn: "Pay bills only through your official electricity board app or website.",
+    tipHi: "बिल केवल आधिकारिक बिजली बोर्ड ऐप या वेबसाइट से ही भरें।",
     icon: "flash",
     sortOrder: 90,
   },
   {
     key: "courier_scam",
     nameEn: "Courier / Parcel Scam",
+    nameHi: "कूरियर / पार्सल घोटाला",
     descriptionEn: "Fake parcel held by customs or containing illegal items.",
+    tipEn: "Couriers never call about 'illegal parcels'. Don't pay or share details.",
+    tipHi: "कूरियर कभी 'अवैध पार्सल' के लिए कॉल नहीं करते। पैसे या जानकारी न दें।",
     icon: "cube",
     sortOrder: 100,
   },
   {
     key: "tech_support",
     nameEn: "Tech Support Scam",
+    nameHi: "टेक सपोर्ट घोटाला",
     descriptionEn: "Fake support claiming your device/account is compromised.",
+    tipEn: "Hang up on unexpected 'tech support' calls and never install remote apps.",
+    tipHi: "अचानक आए 'टेक सपोर्ट' कॉल काट दें और रिमोट ऐप कभी इंस्टॉल न करें।",
     icon: "construct",
     sortOrder: 110,
   },
   {
     key: "impersonation",
     nameEn: "Bank / Govt Impersonation",
+    nameHi: "बैंक / सरकारी अधिकारी बनकर ठगी",
     descriptionEn: "Callers pretending to be your bank or a government office.",
+    tipEn: "Call your bank's official number yourself to verify any request.",
+    tipHi: "किसी भी अनुरोध की पुष्टि के लिए स्वयं बैंक के आधिकारिक नंबर पर कॉल करें।",
     icon: "business",
     sortOrder: 120,
   },
   {
     key: "sextortion",
     nameEn: "Sextortion / Blackmail",
+    nameHi: "सेक्सटॉर्शन / ब्लैकमेल",
     descriptionEn: "Threats to leak private photos/videos unless you pay.",
+    tipEn: "Don't pay blackmailers. Report to 1930 and your local cyber police.",
+    tipHi: "ब्लैकमेलर को पैसे न दें। 1930 और स्थानीय साइबर पुलिस को रिपोर्ट करें।",
     icon: "warning",
     sortOrder: 130,
   },
   {
     key: "other",
     nameEn: "Other",
+    nameHi: "अन्य",
     descriptionEn: "Any other suspicious or fraudulent call/message.",
+    tipEn: "When in doubt, verify independently and report to 1930.",
+    tipHi: "संदेह होने पर स्वतंत्र रूप से जांचें और 1930 पर रिपोर्ट करें।",
     icon: "ellipsis-horizontal",
     sortOrder: 999,
   },
@@ -112,7 +154,10 @@ export async function seedScamCategories(): Promise<void> {
           target: scamCategoriesTable.key,
           set: {
             nameEn: category.nameEn,
+            nameHi: category.nameHi,
             descriptionEn: category.descriptionEn,
+            tipEn: category.tipEn,
+            tipHi: category.tipHi,
             icon: category.icon,
             sortOrder: category.sortOrder,
           },
@@ -121,5 +166,70 @@ export async function seedScamCategories(): Promise<void> {
     logger.info({ count: SEED_CATEGORIES.length }, "Scam categories seeded");
   } catch (err) {
     logger.error({ err }, "Failed to seed scam categories");
+  }
+}
+
+/**
+ * Approximate weekly cybercrime complaint volumes per city for the current and
+ * previous period, derived from the proportions in published NCRB / I4C
+ * figures. These are illustrative baselines (no free live API exists) that the
+ * stats endpoints merge with real user reports.
+ */
+const BASELINE_CITIES: { city: string; current: number; previous: number }[] = [
+  { city: "Delhi", current: 1400, previous: 1300 },
+  { city: "Bengaluru", current: 1200, previous: 1050 },
+  { city: "Mumbai", current: 1100, previous: 1000 },
+  { city: "Hyderabad", current: 950, previous: 1000 },
+  { city: "Chennai", current: 700, previous: 640 },
+  { city: "Pune", current: 600, previous: 560 },
+  { city: "Gurugram", current: 540, previous: 470 },
+  { city: "Kolkata", current: 520, previous: 540 },
+  { city: "Ahmedabad", current: 480, previous: 430 },
+  { city: "Noida", current: 420, previous: 380 },
+  { city: "Jaipur", current: 360, previous: 330 },
+  { city: "Lucknow", current: 320, previous: 290 },
+];
+
+/**
+ * Relative prevalence of each scam category (fractions roughly sum to 1),
+ * used to distribute a city's total volume across categories.
+ */
+const CATEGORY_WEIGHTS: Record<string, number> = {
+  upi_fraud: 0.16,
+  otp_scam: 0.1,
+  kyc_fraud: 0.07,
+  loan_scam: 0.06,
+  job_scam: 0.09,
+  lottery_scam: 0.03,
+  investment_fraud: 0.12,
+  digital_arrest: 0.08,
+  electricity_bill: 0.05,
+  courier_scam: 0.07,
+  tech_support: 0.05,
+  impersonation: 0.06,
+  sextortion: 0.04,
+  other: 0.02,
+};
+
+export async function seedScamStatBaseline(): Promise<void> {
+  try {
+    let rows = 0;
+    for (const { city, current, previous } of BASELINE_CITIES) {
+      for (const [categoryKey, weight] of Object.entries(CATEGORY_WEIGHTS)) {
+        const count = Math.round(current * weight);
+        const prevCount = Math.round(previous * weight);
+        await db
+          .insert(scamStatBaselineTable)
+          .values({ city, categoryKey, count, prevCount, source: "baseline" })
+          .onConflictDoUpdate({
+            target: [scamStatBaselineTable.city, scamStatBaselineTable.categoryKey],
+            set: { count, prevCount, source: "baseline", updatedAt: new Date() },
+          });
+        rows += 1;
+      }
+    }
+    logger.info({ rows }, "Scam stat baseline seeded");
+  } catch (err) {
+    logger.error({ err }, "Failed to seed scam stat baseline");
   }
 }

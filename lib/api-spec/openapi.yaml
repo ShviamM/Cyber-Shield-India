@@ -189,6 +189,95 @@ paths:
         default:
           $ref: "#/components/responses/Error"
 
+  /stats/trending:
+    get:
+      operationId: getTrendingScams
+      tags: [stats]
+      summary: Trending scam categories
+      description: >-
+        Scam categories ranked by recent activity, fusing seeded official
+        baselines with live community reports. When `city` is supplied the list
+        is scoped to that city.
+      parameters:
+        - name: city
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Trending scams
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrendingScamListResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /stats/hotspots:
+    get:
+      operationId: getCityHotspots
+      tags: [stats]
+      summary: City scam hotspots
+      description: >-
+        Cities ranked by total recent scam activity (baseline + live reports),
+        with week-over-week change. When `city` is supplied it is always
+        included in the result even if outside the top ranks.
+      parameters:
+        - name: city
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: City hotspots
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CityHotspotListResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /stats/scam-of-day:
+    get:
+      operationId: getScamOfDay
+      tags: [stats]
+      summary: Most active scam right now
+      description: The single top-trending scam category with bilingual title, tip, and the cities seeing it most.
+      responses:
+        "200":
+          description: Scam of the day
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScamOfDay"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /me/location:
+    patch:
+      operationId: updateMyLocation
+      tags: [auth]
+      summary: Update the current user's detected city/location
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateLocationRequest"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        default:
+          $ref: "#/components/responses/Error"
+
   /numbers/{phone}/check:
     get:
       operationId: checkNumber
@@ -491,6 +580,134 @@ components:
       required:
         - categories
 
+    TrendingScam:
+      type: object
+      properties:
+        categoryKey:
+          type: string
+        type:
+          type: string
+          description: English category name
+        typeHi:
+          type: string
+          nullable: true
+          description: Hindi category name
+        description:
+          type: string
+          nullable: true
+        tip:
+          type: string
+          nullable: true
+        tipHi:
+          type: string
+          nullable: true
+        count:
+          type: integer
+          description: Combined baseline + live report volume
+        trend:
+          type: string
+          enum: [critical, high, medium]
+        city:
+          type: string
+          nullable: true
+          description: Top city for this scam in the queried scope
+        lastReportedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Most recent live report timestamp, null when baseline-only
+      required:
+        - categoryKey
+        - type
+        - count
+        - trend
+
+    TrendingScamListResponse:
+      type: object
+      properties:
+        scams:
+          type: array
+          items:
+            $ref: "#/components/schemas/TrendingScam"
+        total:
+          type: integer
+          description: Sum of all trending counts in scope
+      required:
+        - scams
+        - total
+
+    CityHotspot:
+      type: object
+      properties:
+        city:
+          type: string
+        cases:
+          type: integer
+        changePct:
+          type: number
+          description: Signed week-over-week change percentage
+        up:
+          type: boolean
+          description: True when activity increased versus the previous period
+      required:
+        - city
+        - cases
+        - changePct
+        - up
+
+    CityHotspotListResponse:
+      type: object
+      properties:
+        hotspots:
+          type: array
+          items:
+            $ref: "#/components/schemas/CityHotspot"
+      required:
+        - hotspots
+
+    ScamOfDay:
+      type: object
+      properties:
+        categoryKey:
+          type: string
+        tag:
+          type: string
+        title:
+          type: string
+        titleHi:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        tip:
+          type: string
+          nullable: true
+        tipHi:
+          type: string
+          nullable: true
+        reports:
+          type: integer
+        cities:
+          type: array
+          items:
+            type: string
+      required:
+        - categoryKey
+        - tag
+        - title
+        - reports
+        - cities
+
+    UpdateLocationRequest:
+      type: object
+      properties:
+        location:
+          type: string
+          description: Detected city or location label
+      required:
+        - location
+
     CreateReportRequest:
       type: object
       properties:
@@ -500,6 +717,10 @@ components:
           type: string
         description:
           type: string
+        city:
+          type: string
+          nullable: true
+          description: City where the incident was reported, used for hotspot stats
         incidentDate:
           type: string
           format: date-time

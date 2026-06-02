@@ -103,6 +103,7 @@ router.post("/reports", requireAuth, async (req, res) => {
       phone,
       categoryKey,
       description,
+      city: body.city?.trim() || null,
       incidentDate: body.incidentDate ?? null,
     })
     .returning();

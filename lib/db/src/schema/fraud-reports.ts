@@ -11,6 +11,7 @@ export const fraudReportsTable = pgTable(
     phone: text("phone").notNull(),
     categoryKey: text("category_key").notNull(),
     description: text("description").notNull(),
+    city: text("city"),
     incidentDate: timestamp("incident_date", { withTimezone: true }),
     status: text("status").notNull().default("pending"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -20,6 +21,8 @@ export const fraudReportsTable = pgTable(
     index("fraud_reports_phone_idx").on(table.phone),
     index("fraud_reports_reporter_idx").on(table.reporterId),
     index("fraud_reports_status_idx").on(table.status),
+    index("fraud_reports_city_idx").on(table.city),
+    index("fraud_reports_created_idx").on(table.createdAt),
   ],
 );
 

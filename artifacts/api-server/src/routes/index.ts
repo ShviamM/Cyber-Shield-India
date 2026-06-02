@@ -6,6 +6,7 @@ import reportsRouter from "./reports";
 import numbersRouter from "./numbers";
 import checkRouter from "./check";
 import adminRouter from "./admin";
+import statsRouter from "./stats";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(reportsRouter);
 router.use(numbersRouter);
 router.use(checkRouter);
 router.use(adminRouter);
+router.use(statsRouter);
 
 export default router;

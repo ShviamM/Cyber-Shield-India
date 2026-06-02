@@ -1,22 +1,31 @@
 import { Feather } from "@expo/vector-icons";
-import React from "react";
+import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  ActivityIndicator,
+  AppState,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
 import {
-  CITY_HOTSPOTS,
-  GOLDEN_RULES,
-  LIVE_THREATS,
-  SCAM_OF_DAY,
-} from "@/constants/data";
+  getGetCityHotspotsQueryKey,
+  getGetScamOfDayQueryKey,
+  getGetTrendingScamsQueryKey,
+  useGetCityHotspots,
+  useGetScamOfDay,
+  useGetTrendingScams,
+} from "@workspace/api-client-react";
+
+import { GOLDEN_RULES } from "@/constants/data";
 import { useColors } from "@/hooks/useColors";
+import { formatChangePct, formatTimeAgo } from "@/lib/format";
+
+const REFETCH_MS = 60000;
 
 const NAVY = "#0B3D91";
 const SAFFRON = "#FF6713";
@@ -47,9 +56,45 @@ const SEVERITY_BG = {
 export default function ThreatsScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isHindi = i18n.language?.startsWith("hi");
   const topInset = Platform.OS === "web" ? 0 : insets.top;
   const bottomPad = (Platform.OS === "web" ? 34 : insets.bottom) + 80;
+
+  const scamOfDay = useGetScamOfDay({
+    query: {
+      queryKey: getGetScamOfDayQueryKey(),
+      refetchInterval: REFETCH_MS,
+    },
+  });
+  const trending = useGetTrendingScams(undefined, {
+    query: {
+      queryKey: getGetTrendingScamsQueryKey(),
+      refetchInterval: REFETCH_MS,
+    },
+  });
+  const hotspotsQuery = useGetCityHotspots(undefined, {
+    query: {
+      queryKey: getGetCityHotspotsQueryKey(),
+      refetchInterval: REFETCH_MS,
+    },
+  });
+
+  const featured = scamOfDay.data;
+  const scams = trending.data?.scams ?? [];
+  const hotspots = hotspotsQuery.data?.hotspots ?? [];
+
+  // Refetch the feed whenever the app returns to the foreground.
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state === "active") {
+        scamOfDay.refetch();
+        trending.refetch();
+        hotspotsQuery.refetch();
+      }
+    });
+    return () => sub.remove();
+  }, [scamOfDay, trending, hotspotsQuery]);
 
   return (
     <View style={[s.root, { backgroundColor: colors.background }]}>
@@ -82,31 +127,55 @@ export default function ThreatsScreen() {
         contentContainerStyle={{ paddingBottom: bottomPad }}
       >
         {/* Scam of the Day — featured */}
-        <View style={s.featuredCard}>
-          <View style={s.featuredInner}>
-            <View style={s.featTop}>
-              <View style={[s.featTagPill, { backgroundColor: "#fee2e2" }]}>
-                <Text style={[s.featTagTxt, { color: "#dc2626" }]}>{SCAM_OF_DAY.tag}</Text>
-              </View>
-              <Text style={s.featReports}>{t("threats.reports", { n: SCAM_OF_DAY.reports.toLocaleString() })}</Text>
-            </View>
-            <Text style={s.featTitleHindi}>{SCAM_OF_DAY.titleHindi}</Text>
-            <Text style={s.featTitleEn}>{SCAM_OF_DAY.title}</Text>
-            <Text style={s.featDesc}>{SCAM_OF_DAY.description}</Text>
-            <View style={s.featTip}>
-              <Feather name="shield" size={13} color={GREEN} />
-              <Text style={s.featTipTxt}>{SCAM_OF_DAY.tip}</Text>
-            </View>
-            <View style={s.citiesRow}>
-              {SCAM_OF_DAY.cities.map((c) => (
-                <View key={c} style={s.cityChip}>
-                  <Feather name="map-pin" size={9} color={NAVY} />
-                  <Text style={s.cityChipTxt}>{c}</Text>
-                </View>
-              ))}
+        {scamOfDay.isLoading ? (
+          <View style={s.featuredCard}>
+            <View style={[s.featuredInner, s.stateBox]}>
+              <ActivityIndicator color={NAVY} />
             </View>
           </View>
-        </View>
+        ) : scamOfDay.isError ? (
+          <View style={s.featuredCard}>
+            <View style={[s.featuredInner, s.stateBox]}>
+              <Text style={s.stateHint}>{t("threats.scamOfDayError")}</Text>
+              <TouchableOpacity style={s.retryBtn} onPress={() => scamOfDay.refetch()}>
+                <Feather name="refresh-cw" size={13} color="#fff" />
+                <Text style={s.retryTxt}>{t("common.retry")}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : featured ? (
+          <View style={s.featuredCard}>
+            <View style={s.featuredInner}>
+              <View style={s.featTop}>
+                <View style={[s.featTagPill, { backgroundColor: "#fee2e2" }]}>
+                  <Text style={[s.featTagTxt, { color: "#dc2626" }]}>{featured.tag}</Text>
+                </View>
+                <Text style={s.featReports}>{t("threats.reports", { n: featured.reports.toLocaleString() })}</Text>
+              </View>
+              {featured.titleHi ? <Text style={s.featTitleHindi}>{featured.titleHi}</Text> : null}
+              <Text style={s.featTitleEn}>{featured.title}</Text>
+              {featured.description ? <Text style={s.featDesc}>{featured.description}</Text> : null}
+              {(isHindi ? featured.tipHi ?? featured.tip : featured.tip) ? (
+                <View style={s.featTip}>
+                  <Feather name="shield" size={13} color={GREEN} />
+                  <Text style={s.featTipTxt}>
+                    {isHindi ? featured.tipHi ?? featured.tip : featured.tip}
+                  </Text>
+                </View>
+              ) : null}
+              {featured.cities.length > 0 ? (
+                <View style={s.citiesRow}>
+                  {featured.cities.map((c) => (
+                    <View key={c} style={s.cityChip}>
+                      <Feather name="map-pin" size={9} color={NAVY} />
+                      <Text style={s.cityChipTxt}>{c}</Text>
+                    </View>
+                  ))}
+                </View>
+              ) : null}
+            </View>
+          </View>
+        ) : null}
 
         {/* Trending threats */}
         <View style={s.sectionHeader}>
@@ -116,23 +185,51 @@ export default function ThreatsScreen() {
             <Text style={s.liveTxtSmall}>{t("threats.live")}</Text>
           </View>
         </View>
-        {LIVE_THREATS.map((item) => (
-          <View key={item.id} style={s.threatCard}>
-            <View style={s.threatCardTop}>
-              <View style={[s.trendPill, { backgroundColor: TREND_BG[item.trend] }]}>
-                <View style={[s.trendDot, { backgroundColor: TREND_COLOR[item.trend] }]} />
-                <Text style={[s.trendTxt, { color: TREND_COLOR[item.trend] }]}>{item.trend.toUpperCase()}</Text>
-              </View>
-              <Text style={s.threatTime}>{item.time}</Text>
-            </View>
-            <Text style={s.threatType}>{item.type}</Text>
-            <View style={s.threatMetaRow}>
-              <Feather name="map-pin" size={11} color="#94a3b8" />
-              <Text style={s.threatMeta}>{t("threats.communityReports", { city: item.city, n: item.count.toLocaleString() })}</Text>
-            </View>
-            <Text style={s.threatDesc}>{item.description}</Text>
+        {trending.isLoading ? (
+          <View style={s.stateBox}>
+            <ActivityIndicator color={NAVY} />
           </View>
-        ))}
+        ) : trending.isError ? (
+          <View style={[s.threatCard, s.stateBox]}>
+            <Text style={s.stateHint}>{t("threats.trendingError")}</Text>
+            <TouchableOpacity style={s.retryBtn} onPress={() => trending.refetch()}>
+              <Feather name="refresh-cw" size={13} color="#fff" />
+              <Text style={s.retryTxt}>{t("common.retry")}</Text>
+            </TouchableOpacity>
+          </View>
+        ) : scams.length === 0 ? (
+          <View style={[s.threatCard, s.stateBox]}>
+            <Text style={s.stateHint}>{t("threats.trendingEmpty")}</Text>
+          </View>
+        ) : (
+          scams.map((item) => {
+            const title = isHindi && item.typeHi ? item.typeHi : item.type;
+            return (
+              <View key={item.categoryKey} style={s.threatCard}>
+                <View style={s.threatCardTop}>
+                  <View style={[s.trendPill, { backgroundColor: TREND_BG[item.trend] }]}>
+                    <View style={[s.trendDot, { backgroundColor: TREND_COLOR[item.trend] }]} />
+                    <Text style={[s.trendTxt, { color: TREND_COLOR[item.trend] }]}>{item.trend.toUpperCase()}</Text>
+                  </View>
+                  <Text style={s.threatTime}>{formatTimeAgo(t, item.lastReportedAt)}</Text>
+                </View>
+                <Text style={s.threatType}>{title}</Text>
+                {item.city ? (
+                  <View style={s.threatMetaRow}>
+                    <Feather name="map-pin" size={11} color="#94a3b8" />
+                    <Text style={s.threatMeta}>{t("threats.communityReports", { city: item.city, n: item.count.toLocaleString() })}</Text>
+                  </View>
+                ) : (
+                  <View style={s.threatMetaRow}>
+                    <Feather name="alert-triangle" size={11} color="#94a3b8" />
+                    <Text style={s.threatMeta}>{t("threats.reports", { n: item.count.toLocaleString() })}</Text>
+                  </View>
+                )}
+                {item.description ? <Text style={s.threatDesc}>{item.description}</Text> : null}
+              </View>
+            );
+          })
+        )}
 
         {/* City Hotspots */}
         <View style={s.sectionHeader}>
@@ -141,26 +238,44 @@ export default function ThreatsScreen() {
             <Text style={[s.sectionTitle, { marginLeft: 6, color: colors.text }]}>{t("threats.cityHotspots")}</Text>
           </View>
         </View>
-        <View style={s.hotspotsCard}>
-          {CITY_HOTSPOTS.map((hs, i) => (
-            <View
-              key={hs.city}
-              style={[s.hotspotRow, i < CITY_HOTSPOTS.length - 1 && s.hotspotBorder]}
-            >
-              <View style={s.hsRankBox}>
-                <Text style={s.hsRank}>{hs.rank}</Text>
+        {hotspotsQuery.isLoading ? (
+          <View style={[s.hotspotsCard, s.stateBox]}>
+            <ActivityIndicator color={NAVY} />
+          </View>
+        ) : hotspotsQuery.isError ? (
+          <View style={[s.hotspotsCard, s.stateBox]}>
+            <Text style={s.stateHint}>{t("threats.hotspotsError")}</Text>
+            <TouchableOpacity style={s.retryBtn} onPress={() => hotspotsQuery.refetch()}>
+              <Feather name="refresh-cw" size={13} color="#fff" />
+              <Text style={s.retryTxt}>{t("common.retry")}</Text>
+            </TouchableOpacity>
+          </View>
+        ) : hotspots.length === 0 ? (
+          <View style={[s.hotspotsCard, s.stateBox]}>
+            <Text style={s.stateHint}>{t("threats.hotspotsEmpty")}</Text>
+          </View>
+        ) : (
+          <View style={s.hotspotsCard}>
+            {hotspots.map((hs, i) => (
+              <View
+                key={hs.city}
+                style={[s.hotspotRow, i < hotspots.length - 1 && s.hotspotBorder]}
+              >
+                <View style={s.hsRankBox}>
+                  <Text style={s.hsRank}>{i + 1}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={s.hsCity}>{hs.city}</Text>
+                  <Text style={s.hsCases}>{t("threats.cases", { n: hs.cases.toLocaleString() })}</Text>
+                </View>
+                <View style={s.hsChangePill}>
+                  <Feather name={hs.up ? "trending-up" : "trending-down"} size={11} color={hs.up ? "#dc2626" : GREEN} />
+                  <Text style={[s.hsChange, { color: hs.up ? "#dc2626" : GREEN }]}>{formatChangePct(hs.changePct)}</Text>
+                </View>
               </View>
-              <View style={{ flex: 1 }}>
-                <Text style={s.hsCity}>{hs.city}</Text>
-                <Text style={s.hsCases}>{t("threats.cases", { n: hs.cases.toLocaleString() })}</Text>
-              </View>
-              <View style={s.hsChangePill}>
-                <Feather name={hs.up ? "trending-up" : "trending-down"} size={11} color={hs.up ? "#dc2626" : GREEN} />
-                <Text style={[s.hsChange, { color: hs.up ? "#dc2626" : GREEN }]}>{hs.change}</Text>
-              </View>
-            </View>
-          ))}
-        </View>
+            ))}
+          </View>
+        )}
 
         {/* Golden Safety Rules */}
         <View style={s.sectionHeader}>
@@ -314,4 +429,13 @@ const s = StyleSheet.create({
   ruleIcon: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
   ruleHindi: { fontSize: 14, fontWeight: "700" as const, color: "#0f172a", marginBottom: 3 },
   ruleEnglish: { fontSize: 12, color: "#64748b", lineHeight: 17 },
+
+  // Loading / empty / error states
+  stateBox: { alignItems: "center", justifyContent: "center", paddingVertical: 28, gap: 12 },
+  stateHint: { fontSize: 13, color: "#64748b", textAlign: "center", lineHeight: 19 },
+  retryBtn: {
+    flexDirection: "row", alignItems: "center", gap: 6,
+    backgroundColor: NAVY, paddingHorizontal: 16, paddingVertical: 9, borderRadius: 10,
+  },
+  retryTxt: { fontSize: 13, fontWeight: "700" as const, color: "#fff" },
 });

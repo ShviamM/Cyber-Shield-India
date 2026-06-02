@@ -10,13 +10,16 @@ export type NearbyCityStatus = "loading" | "granted" | "denied" | "unavailable";
  */
 const KNOWN_CITIES: { city: string; lat: number; lng: number }[] = [
   { city: "Mumbai", lat: 19.076, lng: 72.8777 },
-  { city: "Delhi NCR", lat: 28.6139, lng: 77.209 },
+  { city: "Delhi", lat: 28.6139, lng: 77.209 },
+  { city: "Gurugram", lat: 28.4595, lng: 77.0266 },
+  { city: "Noida", lat: 28.5355, lng: 77.391 },
   { city: "Bengaluru", lat: 12.9716, lng: 77.5946 },
   { city: "Hyderabad", lat: 17.385, lng: 78.4867 },
   { city: "Pune", lat: 18.5204, lng: 73.8567 },
   { city: "Chennai", lat: 13.0827, lng: 80.2707 },
   { city: "Kolkata", lat: 22.5726, lng: 88.3639 },
-  { city: "Kanpur", lat: 26.4499, lng: 80.3319 },
+  { city: "Ahmedabad", lat: 23.0225, lng: 72.5714 },
+  { city: "Jaipur", lat: 26.9124, lng: 75.7873 },
   { city: "Lucknow", lat: 26.8467, lng: 80.9462 },
 ];
 

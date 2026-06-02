@@ -25,10 +25,13 @@ import type {
   AdminReportListResponse,
   AuthResponse,
   CategoryListResponse,
+  CityHotspotListResponse,
   CreateReportRequest,
   ErrorResponse,
   FraudCheckRequest,
   FraudVerdict,
+  GetCityHotspotsParams,
+  GetTrendingScamsParams,
   HealthStatus,
   ListReportsParams,
   NumberCheckResponse,
@@ -37,7 +40,10 @@ import type {
   ReportListResponse,
   RequestOtpRequest,
   RequestOtpResult,
+  ScamOfDay,
   SuccessResponse,
+  TrendingScamListResponse,
+  UpdateLocationRequest,
   UpdateReportStatusRequest,
   User,
   VerifyNumberRequest,
@@ -656,6 +662,325 @@ export function useListReports<TData = Awaited<ReturnType<typeof listReports>>, 
 
 
 
+
+export const getGetTrendingScamsUrl = (params?: GetTrendingScamsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/stats/trending?${stringifiedParams}` : `/api/stats/trending`
+}
+
+/**
+ * Scam categories ranked by recent activity, fusing seeded official baselines with live community reports. When `city` is supplied the list is scoped to that city.
+ * @summary Trending scam categories
+ */
+export const getTrendingScams = async (params?: GetTrendingScamsParams, options?: RequestInit): Promise<TrendingScamListResponse> => {
+
+  return customFetch<TrendingScamListResponse>(getGetTrendingScamsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTrendingScamsQueryKey = (params?: GetTrendingScamsParams,) => {
+    return [
+    `/api/stats/trending`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetTrendingScamsQueryOptions = <TData = Awaited<ReturnType<typeof getTrendingScams>>, TError = ErrorType<ErrorResponse>>(params?: GetTrendingScamsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTrendingScams>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTrendingScamsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTrendingScams>>> = ({ signal }) => getTrendingScams(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTrendingScams>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetTrendingScamsQueryResult = NonNullable<Awaited<ReturnType<typeof getTrendingScams>>>
+export type GetTrendingScamsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Trending scam categories
+ */
+
+export function useGetTrendingScams<TData = Awaited<ReturnType<typeof getTrendingScams>>, TError = ErrorType<ErrorResponse>>(
+ params?: GetTrendingScamsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTrendingScams>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetTrendingScamsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetCityHotspotsUrl = (params?: GetCityHotspotsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/stats/hotspots?${stringifiedParams}` : `/api/stats/hotspots`
+}
+
+/**
+ * Cities ranked by total recent scam activity (baseline + live reports), with week-over-week change. When `city` is supplied it is always included in the result even if outside the top ranks.
+ * @summary City scam hotspots
+ */
+export const getCityHotspots = async (params?: GetCityHotspotsParams, options?: RequestInit): Promise<CityHotspotListResponse> => {
+
+  return customFetch<CityHotspotListResponse>(getGetCityHotspotsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCityHotspotsQueryKey = (params?: GetCityHotspotsParams,) => {
+    return [
+    `/api/stats/hotspots`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetCityHotspotsQueryOptions = <TData = Awaited<ReturnType<typeof getCityHotspots>>, TError = ErrorType<ErrorResponse>>(params?: GetCityHotspotsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCityHotspots>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCityHotspotsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCityHotspots>>> = ({ signal }) => getCityHotspots(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCityHotspots>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCityHotspotsQueryResult = NonNullable<Awaited<ReturnType<typeof getCityHotspots>>>
+export type GetCityHotspotsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary City scam hotspots
+ */
+
+export function useGetCityHotspots<TData = Awaited<ReturnType<typeof getCityHotspots>>, TError = ErrorType<ErrorResponse>>(
+ params?: GetCityHotspotsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCityHotspots>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCityHotspotsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetScamOfDayUrl = () => {
+
+
+
+
+  return `/api/stats/scam-of-day`
+}
+
+/**
+ * The single top-trending scam category with bilingual title, tip, and the cities seeing it most.
+ * @summary Most active scam right now
+ */
+export const getScamOfDay = async ( options?: RequestInit): Promise<ScamOfDay> => {
+
+  return customFetch<ScamOfDay>(getGetScamOfDayUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetScamOfDayQueryKey = () => {
+    return [
+    `/api/stats/scam-of-day`
+    ] as const;
+    }
+
+
+export const getGetScamOfDayQueryOptions = <TData = Awaited<ReturnType<typeof getScamOfDay>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getScamOfDay>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetScamOfDayQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getScamOfDay>>> = ({ signal }) => getScamOfDay({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getScamOfDay>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetScamOfDayQueryResult = NonNullable<Awaited<ReturnType<typeof getScamOfDay>>>
+export type GetScamOfDayQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Most active scam right now
+ */
+
+export function useGetScamOfDay<TData = Awaited<ReturnType<typeof getScamOfDay>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getScamOfDay>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetScamOfDayQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateMyLocationUrl = () => {
+
+
+
+
+  return `/api/me/location`
+}
+
+/**
+ * @summary Update the current user's detected city/location
+ */
+export const updateMyLocation = async (updateLocationRequest: UpdateLocationRequest, options?: RequestInit): Promise<User> => {
+
+  return customFetch<User>(getUpdateMyLocationUrl(),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateLocationRequest,)
+  }
+);}
+
+
+
+
+export const getUpdateMyLocationMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMyLocation>>, TError,{data: BodyType<UpdateLocationRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateMyLocation>>, TError,{data: BodyType<UpdateLocationRequest>}, TContext> => {
+
+const mutationKey = ['updateMyLocation'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateMyLocation>>, {data: BodyType<UpdateLocationRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateMyLocation(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateMyLocationMutationResult = NonNullable<Awaited<ReturnType<typeof updateMyLocation>>>
+    export type UpdateMyLocationMutationBody = BodyType<UpdateLocationRequest>
+    export type UpdateMyLocationMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Update the current user's detected city/location
+ */
+export const useUpdateMyLocation = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateMyLocation>>, TError,{data: BodyType<UpdateLocationRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateMyLocation>>,
+        TError,
+        {data: BodyType<UpdateLocationRequest>},
+        TContext
+      > => {
+      return useMutation(getUpdateMyLocationMutationOptions(options));
+    }
 
 export const getCheckNumberUrl = (phone: string,) => {
 

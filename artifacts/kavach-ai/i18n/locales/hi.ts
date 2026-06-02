@@ -11,6 +11,13 @@ const hi = {
     checkConnection: "कृपया अपना इंटरनेट कनेक्शन जाँचें और फिर कोशिश करें।",
     optional: "वैकल्पिक",
     required: "ज़रूरी",
+    timeAgo: {
+      justNow: "अभी",
+      minutes: "{{n}} मिनट पहले",
+      hours: "{{n}} घंटे पहले",
+      days: "{{n}} दिन पहले",
+      thisWeek: "इस हफ्ते",
+    },
     trend: {
       critical: "गंभीर",
       high: "ज़्यादा",
@@ -108,6 +115,10 @@ const hi = {
     verifySub: "किसी भी संदिग्ध चीज़ को तुरंत जाँचें",
     activeScamsToday: "आज की चालू ठगी",
     allCount: "सभी {{n}} →",
+    activeEmpty: "अभी कोई चालू ठगी दर्ज नहीं है। थोड़ी देर बाद देखें।",
+    activeError: "लाइव ठगी लोड नहीं हो सकी।",
+    hotspotsEmpty: "अभी हॉटस्पॉट डेटा नहीं है।",
+    hotspotsError: "हॉटस्पॉट लोड नहीं हो सके।",
     tipCritical: "असली कूरियर वाले कभी फोन पर पैसे नहीं माँगते।",
     tipDefault: "तुरंत फोन काट दें और आधिकारिक तरीके से जाँच करें।",
     familyShield: "फैमिली शील्ड",
@@ -390,6 +401,11 @@ const hi = {
     cityHotspots: "शहर के हॉटस्पॉट",
     cases: "{{n}} मामले",
     goldenRules: "सुरक्षा के सुनहरे नियम",
+    trendingEmpty: "अभी कोई चालू ठगी दर्ज नहीं है। थोड़ी देर बाद देखें।",
+    trendingError: "खतरा फीड लोड नहीं हो सकी।",
+    hotspotsEmpty: "अभी हॉटस्पॉट डेटा नहीं है।",
+    hotspotsError: "हॉटस्पॉट लोड नहीं हो सके।",
+    scamOfDayError: "आज की प्रमुख ठगी लोड नहीं हो सकी।",
   },
 
   family: {

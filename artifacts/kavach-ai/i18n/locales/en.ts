@@ -23,6 +23,13 @@ const en = {
     checkConnection: "Please check your connection and try again.",
     optional: "Optional",
     required: "Required",
+    timeAgo: {
+      justNow: "just now",
+      minutes: "{{n}} min ago",
+      hours: "{{n}} hr ago",
+      days: "{{n}}d ago",
+      thisWeek: "this week",
+    },
     trend: {
       critical: "CRITICAL",
       high: "HIGH",
@@ -129,6 +136,10 @@ const en = {
     nearbyUnavailable: "Couldn't detect your location.",
     nearbyRetry: "Try again",
     nearbyEmpty: "No city-specific reports right now. Stay alert and verify every unknown caller.",
+    activeEmpty: "No active scams reported right now. Check back soon.",
+    activeError: "Couldn't load live scams.",
+    hotspotsEmpty: "No hotspot data yet.",
+    hotspotsError: "Couldn't load hotspots.",
     tipCritical: "Real couriers never ask for payment over the phone.",
     tipDefault: "Hang up immediately and verify through official channels.",
     familyShield: "Family Shield",
@@ -428,6 +439,11 @@ const en = {
     cityHotspots: "City Hotspots",
     cases: "{{n}} cases",
     goldenRules: "Golden Rules of Safety",
+    trendingEmpty: "No active scams reported right now. Check back soon.",
+    trendingError: "Couldn't load the threat feed.",
+    hotspotsEmpty: "No hotspot data yet.",
+    hotspotsError: "Couldn't load hotspots.",
+    scamOfDayError: "Couldn't load today's top scam.",
   },
 
   family: {

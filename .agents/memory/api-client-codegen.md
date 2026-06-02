@@ -16,3 +16,10 @@ generation (or an edit that only refreshed schemas) leaves them out of sync.
 
 **How to apply:** before wiring a newly-added endpoint into an artifact, confirm
 the operation function exists in `generated/api.ts`; if not, run codegen first.
+
+## Overriding query options requires an explicit queryKey
+When you pass a `query: {...}` options object to a generated `useGetXxx` hook
+(e.g. to set `refetchInterval`/`enabled`), TypeScript requires `queryKey` too
+(TanStack Query v5 `UseQueryOptions` shape). Symptom: TS2741 "Property 'queryKey'
+is missing". Fix: import and call the generated `getGetXxxQueryKey(params)` and
+pass it in the same `query` object. The admin app uses this exact pattern.

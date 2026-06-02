@@ -8,6 +8,7 @@ import {
 } from "@workspace/db";
 import {
   RequestOtpBody,
+  UpdateMyLocationBody,
   VerifyOtpBody,
   type AuthResponse,
   type RequestOtpResult,
@@ -208,6 +209,31 @@ router.post("/auth/verify-otp", async (req, res) => {
 
 router.get("/auth/me", requireAuth, async (req, res) => {
   res.json(toUserDto(req.user!));
+});
+
+router.patch("/me/location", requireAuth, async (req, res) => {
+  const user = req.user!;
+  const body = UpdateMyLocationBody.parse(req.body);
+  const location = body.location.trim();
+
+  if (!location) {
+    res.json(toUserDto(user));
+    return;
+  }
+
+  // Only write when the detected city actually changed to avoid needless writes.
+  if (user.location === location) {
+    res.json(toUserDto(user));
+    return;
+  }
+
+  const [updated] = await db
+    .update(usersTable)
+    .set({ location, updatedAt: new Date() })
+    .where(eq(usersTable.id, user.id))
+    .returning();
+
+  res.json(toUserDto(updated));
 });
 
 router.post("/auth/logout", requireAuth, async (req, res) => {

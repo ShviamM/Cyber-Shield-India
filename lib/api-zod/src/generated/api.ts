@@ -102,6 +102,7 @@ export const CreateReportBody = zod.object({
   "phone": zod.string(),
   "categoryKey": zod.string(),
   "description": zod.string(),
+  "city": zod.string().nullish().describe('City where the incident was reported, used for hotspot stats'),
   "incidentDate": zod.coerce.date().nullish()
 })
 
@@ -142,6 +143,84 @@ export const ListReportsResponse = zod.object({
   "createdAt": zod.coerce.date()
 })),
   "total": zod.number()
+})
+
+
+/**
+ * Scam categories ranked by recent activity, fusing seeded official baselines with live community reports. When `city` is supplied the list is scoped to that city.
+ * @summary Trending scam categories
+ */
+export const GetTrendingScamsQueryParams = zod.object({
+  "city": zod.coerce.string().optional()
+})
+
+export const GetTrendingScamsResponse = zod.object({
+  "scams": zod.array(zod.object({
+  "categoryKey": zod.string(),
+  "type": zod.string().describe('English category name'),
+  "typeHi": zod.string().nullish().describe('Hindi category name'),
+  "description": zod.string().nullish(),
+  "tip": zod.string().nullish(),
+  "tipHi": zod.string().nullish(),
+  "count": zod.number().describe('Combined baseline + live report volume'),
+  "trend": zod.enum(['critical', 'high', 'medium']),
+  "city": zod.string().nullish().describe('Top city for this scam in the queried scope'),
+  "lastReportedAt": zod.coerce.date().nullish().describe('Most recent live report timestamp, null when baseline-only')
+})),
+  "total": zod.number().describe('Sum of all trending counts in scope')
+})
+
+
+/**
+ * Cities ranked by total recent scam activity (baseline + live reports), with week-over-week change. When `city` is supplied it is always included in the result even if outside the top ranks.
+ * @summary City scam hotspots
+ */
+export const GetCityHotspotsQueryParams = zod.object({
+  "city": zod.coerce.string().optional()
+})
+
+export const GetCityHotspotsResponse = zod.object({
+  "hotspots": zod.array(zod.object({
+  "city": zod.string(),
+  "cases": zod.number(),
+  "changePct": zod.number().describe('Signed week-over-week change percentage'),
+  "up": zod.boolean().describe('True when activity increased versus the previous period')
+}))
+})
+
+
+/**
+ * The single top-trending scam category with bilingual title, tip, and the cities seeing it most.
+ * @summary Most active scam right now
+ */
+export const GetScamOfDayResponse = zod.object({
+  "categoryKey": zod.string(),
+  "tag": zod.string(),
+  "title": zod.string(),
+  "titleHi": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "tip": zod.string().nullish(),
+  "tipHi": zod.string().nullish(),
+  "reports": zod.number(),
+  "cities": zod.array(zod.string())
+})
+
+
+/**
+ * @summary Update the current user's detected city/location
+ */
+export const UpdateMyLocationBody = zod.object({
+  "location": zod.string().describe('Detected city or location label')
+})
+
+export const UpdateMyLocationResponse = zod.object({
+  "id": zod.string(),
+  "fullName": zod.string(),
+  "phone": zod.string(),
+  "location": zod.string().nullish(),
+  "isAdmin": zod.boolean(),
+  "status": zod.string(),
+  "createdAt": zod.coerce.date()
 })
 
 

@@ -6,11 +6,14 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface CreateReportRequest {
-  phone: string;
+export interface ScamOfDay {
   categoryKey: string;
-  description: string;
-  /** City where the incident was reported, used for hotspot stats */
-  city?: string | null;
-  incidentDate?: Date | null;
+  tag: string;
+  title: string;
+  titleHi?: string | null;
+  description?: string | null;
+  tip?: string | null;
+  tipHi?: string | null;
+  reports: number;
+  cities: string[];
 }

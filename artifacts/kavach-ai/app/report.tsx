@@ -21,6 +21,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ErrorState, LoadingState } from "@/components/StateViews";
 import { categoryIcon } from "@/constants/strings";
 import { useColors } from "@/hooks/useColors";
+import { useNearbyCity } from "@/hooks/useNearbyCity";
 import { isValidIndianPhone, phoneForApi } from "@/lib/phone";
 
 const NAVY = "#0B3D91";
@@ -42,6 +43,7 @@ export default function ReportScreen() {
 
   const phoneValid = isValidIndianPhone(phone);
   const apiPhone = phoneForApi(phone);
+  const { city: detectedCity } = useNearbyCity();
 
   const categoriesQuery = useQuery({
     queryKey: ["categories"],
@@ -86,6 +88,7 @@ export default function ReportScreen() {
           categoryKey,
           description: desc,
           incidentDate: incidentDate.trim() ? incidentDate.trim() : undefined,
+          city: detectedCity ?? undefined,
         },
       });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);

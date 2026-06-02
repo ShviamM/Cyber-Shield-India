@@ -1,9 +1,11 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  ActivityIndicator,
+  AppState,
   Dimensions,
   Linking,
   Platform,
@@ -14,11 +16,21 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  getGetCityHotspotsQueryKey,
+  getGetTrendingScamsQueryKey,
+  useGetCityHotspots,
+  useGetTrendingScams,
+  useUpdateMyLocation,
+} from "@workspace/api-client-react";
 
 import { useAppContext } from "@/context/AppContext";
-import { CITY_HOTSPOTS, GOLDEN_RULES, LIVE_THREATS } from "@/constants/data";
+import { GOLDEN_RULES } from "@/constants/data";
 import { useColors } from "@/hooks/useColors";
 import { useNearbyCity } from "@/hooks/useNearbyCity";
+import { formatChangePct, formatTimeAgo } from "@/lib/format";
+
+const REFETCH_MS = 60000;
 
 const SAFFRON = "#FF6713";
 const NAVY = "#0B3D91";
@@ -29,7 +41,8 @@ const { width } = Dimensions.get("window");
 export default function HomeScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isHindi = i18n.language?.startsWith("hi");
   const { guardianActive, familyMembers, recentChecks, toggleGuardian } = useAppContext();
   const {
     city: nearbyCity,
@@ -38,12 +51,66 @@ export default function HomeScreen() {
     retry: retryNearby,
   } = useNearbyCity();
 
-  const cityThreats = nearbyCity
-    ? LIVE_THREATS.filter((x) => x.city === nearbyCity)
-    : [];
+  // Global trending feed (no city filter) for the "Active Scams Today" section.
+  const trending = useGetTrendingScams(undefined, {
+    query: {
+      queryKey: getGetTrendingScamsQueryKey(),
+      refetchInterval: REFETCH_MS,
+    },
+  });
+  // City-scoped trending for the auto-detected "near you" section.
+  const cityParams = { city: nearbyCity ?? undefined };
+  const cityTrending = useGetTrendingScams(cityParams, {
+    query: {
+      queryKey: getGetTrendingScamsQueryKey(cityParams),
+      enabled: nearbyStatus === "granted" && !!nearbyCity,
+      refetchInterval: REFETCH_MS,
+    },
+  });
+  const hotspotsQuery = useGetCityHotspots(cityParams, {
+    query: {
+      queryKey: getGetCityHotspotsQueryKey(cityParams),
+      refetchInterval: REFETCH_MS,
+    },
+  });
+  const updateLocation = useUpdateMyLocation();
+
+  const globalScams = trending.data?.scams ?? [];
+  const trendingTotal = trending.data?.total ?? 0;
+  const cityScams = cityTrending.data?.scams ?? [];
+  const hotspots = hotspotsQuery.data?.hotspots ?? [];
   const cityHotspot = nearbyCity
-    ? CITY_HOTSPOTS.find((h) => h.city === nearbyCity)
+    ? hotspots.find((h) => h.city === nearbyCity)
     : undefined;
+
+  // Refetch live data whenever the app returns to the foreground.
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state === "active") {
+        trending.refetch();
+        hotspotsQuery.refetch();
+        if (nearbyStatus === "granted" && nearbyCity) cityTrending.refetch();
+      }
+    });
+    return () => sub.remove();
+  }, [trending, hotspotsQuery, cityTrending, nearbyStatus, nearbyCity]);
+
+  // Persist the detected city to the user's profile (fire-and-forget).
+  const lastSentCity = useRef<string | null>(null);
+  useEffect(() => {
+    if (
+      nearbyStatus === "granted" &&
+      nearbyCity &&
+      lastSentCity.current !== nearbyCity
+    ) {
+      lastSentCity.current = nearbyCity;
+      updateLocation
+        .mutateAsync({ data: { location: nearbyCity } })
+        .catch(() => {
+          // Non-critical: ignore (e.g. signed-out or offline).
+        });
+    }
+  }, [nearbyStatus, nearbyCity, updateLocation]);
 
   const topInset = Platform.OS === "web" ? 0 : insets.top;
   const bottomPad = (Platform.OS === "web" ? 34 : insets.bottom) + 80;
@@ -240,7 +307,7 @@ export default function HomeScreen() {
                     { color: cityHotspot.up ? "#dc2626" : GREEN },
                   ]}
                 >
-                  {cityHotspot.change}
+                  {formatChangePct(cityHotspot.changePct)}
                 </Text>
               </View>
             )}
@@ -276,8 +343,23 @@ export default function HomeScreen() {
           )}
 
           {nearbyStatus === "granted" &&
-            (cityThreats.length > 0 ? (
-              cityThreats.map((item) => {
+            (cityTrending.isLoading ? (
+              <View style={s.nearbyLoading}>
+                <ActivityIndicator color={NAVY} />
+              </View>
+            ) : cityTrending.isError ? (
+              <View>
+                <Text style={s.nearbyHint}>{t("home.activeError")}</Text>
+                <TouchableOpacity
+                  style={s.nearbyBtn}
+                  onPress={() => cityTrending.refetch()}
+                >
+                  <Feather name="refresh-cw" size={13} color="#fff" />
+                  <Text style={s.nearbyBtnTxt}>{t("home.nearbyRetry")}</Text>
+                </TouchableOpacity>
+              </View>
+            ) : cityScams.length > 0 ? (
+              cityScams.map((item) => {
                 const color =
                   item.trend === "critical"
                     ? "#dc2626"
@@ -290,15 +372,17 @@ export default function HomeScreen() {
                     : item.trend === "high"
                     ? "#fff7ed"
                     : "#fefce8";
+                const title = isHindi && item.typeHi ? item.typeHi : item.type;
                 return (
-                  <View key={item.id} style={s.nearbyThreat}>
+                  <View key={item.categoryKey} style={s.nearbyThreat}>
                     <View style={[s.nearbyThreatIcon, { backgroundColor: bg }]}>
                       <Feather name="phone-off" size={15} color={color} />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={s.nearbyThreatType}>{item.type}</Text>
+                      <Text style={s.nearbyThreatType}>{title}</Text>
                       <Text style={s.nearbyThreatMeta}>
-                        {t("threats.reports", { n: item.count.toLocaleString() })} · {item.time}
+                        {t("threats.reports", { n: item.count.toLocaleString() })} ·{" "}
+                        {formatTimeAgo(t, item.lastReportedAt)}
                       </Text>
                     </View>
                     <View style={[s.scamTag, { backgroundColor: bg }]}>
@@ -320,48 +404,79 @@ export default function HomeScreen() {
             <View style={s.livePulse} />
             <Text style={[s.outerSectionTitle, { color: colors.text }]}>{t("home.activeScamsToday")}</Text>
           </View>
-          <TouchableOpacity onPress={() => router.push("/(tabs)/threats")}>
-            <Text style={[s.seeAll, { color: NAVY }]}>{t("home.allCount", { n: 23 })}</Text>
-          </TouchableOpacity>
+          {globalScams.length > 0 && (
+            <TouchableOpacity onPress={() => router.push("/(tabs)/threats")}>
+              <Text style={[s.seeAll, { color: NAVY }]}>
+                {t("home.allCount", { n: globalScams.length })}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
-        {LIVE_THREATS.slice(0, 2).map((item) => {
-          const color = item.trend === "critical" ? "#dc2626" : item.trend === "high" ? "#ea580c" : "#d97706";
-          const bg = item.trend === "critical" ? "#fff1f1" : item.trend === "high" ? "#fff7ed" : "#fefce8";
-          return (
-            <View key={item.id} style={[s.scamCard, { borderColor: color + "30" }]}>
-              <View style={s.scamCardTop}>
-                <View style={[s.scamIconBox, { backgroundColor: bg }]}>
-                  <Feather name="phone-off" size={18} color={color} />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <View style={s.scamTagRow}>
-                    <View style={[s.scamTag, { backgroundColor: bg }]}>
-                      <Text style={[s.scamTagTxt, { color }]}>{item.trend.toUpperCase()}</Text>
+        {trending.isLoading ? (
+          <View style={s.sectionLoading}>
+            <ActivityIndicator color={NAVY} />
+          </View>
+        ) : trending.isError ? (
+          <View style={[s.scamCard, { borderColor: "#fecaca" }]}>
+            <Text style={s.stateHint}>{t("home.activeError")}</Text>
+            <TouchableOpacity
+              style={s.inlineRetry}
+              onPress={() => trending.refetch()}
+            >
+              <Feather name="refresh-cw" size={13} color="#fff" />
+              <Text style={s.nearbyBtnTxt}>{t("home.nearbyRetry")}</Text>
+            </TouchableOpacity>
+          </View>
+        ) : globalScams.length === 0 ? (
+          <View style={[s.scamCard, { borderColor: "#e2e8f0" }]}>
+            <Text style={s.stateHint}>{t("home.activeEmpty")}</Text>
+          </View>
+        ) : (
+          globalScams.slice(0, 2).map((item) => {
+            const color = item.trend === "critical" ? "#dc2626" : item.trend === "high" ? "#ea580c" : "#d97706";
+            const bg = item.trend === "critical" ? "#fff1f1" : item.trend === "high" ? "#fff7ed" : "#fefce8";
+            const title = isHindi && item.typeHi ? item.typeHi : item.type;
+            const tip = isHindi && item.tipHi ? item.tipHi : item.tip;
+            return (
+              <View key={item.categoryKey} style={[s.scamCard, { borderColor: color + "30" }]}>
+                <View style={s.scamCardTop}>
+                  <View style={[s.scamIconBox, { backgroundColor: bg }]}>
+                    <Feather name="phone-off" size={18} color={color} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <View style={s.scamTagRow}>
+                      <View style={[s.scamTag, { backgroundColor: bg }]}>
+                        <Text style={[s.scamTagTxt, { color }]}>{item.trend.toUpperCase()}</Text>
+                      </View>
+                      <Feather name="chevron-right" size={14} color="#94a3b8" />
                     </View>
-                    <Feather name="chevron-right" size={14} color="#94a3b8" />
-                  </View>
-                  <Text style={s.scamType}>{item.type}</Text>
-                  <Text style={s.scamDesc} numberOfLines={2}>{item.description}</Text>
-                  <View style={s.scamMeta}>
-                    <Feather name="alert-triangle" size={10} color={color} />
-                    <Text style={[s.scamMetaTxt, { color }]}>
-                      {t("threats.reports", { n: item.count.toLocaleString() })} · {item.city}
-                    </Text>
+                    <Text style={s.scamType}>{title}</Text>
+                    {item.description ? (
+                      <Text style={s.scamDesc} numberOfLines={2}>{item.description}</Text>
+                    ) : null}
+                    <View style={s.scamMeta}>
+                      <Feather name="alert-triangle" size={10} color={color} />
+                      <Text style={[s.scamMetaTxt, { color }]}>
+                        {t("threats.reports", { n: item.count.toLocaleString() })}
+                        {item.city ? ` · ${item.city}` : ""}
+                      </Text>
+                    </View>
                   </View>
                 </View>
+                <View style={s.scamTip}>
+                  <Feather name="check-circle" size={13} color={GREEN} />
+                  <Text style={s.scamTipTxt}>
+                    {tip ??
+                      (item.trend === "critical"
+                        ? t("home.tipCritical")
+                        : t("home.tipDefault"))}
+                  </Text>
+                </View>
               </View>
-              <View style={s.scamTip}>
-                <Feather name="check-circle" size={13} color={GREEN} />
-                <Text style={s.scamTipTxt}>
-                  {item.trend === "critical"
-                    ? t("home.tipCritical")
-                    : t("home.tipDefault")}
-                </Text>
-              </View>
-            </View>
-          );
-        })}
+            );
+          })
+        )}
 
         {/* Family Shield preview */}
         {familyMembers.length > 0 && (
@@ -444,30 +559,58 @@ export default function HomeScreen() {
             <Text style={[s.outerSectionTitle, { marginLeft: 6, color: colors.text }]}>{t("home.hotspots")}</Text>
           </View>
         </View>
-        <View style={s.hotspotsCard}>
-          {(() => {
-            const top = CITY_HOTSPOTS.slice(0, 4);
-            const mine =
-              nearbyStatus === "granted" && cityHotspot && !top.includes(cityHotspot)
-                ? [cityHotspot]
-                : [];
-            const rows = [...top, ...mine];
-            return rows.map((hs, i) => (
-            <View key={hs.city} style={[s.hotspotRow, i < rows.length - 1 && s.hotspotRowBorder]}>
-              <View style={s.hotspotRank}>
-                <Text style={s.hotspotRankTxt}>{hs.rank}</Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={s.hotspotCity}>{hs.city}</Text>
-                <Text style={s.hotspotCases}>{t("home.casesReported", { n: hs.cases.toLocaleString() })}</Text>
-              </View>
-              <View style={s.hotspotBadge}>
-                <Text style={s.hotspotBadgeTxt}>{hs.change}</Text>
-              </View>
+        {hotspotsQuery.isLoading ? (
+          <View style={s.hotspotsCard}>
+            <View style={s.sectionLoading}>
+              <ActivityIndicator color={NAVY} />
             </View>
-            ));
-          })()}
-        </View>
+          </View>
+        ) : hotspotsQuery.isError ? (
+          <View style={s.hotspotsCard}>
+            <View style={{ padding: 16, alignItems: "center", gap: 12 }}>
+              <Text style={s.stateHint}>{t("home.hotspotsError")}</Text>
+              <TouchableOpacity
+                style={s.inlineRetry}
+                onPress={() => hotspotsQuery.refetch()}
+              >
+                <Feather name="refresh-cw" size={13} color="#fff" />
+                <Text style={s.nearbyBtnTxt}>{t("home.nearbyRetry")}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : hotspots.length === 0 ? (
+          <View style={s.hotspotsCard}>
+            <Text style={[s.stateHint, { padding: 16 }]}>{t("home.hotspotsEmpty")}</Text>
+          </View>
+        ) : (
+          <View style={s.hotspotsCard}>
+            {(() => {
+              const top = hotspots.slice(0, 4);
+              const mine =
+                cityHotspot && !top.some((h) => h.city === cityHotspot.city)
+                  ? [cityHotspot]
+                  : [];
+              const rows = [...top, ...mine];
+              return rows.map((hs, i) => {
+                const rank = hotspots.findIndex((h) => h.city === hs.city) + 1;
+                return (
+                  <View key={hs.city} style={[s.hotspotRow, i < rows.length - 1 && s.hotspotRowBorder]}>
+                    <View style={s.hotspotRank}>
+                      <Text style={s.hotspotRankTxt}>{rank}</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={s.hotspotCity}>{hs.city}</Text>
+                      <Text style={s.hotspotCases}>{t("home.casesReported", { n: hs.cases.toLocaleString() })}</Text>
+                    </View>
+                    <View style={s.hotspotBadge}>
+                      <Text style={s.hotspotBadgeTxt}>{formatChangePct(hs.changePct)}</Text>
+                    </View>
+                  </View>
+                );
+              });
+            })()}
+          </View>
+        )}
 
         {/* Protect Your Circle CTA */}
         <TouchableOpacity
@@ -643,6 +786,13 @@ const s = StyleSheet.create({
     backgroundColor: NAVY, borderRadius: 12, paddingVertical: 10, marginTop: 12,
   },
   nearbyBtnTxt: { fontSize: 13, fontWeight: "700" as const, color: "#fff" },
+  nearbyLoading: { paddingVertical: 18, alignItems: "center" },
+  sectionLoading: { paddingVertical: 24, alignItems: "center" },
+  stateHint: { fontSize: 13, color: "#64748b", lineHeight: 19 },
+  inlineRetry: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6,
+    backgroundColor: NAVY, borderRadius: 12, paddingVertical: 10, marginTop: 12,
+  },
   nearbyThreat: { flexDirection: "row", alignItems: "center", gap: 10, marginTop: 12 },
   nearbyThreatIcon: {
     width: 34, height: 34, borderRadius: 10,

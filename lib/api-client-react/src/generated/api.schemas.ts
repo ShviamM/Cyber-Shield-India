@@ -68,10 +68,75 @@ export interface CategoryListResponse {
   categories: ScamCategory[];
 }
 
+export type TrendingScamTrend = typeof TrendingScamTrend[keyof typeof TrendingScamTrend];
+
+
+export const TrendingScamTrend = {
+  critical: 'critical',
+  high: 'high',
+  medium: 'medium',
+} as const;
+
+export interface TrendingScam {
+  categoryKey: string;
+  /** English category name */
+  type: string;
+  /** Hindi category name */
+  typeHi?: string | null;
+  description?: string | null;
+  tip?: string | null;
+  tipHi?: string | null;
+  /** Combined baseline + live report volume */
+  count: number;
+  trend: TrendingScamTrend;
+  /** Top city for this scam in the queried scope */
+  city?: string | null;
+  /** Most recent live report timestamp, null when baseline-only */
+  lastReportedAt?: string | null;
+}
+
+export interface TrendingScamListResponse {
+  scams: TrendingScam[];
+  /** Sum of all trending counts in scope */
+  total: number;
+}
+
+export interface CityHotspot {
+  city: string;
+  cases: number;
+  /** Signed week-over-week change percentage */
+  changePct: number;
+  /** True when activity increased versus the previous period */
+  up: boolean;
+}
+
+export interface CityHotspotListResponse {
+  hotspots: CityHotspot[];
+}
+
+export interface ScamOfDay {
+  categoryKey: string;
+  tag: string;
+  title: string;
+  titleHi?: string | null;
+  description?: string | null;
+  tip?: string | null;
+  tipHi?: string | null;
+  reports: number;
+  cities: string[];
+}
+
+export interface UpdateLocationRequest {
+  /** Detected city or location label */
+  location: string;
+}
+
 export interface CreateReportRequest {
   phone: string;
   categoryKey: string;
   description: string;
+  /** City where the incident was reported, used for hotspot stats */
+  city?: string | null;
   incidentDate?: string | null;
 }
 
@@ -259,6 +324,14 @@ phone?: string;
 category?: string;
 limit?: number;
 offset?: number;
+};
+
+export type GetTrendingScamsParams = {
+city?: string;
+};
+
+export type GetCityHotspotsParams = {
+city?: string;
 };
 
 export type AdminListReportsParams = {
