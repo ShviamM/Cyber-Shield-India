@@ -24,6 +24,10 @@ tags:
     description: Moderation (admin only)
   - name: subscription
     description: Subscription plans, checkout orders, and billing
+  - name: notifications
+    description: Push notification device registration
+  - name: family
+    description: Family plan protected members
 paths:
   /healthz:
     get:
@@ -491,8 +495,8 @@ paths:
       tags: [admin]
       summary: Fraud report volume aggregated by Indian state
       description: >-
-        Scam/fraud report volume grouped by Indian state (seeded official
-        baselines fused with live community reports), ranked highest first.
+        Scam/fraud report volume grouped by Indian state from live community
+        reports only, ranked highest first.
       security:
         - bearerAuth: []
       responses:
@@ -616,6 +620,128 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaymentList"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /me/push-token:
+    post:
+      operationId: registerPushToken
+      tags: [notifications]
+      summary: Register this device's Expo push token
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterPushTokenRequest"
+      responses:
+        "200":
+          description: Token registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /family/members:
+    get:
+      operationId: listFamilyMembers
+      tags: [family]
+      summary: List the current user's protected family members
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Family members with the plan's member cap
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FamilyMemberList"
+        default:
+          $ref: "#/components/responses/Error"
+    post:
+      operationId: addFamilyMember
+      tags: [family]
+      summary: Add a protected family member (requires the Family plan)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddFamilyMemberRequest"
+      responses:
+        "200":
+          description: The created family member
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FamilyMember"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /family/members/{id}:
+    delete:
+      operationId: removeFamilyMember
+      tags: [family]
+      summary: Remove a protected family member
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Removed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /admin/broadcasts:
+    get:
+      operationId: adminListBroadcasts
+      tags: [admin]
+      summary: List past push broadcasts
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Broadcast history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BroadcastList"
+        default:
+          $ref: "#/components/responses/Error"
+    post:
+      operationId: adminSendBroadcast
+      tags: [admin]
+      summary: Send a push broadcast to all registered devices
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendBroadcastRequest"
+      responses:
+        "200":
+          description: The broadcast that was sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Broadcast"
         default:
           $ref: "#/components/responses/Error"
 
@@ -1420,3 +1546,113 @@ components:
             $ref: "#/components/schemas/Payment"
       required:
         - payments
+
+    RegisterPushTokenRequest:
+      type: object
+      properties:
+        token:
+          type: string
+        platform:
+          type: string
+          enum: [ios, android, web]
+          nullable: true
+      required:
+        - token
+
+    FamilyMember:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        phone:
+          type: string
+        relationship:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - phone
+        - createdAt
+
+    FamilyMemberList:
+      type: object
+      properties:
+        members:
+          type: array
+          items:
+            $ref: "#/components/schemas/FamilyMember"
+        maxMembers:
+          type: integer
+          description: Maximum members allowed on the user's current plan
+        plan:
+          type: string
+          enum: [free, premium, family]
+      required:
+        - members
+        - maxMembers
+        - plan
+
+    AddFamilyMemberRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        relationship:
+          type: string
+          nullable: true
+      required:
+        - name
+        - phone
+
+    Broadcast:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        recipientCount:
+          type: integer
+        successCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - body
+        - recipientCount
+        - successCount
+        - createdAt
+
+    BroadcastList:
+      type: object
+      properties:
+        broadcasts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Broadcast"
+      required:
+        - broadcasts
+
+    SendBroadcastRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        body:
+          type: string
+      required:
+        - title
+        - body

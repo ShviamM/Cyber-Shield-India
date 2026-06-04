@@ -35,6 +35,12 @@ export const config = {
   // Multi-signal fraud check: per-client rate limit (the engine may call the AI
   // model and an external threat feed, so this protects cost and abuse).
   fraudCheckMaxPerMinute: intEnv("FRAUD_CHECK_MAX_PER_MINUTE", 20),
+  // Paid plans advertise "priority" fraud checks: authenticated premium users
+  // get a higher per-minute budget on /check than anonymous/free clients.
+  fraudCheckPremiumMaxPerMinute: intEnv(
+    "FRAUD_CHECK_PREMIUM_MAX_PER_MINUTE",
+    60,
+  ),
   // Optional Google Safe Browsing API key. When unset, URL checks fall back to
   // structural heuristics only (explicitly noted in the verdict).
   safeBrowsingApiKey: (process.env.GOOGLE_SAFE_BROWSING_API_KEY ?? "").trim(),
@@ -42,4 +48,19 @@ export const config = {
     .split(",")
     .map((p) => normalizeIndianPhone(p.trim()))
     .filter((p): p is string => Boolean(p)),
+  // Browser origins allowed to call the API (the admin web console). Mobile and
+  // native clients send no Origin header and are always allowed (see app.ts).
+  // The Replit preview/deploy domains are auto-allowed so the console works
+  // without extra configuration; set ADMIN_ORIGINS to lock to a custom domain.
+  allowedOrigins: [
+    ...(process.env.ADMIN_ORIGINS ?? "")
+      .split(",")
+      .map((o) => o.trim())
+      .filter(Boolean),
+    ...(process.env.REPLIT_DOMAINS ?? "")
+      .split(",")
+      .map((d) => d.trim())
+      .filter(Boolean)
+      .map((d) => `https://${d}`),
+  ],
 };

@@ -58,7 +58,9 @@
   "dependencies": {
     "@msg91comm/sendotp-react-native": "^2.1.0",
     "expo-camera": "~17.0.10",
+    "expo-device": "~8.0.10",
     "expo-localization": "~17.0.9",
+    "expo-notifications": "~0.32.17",
     "expo-share-intent": "5.1.1",
     "i18next": "^26.3.0",
     "react-i18next": "^17.0.8",

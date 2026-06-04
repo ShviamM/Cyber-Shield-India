@@ -20,12 +20,15 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AddFamilyMemberRequest,
   AdminListReportsParams,
   AdminLoginRequest,
   AdminReport,
   AdminReportListResponse,
   AdminStats,
   AuthResponse,
+  Broadcast,
+  BroadcastList,
   BusinessMetrics,
   CategoryListResponse,
   CheckPhoneRequest,
@@ -34,6 +37,8 @@ import type {
   CreateOrderRequest,
   CreateReportRequest,
   ErrorResponse,
+  FamilyMember,
+  FamilyMemberList,
   FraudCheckRequest,
   FraudMapResponse,
   FraudVerdict,
@@ -44,9 +49,11 @@ import type {
   NumberCheckResponse,
   NumberReputation,
   PaymentList,
+  RegisterPushTokenRequest,
   Report,
   ReportListResponse,
   ScamOfDay,
+  SendBroadcastRequest,
   SubscriptionOrder,
   SubscriptionPlanList,
   SubscriptionStatus,
@@ -1605,7 +1612,7 @@ export const getAdminFraudMapUrl = () => {
 }
 
 /**
- * Scam/fraud report volume grouped by Indian state (seeded official baselines fused with live community reports), ranked highest first.
+ * Scam/fraud report volume grouped by Indian state from live community reports only, ranked highest first.
  * @summary Fraud report volume aggregated by Indian state
  */
 export const adminFraudMap = async ( options?: RequestInit): Promise<FraudMapResponse> => {
@@ -2118,4 +2125,441 @@ export function useListMyPayments<TData = Awaited<ReturnType<typeof listMyPaymen
 
 
 
+
+export const getRegisterPushTokenUrl = () => {
+
+
+
+
+  return `/api/me/push-token`
+}
+
+/**
+ * @summary Register this device's Expo push token
+ */
+export const registerPushToken = async (registerPushTokenRequest: RegisterPushTokenRequest, options?: RequestInit): Promise<SuccessResponse> => {
+
+  return customFetch<SuccessResponse>(getRegisterPushTokenUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      registerPushTokenRequest,)
+  }
+);}
+
+
+
+
+export const getRegisterPushTokenMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerPushToken>>, TError,{data: BodyType<RegisterPushTokenRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof registerPushToken>>, TError,{data: BodyType<RegisterPushTokenRequest>}, TContext> => {
+
+const mutationKey = ['registerPushToken'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof registerPushToken>>, {data: BodyType<RegisterPushTokenRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  registerPushToken(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RegisterPushTokenMutationResult = NonNullable<Awaited<ReturnType<typeof registerPushToken>>>
+    export type RegisterPushTokenMutationBody = BodyType<RegisterPushTokenRequest>
+    export type RegisterPushTokenMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Register this device's Expo push token
+ */
+export const useRegisterPushToken = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof registerPushToken>>, TError,{data: BodyType<RegisterPushTokenRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof registerPushToken>>,
+        TError,
+        {data: BodyType<RegisterPushTokenRequest>},
+        TContext
+      > => {
+      return useMutation(getRegisterPushTokenMutationOptions(options));
+    }
+
+export const getListFamilyMembersUrl = () => {
+
+
+
+
+  return `/api/family/members`
+}
+
+/**
+ * @summary List the current user's protected family members
+ */
+export const listFamilyMembers = async ( options?: RequestInit): Promise<FamilyMemberList> => {
+
+  return customFetch<FamilyMemberList>(getListFamilyMembersUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListFamilyMembersQueryKey = () => {
+    return [
+    `/api/family/members`
+    ] as const;
+    }
+
+
+export const getListFamilyMembersQueryOptions = <TData = Awaited<ReturnType<typeof listFamilyMembers>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listFamilyMembers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListFamilyMembersQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listFamilyMembers>>> = ({ signal }) => listFamilyMembers({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listFamilyMembers>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListFamilyMembersQueryResult = NonNullable<Awaited<ReturnType<typeof listFamilyMembers>>>
+export type ListFamilyMembersQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List the current user's protected family members
+ */
+
+export function useListFamilyMembers<TData = Awaited<ReturnType<typeof listFamilyMembers>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listFamilyMembers>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListFamilyMembersQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getAddFamilyMemberUrl = () => {
+
+
+
+
+  return `/api/family/members`
+}
+
+/**
+ * @summary Add a protected family member (requires the Family plan)
+ */
+export const addFamilyMember = async (addFamilyMemberRequest: AddFamilyMemberRequest, options?: RequestInit): Promise<FamilyMember> => {
+
+  return customFetch<FamilyMember>(getAddFamilyMemberUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      addFamilyMemberRequest,)
+  }
+);}
+
+
+
+
+export const getAddFamilyMemberMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addFamilyMember>>, TError,{data: BodyType<AddFamilyMemberRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof addFamilyMember>>, TError,{data: BodyType<AddFamilyMemberRequest>}, TContext> => {
+
+const mutationKey = ['addFamilyMember'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addFamilyMember>>, {data: BodyType<AddFamilyMemberRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  addFamilyMember(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AddFamilyMemberMutationResult = NonNullable<Awaited<ReturnType<typeof addFamilyMember>>>
+    export type AddFamilyMemberMutationBody = BodyType<AddFamilyMemberRequest>
+    export type AddFamilyMemberMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Add a protected family member (requires the Family plan)
+ */
+export const useAddFamilyMember = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addFamilyMember>>, TError,{data: BodyType<AddFamilyMemberRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof addFamilyMember>>,
+        TError,
+        {data: BodyType<AddFamilyMemberRequest>},
+        TContext
+      > => {
+      return useMutation(getAddFamilyMemberMutationOptions(options));
+    }
+
+export const getRemoveFamilyMemberUrl = (id: string,) => {
+
+
+
+
+  return `/api/family/members/${id}`
+}
+
+/**
+ * @summary Remove a protected family member
+ */
+export const removeFamilyMember = async (id: string, options?: RequestInit): Promise<SuccessResponse> => {
+
+  return customFetch<SuccessResponse>(getRemoveFamilyMemberUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getRemoveFamilyMemberMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeFamilyMember>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof removeFamilyMember>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['removeFamilyMember'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof removeFamilyMember>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  removeFamilyMember(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RemoveFamilyMemberMutationResult = NonNullable<Awaited<ReturnType<typeof removeFamilyMember>>>
+
+    export type RemoveFamilyMemberMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Remove a protected family member
+ */
+export const useRemoveFamilyMember = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeFamilyMember>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof removeFamilyMember>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getRemoveFamilyMemberMutationOptions(options));
+    }
+
+export const getAdminListBroadcastsUrl = () => {
+
+
+
+
+  return `/api/admin/broadcasts`
+}
+
+/**
+ * @summary List past push broadcasts
+ */
+export const adminListBroadcasts = async ( options?: RequestInit): Promise<BroadcastList> => {
+
+  return customFetch<BroadcastList>(getAdminListBroadcastsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getAdminListBroadcastsQueryKey = () => {
+    return [
+    `/api/admin/broadcasts`
+    ] as const;
+    }
+
+
+export const getAdminListBroadcastsQueryOptions = <TData = Awaited<ReturnType<typeof adminListBroadcasts>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminListBroadcasts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdminListBroadcastsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListBroadcasts>>> = ({ signal }) => adminListBroadcasts({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminListBroadcasts>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type AdminListBroadcastsQueryResult = NonNullable<Awaited<ReturnType<typeof adminListBroadcasts>>>
+export type AdminListBroadcastsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List past push broadcasts
+ */
+
+export function useAdminListBroadcasts<TData = Awaited<ReturnType<typeof adminListBroadcasts>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminListBroadcasts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getAdminListBroadcastsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getAdminSendBroadcastUrl = () => {
+
+
+
+
+  return `/api/admin/broadcasts`
+}
+
+/**
+ * @summary Send a push broadcast to all registered devices
+ */
+export const adminSendBroadcast = async (sendBroadcastRequest: SendBroadcastRequest, options?: RequestInit): Promise<Broadcast> => {
+
+  return customFetch<Broadcast>(getAdminSendBroadcastUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      sendBroadcastRequest,)
+  }
+);}
+
+
+
+
+export const getAdminSendBroadcastMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminSendBroadcast>>, TError,{data: BodyType<SendBroadcastRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminSendBroadcast>>, TError,{data: BodyType<SendBroadcastRequest>}, TContext> => {
+
+const mutationKey = ['adminSendBroadcast'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminSendBroadcast>>, {data: BodyType<SendBroadcastRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  adminSendBroadcast(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminSendBroadcastMutationResult = NonNullable<Awaited<ReturnType<typeof adminSendBroadcast>>>
+    export type AdminSendBroadcastMutationBody = BodyType<SendBroadcastRequest>
+    export type AdminSendBroadcastMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Send a push broadcast to all registered devices
+ */
+export const useAdminSendBroadcast = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminSendBroadcast>>, TError,{data: BodyType<SendBroadcastRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminSendBroadcast>>,
+        TError,
+        {data: BodyType<SendBroadcastRequest>},
+        TContext
+      > => {
+      return useMutation(getAdminSendBroadcastMutationOptions(options));
+    }
 

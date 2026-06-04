@@ -489,6 +489,16 @@ const en = {
     removeTitle: "Remove Member",
     removeMessage: "Remove {{name}} from Family Shield?",
     remove: "Remove",
+    upgradeTitle: "Family plan required",
+    upgradeMessage:
+      "Protecting family members is part of the Family plan. Upgrade to add and monitor your loved ones.",
+    upgradeCta: "See plans",
+    limitTitle: "Member limit reached",
+    limitMessage: "Your plan allows up to {{n}} family members.",
+    addFailedTitle: "Couldn't add member",
+    addFailedMessage: "Something went wrong. Please try again.",
+    removeFailedTitle: "Couldn't remove member",
+    removeFailedMessage: "Something went wrong. Please try again.",
     relations: {
       mother: "Mother",
       father: "Father",

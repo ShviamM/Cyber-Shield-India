@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { LogOut, ShieldCheck, BarChart3, MapPin, AlertTriangle } from "lucide-react";
+import { LogOut, ShieldCheck, BarChart3, MapPin, Megaphone, AlertTriangle } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { BrandLogo, Wordmark, BrandTaglines } from "@/components/brand";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ const NAV_ITEMS: { href: string; label: string; icon: LucideIcon }[] = [
   { href: "/", label: "Moderation", icon: ShieldCheck },
   { href: "/business", label: "Business Metrics", icon: BarChart3 },
   { href: "/fraud-map", label: "India Fraud Map", icon: MapPin },
+  { href: "/broadcasts", label: "Broadcast Center", icon: Megaphone },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {

@@ -4,6 +4,7 @@ import { getMe, logout as logoutRequest } from "@workspace/api-client-react";
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 import { clearToken, loadToken, saveToken } from "@/lib/session";
+import { registerForPushNotifications } from "@/lib/push";
 
 type AuthStatus = "loading" | "authenticated" | "unauthenticated";
 
@@ -34,6 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const me = await getMe();
         setUser(me);
         setStatus("authenticated");
+        void registerForPushNotifications();
       } catch {
         // token invalid/expired
         await clearToken();
@@ -47,6 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await saveToken(auth.token);
     setUser(auth.user);
     setStatus("authenticated");
+    void registerForPushNotifications();
   }, []);
 
   const signOut = useCallback(async () => {

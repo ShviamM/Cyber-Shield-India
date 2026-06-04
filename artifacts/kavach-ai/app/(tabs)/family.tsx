@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { useRouter } from "expo-router";
 import type { TFunction } from "i18next";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -16,7 +17,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { FamilyMember, useAppContext } from "@/context/AppContext";
+import { FamilyMember, FamilyMemberError, useAppContext } from "@/context/AppContext";
 import { useColors } from "@/hooks/useColors";
 
 const NAVY = "#0B3D91";
@@ -42,39 +43,92 @@ export default function FamilyScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
-  const { familyMembers, addFamilyMember, removeFamilyMember, markFamilyMemberSafe } =
-    useAppContext();
+  const router = useRouter();
+  const {
+    familyMembers,
+    familyMaxMembers,
+    familyPlanKnown,
+    addFamilyMember,
+    removeFamilyMember,
+    markFamilyMemberSafe,
+  } = useAppContext();
 
   const relationLabel = (rel: string) =>
     t(`family.relations.${rel.toLowerCase()}`, { defaultValue: rel });
+
+  // Family roster is a Family-plan feature; the server is the source of truth
+  // for the cap. We only apply client-side gating once the server has reported
+  // the plan — until then, defer to the server's 402/403 on submit so a slow or
+  // failed fetch never blocks a legitimate Family-plan user with a false upsell.
+  const planAllows = familyMaxMembers > 0;
+  const atCapacity = planAllows && familyMembers.length >= familyMaxMembers;
 
   const [showAdd, setShowAdd] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [relation, setRelation] = useState("Mother");
+  const [saving, setSaving] = useState(false);
 
   const topInset = Platform.OS === "web" ? 0 : insets.top;
   const bottomPad = (Platform.OS === "web" ? 34 : insets.bottom) + 80;
 
-  function handleAdd() {
-    if (!name.trim() || !phone.trim()) return;
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    addFamilyMember({
-      name: name.trim(),
-      phone: phone.trim(),
-      relation,
-      status: "safe",
-      lastSeen: "Just added",
-    });
-    setName("");
-    setPhone("");
-    setRelation("Mother");
-    setShowAdd(false);
+  function promptUpgrade() {
+    Alert.alert(
+      t("family.upgradeTitle"),
+      t("family.upgradeMessage"),
+      [
+        { text: t("common.cancel"), style: "cancel" },
+        { text: t("family.upgradeCta"), onPress: () => router.push("/subscription") },
+      ]
+    );
+  }
+
+  function openAdd() {
+    Haptics.selectionAsync();
+    if (familyPlanKnown && !planAllows) {
+      promptUpgrade();
+      return;
+    }
+    if (familyPlanKnown && atCapacity) {
+      Alert.alert(t("family.limitTitle"), t("family.limitMessage", { n: familyMaxMembers }));
+      return;
+    }
+    setShowAdd((v) => !v);
+  }
+
+  async function handleAdd() {
+    if (!name.trim() || !phone.trim() || saving) return;
+    setSaving(true);
+    try {
+      await addFamilyMember({
+        name: name.trim(),
+        phone: phone.trim(),
+        relationship: relation,
+      });
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setName("");
+      setPhone("");
+      setRelation("Mother");
+      setShowAdd(false);
+    } catch (err) {
+      const status = err instanceof FamilyMemberError ? err.status : 0;
+      if (status === 402) {
+        promptUpgrade();
+      } else if (status === 403) {
+        Alert.alert(t("family.limitTitle"), t("family.limitMessage", { n: familyMaxMembers }));
+      } else {
+        Alert.alert(t("family.addFailedTitle"), t("family.addFailedMessage"));
+      }
+    } finally {
+      setSaving(false);
+    }
   }
 
   function handleDelete(m: FamilyMember) {
     if (Platform.OS === "web") {
-      removeFamilyMember(m.id);
+      removeFamilyMember(m.id).catch(() => {
+        Alert.alert(t("family.removeFailedTitle"), t("family.removeFailedMessage"));
+      });
       return;
     }
     Alert.alert(t("family.removeTitle"), t("family.removeMessage", { name: m.name }), [
@@ -84,7 +138,9 @@ export default function FamilyScreen() {
         style: "destructive",
         onPress: () => {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-          removeFamilyMember(m.id);
+          removeFamilyMember(m.id).catch(() => {
+            Alert.alert(t("family.removeFailedTitle"), t("family.removeFailedMessage"));
+          });
         },
       },
     ]);
@@ -118,7 +174,7 @@ export default function FamilyScreen() {
           </View>
           <TouchableOpacity
             style={[s.addBtn, { backgroundColor: showAdd ? "rgba(255,255,255,0.2)" : SAFFRON }]}
-            onPress={() => { Haptics.selectionAsync(); setShowAdd((v) => !v); }}
+            onPress={openAdd}
             activeOpacity={0.8}
           >
             <Feather name={showAdd ? "x" : "user-plus"} size={18} color="#fff" />
@@ -196,7 +252,7 @@ export default function FamilyScreen() {
             </Text>
             <TouchableOpacity
               style={s.emptyBtn}
-              onPress={() => { Haptics.selectionAsync(); setShowAdd(true); }}
+              onPress={openAdd}
               activeOpacity={0.85}
             >
               <Feather name="user-plus" size={16} color="#fff" />
@@ -252,9 +308,11 @@ function MemberCard({
         <View style={{ flex: 1 }}>
           <Text style={mc.name}>{member.name}</Text>
           <Text style={mc.relation}>{relationLabel(member.relation)} · {member.phone}</Text>
-          <Text style={mc.lastSeen}>
-            {t("family.lastActivity", { value: resolveLastSeen(member.lastSeen, t) })}
-          </Text>
+          {isWarning && (
+            <Text style={mc.lastSeen}>
+              {t("family.lastActivity", { value: resolveLastSeen(member.lastSeen, t) })}
+            </Text>
+          )}
         </View>
         <TouchableOpacity style={mc.deleteBtn} onPress={onDelete} activeOpacity={0.75}>
           <Feather name="trash-2" size={15} color="#dc2626" />

@@ -1,11 +1,6 @@
 import { Router, type IRouter } from "express";
 import { and, count, eq, gte, inArray, lt, max, sql } from "drizzle-orm";
-import {
-  db,
-  fraudReportsTable,
-  scamCategoriesTable,
-  scamStatBaselineTable,
-} from "@workspace/db";
+import { db, fraudReportsTable, scamCategoriesTable } from "@workspace/db";
 import type {
   CityHotspot,
   CityHotspotListResponse,
@@ -21,10 +16,6 @@ const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
 function cityEq(value: string) {
   return sql`lower(${fraudReportsTable.city}) = lower(${value})`;
-}
-
-function baselineCityEq(value: string) {
-  return sql`lower(${scamStatBaselineTable.city}) = lower(${value})`;
 }
 
 function trendLevel(value: number, max: number): TrendingScam["trend"] {
@@ -89,24 +80,8 @@ async function computeTrending(city?: string): Promise<{
     return entry;
   };
 
-  // Seeded baseline (per city + category).
-  const baselineRows = await db
-    .select({
-      categoryKey: scamStatBaselineTable.categoryKey,
-      city: scamStatBaselineTable.city,
-      count: scamStatBaselineTable.count,
-    })
-    .from(scamStatBaselineTable)
-    .where(city ? baselineCityEq(city) : undefined);
-
-  for (const row of baselineRows) {
-    if (!meta.has(row.categoryKey)) continue;
-    const entry = ensure(row.categoryKey);
-    entry.count += row.count;
-    entry.cityCounts.set(row.city, (entry.cityCounts.get(row.city) ?? 0) + row.count);
-  }
-
-  // Live community reports in the last 7 days.
+  // Live community reports in the last 7 days. Public stats reflect only real
+  // user reports — no seeded baseline is fused in.
   const since = new Date(Date.now() - WEEK_MS);
   const liveRows = await db
     .select({
@@ -195,22 +170,7 @@ router.get("/stats/hotspots", async (req, res) => {
     return r;
   };
 
-  // Baseline current + previous per city.
-  const baselineRows = await db
-    .select({
-      city: scamStatBaselineTable.city,
-      cur: sql<number>`sum(${scamStatBaselineTable.count})`,
-      prev: sql<number>`sum(${scamStatBaselineTable.prevCount})`,
-    })
-    .from(scamStatBaselineTable)
-    .groupBy(scamStatBaselineTable.city);
-  for (const row of baselineRows) {
-    const r = ensure(row.city);
-    r.cur += Number(row.cur ?? 0);
-    r.prev += Number(row.prev ?? 0);
-  }
-
-  // Live: this week vs the prior week, per city.
+  // Live only: this week vs the prior week, per city (real reports, no baseline).
   const now = Date.now();
   const weekAgo = new Date(now - WEEK_MS);
   const twoWeeksAgo = new Date(now - 2 * WEEK_MS);

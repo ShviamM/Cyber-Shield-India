@@ -40,6 +40,20 @@ export const PLANS: Record<PlanKey, PlanDef> = {
   },
 };
 
+/**
+ * Maximum protected family members allowed per plan. Server-enforced — only the
+ * Family plan can keep members; free/premium owners get none.
+ */
+export const MAX_FAMILY_MEMBERS: Record<PlanKey, number> = {
+  free: 0,
+  premium: 0,
+  family: 5,
+};
+
+export function maxFamilyMembers(plan: string): number {
+  return isPlanKey(plan) ? MAX_FAMILY_MEMBERS[plan] : 0;
+}
+
 export const PLAN_KEYS = Object.keys(PLANS) as PlanKey[];
 
 export function isPlanKey(value: string): value is PlanKey {

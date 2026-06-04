@@ -2,16 +2,19 @@ import { Router, type IRouter } from "express";
 import { and, count, desc, eq, gte, lte, inArray, sql } from "drizzle-orm";
 import {
   db,
+  broadcastsTable,
+  deviceTokensTable,
   fraudReportsTable,
   numberReputationTable,
   paymentsTable,
-  scamStatBaselineTable,
   sessionsTable,
   subscriptionsTable,
   usersTable,
+  type Broadcast as DbBroadcast,
 } from "@workspace/db";
 import {
   AdminListReportsQueryParams,
+  AdminSendBroadcastBody,
   AdminUpdateReportBody,
   AdminUpdateReportParams,
   AdminVerifyNumberBody,
@@ -19,11 +22,14 @@ import {
   type AdminReport,
   type AdminReportListResponse,
   type AdminStats,
+  type Broadcast,
+  type BroadcastList,
   type BusinessMetrics,
   type FraudMapResponse,
   type FraudMapState,
   type NumberReputation,
 } from "@workspace/api-zod";
+import { sendExpoPush } from "../lib/expo-push";
 import { normalizeIndianPhone } from "../lib/phone";
 import { HttpError, isUuid } from "../lib/http-error";
 import { toAdminReportDto } from "../lib/dto";
@@ -307,25 +313,17 @@ router.get("/admin/business-metrics", requireAdmin, async (_req, res) => {
 });
 
 router.get("/admin/fraud-map", requireAdmin, async (_req, res) => {
-  const [baselineRows, liveRows] = await Promise.all([
-    db
-      .select({
-        city: scamStatBaselineTable.city,
-        value: sql<string>`sum(${scamStatBaselineTable.count})`,
-      })
-      .from(scamStatBaselineTable)
-      .groupBy(scamStatBaselineTable.city),
-    db
-      .select({ city: fraudReportsTable.city, value: count() })
-      .from(fraudReportsTable)
-      .where(
-        and(
-          inArray(fraudReportsTable.status, [...VISIBLE_REPORT_STATUSES]),
-          sql`${fraudReportsTable.city} is not null`,
-        ),
-      )
-      .groupBy(fraudReportsTable.city),
-  ]);
+  // Real user reports only — no seeded baseline.
+  const liveRows = await db
+    .select({ city: fraudReportsTable.city, value: count() })
+    .from(fraudReportsTable)
+    .where(
+      and(
+        inArray(fraudReportsTable.status, [...VISIBLE_REPORT_STATUSES]),
+        sql`${fraudReportsTable.city} is not null`,
+      ),
+    )
+    .groupBy(fraudReportsTable.city);
 
   const byState = new Map<string, FraudMapState>();
   const add = (city: string | null, amount: number) => {
@@ -343,7 +341,6 @@ router.get("/admin/fraud-map", requireAdmin, async (_req, res) => {
     }
   };
 
-  for (const row of baselineRows) add(row.city, Number(row.value ?? 0));
   for (const row of liveRows) add(row.city, Number(row.value ?? 0));
 
   const states = [...byState.values()].sort((a, b) => b.reports - a.reports);
@@ -351,6 +348,72 @@ router.get("/admin/fraud-map", requireAdmin, async (_req, res) => {
 
   const response: FraudMapResponse = { states, total };
   res.json(response);
+});
+
+function toBroadcastDto(row: DbBroadcast): Broadcast {
+  return {
+    id: row.id,
+    title: row.title,
+    body: row.body,
+    recipientCount: row.recipientCount,
+    successCount: row.successCount,
+    createdAt: row.createdAt,
+  };
+}
+
+router.get("/admin/broadcasts", requireAdmin, async (_req, res) => {
+  const rows = await db
+    .select()
+    .from(broadcastsTable)
+    .orderBy(desc(broadcastsTable.createdAt))
+    .limit(100);
+  const response: BroadcastList = { broadcasts: rows.map(toBroadcastDto) };
+  res.json(response);
+});
+
+router.post("/admin/broadcasts", requireAdmin, async (req, res) => {
+  const admin = req.user!;
+  const body = AdminSendBroadcastBody.parse(req.body);
+  const title = body.title.trim();
+  const message = body.body.trim();
+  if (!title || !message) {
+    throw new HttpError(
+      400,
+      "invalid_broadcast",
+      "Provide both a title and a message body.",
+    );
+  }
+
+  const tokenRows = await db
+    .select({ token: deviceTokensTable.token })
+    .from(deviceTokensTable);
+  const tokens = tokenRows.map((r) => r.token);
+
+  const { successCount, invalidTokens } = await sendExpoPush(
+    tokens,
+    title,
+    message,
+  );
+
+  // Prune tokens Expo reported as no longer registered.
+  if (invalidTokens.length > 0) {
+    await db
+      .delete(deviceTokensTable)
+      .where(inArray(deviceTokensTable.token, invalidTokens));
+  }
+
+  const [created] = await db
+    .insert(broadcastsTable)
+    .values({
+      title,
+      body: message,
+      sentById: admin.id,
+      recipientCount: tokens.length,
+      successCount,
+    })
+    .returning();
+
+  res.json(toBroadcastDto(created));
 });
 
 export default router;

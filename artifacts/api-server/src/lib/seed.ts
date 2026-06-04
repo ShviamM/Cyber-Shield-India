@@ -1,4 +1,4 @@
-import { db, scamCategoriesTable, scamStatBaselineTable } from "@workspace/db";
+import { db, scamCategoriesTable } from "@workspace/db";
 import { logger } from "./logger";
 
 export const SEED_CATEGORIES = [
@@ -166,70 +166,5 @@ export async function seedScamCategories(): Promise<void> {
     logger.info({ count: SEED_CATEGORIES.length }, "Scam categories seeded");
   } catch (err) {
     logger.error({ err }, "Failed to seed scam categories");
-  }
-}
-
-/**
- * Approximate weekly cybercrime complaint volumes per city for the current and
- * previous period, derived from the proportions in published NCRB / I4C
- * figures. These are illustrative baselines (no free live API exists) that the
- * stats endpoints merge with real user reports.
- */
-const BASELINE_CITIES: { city: string; current: number; previous: number }[] = [
-  { city: "Delhi", current: 1400, previous: 1300 },
-  { city: "Bengaluru", current: 1200, previous: 1050 },
-  { city: "Mumbai", current: 1100, previous: 1000 },
-  { city: "Hyderabad", current: 950, previous: 1000 },
-  { city: "Chennai", current: 700, previous: 640 },
-  { city: "Pune", current: 600, previous: 560 },
-  { city: "Gurugram", current: 540, previous: 470 },
-  { city: "Kolkata", current: 520, previous: 540 },
-  { city: "Ahmedabad", current: 480, previous: 430 },
-  { city: "Noida", current: 420, previous: 380 },
-  { city: "Jaipur", current: 360, previous: 330 },
-  { city: "Lucknow", current: 320, previous: 290 },
-];
-
-/**
- * Relative prevalence of each scam category (fractions roughly sum to 1),
- * used to distribute a city's total volume across categories.
- */
-const CATEGORY_WEIGHTS: Record<string, number> = {
-  upi_fraud: 0.16,
-  otp_scam: 0.1,
-  kyc_fraud: 0.07,
-  loan_scam: 0.06,
-  job_scam: 0.09,
-  lottery_scam: 0.03,
-  investment_fraud: 0.12,
-  digital_arrest: 0.08,
-  electricity_bill: 0.05,
-  courier_scam: 0.07,
-  tech_support: 0.05,
-  impersonation: 0.06,
-  sextortion: 0.04,
-  other: 0.02,
-};
-
-export async function seedScamStatBaseline(): Promise<void> {
-  try {
-    let rows = 0;
-    for (const { city, current, previous } of BASELINE_CITIES) {
-      for (const [categoryKey, weight] of Object.entries(CATEGORY_WEIGHTS)) {
-        const count = Math.round(current * weight);
-        const prevCount = Math.round(previous * weight);
-        await db
-          .insert(scamStatBaselineTable)
-          .values({ city, categoryKey, count, prevCount, source: "baseline" })
-          .onConflictDoUpdate({
-            target: [scamStatBaselineTable.city, scamStatBaselineTable.categoryKey],
-            set: { count, prevCount, source: "baseline", updatedAt: new Date() },
-          });
-        rows += 1;
-      }
-    }
-    logger.info({ rows }, "Scam stat baseline seeded");
-  } catch (err) {
-    logger.error({ err }, "Failed to seed scam stat baseline");
   }
 }

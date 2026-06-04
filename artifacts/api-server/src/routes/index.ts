@@ -8,6 +8,8 @@ import checkRouter from "./check";
 import adminRouter from "./admin";
 import statsRouter from "./stats";
 import subscriptionRouter from "./subscription";
+import notificationsRouter from "./notifications";
+import familyRouter from "./family";
 import webhooksRouter from "./webhooks";
 
 const router: IRouter = Router();
@@ -21,6 +23,8 @@ router.use(checkRouter);
 router.use(adminRouter);
 router.use(statsRouter);
 router.use(subscriptionRouter);
+router.use(notificationsRouter);
+router.use(familyRouter);
 router.use(webhooksRouter);
 
 export default router;

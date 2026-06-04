@@ -7,6 +7,7 @@ import Login from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
 import BusinessMetrics from "@/pages/business-metrics";
 import FraudMap from "@/pages/fraud-map";
+import Broadcasts from "@/pages/broadcasts";
 import NotFound from "@/pages/not-found";
 import { Loader2 } from "lucide-react";
 
@@ -38,6 +39,7 @@ function Router() {
       <Route path="/" component={() => <ProtectedRoute component={Dashboard} />} />
       <Route path="/business" component={() => <ProtectedRoute component={BusinessMetrics} />} />
       <Route path="/fraud-map" component={() => <ProtectedRoute component={FraudMap} />} />
+      <Route path="/broadcasts" component={() => <ProtectedRoute component={Broadcasts} />} />
       <Route component={NotFound} />
     </Switch>
   );

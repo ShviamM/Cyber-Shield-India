@@ -396,7 +396,7 @@ export const AdminBusinessMetricsResponse = zod.object({
 
 
 /**
- * Scam/fraud report volume grouped by Indian state (seeded official baselines fused with live community reports), ranked highest first.
+ * Scam/fraud report volume grouped by Indian state from live community reports only, ranked highest first.
  * @summary Fraud report volume aggregated by Indian state
  */
 export const AdminFraudMapResponse = zod.object({
@@ -501,6 +501,98 @@ export const ListMyPaymentsResponse = zod.object({
   "periodEnd": zod.coerce.date().nullish(),
   "createdAt": zod.coerce.date()
 }))
+})
+
+
+/**
+ * @summary Register this device's Expo push token
+ */
+export const RegisterPushTokenBody = zod.object({
+  "token": zod.string(),
+  "platform": zod.enum(['ios', 'android', 'web']).nullish()
+})
+
+export const RegisterPushTokenResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary List the current user's protected family members
+ */
+export const ListFamilyMembersResponse = zod.object({
+  "members": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "phone": zod.string(),
+  "relationship": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})),
+  "maxMembers": zod.number().describe('Maximum members allowed on the user\'s current plan'),
+  "plan": zod.enum(['free', 'premium', 'family'])
+})
+
+
+/**
+ * @summary Add a protected family member (requires the Family plan)
+ */
+export const AddFamilyMemberBody = zod.object({
+  "name": zod.string(),
+  "phone": zod.string(),
+  "relationship": zod.string().nullish()
+})
+
+export const AddFamilyMemberResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "phone": zod.string(),
+  "relationship": zod.string().nullish(),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Remove a protected family member
+ */
+export const RemoveFamilyMemberParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const RemoveFamilyMemberResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary List past push broadcasts
+ */
+export const AdminListBroadcastsResponse = zod.object({
+  "broadcasts": zod.array(zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "body": zod.string(),
+  "recipientCount": zod.number(),
+  "successCount": zod.number(),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+
+/**
+ * @summary Send a push broadcast to all registered devices
+ */
+export const AdminSendBroadcastBody = zod.object({
+  "title": zod.string(),
+  "body": zod.string()
+})
+
+export const AdminSendBroadcastResponse = zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "body": zod.string(),
+  "recipientCount": zod.number(),
+  "successCount": zod.number(),
+  "createdAt": zod.coerce.date()
 })
 
 

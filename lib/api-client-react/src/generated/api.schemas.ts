@@ -479,6 +479,68 @@ export interface PaymentList {
   payments: Payment[];
 }
 
+export type RegisterPushTokenRequestPlatform = typeof RegisterPushTokenRequestPlatform[keyof typeof RegisterPushTokenRequestPlatform] | null;
+
+
+export const RegisterPushTokenRequestPlatform = {
+  ios: 'ios',
+  android: 'android',
+  web: 'web',
+} as const;
+
+export interface RegisterPushTokenRequest {
+  token: string;
+  platform?: RegisterPushTokenRequestPlatform;
+}
+
+export interface FamilyMember {
+  id: string;
+  name: string;
+  phone: string;
+  relationship?: string | null;
+  createdAt: string;
+}
+
+export type FamilyMemberListPlan = typeof FamilyMemberListPlan[keyof typeof FamilyMemberListPlan];
+
+
+export const FamilyMemberListPlan = {
+  free: 'free',
+  premium: 'premium',
+  family: 'family',
+} as const;
+
+export interface FamilyMemberList {
+  members: FamilyMember[];
+  /** Maximum members allowed on the user's current plan */
+  maxMembers: number;
+  plan: FamilyMemberListPlan;
+}
+
+export interface AddFamilyMemberRequest {
+  name: string;
+  phone: string;
+  relationship?: string | null;
+}
+
+export interface Broadcast {
+  id: string;
+  title: string;
+  body: string;
+  recipientCount: number;
+  successCount: number;
+  createdAt: string;
+}
+
+export interface BroadcastList {
+  broadcasts: Broadcast[];
+}
+
+export interface SendBroadcastRequest {
+  title: string;
+  body: string;
+}
+
 export type ListReportsParams = {
 phone?: string;
 category?: string;
