@@ -1,10 +1,11 @@
 import { Router, type IRouter } from "express";
-import { and, count, desc, eq, gte, inArray, sql } from "drizzle-orm";
+import { and, count, desc, eq, gte, lte, inArray, sql } from "drizzle-orm";
 import {
   db,
   fraudReportsTable,
   numberReputationTable,
   paymentsTable,
+  scamStatBaselineTable,
   sessionsTable,
   subscriptionsTable,
   usersTable,
@@ -18,15 +19,22 @@ import {
   type AdminReport,
   type AdminReportListResponse,
   type AdminStats,
+  type BusinessMetrics,
+  type FraudMapResponse,
+  type FraudMapState,
   type NumberReputation,
 } from "@workspace/api-zod";
 import { normalizeIndianPhone } from "../lib/phone";
 import { HttpError, isUuid } from "../lib/http-error";
 import { toAdminReportDto } from "../lib/dto";
 import { recomputeReputation, setVerifiedScam } from "../lib/reputation";
+import { PLANS } from "../lib/plans";
+import { resolveState } from "../lib/states";
 import { requireAdmin } from "../middlewares/auth";
 
 const router: IRouter = Router();
+
+const VISIBLE_REPORT_STATUSES = ["pending", "verified"] as const;
 
 router.get("/admin/stats", requireAdmin, async (_req, res) => {
   const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
@@ -190,6 +198,158 @@ router.post("/admin/numbers/:phone/verify", requireAdmin, async (req, res) => {
     verifiedScam: row.verifiedScam,
     lastReportedAt: row.lastReportedAt,
   };
+  res.json(response);
+});
+
+router.get("/admin/business-metrics", requireAdmin, async (_req, res) => {
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const in30Days = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+  const ago30Days = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+  const notExpired = and(
+    sql`${subscriptionsTable.currentPeriodEnd} is not null`,
+    gte(subscriptionsTable.currentPeriodEnd, now),
+  );
+
+  // Currently entitled paid members: a subscription keeps access until its
+  // period end even after the user cancels (status "canceled"), so both count
+  // toward active subscriptions / families protected.
+  const entitledPaid = and(
+    inArray(subscriptionsTable.plan, ["premium", "family"]),
+    inArray(subscriptionsTable.status, ["active", "canceled"]),
+    notExpired,
+  );
+
+  // Recurring members feed MRR: only active subscriptions that are not set to
+  // cancel will actually bill again, so a canceled-at-period-end plan is not
+  // recurring revenue.
+  const recurringPaid = and(
+    inArray(subscriptionsTable.plan, ["premium", "family"]),
+    eq(subscriptionsTable.status, "active"),
+    eq(subscriptionsTable.cancelAtPeriodEnd, false),
+    notExpired,
+  );
+
+  const [
+    [revenueAll],
+    [revenueMonth],
+    entitledByPlan,
+    recurringByPlan,
+    [renewalsRow],
+    [newSubsRow],
+  ] = await Promise.all([
+    db
+      .select({ value: sql<string>`coalesce(sum(${paymentsTable.amount}), 0)` })
+      .from(paymentsTable)
+      .where(eq(paymentsTable.status, "paid")),
+    db
+      .select({ value: sql<string>`coalesce(sum(${paymentsTable.amount}), 0)` })
+      .from(paymentsTable)
+      .where(
+        and(
+          eq(paymentsTable.status, "paid"),
+          gte(paymentsTable.createdAt, monthStart),
+        ),
+      ),
+    db
+      .select({ plan: subscriptionsTable.plan, value: count() })
+      .from(subscriptionsTable)
+      .where(entitledPaid)
+      .groupBy(subscriptionsTable.plan),
+    db
+      .select({ plan: subscriptionsTable.plan, value: count() })
+      .from(subscriptionsTable)
+      .where(recurringPaid)
+      .groupBy(subscriptionsTable.plan),
+    db
+      .select({ value: count() })
+      .from(subscriptionsTable)
+      .where(
+        and(
+          recurringPaid,
+          lte(subscriptionsTable.currentPeriodEnd, in30Days),
+        ),
+      ),
+    db
+      .select({ value: count() })
+      .from(subscriptionsTable)
+      .where(
+        and(
+          inArray(subscriptionsTable.plan, ["premium", "family"]),
+          gte(subscriptionsTable.createdAt, ago30Days),
+        ),
+      ),
+  ]);
+
+  const planCount = (
+    rows: { plan: string; value: number }[],
+    plan: string,
+  ): number => Number(rows.find((r) => r.plan === plan)?.value ?? 0);
+
+  const premiumSubscriptions = planCount(entitledByPlan, "premium");
+  const familySubscriptions = planCount(entitledByPlan, "family");
+
+  const response: BusinessMetrics = {
+    revenuePaise: Number(revenueAll?.value ?? 0),
+    revenueThisMonthPaise: Number(revenueMonth?.value ?? 0),
+    mrrPaise:
+      planCount(recurringByPlan, "premium") * PLANS.premium.amount +
+      planCount(recurringByPlan, "family") * PLANS.family.amount,
+    activeSubscriptions: premiumSubscriptions + familySubscriptions,
+    premiumSubscriptions,
+    familySubscriptions,
+    familiesProtected: familySubscriptions,
+    renewalsDue: Number(renewalsRow?.value ?? 0),
+    newSubscriptions: Number(newSubsRow?.value ?? 0),
+  };
+  res.json(response);
+});
+
+router.get("/admin/fraud-map", requireAdmin, async (_req, res) => {
+  const [baselineRows, liveRows] = await Promise.all([
+    db
+      .select({
+        city: scamStatBaselineTable.city,
+        value: sql<string>`sum(${scamStatBaselineTable.count})`,
+      })
+      .from(scamStatBaselineTable)
+      .groupBy(scamStatBaselineTable.city),
+    db
+      .select({ city: fraudReportsTable.city, value: count() })
+      .from(fraudReportsTable)
+      .where(
+        and(
+          inArray(fraudReportsTable.status, [...VISIBLE_REPORT_STATUSES]),
+          sql`${fraudReportsTable.city} is not null`,
+        ),
+      )
+      .groupBy(fraudReportsTable.city),
+  ]);
+
+  const byState = new Map<string, FraudMapState>();
+  const add = (city: string | null, amount: number) => {
+    if (amount <= 0) return;
+    const ref = resolveState(city);
+    const existing = byState.get(ref.code);
+    if (existing) {
+      existing.reports += amount;
+    } else {
+      byState.set(ref.code, {
+        state: ref.state,
+        code: ref.code,
+        reports: amount,
+      });
+    }
+  };
+
+  for (const row of baselineRows) add(row.city, Number(row.value ?? 0));
+  for (const row of liveRows) add(row.city, Number(row.value ?? 0));
+
+  const states = [...byState.values()].sort((a, b) => b.reports - a.reports);
+  const total = states.reduce((sum, s) => sum + s.reports, 0);
+
+  const response: FraudMapResponse = { states, total };
   res.json(response);
 });
 

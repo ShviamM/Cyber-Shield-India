@@ -26,6 +26,7 @@ import type {
   AdminReportListResponse,
   AdminStats,
   AuthResponse,
+  BusinessMetrics,
   CategoryListResponse,
   CheckPhoneRequest,
   CheckPhoneResult,
@@ -34,6 +35,7 @@ import type {
   CreateReportRequest,
   ErrorResponse,
   FraudCheckRequest,
+  FraudMapResponse,
   FraudVerdict,
   GetCityHotspotsParams,
   GetTrendingScamsParams,
@@ -1515,6 +1517,162 @@ export const useAdminVerifyNumber = <TError = ErrorType<ErrorResponse>,
       > => {
       return useMutation(getAdminVerifyNumberMutationOptions(options));
     }
+
+export const getAdminBusinessMetricsUrl = () => {
+
+
+
+
+  return `/api/admin/business-metrics`
+}
+
+/**
+ * Revenue, monthly recurring revenue (MRR), active subscription counts, upcoming renewals, and families protected — derived from verified payments and active subscriptions.
+ * @summary Revenue and subscription business metrics
+ */
+export const adminBusinessMetrics = async ( options?: RequestInit): Promise<BusinessMetrics> => {
+
+  return customFetch<BusinessMetrics>(getAdminBusinessMetricsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getAdminBusinessMetricsQueryKey = () => {
+    return [
+    `/api/admin/business-metrics`
+    ] as const;
+    }
+
+
+export const getAdminBusinessMetricsQueryOptions = <TData = Awaited<ReturnType<typeof adminBusinessMetrics>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminBusinessMetrics>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdminBusinessMetricsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminBusinessMetrics>>> = ({ signal }) => adminBusinessMetrics({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminBusinessMetrics>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type AdminBusinessMetricsQueryResult = NonNullable<Awaited<ReturnType<typeof adminBusinessMetrics>>>
+export type AdminBusinessMetricsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Revenue and subscription business metrics
+ */
+
+export function useAdminBusinessMetrics<TData = Awaited<ReturnType<typeof adminBusinessMetrics>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminBusinessMetrics>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getAdminBusinessMetricsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getAdminFraudMapUrl = () => {
+
+
+
+
+  return `/api/admin/fraud-map`
+}
+
+/**
+ * Scam/fraud report volume grouped by Indian state (seeded official baselines fused with live community reports), ranked highest first.
+ * @summary Fraud report volume aggregated by Indian state
+ */
+export const adminFraudMap = async ( options?: RequestInit): Promise<FraudMapResponse> => {
+
+  return customFetch<FraudMapResponse>(getAdminFraudMapUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getAdminFraudMapQueryKey = () => {
+    return [
+    `/api/admin/fraud-map`
+    ] as const;
+    }
+
+
+export const getAdminFraudMapQueryOptions = <TData = Awaited<ReturnType<typeof adminFraudMap>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminFraudMap>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdminFraudMapQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminFraudMap>>> = ({ signal }) => adminFraudMap({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminFraudMap>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type AdminFraudMapQueryResult = NonNullable<Awaited<ReturnType<typeof adminFraudMap>>>
+export type AdminFraudMapQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Fraud report volume aggregated by Indian state
+ */
+
+export function useAdminFraudMap<TData = Awaited<ReturnType<typeof adminFraudMap>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminFraudMap>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getAdminFraudMapQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export const getGetSubscriptionPlansUrl = () => {
 

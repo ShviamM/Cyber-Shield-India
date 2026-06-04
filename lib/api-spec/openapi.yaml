@@ -464,6 +464,47 @@ paths:
         default:
           $ref: "#/components/responses/Error"
 
+  /admin/business-metrics:
+    get:
+      operationId: adminBusinessMetrics
+      tags: [admin]
+      summary: Revenue and subscription business metrics
+      description: >-
+        Revenue, monthly recurring revenue (MRR), active subscription counts,
+        upcoming renewals, and families protected — derived from verified
+        payments and active subscriptions.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Business metrics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BusinessMetrics"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /admin/fraud-map:
+    get:
+      operationId: adminFraudMap
+      tags: [admin]
+      summary: Fraud report volume aggregated by Indian state
+      description: >-
+        Scam/fraud report volume grouped by Indian state (seeded official
+        baselines fused with live community reports), ranked highest first.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Fraud volume by state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FraudMapResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
   /subscription/plans:
     get:
       operationId: getSubscriptionPlans
@@ -1005,6 +1046,73 @@ components:
         - blockedNumbers
         - revenuePaise
         - dailyActiveUsers
+
+    BusinessMetrics:
+      type: object
+      properties:
+        revenuePaise:
+          type: integer
+          description: All-time verified revenue, in paise.
+        revenueThisMonthPaise:
+          type: integer
+          description: Verified revenue in the current calendar month, in paise.
+        mrrPaise:
+          type: integer
+          description: Monthly recurring revenue from active paid subscriptions, in paise.
+        activeSubscriptions:
+          type: integer
+          description: Active premium + family subscriptions.
+        premiumSubscriptions:
+          type: integer
+        familySubscriptions:
+          type: integer
+        familiesProtected:
+          type: integer
+          description: Active family-plan subscriptions (one per protected family).
+        renewalsDue:
+          type: integer
+          description: Active paid subscriptions renewing in the next 30 days.
+        newSubscriptions:
+          type: integer
+          description: Paid subscriptions started in the last 30 days.
+      required:
+        - revenuePaise
+        - revenueThisMonthPaise
+        - mrrPaise
+        - activeSubscriptions
+        - premiumSubscriptions
+        - familySubscriptions
+        - familiesProtected
+        - renewalsDue
+        - newSubscriptions
+
+    FraudMapState:
+      type: object
+      properties:
+        state:
+          type: string
+        code:
+          type: string
+          description: Short state code (e.g. UP, MH, KA).
+        reports:
+          type: integer
+      required:
+        - state
+        - code
+        - reports
+
+    FraudMapResponse:
+      type: object
+      properties:
+        states:
+          type: array
+          items:
+            $ref: "#/components/schemas/FraudMapState"
+        total:
+          type: integer
+      required:
+        - states
+        - total
 
     NumberCheckResponse:
       type: object

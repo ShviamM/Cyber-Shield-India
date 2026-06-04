@@ -379,6 +379,37 @@ export const AdminVerifyNumberResponse = zod.object({
 
 
 /**
+ * Revenue, monthly recurring revenue (MRR), active subscription counts, upcoming renewals, and families protected — derived from verified payments and active subscriptions.
+ * @summary Revenue and subscription business metrics
+ */
+export const AdminBusinessMetricsResponse = zod.object({
+  "revenuePaise": zod.number().describe('All-time verified revenue, in paise.'),
+  "revenueThisMonthPaise": zod.number().describe('Verified revenue in the current calendar month, in paise.'),
+  "mrrPaise": zod.number().describe('Monthly recurring revenue from active paid subscriptions, in paise.'),
+  "activeSubscriptions": zod.number().describe('Active premium + family subscriptions.'),
+  "premiumSubscriptions": zod.number(),
+  "familySubscriptions": zod.number(),
+  "familiesProtected": zod.number().describe('Active family-plan subscriptions (one per protected family).'),
+  "renewalsDue": zod.number().describe('Active paid subscriptions renewing in the next 30 days.'),
+  "newSubscriptions": zod.number().describe('Paid subscriptions started in the last 30 days.')
+})
+
+
+/**
+ * Scam/fraud report volume grouped by Indian state (seeded official baselines fused with live community reports), ranked highest first.
+ * @summary Fraud report volume aggregated by Indian state
+ */
+export const AdminFraudMapResponse = zod.object({
+  "states": zod.array(zod.object({
+  "state": zod.string(),
+  "code": zod.string().describe('Short state code (e.g. UP, MH, KA).'),
+  "reports": zod.number()
+})),
+  "total": zod.number()
+})
+
+
+/**
  * Returns the server-authoritative plan catalogue (pricing in paise).
  * @summary List subscription plans
  */

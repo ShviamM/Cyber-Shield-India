@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import { LogOut, CheckCircle2, XCircle, AlertTriangle, ShieldAlert, ShieldOff, Phone, Clock, Search, ListFilter, Ban, Users, Crown, FileWarning, IndianRupee, Activity } from "lucide-react";
-import { BrandLogo, Wordmark } from "@/components/brand";
+import { CheckCircle2, XCircle, ShieldAlert, ShieldOff, Phone, Clock, Search, Ban, Users, Crown, FileWarning, IndianRupee, Activity } from "lucide-react";
+import { AppShell } from "@/components/app-shell";
 import type { LucideIcon } from "lucide-react";
 import { format } from "date-fns";
-import { useAuth } from "@/hooks/use-auth";
-import { useLogout, useAdminListReports, getAdminListReportsQueryKey, useAdminUpdateReport, useAdminVerifyNumber, useAdminStats, getAdminStatsQueryKey } from "@workspace/api-client-react";
+import { useAdminListReports, getAdminListReportsQueryKey, useAdminUpdateReport, useAdminVerifyNumber, useAdminStats, getAdminStatsQueryKey } from "@workspace/api-client-react";
 import type { AdminReport } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -37,8 +36,6 @@ import {
 import type { UpdateReportStatusRequestStatus } from "@workspace/api-client-react";
 
 export default function Dashboard() {
-  const { user, logout } = useAuth();
-  const doLogout = useLogout();
   const queryClient = useQueryClient();
   
   const PAGE_SIZE = 20;
@@ -139,14 +136,6 @@ export default function Dashboard() {
     return pages;
   })();
 
-  const handleLogout = async () => {
-    try {
-      await doLogout.mutateAsync();
-    } finally {
-      logout();
-    }
-  };
-
   const handleUpdateStatus = async (id: string, status: UpdateReportStatusRequestStatus) => {
     try {
       await updateReport.mutateAsync({ id, data: { status } });
@@ -177,53 +166,8 @@ export default function Dashboard() {
     }
   };
 
-  if (!user?.isAdmin) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <Card className="max-w-md w-full border-destructive/20 bg-destructive/5 text-center p-8">
-          <AlertTriangle className="w-12 h-12 text-destructive mx-auto mb-4" />
-          <h2 className="text-xl font-bold mb-2">Access Denied</h2>
-          <p className="text-muted-foreground mb-6">
-            This console is restricted to Netraksh administrators. Your account does not have the required permissions.
-          </p>
-          <Button variant="outline" onClick={handleLogout}>Sign Out</Button>
-        </Card>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-muted/30">
-      <header className="bg-sidebar text-sidebar-foreground sticky top-0 z-10">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <BrandLogo size={36} className="ring-1 ring-white/15" />
-            <Wordmark className="text-lg text-white" />
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="text-sm text-right hidden sm:block">
-              <p className="font-medium text-white">{user.fullName}</p>
-              <p className="text-white/60 text-xs">Moderator</p>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleLogout}
-              title="Sign Out"
-              className="text-white hover:bg-white/10 hover:text-white"
-            >
-              <LogOut className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-        <div className="flex h-[3px] w-full">
-          <div className="flex-1" style={{ backgroundColor: "#FF6713" }} />
-          <div className="flex-1 bg-white" />
-          <div className="flex-1" style={{ backgroundColor: "#138808" }} />
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8">
+    <AppShell>
         <section className="mb-10">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">Overview</h2>
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
@@ -455,7 +399,6 @@ export default function Dashboard() {
             </div>
           )}
         </Tabs>
-      </main>
 
       <AlertDialog open={pendingVerify !== null} onOpenChange={(open) => { if (!open) setPendingVerify(null); }}>
         <AlertDialogContent>
@@ -490,6 +433,6 @@ export default function Dashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </AppShell>
   );
 }

@@ -186,6 +186,37 @@ export interface AdminStats {
   dailyActiveUsers: number;
 }
 
+export interface BusinessMetrics {
+  /** All-time verified revenue, in paise. */
+  revenuePaise: number;
+  /** Verified revenue in the current calendar month, in paise. */
+  revenueThisMonthPaise: number;
+  /** Monthly recurring revenue from active paid subscriptions, in paise. */
+  mrrPaise: number;
+  /** Active premium + family subscriptions. */
+  activeSubscriptions: number;
+  premiumSubscriptions: number;
+  familySubscriptions: number;
+  /** Active family-plan subscriptions (one per protected family). */
+  familiesProtected: number;
+  /** Active paid subscriptions renewing in the next 30 days. */
+  renewalsDue: number;
+  /** Paid subscriptions started in the last 30 days. */
+  newSubscriptions: number;
+}
+
+export interface FraudMapState {
+  state: string;
+  /** Short state code (e.g. UP, MH, KA). */
+  code: string;
+  reports: number;
+}
+
+export interface FraudMapResponse {
+  states: FraudMapState[];
+  total: number;
+}
+
 export type NumberCheckResponseRiskLevel = typeof NumberCheckResponseRiskLevel[keyof typeof NumberCheckResponseRiskLevel];
 
 

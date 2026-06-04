@@ -5,6 +5,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import Login from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
+import BusinessMetrics from "@/pages/business-metrics";
+import FraudMap from "@/pages/fraud-map";
 import NotFound from "@/pages/not-found";
 import { Loader2 } from "lucide-react";
 
@@ -34,6 +36,8 @@ function Router() {
     <Switch>
       <Route path="/login" component={Login} />
       <Route path="/" component={() => <ProtectedRoute component={Dashboard} />} />
+      <Route path="/business" component={() => <ProtectedRoute component={BusinessMetrics} />} />
+      <Route path="/fraud-map" component={() => <ProtectedRoute component={FraudMap} />} />
       <Route component={NotFound} />
     </Switch>
   );
