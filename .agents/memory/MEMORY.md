@@ -16,3 +16,4 @@
 - [Testing the Expo app URL](testing-expo-app-url.md) — runTest/browser nav must use the full Expo dev domain for kavach-ai; proxy root "/" is the admin web app (mobile users hit its isAdmin "Access Denied").
 - [Cybercrime suspect repository](cybercrime-suspect-repository.md) — cybercrime.gov.in suspect search has no API (captcha ASPX, no prefill); integrate by opening the portal, never by fetching it.
 - [Admin India choropleth map](admin-india-map.md) — precompute static SVG paths from topojson (Python Mercator) into assets; no runtime map lib. Match report data by state code w/ TS->TG alias + name fallback.
+- [MSG91 client env vars](msg91-client-env.md) — EXPO_PUBLIC_/VITE_ MSG91 WIDGET_ID & TOKEN_AUTH are client-public by design (ship in bundles); secret scanners flag TOKEN_AUTH as a false positive. Real secret = MSG91_AUTH_KEY in secrets store.
