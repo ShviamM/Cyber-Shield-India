@@ -48,3 +48,10 @@ fallback (no otp_codes table, no request-otp/verify-otp); don't reintroduce one.
   own widget anti-abuse owns send throttling — a conscious tradeoff of approach B.
 - Load the native SDK with a guarded lazy `require` (try/catch) + an
   `isOtpAvailable()` gate so Expo Go / web preview don't crash.
+- The RN SDK's top-level code does `NativeModules.BiometricAuth` and fires a
+  `console.error("BiometricAuth is undefined! Ensure the native module is
+  properly linked.")` when that optional biometric module isn't linked. We don't
+  use biometrics and OTP works regardless — it's harmless noise. The try/catch in
+  `getWidget()` does NOT catch it (it's a console.error, not a throw), so it shows
+  as a red LogBox overlay. Silenced via `LogBox.ignoreLogs([/BiometricAuth is
+  undefined/])` at app entry; don't mistake it for an OTP failure.

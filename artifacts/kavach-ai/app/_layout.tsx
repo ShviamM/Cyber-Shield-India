@@ -13,7 +13,7 @@ import { ShareIntentProvider, useShareIntentContext } from "expo-share-intent";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { View } from "react-native";
+import { LogBox, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -26,6 +26,12 @@ import { initI18n } from "@/i18n";
 import { getToken } from "@/lib/session";
 
 SplashScreen.preventAutoHideAsync();
+
+// The MSG91 OTP SDK ships an optional biometric native module we don't use. When
+// it isn't linked into the dev build, the SDK logs a console.error at load time
+// ("BiometricAuth is undefined..."). OTP send/verify works regardless, so we
+// silence this specific, harmless log to avoid a misleading red error overlay.
+LogBox.ignoreLogs([/BiometricAuth is undefined/]);
 
 // Configure the generated API client once, at module load. Expo bundles run
 // outside the web proxy and need an absolute URL to reach the API server.
