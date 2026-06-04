@@ -3,6 +3,7 @@
 - [Orval schema naming](orval-schema-naming.md) — a component schema named like an operationId's response collides in generated zod; name response schemas noun-first (e.g. FraudVerdict not FraudCheckResponse).
 - [Fraud engine fusion vs reputation scales](fraud-engine-fusion-vs-reputation.md) — medium weight tuned to 40 so a lone "medium" signal now flags medium; weights (not computeRiskLevel) decide the verdict band.
 - [API client codegen staleness](api-client-codegen.md) — generated api.ts can lag the spec (schema present, operation fn missing); run lib/api-spec codegen after adding endpoints.
+- [Admin web brand theme](admin-brand-theme.md) — admin mirrors the mobile Netraksh brand; shadcn `--primary` must be NAVY not saffron (saffron+white fails contrast; app uses navy buttons, saffron only as accent).
 - [MSG91 widget diagnosis](msg91-widget-diagnosis.md) — probe MSG91 directly; 201=unknown authkey, 418=wrong-account authkey, 701=correct authkey/bad token; success returns mobile in `message` not data.mobile; viewEnvVars hides user secrets.
 - [Admin dashboard stats / DAU](admin-dashboard-stats.md) — /admin/stats KPIs; "Daily Active Users" is login-based (24h sessions, no activity table); revenue in paise; Number() pg sum/distinct.
 - [Replit trust proxy + per-IP rate limits](replit-trust-proxy-rate-limit.md) — need `trust proxy` for real req.ip; per-phone OTP caps alone don't stop SMS-cost abuse.

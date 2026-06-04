@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Shield, LogOut, CheckCircle2, XCircle, AlertTriangle, ShieldAlert, ShieldOff, Phone, Clock, Search, ListFilter, Ban, Users, Crown, FileWarning, IndianRupee, Activity } from "lucide-react";
+import { LogOut, CheckCircle2, XCircle, AlertTriangle, ShieldAlert, ShieldOff, Phone, Clock, Search, ListFilter, Ban, Users, Crown, FileWarning, IndianRupee, Activity } from "lucide-react";
+import { BrandLogo, Wordmark } from "@/components/brand";
 import type { LucideIcon } from "lucide-react";
 import { format } from "date-fns";
 import { useAuth } from "@/hooks/use-auth";
@@ -193,21 +194,32 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-muted/30">
-      <header className="bg-background border-b sticky top-0 z-10">
+      <header className="bg-sidebar text-sidebar-foreground sticky top-0 z-10">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Shield className="w-6 h-6 text-primary" />
-            <span className="font-bold text-lg tracking-tight">Netraksh Admin</span>
+          <div className="flex items-center gap-3">
+            <BrandLogo size={36} className="ring-1 ring-white/15" />
+            <Wordmark className="text-lg text-white" />
           </div>
           <div className="flex items-center gap-4">
             <div className="text-sm text-right hidden sm:block">
-              <p className="font-medium">{user.fullName}</p>
-              <p className="text-muted-foreground text-xs">Moderator</p>
+              <p className="font-medium text-white">{user.fullName}</p>
+              <p className="text-white/60 text-xs">Moderator</p>
             </div>
-            <Button variant="ghost" size="icon" onClick={handleLogout} title="Sign Out">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleLogout}
+              title="Sign Out"
+              className="text-white hover:bg-white/10 hover:text-white"
+            >
               <LogOut className="w-4 h-4" />
             </Button>
           </div>
+        </div>
+        <div className="flex h-[3px] w-full">
+          <div className="flex-1" style={{ backgroundColor: "#FF6713" }} />
+          <div className="flex-1 bg-white" />
+          <div className="flex-1" style={{ backgroundColor: "#138808" }} />
         </div>
       </header>
 
