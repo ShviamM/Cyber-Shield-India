@@ -1,15 +1,9 @@
 import { MapPin, FileWarning, Map as MapIcon } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
+import { IndiaFraudMap, heatColor } from "@/components/india-map";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminFraudMap, getAdminFraudMapQueryKey } from "@workspace/api-client-react";
-
-function heatColor(ratio: number): string {
-  if (ratio >= 0.66) return "#C81E1E";
-  if (ratio >= 0.33) return "#FF6713";
-  if (ratio >= 0.12) return "#E6A100";
-  return "#138808";
-}
 
 export default function FraudMap() {
   const { data, isLoading } = useAdminFraudMap({
@@ -70,6 +64,25 @@ export default function FraudMap() {
           </CardContent>
         </Card>
       </div>
+
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle className="text-base">Live Fraud Heatmap</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <Skeleton className="h-[480px] w-full" />
+          ) : states.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <MapIcon className="w-12 h-12 text-muted-foreground mb-4 opacity-50" />
+              <h3 className="text-lg font-medium">No reports yet</h3>
+              <p className="text-muted-foreground">The heatmap will light up as reports come in.</p>
+            </div>
+          ) : (
+            <IndiaFraudMap states={states} maxReports={maxReports} />
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

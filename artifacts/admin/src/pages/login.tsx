@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BrandLogo, Wordmark, Tricolor } from "@/components/brand";
+import { BrandLogo, Wordmark, Tricolor, BrandTaglines } from "@/components/brand";
 
 const passwordSchema = z.object({
   password: z.string().min(1, "Password is required"),
@@ -54,7 +54,8 @@ export default function Login() {
           <BrandLogo size={72} className="bg-white/10" />
           <Wordmark className="text-3xl text-white" />
           <Tricolor className="w-16" />
-          <p className="text-sm font-semibold mt-1" style={{ color: "#5AA9FF" }}>
+          <BrandTaglines className="text-center text-sm" />
+          <p className="text-xs font-semibold mt-1 uppercase tracking-wide text-white/50">
             Trust &amp; Safety Console
           </p>
         </div>

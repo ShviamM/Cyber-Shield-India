@@ -1,7 +1,7 @@
 import { Link, useLocation } from "wouter";
 import { LogOut, ShieldCheck, BarChart3, MapPin, AlertTriangle } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { BrandLogo, Wordmark } from "@/components/brand";
+import { BrandLogo, Wordmark, BrandTaglines } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
@@ -49,7 +49,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="container mx-auto px-4 h-16 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <BrandLogo size={36} className="ring-1 ring-white/15" />
-              <Wordmark className="text-lg text-white" />
+              <div className="leading-tight">
+                <Wordmark className="text-lg text-white block" />
+                <BrandTaglines className="text-[10px]" hindiClassName="hidden sm:block" />
+              </div>
             </div>
             <div className="flex items-center gap-4">
               <div className="text-sm text-right hidden sm:block">

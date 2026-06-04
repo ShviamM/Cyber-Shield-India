@@ -20,6 +20,28 @@ export function Wordmark({ className }: { className?: string }) {
   );
 }
 
+/** Brand blue used for the English identity line. */
+export const BRAND_BLUE = "#5AA9FF";
+
+export function BrandTaglines({
+  className,
+  blueClassName,
+  hindiClassName,
+}: {
+  className?: string;
+  blueClassName?: string;
+  hindiClassName?: string;
+}) {
+  return (
+    <div className={cn("leading-tight", className)}>
+      <p className={cn("font-semibold", blueClassName)} style={{ color: BRAND_BLUE }}>
+        India&apos;s Digital Bodyguard
+      </p>
+      <p className={cn("text-white/70", hindiClassName)}>Thag se 2 kadam aage</p>
+    </div>
+  );
+}
+
 export function Tricolor({ className }: { className?: string }) {
   return (
     <div className={cn("flex h-[3px] w-16 overflow-hidden rounded-full", className)}>
