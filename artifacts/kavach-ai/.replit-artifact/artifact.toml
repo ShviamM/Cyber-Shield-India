@@ -1,6 +1,6 @@
 kind = "mobile"
 previewPath = "/kavach-ai/"
-title = "Netraksh — India Cyber Safety"
+title = "Netraksh — India's Digital Bodyguard"
 version = "1.0.0"
 id = "artifacts/kavach-ai"
 router = "expo-domain"

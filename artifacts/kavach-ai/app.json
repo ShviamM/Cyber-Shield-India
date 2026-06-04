@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Netraksh — India Cyber Safety",
+    "name": "Netraksh — India's Digital Bodyguard",
     "slug": "kavach-ai",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -11,14 +11,14 @@
     "splash": {
       "image": "./assets/images/icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#060b18"
+      "backgroundColor": "#0B3D91"
     },
     "ios": {
       "supportsTablet": false
     },
     "android": {
       "package": "com.kavachai.app",
-      "backgroundColor": "#060b18",
+      "backgroundColor": "#0B3D91",
       "permissions": [
         "android.permission.READ_PHONE_STATE",
         "android.permission.READ_CALL_LOG",
