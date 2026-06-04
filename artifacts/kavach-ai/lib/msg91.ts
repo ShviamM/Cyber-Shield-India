@@ -53,12 +53,20 @@ export async function sendWidgetOtp(phoneE164: string): Promise<string> {
   const identifier = phoneE164.replace(/^\+/, "");
   const res = (await w.sendOTP({ identifier })) as {
     reqId?: string;
+    message?: string;
     type?: string;
   } | null;
-  if (!res || res.type === "error" || !res.reqId) {
+  // The MSG91 widget API returns { type, message } — on success the reqId lives
+  // in `message` (some versions also set `reqId`). Treat anything that isn't an
+  // explicit error with a usable reqId as a success.
+  if (!res || res.type === "error") {
     throw new Error("send_failed");
   }
-  return res.reqId;
+  const reqId = res.reqId ?? res.message;
+  if (!reqId) {
+    throw new Error("send_failed");
+  }
+  return reqId;
 }
 
 /** Verify an OTP via the MSG91 widget. Returns the access token for the backend. */
@@ -70,10 +78,15 @@ export async function verifyWidgetOtp(
   if (!w) throw new Error("otp_unavailable");
   const res = (await w.verifyOTP({ reqId, otp })) as {
     type?: string;
+    message?: string;
     "access-token"?: string;
   } | null;
-  const token = res?.["access-token"];
-  if (!res || res.type !== "success" || !token) {
+  // On success the JWT comes back in `message` (some versions use `access-token`).
+  if (!res || res.type === "error") {
+    throw new Error("verify_failed");
+  }
+  const token = res["access-token"] ?? res.message;
+  if (!token) {
     throw new Error("verify_failed");
   }
   return token;

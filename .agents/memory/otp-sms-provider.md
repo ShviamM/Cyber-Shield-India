@@ -13,8 +13,14 @@ widgetId }`) and issues our own opaque session. verifyAccessToken success →
 - **Mobile (kavach-ai)** uses the RN SDK `@msg91comm/sendotp-react-native`:
   `OTPWidget.initializeWidget(widgetId, tokenAuth)` → `sendOTP({identifier})`
   (identifier = phone WITHOUT a leading "+", e.g. `91XXXXXXXXXX`) →
-  `verifyOTP({reqId, otp})` → returns the JWT at the top-level hyphenated key
-  `access-token`.
+  `verifyOTP({reqId, otp})`. **The SDK returns the RAW MSG91 widget API JSON
+  `{ type, message }`** (it just does `fetch().then(r=>r.json())` against
+  `control.msg91.com/api/v5/widget/sendOtpMobile` / `/verifyOtp`). On success the
+  **reqId AND the verify access-token both come back in `message`**, NOT in
+  `reqId` / `access-token`. `type === "error"` signals failure. Parse defensively
+  (`res.reqId ?? res.message`, `res["access-token"] ?? res.message`) — assuming a
+  hyphenated `access-token` key made send fail with `send_failed` even though the
+  OTP SMS was delivered.
 - **Admin (web)** can't use the RN SDK, so it loads the web widget script
   `https://verify.msg91.com/otp-provider.js` and calls
   `window.initSendOTP({widgetId, tokenAuth, exposeMethods:true})` → exposes
