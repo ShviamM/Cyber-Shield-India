@@ -1,0 +1,283 @@
+NETRAKSH PRODUCTION READINESS AUDIT AND FINAL LAUNCH VALIDATION
+
+Act as a Senior Mobile Architect, DevSecOps Engineer, QA Lead, Product Owner, SOC Architect, and Production Release Manager.
+
+Perform a complete end-to-end audit of the Netraksh application and admin portal and prepare it for production launch.
+
+OBJECTIVES
+
+1. Remove all demo, test, placeholder, mock, and sample data.
+2. Ensure every feature is fully functional and production-ready.
+3. Validate all integrations.
+4. Identify and fix bugs, security issues, performance issues, broken workflows, and missing backend connections.
+5. Generate a Production Readiness Report with PASS / FAIL status for every feature.
+
+GENERAL REQUIREMENTS
+
+* Remove all hardcoded demo data.
+* Remove mock users.
+* Remove test fraud reports.
+* Remove placeholder notifications.
+* Remove sample subscriptions.
+* Remove fake analytics.
+* Remove development banners.
+* Remove unused code and components.
+* Verify all API endpoints are connected to production services.
+
+AUTHENTICATION VALIDATION
+
+Verify:
+
+* OTP generation
+* OTP delivery
+* OTP verification
+* OTP expiration
+* OTP retry limits
+* OTP abuse protection
+* JWT generation
+* JWT refresh flow
+* Session handling
+* Logout functionality
+* Account recovery
+
+Fail deployment if any authentication workflow is broken.
+
+SUBSCRIPTION VALIDATION
+
+Verify:
+
+* Razorpay integration
+* Subscription creation
+* Payment verification
+* Webhook processing
+* Premium access control
+* Family subscription plans
+* Subscription renewal
+* Cancellation flow
+
+Ensure premium features cannot be accessed without an active subscription.
+
+AI ENGINE VALIDATION
+
+Verify:
+
+* AI Scam Analyzer
+* AI Fraud Detection Engine
+* AI Message Analysis
+* AI URL Analysis
+* AI Risk Scoring
+* AI Recommendations
+
+Test with:
+
+* Scam messages
+* OTP scams
+* UPI scams
+* Job scams
+* Loan scams
+* Investment scams
+* Phishing links
+
+Verify:
+
+* Correct classification
+* Confidence score
+* Response speed
+* Error handling
+
+Generate AI accuracy statistics.
+
+SCAM CALL SCREENING
+
+Verify:
+
+* On-Device Call Screening
+* Incoming call detection
+* Risk scoring
+* Community reputation lookup
+* Real-time alerts
+
+REQUIREMENT:
+
+Guardian Active Protection must be enabled by default.
+
+REQUIREMENT:
+
+Scam Call Screening must be enabled by default on first launch.
+
+Verify permissions workflow.
+
+SCAM SMS SCREENING
+
+Verify:
+
+* SMS monitoring
+* SMS analysis
+* Scam detection
+* Risk scoring
+* Community intelligence lookup
+
+REQUIREMENT:
+
+Scam SMS Protection must be enabled by default.
+
+REQUIREMENT:
+
+Guardian Protection must monitor SMS threats automatically.
+
+WHATSAPP ANALYZER
+
+Verify:
+
+* Share to Netraksh
+* Message analysis
+* Link extraction
+* Scam detection
+* AI explanation
+
+Validate all WhatsApp share workflows.
+
+QR CODE ANALYZER
+
+Verify:
+
+* QR scanning
+* UPI validation
+* URL extraction
+* Scam detection
+* Risk display
+
+Test with both safe and malicious QR codes.
+
+NOTIFICATION SYSTEM
+
+Verify:
+
+* Push notifications
+* Fraud alerts
+* Subscription alerts
+* Threat alerts
+* Family alerts
+
+Ensure:
+
+* Notification delivery works
+* Notification history syncs
+* Admin broadcasts function correctly
+
+FRAUD REPORTING SYSTEM
+
+Perform complete audit.
+
+Requirements:
+
+* Fraud reports must be genuine records only.
+* Remove all fake reports.
+* Remove placeholder reports.
+* Remove development test reports.
+* Verify report creation.
+* Verify evidence upload.
+* Verify screenshots.
+* Verify attachments.
+* Verify report moderation workflow.
+* Verify blacklist workflow.
+
+Ensure every report shown in production originated from a real user submission.
+
+ADMIN PORTAL AUDIT
+
+Verify:
+
+* User management
+* Moderation queue
+* Reputation system
+* Threat intelligence dashboard
+* Subscription analytics
+* Push notification center
+* Evidence viewer
+* Audit logging
+
+Remove all demo statistics.
+
+Ensure all dashboard metrics are generated from live data.
+
+DATABASE AUDIT
+
+Verify:
+
+* Foreign key relationships
+* Data consistency
+* Duplicate prevention
+* Fraud report integrity
+* Subscription integrity
+* User integrity
+
+Repair any orphaned records.
+
+SECURITY AUDIT
+
+Perform:
+
+* OWASP Mobile Top 10 review
+* OWASP API Top 10 review
+* Authentication review
+* Authorization review
+* Rate limiting review
+* Secrets management review
+* Input validation review
+
+Generate security findings.
+
+PERFORMANCE TESTING
+
+Simulate:
+
+* 1,000 users
+* 10,000 users
+* 50,000 users
+* 100,000 users
+
+Measure:
+
+* API latency
+* Database latency
+* AI response times
+* Notification delivery times
+
+Identify bottlenecks.
+
+PRODUCTION CONFIGURATION
+
+Verify:
+
+* Production environment variables
+* SSL certificates
+* Logging
+* Monitoring
+* Error tracking
+* Backup jobs
+* Database backups
+* Disaster recovery
+
+PRE-LAUNCH CHECKLIST
+
+Generate final checklist with:
+
+PASS
+FAIL
+WARNING
+
+for every feature.
+
+Do not mark the application production-ready until every critical item passes.
+
+At the end provide:
+
+1. Production Readiness Score (%)
+2. Security Score (%)
+3. Performance Score (%)
+4. AI Accuracy Score (%)
+5. Launch Recommendation
+6. Remaining Critical Issues
+7. Estimated Maximum Concurrent Users Supported
+8. Go-Live Approval Status
