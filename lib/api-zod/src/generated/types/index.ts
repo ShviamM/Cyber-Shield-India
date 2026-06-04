@@ -9,6 +9,7 @@
 export * from './adminListReportsParams';
 export * from './adminReport';
 export * from './adminReportListResponse';
+export * from './adminStats';
 export * from './authResponse';
 export * from './categoryListResponse';
 export * from './checkPhoneRequest';

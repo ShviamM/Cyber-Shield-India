@@ -23,6 +23,7 @@ import type {
   AdminListReportsParams,
   AdminReport,
   AdminReportListResponse,
+  AdminStats,
   AuthResponse,
   CategoryListResponse,
   CheckPhoneRequest,
@@ -1136,6 +1137,83 @@ export const useFraudCheck = <TError = ErrorType<ErrorResponse>,
       > => {
       return useMutation(getFraudCheckMutationOptions(options));
     }
+
+export const getAdminStatsUrl = () => {
+
+
+
+
+  return `/api/admin/stats`
+}
+
+/**
+ * @summary Dashboard metrics overview
+ */
+export const adminStats = async ( options?: RequestInit): Promise<AdminStats> => {
+
+  return customFetch<AdminStats>(getAdminStatsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getAdminStatsQueryKey = () => {
+    return [
+    `/api/admin/stats`
+    ] as const;
+    }
+
+
+export const getAdminStatsQueryOptions = <TData = Awaited<ReturnType<typeof adminStats>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminStats>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdminStatsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminStats>>> = ({ signal }) => adminStats({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminStats>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type AdminStatsQueryResult = NonNullable<Awaited<ReturnType<typeof adminStats>>>
+export type AdminStatsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Dashboard metrics overview
+ */
+
+export function useAdminStats<TData = Awaited<ReturnType<typeof adminStats>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminStats>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getAdminStatsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export const getAdminListReportsUrl = (params?: AdminListReportsParams,) => {
   const normalizedParams = new URLSearchParams();

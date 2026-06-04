@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Shield, LogOut, CheckCircle2, XCircle, AlertTriangle, ShieldAlert, ShieldOff, Phone, Clock, Search, ListFilter, Ban } from "lucide-react";
+import { Shield, LogOut, CheckCircle2, XCircle, AlertTriangle, ShieldAlert, ShieldOff, Phone, Clock, Search, ListFilter, Ban, Users, Crown, FileWarning, IndianRupee, Activity } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { format } from "date-fns";
 import { useAuth } from "@/hooks/use-auth";
-import { useLogout, useAdminListReports, getAdminListReportsQueryKey, useAdminUpdateReport, useAdminVerifyNumber } from "@workspace/api-client-react";
+import { useLogout, useAdminListReports, getAdminListReportsQueryKey, useAdminUpdateReport, useAdminVerifyNumber, useAdminStats, getAdminStatsQueryKey } from "@workspace/api-client-react";
 import type { AdminReport } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,24 @@ export default function Dashboard() {
 
   const updateReport = useAdminUpdateReport();
   const verifyNumber = useAdminVerifyNumber();
+
+  const { data: stats, isLoading: statsLoading } = useAdminStats({
+    query: { queryKey: getAdminStatsQueryKey() },
+  });
+
+  const metricCards: {
+    label: string;
+    value: number | undefined;
+    icon: LucideIcon;
+    format: (v: number) => string;
+  }[] = [
+    { label: "Total Users", value: stats?.totalUsers, icon: Users, format: (v) => v.toLocaleString("en-IN") },
+    { label: "Premium Users", value: stats?.premiumUsers, icon: Crown, format: (v) => v.toLocaleString("en-IN") },
+    { label: "Fraud Reports", value: stats?.fraudReports, icon: FileWarning, format: (v) => v.toLocaleString("en-IN") },
+    { label: "Blocked Numbers", value: stats?.blockedNumbers, icon: Ban, format: (v) => v.toLocaleString("en-IN") },
+    { label: "Revenue", value: stats?.revenuePaise, icon: IndianRupee, format: (v) => `₹${(v / 100).toLocaleString("en-IN", { maximumFractionDigits: 0 })}` },
+    { label: "Daily Active Users", value: stats?.dailyActiveUsers, icon: Activity, format: (v) => v.toLocaleString("en-IN") },
+  ];
 
   // Debounce search
   useEffect(() => {
@@ -193,6 +212,32 @@ export default function Dashboard() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        <section className="mb-10">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4">Overview</h2>
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+            {metricCards.map((metric) => {
+              const Icon = metric.icon;
+              return (
+                <Card key={metric.label}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-medium text-muted-foreground">{metric.label}</span>
+                      <Icon className="w-4 h-4 text-muted-foreground" />
+                    </div>
+                    {statsLoading ? (
+                      <Skeleton className="h-8 w-20" />
+                    ) : (
+                      <p className="text-2xl font-bold tracking-tight tabular-nums">
+                        {metric.value === undefined ? "—" : metric.format(metric.value)}
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </section>
+
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Moderation Queue</h1>

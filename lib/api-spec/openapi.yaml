@@ -327,6 +327,23 @@ paths:
         default:
           $ref: "#/components/responses/Error"
 
+  /admin/stats:
+    get:
+      operationId: adminStats
+      tags: [admin]
+      summary: Dashboard metrics overview
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Dashboard metrics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminStats"
+        default:
+          $ref: "#/components/responses/Error"
+
   /admin/reports:
     get:
       operationId: adminListReports
@@ -934,6 +951,29 @@ components:
       required:
         - reports
         - total
+
+    AdminStats:
+      type: object
+      properties:
+        totalUsers:
+          type: integer
+        premiumUsers:
+          type: integer
+        fraudReports:
+          type: integer
+        blockedNumbers:
+          type: integer
+        revenuePaise:
+          type: integer
+        dailyActiveUsers:
+          type: integer
+      required:
+        - totalUsers
+        - premiumUsers
+        - fraudReports
+        - blockedNumbers
+        - revenuePaise
+        - dailyActiveUsers
 
     NumberCheckResponse:
       type: object

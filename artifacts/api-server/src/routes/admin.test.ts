@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import request from "supertest";
-import { eq } from "drizzle-orm";
+import { eq, gte, sql } from "drizzle-orm";
 import {
   db,
   fraudReportsTable,
@@ -31,6 +31,8 @@ const scamPhone = randomPhone();
 
 let adminId: string;
 let reporterId: string;
+let stalePhone: string;
+let staleUserId: string;
 
 beforeAll(async () => {
   const [admin] = await db
@@ -58,6 +60,21 @@ beforeAll(async () => {
     description: "Test scam report for blacklist coverage",
     status: "pending",
   });
+
+  // A user whose only session was created >24h ago: should NOT count as a
+  // daily active user, which proves the metric uses a 24h login window.
+  stalePhone = randomPhone();
+  const [stale] = await db
+    .insert(usersTable)
+    .values({ fullName: "Stale Session User", phone: stalePhone })
+    .returning();
+  staleUserId = stale.id;
+  await db.insert(sessionsTable).values({
+    userId: staleUserId,
+    tokenHash: hashToken(`test-stale-${Math.random().toString(36).slice(2)}`),
+    expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+    createdAt: new Date(Date.now() - 48 * 60 * 60 * 1000),
+  });
 });
 
 afterAll(async () => {
@@ -68,8 +85,10 @@ afterAll(async () => {
     .delete(numberReputationTable)
     .where(eq(numberReputationTable.phone, scamPhone));
   await db.delete(sessionsTable).where(eq(sessionsTable.userId, adminId));
+  await db.delete(sessionsTable).where(eq(sessionsTable.userId, staleUserId));
   await db.delete(usersTable).where(eq(usersTable.id, adminId));
   await db.delete(usersTable).where(eq(usersTable.id, reporterId));
+  await db.delete(usersTable).where(eq(usersTable.id, staleUserId));
 });
 
 async function getReputation(phone: string) {
@@ -101,6 +120,53 @@ describe("POST /admin/numbers/:phone/verify", () => {
     expect(off.status).toBe(200);
     expect(off.body.verifiedScam).toBe(false);
     expect((await getReputation(scamPhone)).verifiedScam).toBe(false);
+  });
+});
+
+describe("GET /admin/stats", () => {
+  it("returns numeric dashboard metrics reflecting seeded data", async () => {
+    const res = await request(app)
+      .get(`/api/admin/stats`)
+      .set("Authorization", `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    for (const key of [
+      "totalUsers",
+      "premiumUsers",
+      "fraudReports",
+      "blockedNumbers",
+      "revenuePaise",
+      "dailyActiveUsers",
+    ]) {
+      expect(typeof res.body[key]).toBe("number");
+      expect(res.body[key]).toBeGreaterThanOrEqual(0);
+    }
+    // We seeded two users, one fraud report, and one fresh admin session.
+    expect(res.body.totalUsers).toBeGreaterThanOrEqual(2);
+    expect(res.body.fraudReports).toBeGreaterThanOrEqual(1);
+    expect(res.body.dailyActiveUsers).toBeGreaterThanOrEqual(1);
+  });
+
+  it("rejects requests without an admin session", async () => {
+    const res = await request(app).get(`/api/admin/stats`);
+    expect(res.status).toBe(401);
+  });
+
+  it("counts daily active users as distinct logins in the last 24h (excludes stale sessions)", async () => {
+    const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const [{ value: expected }] = await db
+      .select({ value: sql<string>`count(distinct ${sessionsTable.userId})` })
+      .from(sessionsTable)
+      .where(gte(sessionsTable.createdAt, dayAgo));
+
+    const res = await request(app)
+      .get(`/api/admin/stats`)
+      .set("Authorization", `Bearer ${adminToken}`);
+
+    expect(res.status).toBe(200);
+    // Endpoint matches a freshly recomputed 24h window, so the stale-session
+    // user (created 48h ago) is necessarily excluded from the count.
+    expect(res.body.dailyActiveUsers).toBe(Number(expected));
   });
 });
 

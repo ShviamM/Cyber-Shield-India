@@ -1,9 +1,12 @@
 import { Router, type IRouter } from "express";
-import { and, count, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq, gte, inArray, sql } from "drizzle-orm";
 import {
   db,
   fraudReportsTable,
   numberReputationTable,
+  paymentsTable,
+  sessionsTable,
+  subscriptionsTable,
   usersTable,
 } from "@workspace/db";
 import {
@@ -14,6 +17,7 @@ import {
   AdminVerifyNumberParams,
   type AdminReport,
   type AdminReportListResponse,
+  type AdminStats,
   type NumberReputation,
 } from "@workspace/api-zod";
 import { normalizeIndianPhone } from "../lib/phone";
@@ -23,6 +27,55 @@ import { recomputeReputation, setVerifiedScam } from "../lib/reputation";
 import { requireAdmin } from "../middlewares/auth";
 
 const router: IRouter = Router();
+
+router.get("/admin/stats", requireAdmin, async (_req, res) => {
+  const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+  const [
+    [{ value: totalUsers }],
+    [{ value: premiumUsers }],
+    [{ value: fraudReports }],
+    [{ value: blockedNumbers }],
+    [revenueRow],
+    [dauRow],
+  ] = await Promise.all([
+    db.select({ value: count() }).from(usersTable),
+    db
+      .select({ value: count() })
+      .from(subscriptionsTable)
+      .where(
+        and(
+          eq(subscriptionsTable.status, "active"),
+          inArray(subscriptionsTable.plan, ["premium", "family"]),
+        ),
+      ),
+    db.select({ value: count() }).from(fraudReportsTable),
+    db
+      .select({ value: count() })
+      .from(numberReputationTable)
+      .where(eq(numberReputationTable.verifiedScam, true)),
+    db
+      .select({
+        value: sql<string>`coalesce(sum(${paymentsTable.amount}), 0)`,
+      })
+      .from(paymentsTable)
+      .where(eq(paymentsTable.status, "paid")),
+    db
+      .select({ value: sql<string>`count(distinct ${sessionsTable.userId})` })
+      .from(sessionsTable)
+      .where(gte(sessionsTable.createdAt, dayAgo)),
+  ]);
+
+  const response: AdminStats = {
+    totalUsers,
+    premiumUsers,
+    fraudReports,
+    blockedNumbers,
+    revenuePaise: Number(revenueRow?.value ?? 0),
+    dailyActiveUsers: Number(dauRow?.value ?? 0),
+  };
+  res.json(response);
+});
 
 router.get("/admin/reports", requireAdmin, async (req, res) => {
   const query = AdminListReportsQueryParams.parse(req.query);

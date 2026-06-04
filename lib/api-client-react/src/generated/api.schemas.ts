@@ -172,6 +172,15 @@ export interface AdminReportListResponse {
   total: number;
 }
 
+export interface AdminStats {
+  totalUsers: number;
+  premiumUsers: number;
+  fraudReports: number;
+  blockedNumbers: number;
+  revenuePaise: number;
+  dailyActiveUsers: number;
+}
+
 export type NumberCheckResponseRiskLevel = typeof NumberCheckResponseRiskLevel[keyof typeof NumberCheckResponseRiskLevel];
 
 

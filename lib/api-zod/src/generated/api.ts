@@ -266,6 +266,19 @@ export const FraudCheckResponse = zod.object({
 
 
 /**
+ * @summary Dashboard metrics overview
+ */
+export const AdminStatsResponse = zod.object({
+  "totalUsers": zod.number(),
+  "premiumUsers": zod.number(),
+  "fraudReports": zod.number(),
+  "blockedNumbers": zod.number(),
+  "revenuePaise": zod.number(),
+  "dailyActiveUsers": zod.number()
+})
+
+
+/**
  * @summary List reports for moderation
  */
 export const adminListReportsQueryLimitDefault = 100;
