@@ -22,7 +22,11 @@ widgetId }`) and issues our own opaque session. verifyAccessToken success →
   `window.retryOtp(channel|null, ok, fail, reqId?)`. The web verifyOtp success
   payload shape is inconsistent across versions, so extract the token defensively
   (string | `access-token` | `message` | `token`). Client env is VITE_-prefixed
-  (`VITE_MSG91_WIDGET_ID`, `VITE_MSG91_TOKEN_AUTH`).
+  (`VITE_MSG91_WIDGET_ID`, `VITE_MSG91_TOKEN_AUTH`). **`initSendOTP` config MUST
+  include `success` and `failure` callbacks even with `exposeMethods: true`** —
+  the widget invokes the config-level `success` from its internal flow and throws
+  an unhandled `"success callback function missing !"` (crashes the page) if it's
+  absent. They can be no-ops since the real flow runs through the exposed methods.
 
 Backend auth endpoints: `POST /auth/check-phone {phone} -> {isNewUser}` (so the
 app can collect name/location for new users first) and `POST /auth/verify-token

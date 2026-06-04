@@ -71,6 +71,11 @@ async function ensureInit(): Promise<void> {
       tokenAuth: TOKEN_AUTH,
       // exposeMethods drives our own UI and exposes sendOtp/verifyOtp/retryOtp.
       exposeMethods: true,
+      // The widget invokes these config-level callbacks from its internal flow.
+      // They MUST exist or it throws "success callback function missing !" — we
+      // drive the real flow via the exposed methods, so these are no-ops.
+      success: () => {},
+      failure: () => {},
     });
     initialized = true;
   }
