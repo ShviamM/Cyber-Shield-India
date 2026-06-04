@@ -17,6 +17,9 @@ export const config = {
   // auth key (server-side only); `msg91WidgetId` is the public widget id.
   msg91AuthKey: (process.env.MSG91_AUTH_KEY ?? "").trim(),
   msg91WidgetId: (process.env.MSG91_WIDGET_ID ?? "").trim(),
+  // Single shared password for the admin web console (password-only login).
+  // Server-side only; never sent to clients.
+  adminPassword: (process.env.ADMIN_PASSWORD ?? "").trim(),
   // Per-IP throttles on the auth endpoints (cost/abuse protection): stop one
   // client from probing many phone numbers or replaying tokens.
   otpRequestMaxPerIpPerHour: intEnv("OTP_REQUEST_MAX_PER_IP_PER_HOUR", 30),

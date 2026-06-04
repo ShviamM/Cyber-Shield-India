@@ -83,6 +83,28 @@ paths:
         default:
           $ref: "#/components/responses/Error"
 
+  /auth/admin-login:
+    post:
+      operationId: adminLogin
+      tags: [auth]
+      summary: Sign in to the admin console with the shared admin password
+      description: Authenticates the admin web console using a single shared admin password. On success, returns a session token bound to the configured admin account.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminLoginRequest"
+      responses:
+        "200":
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
   /auth/me:
     get:
       operationId: getMe
@@ -629,6 +651,15 @@ components:
           nullable: true
       required:
         - accessToken
+
+    AdminLoginRequest:
+      type: object
+      properties:
+        password:
+          type: string
+          description: The shared admin console password
+      required:
+        - password
 
     User:
       type: object
