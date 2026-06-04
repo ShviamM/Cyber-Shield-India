@@ -6,10 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface VerifyOtpRequest {
+export interface CheckPhoneRequest {
+  /** Indian mobile number in any common format */
   phone: string;
-  code: string;
-  /** Required when registering a new number */
-  fullName?: string | null;
-  location?: string | null;
 }

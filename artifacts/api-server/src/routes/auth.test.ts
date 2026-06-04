@@ -3,17 +3,18 @@ import request from "supertest";
 import { eq } from "drizzle-orm";
 
 /**
- * Control the SMS sender per-test. The mock replaces the real provider so we can
- * simulate delivery success/failure without touching MSG91. Must be declared
- * before importing `app` so the route picks up the mocked `smsSender`.
+ * Control the MSG91 widget verification per-test. The mock replaces the real
+ * verifyAccessToken so we can simulate a verified/failed token without calling
+ * MSG91. Must be declared before importing `app` so routes pick up the mock.
  */
-const sendOtp = vi.fn<(phone: string, code: string) => Promise<void>>();
-vi.mock("../lib/sms", () => ({
-  smsSender: { sendOtp: (phone: string, code: string) => sendOtp(phone, code) },
+const verifyAccessToken = vi.fn<(token: string) => Promise<{ phone: string }>>();
+vi.mock("../lib/msg91-widget", () => ({
+  verifyAccessToken: (token: string) => verifyAccessToken(token),
 }));
 
 const { default: app } = await import("../app");
-const { db, otpCodesTable } = await import("@workspace/db");
+const { db, usersTable, sessionsTable } = await import("@workspace/db");
+const { HttpError } = await import("../lib/http-error");
 
 function randomPhone(): string {
   const first = 6 + Math.floor(Math.random() * 4);
@@ -27,38 +28,83 @@ const usedPhones: string[] = [];
 
 afterAll(async () => {
   for (const phone of usedPhones) {
-    await db.delete(otpCodesTable).where(eq(otpCodesTable.phone, phone));
+    const users = await db
+      .select({ id: usersTable.id })
+      .from(usersTable)
+      .where(eq(usersTable.phone, phone));
+    for (const u of users) {
+      await db.delete(sessionsTable).where(eq(sessionsTable.userId, u.id));
+    }
+    await db.delete(usersTable).where(eq(usersTable.phone, phone));
   }
 });
 
-async function otpRowsFor(phone: string) {
-  return db.select().from(otpCodesTable).where(eq(otpCodesTable.phone, phone));
-}
-
-describe("POST /auth/request-otp SMS delivery handling", () => {
-  it("deletes the OTP row and returns 502 when delivery fails", async () => {
+describe("POST /auth/check-phone", () => {
+  it("reports an unknown number as a new user", async () => {
     const phone = randomPhone();
     usedPhones.push(phone);
-    sendOtp.mockRejectedValueOnce(new Error("MSG91 send failed"));
 
-    const res = await request(app).post("/api/auth/request-otp").send({ phone });
-
-    expect(res.status).toBe(502);
-    expect(res.body.error).toBe("sms_delivery_failed");
-    // The failed attempt must not linger, otherwise it counts toward the resend
-    // cooldown / hourly cap and locks the user out without a code.
-    expect(await otpRowsFor(phone)).toHaveLength(0);
-  });
-
-  it("keeps the OTP row when delivery succeeds", async () => {
-    const phone = randomPhone();
-    usedPhones.push(phone);
-    sendOtp.mockResolvedValueOnce(undefined);
-
-    const res = await request(app).post("/api/auth/request-otp").send({ phone });
+    const res = await request(app).post("/api/auth/check-phone").send({ phone });
 
     expect(res.status).toBe(200);
-    expect(sendOtp).toHaveBeenCalledWith(phone, expect.any(String));
-    expect(await otpRowsFor(phone)).toHaveLength(1);
+    expect(res.body.isNewUser).toBe(true);
+  });
+
+  it("rejects an invalid phone number", async () => {
+    const res = await request(app)
+      .post("/api/auth/check-phone")
+      .send({ phone: "12345" });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe("invalid_phone");
+  });
+});
+
+describe("POST /auth/verify-token", () => {
+  it("requires a full name when registering a new number", async () => {
+    const phone = randomPhone();
+    usedPhones.push(phone);
+    verifyAccessToken.mockResolvedValueOnce({ phone });
+
+    const res = await request(app)
+      .post("/api/auth/verify-token")
+      .send({ accessToken: "valid-token" });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe("registration_required");
+  });
+
+  it("creates an account and issues a session for a verified token", async () => {
+    const phone = randomPhone();
+    usedPhones.push(phone);
+    verifyAccessToken.mockResolvedValueOnce({ phone });
+
+    const res = await request(app)
+      .post("/api/auth/verify-token")
+      .send({ accessToken: "valid-token", fullName: "Test User" });
+
+    expect(res.status).toBe(200);
+    expect(typeof res.body.token).toBe("string");
+    expect(res.body.token.length).toBeGreaterThan(0);
+    expect(res.body.user.phone).toBe(phone);
+
+    // The number now belongs to an account, so check-phone flips to existing.
+    const check = await request(app)
+      .post("/api/auth/check-phone")
+      .send({ phone });
+    expect(check.body.isNewUser).toBe(false);
+  });
+
+  it("rejects an invalid or expired token", async () => {
+    verifyAccessToken.mockRejectedValueOnce(
+      new HttpError(401, "verification_failed", "bad token"),
+    );
+
+    const res = await request(app)
+      .post("/api/auth/verify-token")
+      .send({ accessToken: "bad-token", fullName: "Test User" });
+
+    expect(res.status).toBe(401);
+    expect(res.body.error).toBe("verification_failed");
   });
 });

@@ -56,6 +56,7 @@
     "zod-validation-error": "^3.4.0"
   },
   "dependencies": {
+    "@msg91comm/sendotp-react-native": "^2.1.0",
     "expo-camera": "~17.0.10",
     "expo-localization": "~17.0.9",
     "expo-share-intent": "5.1.1",

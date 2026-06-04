@@ -18,23 +18,19 @@ export interface SuccessResponse {
   success: boolean;
 }
 
-export interface RequestOtpRequest {
+export interface CheckPhoneRequest {
   /** Indian mobile number in any common format */
   phone: string;
 }
 
-export interface RequestOtpResult {
-  success: boolean;
+export interface CheckPhoneResult {
   /** True when no account exists yet for this number */
   isNewUser: boolean;
-  expiresInSeconds: number;
-  /** Present only in development to ease testing */
-  devOtp?: string | null;
 }
 
-export interface VerifyOtpRequest {
-  phone: string;
-  code: string;
+export interface VerifyTokenRequest {
+  /** The MSG91 widget access token returned after OTP verification */
+  accessToken: string;
   /** Required when registering a new number */
   fullName?: string | null;
   location?: string | null;

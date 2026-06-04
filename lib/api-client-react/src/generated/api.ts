@@ -25,6 +25,8 @@ import type {
   AdminReportListResponse,
   AuthResponse,
   CategoryListResponse,
+  CheckPhoneRequest,
+  CheckPhoneResult,
   CityHotspotListResponse,
   CreateOrderRequest,
   CreateReportRequest,
@@ -40,8 +42,6 @@ import type {
   PaymentList,
   Report,
   ReportListResponse,
-  RequestOtpRequest,
-  RequestOtpResult,
   ScamOfDay,
   SubscriptionOrder,
   SubscriptionPlanList,
@@ -52,8 +52,8 @@ import type {
   UpdateReportStatusRequest,
   User,
   VerifyNumberRequest,
-  VerifyOtpRequest,
-  VerifyPaymentRequest
+  VerifyPaymentRequest,
+  VerifyTokenRequest
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -146,38 +146,38 @@ export function useHealthCheck<TData = Awaited<ReturnType<typeof healthCheck>>, 
 
 
 
-export const getRequestOtpUrl = () => {
+export const getCheckPhoneUrl = () => {
 
 
 
 
-  return `/api/auth/request-otp`
+  return `/api/auth/check-phone`
 }
 
 /**
- * Generates and "sends" a one-time code to the given Indian mobile number. In development the code is returned in the response and logged.
- * @summary Request an OTP for a phone number
+ * Returns whether the given Indian mobile number is a new user, so the client can collect registration details before starting OTP verification via the MSG91 widget.
+ * @summary Check whether a phone number already has an account
  */
-export const requestOtp = async (requestOtpRequest: RequestOtpRequest, options?: RequestInit): Promise<RequestOtpResult> => {
+export const checkPhone = async (checkPhoneRequest: CheckPhoneRequest, options?: RequestInit): Promise<CheckPhoneResult> => {
 
-  return customFetch<RequestOtpResult>(getRequestOtpUrl(),
+  return customFetch<CheckPhoneResult>(getCheckPhoneUrl(),
   {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(
-      requestOtpRequest,)
+      checkPhoneRequest,)
   }
 );}
 
 
 
 
-export const getRequestOtpMutationOptions = <TError = ErrorType<ErrorResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestOtp>>, TError,{data: BodyType<RequestOtpRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof requestOtp>>, TError,{data: BodyType<RequestOtpRequest>}, TContext> => {
+export const getCheckPhoneMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkPhone>>, TError,{data: BodyType<CheckPhoneRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof checkPhone>>, TError,{data: BodyType<CheckPhoneRequest>}, TContext> => {
 
-const mutationKey = ['requestOtp'];
+const mutationKey = ['checkPhone'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -187,10 +187,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestOtp>>, {data: BodyType<RequestOtpRequest>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof checkPhone>>, {data: BodyType<CheckPhoneRequest>}> = (props) => {
           const {data} = props ?? {};
 
-          return  requestOtp(data,requestOptions)
+          return  checkPhone(data,requestOptions)
         }
 
 
@@ -200,56 +200,56 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type RequestOtpMutationResult = NonNullable<Awaited<ReturnType<typeof requestOtp>>>
-    export type RequestOtpMutationBody = BodyType<RequestOtpRequest>
-    export type RequestOtpMutationError = ErrorType<ErrorResponse>
+    export type CheckPhoneMutationResult = NonNullable<Awaited<ReturnType<typeof checkPhone>>>
+    export type CheckPhoneMutationBody = BodyType<CheckPhoneRequest>
+    export type CheckPhoneMutationError = ErrorType<ErrorResponse>
 
     /**
- * @summary Request an OTP for a phone number
+ * @summary Check whether a phone number already has an account
  */
-export const useRequestOtp = <TError = ErrorType<ErrorResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestOtp>>, TError,{data: BodyType<RequestOtpRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+export const useCheckPhone = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof checkPhone>>, TError,{data: BodyType<CheckPhoneRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
-        Awaited<ReturnType<typeof requestOtp>>,
+        Awaited<ReturnType<typeof checkPhone>>,
         TError,
-        {data: BodyType<RequestOtpRequest>},
+        {data: BodyType<CheckPhoneRequest>},
         TContext
       > => {
-      return useMutation(getRequestOtpMutationOptions(options));
+      return useMutation(getCheckPhoneMutationOptions(options));
     }
 
-export const getVerifyOtpUrl = () => {
+export const getVerifyTokenUrl = () => {
 
 
 
 
-  return `/api/auth/verify-otp`
+  return `/api/auth/verify-token`
 }
 
 /**
- * Verifies the code. For a new phone number, fullName is required and an account is created. Returns a session token and the user.
- * @summary Verify an OTP and authenticate
+ * Validates the MSG91 OTP widget access token server-side, then signs the user in. For a new phone number, fullName is required and an account is created. Returns a session token and the user.
+ * @summary Verify an MSG91 widget access token and authenticate
  */
-export const verifyOtp = async (verifyOtpRequest: VerifyOtpRequest, options?: RequestInit): Promise<AuthResponse> => {
+export const verifyToken = async (verifyTokenRequest: VerifyTokenRequest, options?: RequestInit): Promise<AuthResponse> => {
 
-  return customFetch<AuthResponse>(getVerifyOtpUrl(),
+  return customFetch<AuthResponse>(getVerifyTokenUrl(),
   {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
     body: JSON.stringify(
-      verifyOtpRequest,)
+      verifyTokenRequest,)
   }
 );}
 
 
 
 
-export const getVerifyOtpMutationOptions = <TError = ErrorType<ErrorResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyOtp>>, TError,{data: BodyType<VerifyOtpRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof verifyOtp>>, TError,{data: BodyType<VerifyOtpRequest>}, TContext> => {
+export const getVerifyTokenMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyToken>>, TError,{data: BodyType<VerifyTokenRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof verifyToken>>, TError,{data: BodyType<VerifyTokenRequest>}, TContext> => {
 
-const mutationKey = ['verifyOtp'];
+const mutationKey = ['verifyToken'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -259,10 +259,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof verifyOtp>>, {data: BodyType<VerifyOtpRequest>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof verifyToken>>, {data: BodyType<VerifyTokenRequest>}> = (props) => {
           const {data} = props ?? {};
 
-          return  verifyOtp(data,requestOptions)
+          return  verifyToken(data,requestOptions)
         }
 
 
@@ -272,22 +272,22 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type VerifyOtpMutationResult = NonNullable<Awaited<ReturnType<typeof verifyOtp>>>
-    export type VerifyOtpMutationBody = BodyType<VerifyOtpRequest>
-    export type VerifyOtpMutationError = ErrorType<ErrorResponse>
+    export type VerifyTokenMutationResult = NonNullable<Awaited<ReturnType<typeof verifyToken>>>
+    export type VerifyTokenMutationBody = BodyType<VerifyTokenRequest>
+    export type VerifyTokenMutationError = ErrorType<ErrorResponse>
 
     /**
- * @summary Verify an OTP and authenticate
+ * @summary Verify an MSG91 widget access token and authenticate
  */
-export const useVerifyOtp = <TError = ErrorType<ErrorResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyOtp>>, TError,{data: BodyType<VerifyOtpRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+export const useVerifyToken = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifyToken>>, TError,{data: BodyType<VerifyTokenRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
-        Awaited<ReturnType<typeof verifyOtp>>,
+        Awaited<ReturnType<typeof verifyToken>>,
         TError,
-        {data: BodyType<VerifyOtpRequest>},
+        {data: BodyType<VerifyTokenRequest>},
         TContext
       > => {
-      return useMutation(getVerifyOtpMutationOptions(options));
+      return useMutation(getVerifyTokenMutationOptions(options));
     }
 
 export const getGetMeUrl = () => {

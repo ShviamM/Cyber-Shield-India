@@ -1,5 +1,4 @@
-import { Feather } from "@expo/vector-icons";
-import { useRequestOtp, useVerifyOtp } from "@workspace/api-client-react";
+import { useCheckPhone, useVerifyToken } from "@workspace/api-client-react";
 import * as Haptics from "expo-haptics";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -19,6 +18,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useAuth } from "@/context/AuthContext";
 import { isValidIndianPhone, formatIndianPhone } from "@/lib/phone";
+import { isOtpAvailable, sendWidgetOtp, verifyWidgetOtp } from "@/lib/msg91";
 
 const NAVY = "#0B3D91";
 const SAFFRON = "#FF6713";
@@ -29,12 +29,16 @@ const RESEND_SECONDS = 30;
 
 type Step = "phone" | "details" | "otp";
 
+function toE164(phone: string): string {
+  return `+91${phone.replace(/\D/g, "").slice(-10)}`;
+}
+
 export default function LoginScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const { signIn } = useAuth();
-  const requestOtp = useRequestOtp();
-  const verifyOtp = useVerifyOtp();
+  const checkPhone = useCheckPhone();
+  const verifyToken = useVerifyToken();
 
   const [step, setStep] = useState<Step>("phone");
   const [phone, setPhone] = useState("");
@@ -42,7 +46,9 @@ export default function LoginScreen() {
   const [location, setLocation] = useState("");
   const [code, setCode] = useState("");
   const [isNewUser, setIsNewUser] = useState(false);
-  const [devOtp, setDevOtp] = useState<string | null>(null);
+  const [reqId, setReqId] = useState<string | null>(null);
+  const [otpSending, setOtpSending] = useState(false);
+  const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resendIn, setResendIn] = useState(0);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -67,31 +73,55 @@ export default function LoginScreen() {
     }, 1000);
   }
 
-  async function sendOtp(advance: boolean) {
+  // Launch the MSG91 widget to send the code, then move to the OTP entry step.
+  async function startOtp() {
+    if (!isOtpAvailable()) {
+      setError(t("auth.otpUnavailable"));
+      return;
+    }
+    setOtpSending(true);
+    setError(null);
+    try {
+      const id = await sendWidgetOtp(toE164(phone));
+      setReqId(id);
+      startResendTimer();
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setStep("otp");
+    } catch {
+      setError(t("auth.requestFailed"));
+    } finally {
+      setOtpSending(false);
+    }
+  }
+
+  // From the phone step: figure out if this is a new account (to collect a name
+  // first), then either branch to details or start OTP verification.
+  async function proceedFromPhone() {
     if (!isValidIndianPhone(phone)) {
       setError(t("auth.invalidPhone"));
       return;
     }
     setError(null);
     try {
-      const res = await requestOtp.mutateAsync({ data: { phone } });
+      const res = await checkPhone.mutateAsync({ data: { phone } });
       setIsNewUser(res.isNewUser);
-      setDevOtp(res.devOtp ?? null);
-      startResendTimer();
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      if (advance) setStep(res.isNewUser ? "details" : "otp");
+      if (res.isNewUser) {
+        setStep("details");
+      } else {
+        await startOtp();
+      }
     } catch {
       setError(t("auth.requestFailed"));
     }
   }
 
-  function goToOtpFromDetails() {
+  async function proceedFromDetails() {
     if (!fullName.trim()) {
       setError(t("auth.nameRequired"));
       return;
     }
     setError(null);
-    setStep("otp");
+    await startOtp();
   }
 
   async function handleVerify() {
@@ -99,12 +129,17 @@ export default function LoginScreen() {
       setError(t("auth.invalidOtp"));
       return;
     }
+    if (!reqId) {
+      setError(t("auth.requestFailed"));
+      return;
+    }
+    setVerifying(true);
     setError(null);
     try {
-      const auth = await verifyOtp.mutateAsync({
+      const accessToken = await verifyWidgetOtp(reqId, code.trim());
+      const auth = await verifyToken.mutateAsync({
         data: {
-          phone,
-          code: code.trim(),
+          accessToken,
           fullName: isNewUser ? fullName.trim() : undefined,
           location: isNewUser && location.trim() ? location.trim() : undefined,
         },
@@ -114,17 +149,19 @@ export default function LoginScreen() {
       // root layout's auth gate redirects into the app
     } catch {
       setError(t("auth.verifyFailed"));
+    } finally {
+      setVerifying(false);
     }
   }
 
   function resetToPhone() {
     setStep("phone");
     setCode("");
+    setReqId(null);
     setError(null);
   }
 
-  const sending = requestOtp.isPending;
-  const verifying = verifyOtp.isPending;
+  const checking = checkPhone.isPending;
 
   return (
     <KeyboardAvoidingView
@@ -177,7 +214,7 @@ export default function LoginScreen() {
                 keyboardType="phone-pad"
                 maxLength={15}
                 returnKeyType="done"
-                onSubmitEditing={() => sendOtp(true)}
+                onSubmitEditing={proceedFromPhone}
               />
             </View>
             <Text style={s.hint}>{t("auth.phoneHint")}</Text>
@@ -186,8 +223,8 @@ export default function LoginScreen() {
 
             <PrimaryButton
               label={t("auth.sendOtp")}
-              loading={sending}
-              onPress={() => sendOtp(true)}
+              loading={checking || otpSending}
+              onPress={proceedFromPhone}
             />
           </View>
         )}
@@ -220,13 +257,17 @@ export default function LoginScreen() {
               onChangeText={setLocation}
               autoCapitalize="words"
               returnKeyType="done"
-              onSubmitEditing={goToOtpFromDetails}
+              onSubmitEditing={proceedFromDetails}
             />
             <Text style={s.hint}>{t("common.optional")}</Text>
 
             {error ? <Text style={s.error}>{error}</Text> : null}
 
-            <PrimaryButton label={t("common.continue")} onPress={goToOtpFromDetails} />
+            <PrimaryButton
+              label={t("common.continue")}
+              loading={otpSending}
+              onPress={proceedFromDetails}
+            />
             <TouchableOpacity style={s.linkBtn} onPress={resetToPhone}>
               <Text style={s.linkTxt}>{t("auth.changeNumber")}</Text>
             </TouchableOpacity>
@@ -240,16 +281,6 @@ export default function LoginScreen() {
               {t("auth.otpSubPrefix")}
               <Text style={s.bold}>{formatIndianPhone(phone)}</Text>
             </Text>
-
-            {devOtp ? (
-              <View style={s.devBox}>
-                <Feather name="info" size={13} color={NAVY} />
-                <Text style={s.devTxt}>
-                  {t("auth.devOtpPrefix")}
-                  {devOtp}
-                </Text>
-              </View>
-            ) : null}
 
             <TextInput
               style={s.otpInput}
@@ -272,8 +303,8 @@ export default function LoginScreen() {
 
             <TouchableOpacity
               style={s.linkBtn}
-              disabled={resendIn > 0 || sending}
-              onPress={() => sendOtp(false)}
+              disabled={resendIn > 0 || otpSending}
+              onPress={startOtp}
             >
               <Text style={[s.linkTxt, resendIn > 0 && { color: "#94a3b8" }]}>
                 {resendIn > 0 ? t("auth.resendIn", { seconds: resendIn }) : t("auth.resend")}
@@ -368,9 +399,4 @@ const s = StyleSheet.create({
   btnTxt: { fontSize: 16, fontWeight: "700" as const, color: "#fff" },
   linkBtn: { alignItems: "center", paddingVertical: 10, marginTop: 4 },
   linkTxt: { fontSize: 13, fontWeight: "600" as const, color: NAVY },
-  devBox: {
-    flexDirection: "row", alignItems: "center", gap: 8,
-    backgroundColor: "#EBF0FA", borderRadius: 10, padding: 10, marginBottom: 16,
-  },
-  devTxt: { fontSize: 13, fontWeight: "700" as const, color: NAVY, letterSpacing: 1 },
 });

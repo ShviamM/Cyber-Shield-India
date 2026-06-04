@@ -39,40 +39,40 @@ paths:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
 
-  /auth/request-otp:
+  /auth/check-phone:
     post:
-      operationId: requestOtp
+      operationId: checkPhone
       tags: [auth]
-      summary: Request an OTP for a phone number
-      description: Generates and "sends" a one-time code to the given Indian mobile number. In development the code is returned in the response and logged.
+      summary: Check whether a phone number already has an account
+      description: Returns whether the given Indian mobile number is a new user, so the client can collect registration details before starting OTP verification via the MSG91 widget.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RequestOtpRequest"
+              $ref: "#/components/schemas/CheckPhoneRequest"
       responses:
         "200":
-          description: OTP generated
+          description: Lookup result
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/RequestOtpResult"
+                $ref: "#/components/schemas/CheckPhoneResult"
         default:
           $ref: "#/components/responses/Error"
 
-  /auth/verify-otp:
+  /auth/verify-token:
     post:
-      operationId: verifyOtp
+      operationId: verifyToken
       tags: [auth]
-      summary: Verify an OTP and authenticate
-      description: Verifies the code. For a new phone number, fullName is required and an account is created. Returns a session token and the user.
+      summary: Verify an MSG91 widget access token and authenticate
+      description: Validates the MSG91 OTP widget access token server-side, then signs the user in. For a new phone number, fullName is required and an account is created. Returns a session token and the user.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/VerifyOtpRequest"
+              $ref: "#/components/schemas/VerifyTokenRequest"
       responses:
         "200":
           description: Authenticated
@@ -579,7 +579,7 @@ components:
       required:
         - success
 
-    RequestOtpRequest:
+    CheckPhoneRequest:
       type: object
       properties:
         phone:
@@ -588,32 +588,21 @@ components:
       required:
         - phone
 
-    RequestOtpResult:
+    CheckPhoneResult:
       type: object
       properties:
-        success:
-          type: boolean
         isNewUser:
           type: boolean
           description: True when no account exists yet for this number
-        expiresInSeconds:
-          type: integer
-        devOtp:
-          type: string
-          nullable: true
-          description: Present only in development to ease testing
       required:
-        - success
         - isNewUser
-        - expiresInSeconds
 
-    VerifyOtpRequest:
+    VerifyTokenRequest:
       type: object
       properties:
-        phone:
+        accessToken:
           type: string
-        code:
-          type: string
+          description: The MSG91 widget access token returned after OTP verification
         fullName:
           type: string
           nullable: true
@@ -622,8 +611,7 @@ components:
           type: string
           nullable: true
       required:
-        - phone
-        - code
+        - accessToken
 
     User:
       type: object

@@ -73,6 +73,8 @@ const en = {
     otpSent: "Code sent",
     requestFailed: "Could not send the code. Please try again.",
     verifyFailed: "Could not verify the code. Please try again.",
+    otpUnavailable:
+      "Phone verification isn't available in this preview. Please use the installed app.",
   },
 
   profile: {

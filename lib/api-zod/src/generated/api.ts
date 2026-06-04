@@ -18,33 +18,29 @@ export const HealthCheckResponse = zod.object({
 
 
 /**
- * Generates and "sends" a one-time code to the given Indian mobile number. In development the code is returned in the response and logged.
- * @summary Request an OTP for a phone number
+ * Returns whether the given Indian mobile number is a new user, so the client can collect registration details before starting OTP verification via the MSG91 widget.
+ * @summary Check whether a phone number already has an account
  */
-export const RequestOtpBody = zod.object({
+export const CheckPhoneBody = zod.object({
   "phone": zod.string().describe('Indian mobile number in any common format')
 })
 
-export const RequestOtpResponse = zod.object({
-  "success": zod.boolean(),
-  "isNewUser": zod.boolean().describe('True when no account exists yet for this number'),
-  "expiresInSeconds": zod.number(),
-  "devOtp": zod.string().nullish().describe('Present only in development to ease testing')
+export const CheckPhoneResponse = zod.object({
+  "isNewUser": zod.boolean().describe('True when no account exists yet for this number')
 })
 
 
 /**
- * Verifies the code. For a new phone number, fullName is required and an account is created. Returns a session token and the user.
- * @summary Verify an OTP and authenticate
+ * Validates the MSG91 OTP widget access token server-side, then signs the user in. For a new phone number, fullName is required and an account is created. Returns a session token and the user.
+ * @summary Verify an MSG91 widget access token and authenticate
  */
-export const VerifyOtpBody = zod.object({
-  "phone": zod.string(),
-  "code": zod.string(),
+export const VerifyTokenBody = zod.object({
+  "accessToken": zod.string().describe('The MSG91 widget access token returned after OTP verification'),
   "fullName": zod.string().nullish().describe('Required when registering a new number'),
   "location": zod.string().nullish()
 })
 
-export const VerifyOtpResponse = zod.object({
+export const VerifyTokenResponse = zod.object({
   "token": zod.string(),
   "user": zod.object({
   "id": zod.string(),

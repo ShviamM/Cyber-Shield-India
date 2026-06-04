@@ -9,30 +9,17 @@ function intEnv(name: string, fallback: number): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
-// SMS provider for OTP delivery. Defaults to MSG91 in production and the dev
-// mock otherwise. Set SMS_PROVIDER=msg91 to test real SMS in development.
-const smsProvider = (process.env.SMS_PROVIDER ?? (isProduction ? "msg91" : "mock"))
-  .trim()
-  .toLowerCase();
-
 export const config = {
   isProduction,
-  smsProvider,
-  // MSG91 credentials for OTP delivery via the MSG91 Flow API. The auth key and
-  // a DLT-approved template id are required; the sender id is optional (usually
-  // baked into the template). `msg91OtpVar` is the variable name used inside the
-  // template to inject the code (defaults to "OTP").
+  // MSG91 OTP Widget. The widget (client-side RN SDK) sends and verifies the
+  // OTP on MSG91's side and returns an access token; the backend validates that
+  // token with MSG91's verifyAccessToken API. `msg91AuthKey` is the account
+  // auth key (server-side only); `msg91WidgetId` is the public widget id.
   msg91AuthKey: (process.env.MSG91_AUTH_KEY ?? "").trim(),
-  msg91TemplateId: (process.env.MSG91_TEMPLATE_ID ?? "").trim(),
-  msg91SenderId: (process.env.MSG91_SENDER_ID ?? "").trim(),
-  msg91OtpVar: (process.env.MSG91_OTP_VAR ?? "OTP").trim(),
-  otpTtlSeconds: intEnv("OTP_TTL_SECONDS", 300),
-  otpMaxAttempts: intEnv("OTP_MAX_ATTEMPTS", 5),
-  otpResendIntervalSeconds: intEnv("OTP_RESEND_INTERVAL_SECONDS", 30),
-  otpMaxPerHour: intEnv("OTP_MAX_PER_HOUR", 5),
-  // Per-IP throttles on the OTP endpoints (cost/abuse protection layered on top
-  // of the per-phone caps): stops one client from spraying many phone numbers.
-  otpRequestMaxPerIpPerHour: intEnv("OTP_REQUEST_MAX_PER_IP_PER_HOUR", 10),
+  msg91WidgetId: (process.env.MSG91_WIDGET_ID ?? "").trim(),
+  // Per-IP throttles on the auth endpoints (cost/abuse protection): stop one
+  // client from probing many phone numbers or replaying tokens.
+  otpRequestMaxPerIpPerHour: intEnv("OTP_REQUEST_MAX_PER_IP_PER_HOUR", 30),
   otpVerifyMaxPerIpPerMinute: intEnv("OTP_VERIFY_MAX_PER_IP_PER_MINUTE", 10),
   sessionTtlDays: intEnv("SESSION_TTL_DAYS", 60),
   reportDuplicateWindowHours: intEnv("REPORT_DUPLICATE_WINDOW_HOURS", 24),

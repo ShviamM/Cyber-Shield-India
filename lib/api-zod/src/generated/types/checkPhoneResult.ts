@@ -6,7 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface RequestOtpRequest {
-  /** Indian mobile number in any common format */
-  phone: string;
+export interface CheckPhoneResult {
+  /** True when no account exists yet for this number */
+  isNewUser: boolean;
 }
