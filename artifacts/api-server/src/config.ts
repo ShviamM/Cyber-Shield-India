@@ -9,21 +9,23 @@ function intEnv(name: string, fallback: number): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
-// SMS provider for OTP delivery. Defaults to Twilio in production and the dev
-// mock otherwise. Set SMS_PROVIDER=twilio to test real SMS in development.
-const smsProvider = (process.env.SMS_PROVIDER ?? (isProduction ? "twilio" : "mock"))
+// SMS provider for OTP delivery. Defaults to MSG91 in production and the dev
+// mock otherwise. Set SMS_PROVIDER=msg91 to test real SMS in development.
+const smsProvider = (process.env.SMS_PROVIDER ?? (isProduction ? "msg91" : "mock"))
   .trim()
   .toLowerCase();
 
 export const config = {
   isProduction,
   smsProvider,
-  // Standard Twilio credentials for third-party (non-Replit) hosting. When
-  // twilioAuthToken is set, the app sends OTPs directly via api.twilio.com
-  // instead of the Replit "twilio" connector proxy.
-  twilioAccountSid: (process.env.TWILIO_ACCOUNT_SID ?? "").trim(),
-  twilioAuthToken: (process.env.TWILIO_AUTH_TOKEN ?? "").trim(),
-  twilioFromNumber: (process.env.TWILIO_FROM_NUMBER ?? "").trim(),
+  // MSG91 credentials for OTP delivery via the MSG91 Flow API. The auth key and
+  // a DLT-approved template id are required; the sender id is optional (usually
+  // baked into the template). `msg91OtpVar` is the variable name used inside the
+  // template to inject the code (defaults to "OTP").
+  msg91AuthKey: (process.env.MSG91_AUTH_KEY ?? "").trim(),
+  msg91TemplateId: (process.env.MSG91_TEMPLATE_ID ?? "").trim(),
+  msg91SenderId: (process.env.MSG91_SENDER_ID ?? "").trim(),
+  msg91OtpVar: (process.env.MSG91_OTP_VAR ?? "OTP").trim(),
   otpTtlSeconds: intEnv("OTP_TTL_SECONDS", 300),
   otpMaxAttempts: intEnv("OTP_MAX_ATTEMPTS", 5),
   otpResendIntervalSeconds: intEnv("OTP_RESEND_INTERVAL_SECONDS", 30),

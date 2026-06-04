@@ -13,7 +13,6 @@
     "eval": "tsx src/eval/run.ts"
   },
   "dependencies": {
-    "@replit/connectors-sdk": "^0.4.1",
     "@workspace/api-zod": "workspace:*",
     "@workspace/db": "workspace:*",
     "@workspace/integrations-openai-ai-server": "workspace:*",

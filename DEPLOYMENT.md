@@ -19,8 +19,9 @@ with three deployable pieces:
 
 - **Node.js 24** and **pnpm** (`corepack enable` gives you pnpm).
 - A **PostgreSQL 16** database.
-- A **Twilio** account (Account SID, Auth Token, a verified/approved sender number)
-  for OTP login SMS. For India, you typically need a DLT-registered sender.
+- An **MSG91** account (Auth Key, a DLT-approved flow Template ID, and an
+  approved Sender ID) for OTP login SMS. For India, the template and sender must
+  be DLT-registered.
 - (Optional) An **OpenAI API key** for the AI scam classifier. Without it, the
   fraud engine still works using its non-AI signals.
 - (Optional) A **Google Safe Browsing** API key for URL reputation checks.
@@ -59,22 +60,23 @@ See `artifacts/api-server/.env.example` for the full list. The essentials:
 | `NODE_ENV`           | yes      | `production`                                              |
 | `PORT`               | yes      | Port to listen on (many hosts inject this)               |
 | `DATABASE_URL`       | yes      | Postgres connection string                               |
-| `SMS_PROVIDER`       | yes      | `twilio`                                                  |
-| `TWILIO_ACCOUNT_SID` | yes\*    | Your Twilio Account SID                                   |
-| `TWILIO_AUTH_TOKEN`  | yes\*    | Your Twilio Auth Token                                    |
-| `TWILIO_FROM_NUMBER` | yes\*    | Verified/approved sender in E.164 (e.g. `+1...`)          |
+| `SMS_PROVIDER`       | yes      | `msg91`                                                   |
+| `MSG91_AUTH_KEY`     | yes\*    | Your MSG91 Auth Key                                       |
+| `MSG91_TEMPLATE_ID`  | yes\*    | DLT-approved MSG91 flow Template ID                       |
+| `MSG91_SENDER_ID`    | no       | Approved Sender ID (often baked into the template)        |
+| `MSG91_OTP_VAR`      | no       | Template variable name for the code (defaults to `OTP`)   |
 | `OPENAI_API_KEY`     | no       | Enables AI scam classification                            |
 | `OPENAI_BASE_URL`    | no       | Defaults to `https://api.openai.com/v1`                   |
 | `ADMIN_PHONES`       | no       | Comma-separated admin phone numbers (Indian format)      |
 | `GOOGLE_SAFE_BROWSING_API_KEY` | no | Enables Safe Browsing URL checks                     |
 
-\* Required when `SMS_PROVIDER=twilio` (the default in production).
+\* Required when `SMS_PROVIDER=msg91` (the default in production).
 
-> **Replit vs. third-party (important):** On Replit, SMS used the managed Twilio
-> *connector* and AI used Replit's managed OpenAI gateway. Off Replit, set your
-> own `TWILIO_*` and `OPENAI_API_KEY` values above — the code automatically uses
-> them (sending SMS directly via `api.twilio.com`) instead of the Replit
-> connector. No code changes needed.
+> **Note:** The app generates and verifies its own OTP codes; MSG91 is used only
+> to deliver the code via its Flow API to a DLT-approved template. The template
+> must contain a variable (default name `OTP`) where the code is injected. AI uses
+> Replit's managed OpenAI gateway on Replit, or your own `OPENAI_API_KEY` off
+> Replit. No code changes needed.
 
 ### Build & run
 
@@ -132,7 +134,7 @@ Dockerfiles live at `artifacts/api-server/Dockerfile` and
 
 ```bash
 # Provide secrets via your shell/env or an .env file next to docker-compose.yml:
-#   TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM_NUMBER, OPENAI_API_KEY, ...
+#   MSG91_AUTH_KEY, MSG91_TEMPLATE_ID, MSG91_SENDER_ID, OPENAI_API_KEY, ...
 docker compose up --build
 
 # First run only — create the database schema:
@@ -151,8 +153,8 @@ secrets management, and the Postgres password before any real deployment.
 ## 6. Production checklist
 
 - [ ] Postgres provisioned and `pnpm --filter @workspace/db push` run.
-- [ ] API server env vars set (DB, Twilio, optional OpenAI/Safe Browsing).
+- [ ] API server env vars set (DB, MSG91, optional OpenAI/Safe Browsing).
 - [ ] HTTPS/TLS terminated in front of the API and admin.
 - [ ] Admin served behind a proxy that forwards `/api` to the API server.
 - [ ] `EXPO_PUBLIC_API_DOMAIN` points the mobile build at the live API.
-- [ ] Twilio sender number is verified/DLT-approved for your recipients.
+- [ ] MSG91 template and sender ID are DLT-approved for your recipients.

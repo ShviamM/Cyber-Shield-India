@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 
 /**
  * Control the SMS sender per-test. The mock replaces the real provider so we can
- * simulate delivery success/failure without touching Twilio. Must be declared
+ * simulate delivery success/failure without touching MSG91. Must be declared
  * before importing `app` so the route picks up the mocked `smsSender`.
  */
 const sendOtp = vi.fn<(phone: string, code: string) => Promise<void>>();
@@ -39,7 +39,7 @@ describe("POST /auth/request-otp SMS delivery handling", () => {
   it("deletes the OTP row and returns 502 when delivery fails", async () => {
     const phone = randomPhone();
     usedPhones.push(phone);
-    sendOtp.mockRejectedValueOnce(new Error("Twilio send failed"));
+    sendOtp.mockRejectedValueOnce(new Error("MSG91 send failed"));
 
     const res = await request(app).post("/api/auth/request-otp").send({ phone });
 

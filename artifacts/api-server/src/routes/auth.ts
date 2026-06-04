@@ -88,8 +88,8 @@ router.post("/auth/request-otp", async (req, res) => {
   try {
     await smsSender.sendOtp(phone, code);
   } catch {
-    // Delivery failed (e.g. Twilio trial-account/unverified recipient, DLT
-    // registration, provider outage). Remove the OTP row so this failed attempt
+    // Delivery failed (e.g. MSG91 DLT template/sender not approved, invalid
+    // recipient, provider outage). Remove the OTP row so this failed attempt
     // doesn't count toward the resend cooldown or hourly cap — otherwise the
     // user gets rate-limited without ever receiving a code.
     await db.delete(otpCodesTable).where(eq(otpCodesTable.id, otpRow.id));

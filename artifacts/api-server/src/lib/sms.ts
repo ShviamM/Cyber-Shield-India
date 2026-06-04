@@ -1,24 +1,13 @@
-import { ReplitConnectors } from "@replit/connectors-sdk";
 import { logger } from "./logger";
 import { config } from "../config";
 
 /**
- * Pluggable SMS sender. The dev mock just logs the code; the Twilio sender
+ * Pluggable SMS sender. The dev mock just logs the code; the MSG91 sender
  * delivers a real text. `createSmsSender` picks the implementation from
  * `config.smsProvider`.
  */
 export interface SmsSender {
   sendOtp(phone: string, code: string): Promise<void>;
-}
-
-/** Shared OTP message body used by every real Twilio sender. */
-function buildOtpMessage(code: string): string {
-  const minutes = Math.max(1, Math.round(config.otpTtlSeconds / 60));
-  return (
-    `${code} is your Netraksh verification code. ` +
-    `It expires in ${minutes} minute${minutes === 1 ? "" : "s"}. ` +
-    `Never share this code with anyone.`
-  );
 }
 
 class MockSmsSender implements SmsSender {
@@ -29,172 +18,82 @@ class MockSmsSender implements SmsSender {
   }
 }
 
+const MSG91_FLOW_URL = "https://control.msg91.com/api/v5/flow/";
+
 /**
- * Twilio OTP delivery via the Replit "twilio" connector (@replit/connectors-sdk).
+ * MSG91 OTP delivery via the MSG91 Flow API.
  *
- * Two facts drive this implementation:
- *  - The connector's proxy injects Twilio auth automatically, so all REST calls
- *    must go through `connectors.proxy("twilio", ...)`. Direct calls to
- *    api.twilio.com with the connection's api_key fail (the key is scoped to
- *    the proxy).
- *  - The SDK's `listConnections` does NOT return credential settings, so the
- *    Account SID and the verified "from" number are read from the connectors
- *    "connection" endpoint with `include_secrets=true`.
+ * The app generates and verifies its own OTP, so MSG91 is used purely as a
+ * delivery channel: we post the already-generated code as a template variable
+ * to a DLT-approved flow template. Mobile numbers must be in country-code form
+ * without a leading "+" (e.g. 919876543210), which is how MSG91 expects them.
  */
-interface TwilioConfig {
-  accountSid: string;
-  from: string;
-}
-
-class TwilioSmsSender implements SmsSender {
-  private readonly connectors = new ReplitConnectors();
-  private cached: TwilioConfig | null = null;
-
-  private async loadConfig(): Promise<TwilioConfig> {
-    if (this.cached) return this.cached;
-
-    const host = process.env.REPLIT_CONNECTORS_HOSTNAME ?? "connectors.replit.com";
-    const identity = process.env.REPL_IDENTITY
-      ? `repl ${process.env.REPL_IDENTITY}`
-      : process.env.WEB_REPL_RENEWAL
-        ? `depl ${process.env.WEB_REPL_RENEWAL}`
-        : null;
-    if (!identity) {
-      throw new Error(
-        "Replit identity token not found; cannot read Twilio connection settings.",
-      );
-    }
-
-    const res = await fetch(
-      `https://${host}/api/v2/connection?include_secrets=true&connector_names=twilio`,
-      { headers: { Accept: "application/json", "X-Replit-Token": identity } },
-    );
-    if (!res.ok) {
-      throw new Error(
-        `Failed to load Twilio connection settings (status ${res.status}). ` +
-          "Reconnect the Twilio integration.",
-      );
-    }
-    const data = (await res.json()) as {
-      items?: Array<{ settings?: { account_sid?: string; phone_number?: string } }>;
-    };
-    const settings = data.items?.[0]?.settings ?? {};
-    if (!settings.account_sid || !settings.phone_number) {
-      throw new Error(
-        "Twilio connection is missing account_sid or phone_number. " +
-          "Reconnect the Twilio integration.",
-      );
-    }
-    this.cached = { accountSid: settings.account_sid, from: settings.phone_number };
-    return this.cached;
-  }
-
-  async sendOtp(phone: string, code: string): Promise<void> {
-    const { accountSid, from } = await this.loadConfig();
-    const body = new URLSearchParams({
-      To: phone,
-      From: from,
-      Body: buildOtpMessage(code),
-    }).toString();
-
-    const res = await this.connectors.proxy(
-      "twilio",
-      `/2010-04-01/Accounts/${accountSid}/Messages.json`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body,
-      },
-    );
-
-    if (!res.ok) {
-      // Surface Twilio's own error message so delivery failures are diagnosable
-      // (e.g. trial-account unverified recipient, DLT/registration issues).
-      let detail = "";
-      try {
-        const err = (await res.json()) as { message?: string; code?: number };
-        detail = err.message ? `${err.message} (Twilio code ${err.code})` : "";
-      } catch {
-        detail = await res.text().catch(() => "");
-      }
-      logger.error({ phone, status: res.status, detail }, "Twilio SMS send failed");
-      throw new Error(
-        `Twilio SMS send failed (status ${res.status})${detail ? `: ${detail}` : ""}.`,
-      );
-    }
-  }
-}
-
-/**
- * Standard Twilio OTP delivery using your own Twilio credentials. Use this when
- * the app runs OUTSIDE Replit (any third-party host): set TWILIO_ACCOUNT_SID,
- * TWILIO_AUTH_TOKEN, and TWILIO_FROM_NUMBER and calls go straight to
- * api.twilio.com with HTTP Basic auth.
- */
-class StandardTwilioSmsSender implements SmsSender {
+class Msg91SmsSender implements SmsSender {
   constructor(
-    private readonly accountSid: string,
-    private readonly authToken: string,
-    private readonly from: string,
+    private readonly authKey: string,
+    private readonly templateId: string,
+    private readonly senderId: string,
+    private readonly otpVar: string,
   ) {}
 
   async sendOtp(phone: string, code: string): Promise<void> {
-    const body = new URLSearchParams({
-      To: phone,
-      From: this.from,
-      Body: buildOtpMessage(code),
-    }).toString();
+    // MSG91 wants the mobile as country code + number with no leading "+".
+    const mobiles = phone.replace(/^\+/, "");
 
-    const auth = Buffer.from(`${this.accountSid}:${this.authToken}`).toString(
-      "base64",
-    );
-    const res = await fetch(
-      `https://api.twilio.com/2010-04-01/Accounts/${this.accountSid}/Messages.json`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          Authorization: `Basic ${auth}`,
-        },
-        body,
+    const body: Record<string, unknown> = {
+      template_id: this.templateId,
+      short_url: "0",
+      recipients: [{ mobiles, [this.otpVar]: code }],
+    };
+    if (this.senderId) body.sender = this.senderId;
+
+    const res = await fetch(MSG91_FLOW_URL, {
+      method: "POST",
+      headers: {
+        authkey: this.authKey,
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
-    );
+      body: JSON.stringify(body),
+    });
 
-    if (!res.ok) {
-      let detail = "";
-      try {
-        const err = (await res.json()) as { message?: string; code?: number };
-        detail = err.message ? `${err.message} (Twilio code ${err.code})` : "";
-      } catch {
-        detail = await res.text().catch(() => "");
-      }
-      logger.error({ phone, status: res.status, detail }, "Twilio SMS send failed");
+    // MSG91 returns HTTP 200 even for some logical failures, so inspect the
+    // payload's `type` field ("success" | "error") as well as the status code.
+    let payload: { type?: string; message?: string } = {};
+    try {
+      payload = (await res.json()) as typeof payload;
+    } catch {
+      payload = {};
+    }
+
+    if (!res.ok || payload.type === "error") {
+      const detail = payload.message ?? "";
+      logger.error(
+        { phone, status: res.status, detail },
+        "MSG91 SMS send failed",
+      );
       throw new Error(
-        `Twilio SMS send failed (status ${res.status})${detail ? `: ${detail}` : ""}.`,
+        `MSG91 SMS send failed (status ${res.status})${detail ? `: ${detail}` : ""}.`,
       );
     }
   }
 }
 
 export function createSmsSender(): SmsSender {
-  if (config.smsProvider === "twilio") {
-    // Prefer standard Twilio credentials when present (off-Replit / third-party
-    // hosting). Falls back to the Replit "twilio" connector otherwise.
-    const { twilioAccountSid, twilioAuthToken, twilioFromNumber } = config;
-    if (twilioAuthToken) {
-      if (!twilioAccountSid || !twilioFromNumber) {
-        throw new Error(
-          "TWILIO_AUTH_TOKEN is set but TWILIO_ACCOUNT_SID and/or " +
-            "TWILIO_FROM_NUMBER are missing. Provide all three to send SMS.",
-        );
-      }
-      return new StandardTwilioSmsSender(
-        twilioAccountSid,
-        twilioAuthToken,
-        twilioFromNumber,
+  if (config.smsProvider === "msg91") {
+    const { msg91AuthKey, msg91TemplateId, msg91SenderId, msg91OtpVar } = config;
+    if (!msg91AuthKey || !msg91TemplateId) {
+      throw new Error(
+        "SMS_PROVIDER=msg91 but MSG91_AUTH_KEY and/or MSG91_TEMPLATE_ID are " +
+          "missing. Provide both to send OTPs via MSG91.",
       );
     }
-    return new TwilioSmsSender();
+    return new Msg91SmsSender(
+      msg91AuthKey,
+      msg91TemplateId,
+      msg91SenderId,
+      msg91OtpVar,
+    );
   }
   // Mock provider: never allowed in production (would log plaintext codes and
   // never actually deliver them).
