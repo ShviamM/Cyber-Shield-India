@@ -130,6 +130,22 @@ export default function ProfileScreen() {
           <Text style={s.sosBigNum}>1930</Text>
         </TouchableOpacity>
 
+        {/* Premium / subscription */}
+        <TouchableOpacity
+          style={s.premiumCard}
+          onPress={() => { Haptics.selectionAsync(); router.push("/subscription"); }}
+          activeOpacity={0.85}
+        >
+          <View style={s.premiumIconBg}>
+            <Feather name="star" size={22} color="#fff" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={s.premiumTitle}>{t("subscription.entryTitle")}</Text>
+            <Text style={s.premiumSub}>{t("subscription.entrySub")}</Text>
+          </View>
+          <Feather name="chevron-right" size={18} color="rgba(255,255,255,0.7)" />
+        </TouchableOpacity>
+
         {/* Protection section */}
         <Text style={s.sectionLabel}>{t("profile.sectionProtection")}</Text>
         <View style={s.settingsCard}>
@@ -358,6 +374,21 @@ const s = StyleSheet.create({
     shadowColor: "#dc2626", shadowOpacity: 0.4, shadowRadius: 10, shadowOffset: { width: 0, height: 4 },
     elevation: 4,
   },
+  premiumCard: {
+    flexDirection: "row", alignItems: "center", gap: 14,
+    backgroundColor: NAVY, borderRadius: 18, padding: 16, marginBottom: 24,
+    shadowColor: NAVY, shadowOpacity: 0.25, shadowRadius: 16, shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+  },
+  premiumIconBg: {
+    width: 52, height: 52, borderRadius: 26, backgroundColor: SAFFRON,
+    alignItems: "center", justifyContent: "center",
+    shadowColor: SAFFRON, shadowOpacity: 0.4, shadowRadius: 10, shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+  },
+  premiumTitle: { fontSize: 15, fontWeight: "700" as const, color: "#fff" },
+  premiumSub: { fontSize: 12, color: "rgba(255,255,255,0.7)", marginTop: 2 },
+
   sosTitle: { fontSize: 15, fontWeight: "700" as const, color: "#fff" },
   sosDesc: { fontSize: 12, color: "#fca5a5", marginTop: 2 },
   sosBigNum: { fontSize: 28, fontWeight: "900" as const, color: "#fff" },

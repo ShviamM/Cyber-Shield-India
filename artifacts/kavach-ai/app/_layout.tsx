@@ -127,6 +127,10 @@ function RootLayoutNav() {
         />
         <Stack.Screen name="screening" options={{ title: t("screening.title") }} />
         <Stack.Screen name="report" options={{ title: t("report.title") }} />
+        <Stack.Screen
+          name="subscription"
+          options={{ title: t("subscription.title") }}
+        />
         <Stack.Screen name="categories" options={{ title: t("categories.title") }} />
         <Stack.Screen name="safety" options={{ title: t("safety.title") }} />
         <Stack.Screen name="helpline" options={{ title: t("helpline.title") }} />

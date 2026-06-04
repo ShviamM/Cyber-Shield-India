@@ -347,3 +347,98 @@ export const AdminVerifyNumberResponse = zod.object({
 })
 
 
+/**
+ * Returns the server-authoritative plan catalogue (pricing in paise).
+ * @summary List subscription plans
+ */
+export const GetSubscriptionPlansResponse = zod.object({
+  "plans": zod.array(zod.object({
+  "key": zod.enum(['free', 'premium', 'family']),
+  "amount": zod.number().describe('Price per interval in paise (0 for free)'),
+  "currency": zod.string(),
+  "interval": zod.enum(['month']),
+  "premium": zod.boolean().describe('Whether this plan unlocks premium-gated features')
+}))
+})
+
+
+/**
+ * @summary Get the current user's subscription status
+ */
+export const GetMySubscriptionResponse = zod.object({
+  "plan": zod.enum(['free', 'premium', 'family']),
+  "status": zod.enum(['active', 'canceled', 'expired', 'past_due']),
+  "currentPeriodStart": zod.coerce.date().nullish(),
+  "currentPeriodEnd": zod.coerce.date().nullish(),
+  "cancelAtPeriodEnd": zod.boolean(),
+  "isPremium": zod.boolean().describe('Server-computed — true when a paid plan is currently active')
+})
+
+
+/**
+ * @summary Create a Razorpay order to upgrade to a paid plan
+ */
+export const CreateSubscriptionOrderBody = zod.object({
+  "plan": zod.enum(['premium', 'family'])
+})
+
+export const CreateSubscriptionOrderResponse = zod.object({
+  "orderId": zod.string(),
+  "amount": zod.number(),
+  "currency": zod.string(),
+  "keyId": zod.string().describe('Razorpay public key id for the checkout SDK'),
+  "plan": zod.enum(['premium', 'family'])
+})
+
+
+/**
+ * Verifies the Razorpay signature server-side. Client payment status is never trusted.
+ * @summary Verify a checkout payment and activate the subscription
+ */
+export const VerifySubscriptionPaymentBody = zod.object({
+  "orderId": zod.string(),
+  "paymentId": zod.string(),
+  "signature": zod.string()
+})
+
+export const VerifySubscriptionPaymentResponse = zod.object({
+  "plan": zod.enum(['free', 'premium', 'family']),
+  "status": zod.enum(['active', 'canceled', 'expired', 'past_due']),
+  "currentPeriodStart": zod.coerce.date().nullish(),
+  "currentPeriodEnd": zod.coerce.date().nullish(),
+  "cancelAtPeriodEnd": zod.boolean(),
+  "isPremium": zod.boolean().describe('Server-computed — true when a paid plan is currently active')
+})
+
+
+/**
+ * @summary Cancel auto-renewal (lapses to free at period end)
+ */
+export const CancelSubscriptionResponse = zod.object({
+  "plan": zod.enum(['free', 'premium', 'family']),
+  "status": zod.enum(['active', 'canceled', 'expired', 'past_due']),
+  "currentPeriodStart": zod.coerce.date().nullish(),
+  "currentPeriodEnd": zod.coerce.date().nullish(),
+  "cancelAtPeriodEnd": zod.boolean(),
+  "isPremium": zod.boolean().describe('Server-computed — true when a paid plan is currently active')
+})
+
+
+/**
+ * @summary List the current user's payment history
+ */
+export const ListMyPaymentsResponse = zod.object({
+  "payments": zod.array(zod.object({
+  "id": zod.string(),
+  "plan": zod.string(),
+  "amount": zod.number(),
+  "currency": zod.string(),
+  "status": zod.enum(['created', 'paid', 'failed']),
+  "razorpayPaymentId": zod.string().nullish(),
+  "periodStart": zod.coerce.date().nullish(),
+  "periodEnd": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+

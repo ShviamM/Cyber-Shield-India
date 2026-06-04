@@ -319,6 +319,125 @@ export interface FraudVerdict {
   signals: FraudSignal[];
 }
 
+export type SubscriptionPlanKey = typeof SubscriptionPlanKey[keyof typeof SubscriptionPlanKey];
+
+
+export const SubscriptionPlanKey = {
+  free: 'free',
+  premium: 'premium',
+  family: 'family',
+} as const;
+
+export type SubscriptionPlanInterval = typeof SubscriptionPlanInterval[keyof typeof SubscriptionPlanInterval];
+
+
+export const SubscriptionPlanInterval = {
+  month: 'month',
+} as const;
+
+export interface SubscriptionPlan {
+  key: SubscriptionPlanKey;
+  /** Price per interval in paise (0 for free) */
+  amount: number;
+  currency: string;
+  interval: SubscriptionPlanInterval;
+  /** Whether this plan unlocks premium-gated features */
+  premium: boolean;
+}
+
+export interface SubscriptionPlanList {
+  plans: SubscriptionPlan[];
+}
+
+export type SubscriptionStatusPlan = typeof SubscriptionStatusPlan[keyof typeof SubscriptionStatusPlan];
+
+
+export const SubscriptionStatusPlan = {
+  free: 'free',
+  premium: 'premium',
+  family: 'family',
+} as const;
+
+export type SubscriptionStatusStatus = typeof SubscriptionStatusStatus[keyof typeof SubscriptionStatusStatus];
+
+
+export const SubscriptionStatusStatus = {
+  active: 'active',
+  canceled: 'canceled',
+  expired: 'expired',
+  past_due: 'past_due',
+} as const;
+
+export interface SubscriptionStatus {
+  plan: SubscriptionStatusPlan;
+  status: SubscriptionStatusStatus;
+  currentPeriodStart?: string | null;
+  currentPeriodEnd?: string | null;
+  cancelAtPeriodEnd: boolean;
+  /** Server-computed — true when a paid plan is currently active */
+  isPremium: boolean;
+}
+
+export type CreateOrderRequestPlan = typeof CreateOrderRequestPlan[keyof typeof CreateOrderRequestPlan];
+
+
+export const CreateOrderRequestPlan = {
+  premium: 'premium',
+  family: 'family',
+} as const;
+
+export interface CreateOrderRequest {
+  plan: CreateOrderRequestPlan;
+}
+
+export type SubscriptionOrderPlan = typeof SubscriptionOrderPlan[keyof typeof SubscriptionOrderPlan];
+
+
+export const SubscriptionOrderPlan = {
+  premium: 'premium',
+  family: 'family',
+} as const;
+
+export interface SubscriptionOrder {
+  orderId: string;
+  amount: number;
+  currency: string;
+  /** Razorpay public key id for the checkout SDK */
+  keyId: string;
+  plan: SubscriptionOrderPlan;
+}
+
+export interface VerifyPaymentRequest {
+  orderId: string;
+  paymentId: string;
+  signature: string;
+}
+
+export type PaymentStatus = typeof PaymentStatus[keyof typeof PaymentStatus];
+
+
+export const PaymentStatus = {
+  created: 'created',
+  paid: 'paid',
+  failed: 'failed',
+} as const;
+
+export interface Payment {
+  id: string;
+  plan: string;
+  amount: number;
+  currency: string;
+  status: PaymentStatus;
+  razorpayPaymentId?: string | null;
+  periodStart?: string | null;
+  periodEnd?: string | null;
+  createdAt: string;
+}
+
+export interface PaymentList {
+  payments: Payment[];
+}
+
 export type ListReportsParams = {
 phone?: string;
 category?: string;

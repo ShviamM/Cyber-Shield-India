@@ -676,6 +676,78 @@ const en = {
       },
     ],
   },
+  subscription: {
+    title: "Premium",
+    entryTitle: "Netraksh Premium",
+    entrySub: "Unlock advanced protection for you and your family",
+    choosePlan: "Choose your plan",
+    free: "Free",
+    perMonth: "/month",
+    currentPlan: "Current plan",
+    currentPlanSub: "Thank you for supporting Netraksh",
+    freePlanSub: "Basic protection, always free",
+    statusActive: "Active",
+    statusEnding: "Ending soon",
+    statusFree: "Free",
+    renewsOn: "Renews on {{date}}",
+    accessUntil: "Access until {{date}}",
+    cancelRenewal: "Cancel renewal",
+    upgradeTo: "Upgrade to {{plan}}",
+    switchTo: "Switch to {{plan}}",
+    history: "Payment history",
+    loadError: "Couldn't load subscription details.",
+    secureNote:
+      "Payments are processed securely by Razorpay. Netraksh never stores your card details.",
+    successTitle: "You're all set!",
+    successMsg: "Your {{plan}} plan is now active.",
+    failedTitle: "Payment failed",
+    failedMsg:
+      "Your payment could not be completed. If money was deducted, it will be refunded.",
+    cancelFailedMsg: "Could not cancel your subscription. Please try again.",
+    cancelConfirmTitle: "Cancel renewal?",
+    cancelConfirmMsg:
+      "Your plan stays active until the end of the current billing period, then switches to Free.",
+    cancelConfirm: "Cancel renewal",
+    checkoutUnavailableTitle: "Checkout unavailable",
+    checkoutUnavailableMsg:
+      "Payments need the full Netraksh app. Please install or update it from the Play Store or App Store.",
+    payStatus: {
+      created: "Pending",
+      paid: "Paid",
+      failed: "Failed",
+    },
+    plans: {
+      free: {
+        name: "Free",
+        tagline: "Essential scam protection",
+        features: [
+          "Verify numbers, links & UPI IDs",
+          "Community scam reports",
+          "Daily threat alerts",
+        ],
+      },
+      premium: {
+        name: "Premium",
+        tagline: "Advanced protection for you",
+        features: [
+          "Everything in Free",
+          "AI call screening",
+          "Priority fraud checks",
+          "Ad-free experience",
+        ],
+      },
+      family: {
+        name: "Family",
+        tagline: "Protect up to 5 family members",
+        features: [
+          "Everything in Premium",
+          "Up to 5 family members",
+          "Live family shield alerts",
+          "Guardian dashboard",
+        ],
+      },
+    },
+  },
 };
 
 export default en;

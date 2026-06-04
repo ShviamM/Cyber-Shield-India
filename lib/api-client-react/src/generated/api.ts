@@ -26,6 +26,7 @@ import type {
   AuthResponse,
   CategoryListResponse,
   CityHotspotListResponse,
+  CreateOrderRequest,
   CreateReportRequest,
   ErrorResponse,
   FraudCheckRequest,
@@ -36,18 +37,23 @@ import type {
   ListReportsParams,
   NumberCheckResponse,
   NumberReputation,
+  PaymentList,
   Report,
   ReportListResponse,
   RequestOtpRequest,
   RequestOtpResult,
   ScamOfDay,
+  SubscriptionOrder,
+  SubscriptionPlanList,
+  SubscriptionStatus,
   SuccessResponse,
   TrendingScamListResponse,
   UpdateLocationRequest,
   UpdateReportStatusRequest,
   User,
   VerifyNumberRequest,
-  VerifyOtpRequest
+  VerifyOtpRequest,
+  VerifyPaymentRequest
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -1358,4 +1364,449 @@ export const useAdminVerifyNumber = <TError = ErrorType<ErrorResponse>,
       > => {
       return useMutation(getAdminVerifyNumberMutationOptions(options));
     }
+
+export const getGetSubscriptionPlansUrl = () => {
+
+
+
+
+  return `/api/subscription/plans`
+}
+
+/**
+ * Returns the server-authoritative plan catalogue (pricing in paise).
+ * @summary List subscription plans
+ */
+export const getSubscriptionPlans = async ( options?: RequestInit): Promise<SubscriptionPlanList> => {
+
+  return customFetch<SubscriptionPlanList>(getGetSubscriptionPlansUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSubscriptionPlansQueryKey = () => {
+    return [
+    `/api/subscription/plans`
+    ] as const;
+    }
+
+
+export const getGetSubscriptionPlansQueryOptions = <TData = Awaited<ReturnType<typeof getSubscriptionPlans>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSubscriptionPlans>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSubscriptionPlansQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSubscriptionPlans>>> = ({ signal }) => getSubscriptionPlans({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSubscriptionPlans>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetSubscriptionPlansQueryResult = NonNullable<Awaited<ReturnType<typeof getSubscriptionPlans>>>
+export type GetSubscriptionPlansQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List subscription plans
+ */
+
+export function useGetSubscriptionPlans<TData = Awaited<ReturnType<typeof getSubscriptionPlans>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSubscriptionPlans>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetSubscriptionPlansQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetMySubscriptionUrl = () => {
+
+
+
+
+  return `/api/subscription`
+}
+
+/**
+ * @summary Get the current user's subscription status
+ */
+export const getMySubscription = async ( options?: RequestInit): Promise<SubscriptionStatus> => {
+
+  return customFetch<SubscriptionStatus>(getGetMySubscriptionUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMySubscriptionQueryKey = () => {
+    return [
+    `/api/subscription`
+    ] as const;
+    }
+
+
+export const getGetMySubscriptionQueryOptions = <TData = Awaited<ReturnType<typeof getMySubscription>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMySubscription>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMySubscriptionQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMySubscription>>> = ({ signal }) => getMySubscription({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMySubscription>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetMySubscriptionQueryResult = NonNullable<Awaited<ReturnType<typeof getMySubscription>>>
+export type GetMySubscriptionQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get the current user's subscription status
+ */
+
+export function useGetMySubscription<TData = Awaited<ReturnType<typeof getMySubscription>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMySubscription>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetMySubscriptionQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateSubscriptionOrderUrl = () => {
+
+
+
+
+  return `/api/subscription/order`
+}
+
+/**
+ * @summary Create a Razorpay order to upgrade to a paid plan
+ */
+export const createSubscriptionOrder = async (createOrderRequest: CreateOrderRequest, options?: RequestInit): Promise<SubscriptionOrder> => {
+
+  return customFetch<SubscriptionOrder>(getCreateSubscriptionOrderUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createOrderRequest,)
+  }
+);}
+
+
+
+
+export const getCreateSubscriptionOrderMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSubscriptionOrder>>, TError,{data: BodyType<CreateOrderRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createSubscriptionOrder>>, TError,{data: BodyType<CreateOrderRequest>}, TContext> => {
+
+const mutationKey = ['createSubscriptionOrder'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createSubscriptionOrder>>, {data: BodyType<CreateOrderRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createSubscriptionOrder(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateSubscriptionOrderMutationResult = NonNullable<Awaited<ReturnType<typeof createSubscriptionOrder>>>
+    export type CreateSubscriptionOrderMutationBody = BodyType<CreateOrderRequest>
+    export type CreateSubscriptionOrderMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Create a Razorpay order to upgrade to a paid plan
+ */
+export const useCreateSubscriptionOrder = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSubscriptionOrder>>, TError,{data: BodyType<CreateOrderRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createSubscriptionOrder>>,
+        TError,
+        {data: BodyType<CreateOrderRequest>},
+        TContext
+      > => {
+      return useMutation(getCreateSubscriptionOrderMutationOptions(options));
+    }
+
+export const getVerifySubscriptionPaymentUrl = () => {
+
+
+
+
+  return `/api/subscription/verify`
+}
+
+/**
+ * Verifies the Razorpay signature server-side. Client payment status is never trusted.
+ * @summary Verify a checkout payment and activate the subscription
+ */
+export const verifySubscriptionPayment = async (verifyPaymentRequest: VerifyPaymentRequest, options?: RequestInit): Promise<SubscriptionStatus> => {
+
+  return customFetch<SubscriptionStatus>(getVerifySubscriptionPaymentUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      verifyPaymentRequest,)
+  }
+);}
+
+
+
+
+export const getVerifySubscriptionPaymentMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifySubscriptionPayment>>, TError,{data: BodyType<VerifyPaymentRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof verifySubscriptionPayment>>, TError,{data: BodyType<VerifyPaymentRequest>}, TContext> => {
+
+const mutationKey = ['verifySubscriptionPayment'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof verifySubscriptionPayment>>, {data: BodyType<VerifyPaymentRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  verifySubscriptionPayment(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type VerifySubscriptionPaymentMutationResult = NonNullable<Awaited<ReturnType<typeof verifySubscriptionPayment>>>
+    export type VerifySubscriptionPaymentMutationBody = BodyType<VerifyPaymentRequest>
+    export type VerifySubscriptionPaymentMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Verify a checkout payment and activate the subscription
+ */
+export const useVerifySubscriptionPayment = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof verifySubscriptionPayment>>, TError,{data: BodyType<VerifyPaymentRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof verifySubscriptionPayment>>,
+        TError,
+        {data: BodyType<VerifyPaymentRequest>},
+        TContext
+      > => {
+      return useMutation(getVerifySubscriptionPaymentMutationOptions(options));
+    }
+
+export const getCancelSubscriptionUrl = () => {
+
+
+
+
+  return `/api/subscription/cancel`
+}
+
+/**
+ * @summary Cancel auto-renewal (lapses to free at period end)
+ */
+export const cancelSubscription = async ( options?: RequestInit): Promise<SubscriptionStatus> => {
+
+  return customFetch<SubscriptionStatus>(getCancelSubscriptionUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getCancelSubscriptionMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelSubscription>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof cancelSubscription>>, TError,void, TContext> => {
+
+const mutationKey = ['cancelSubscription'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof cancelSubscription>>, void> = () => {
+
+
+          return  cancelSubscription(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CancelSubscriptionMutationResult = NonNullable<Awaited<ReturnType<typeof cancelSubscription>>>
+
+    export type CancelSubscriptionMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Cancel auto-renewal (lapses to free at period end)
+ */
+export const useCancelSubscription = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelSubscription>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof cancelSubscription>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getCancelSubscriptionMutationOptions(options));
+    }
+
+export const getListMyPaymentsUrl = () => {
+
+
+
+
+  return `/api/subscription/payments`
+}
+
+/**
+ * @summary List the current user's payment history
+ */
+export const listMyPayments = async ( options?: RequestInit): Promise<PaymentList> => {
+
+  return customFetch<PaymentList>(getListMyPaymentsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListMyPaymentsQueryKey = () => {
+    return [
+    `/api/subscription/payments`
+    ] as const;
+    }
+
+
+export const getListMyPaymentsQueryOptions = <TData = Awaited<ReturnType<typeof listMyPayments>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMyPayments>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListMyPaymentsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listMyPayments>>> = ({ signal }) => listMyPayments({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listMyPayments>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListMyPaymentsQueryResult = NonNullable<Awaited<ReturnType<typeof listMyPayments>>>
+export type ListMyPaymentsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List the current user's payment history
+ */
+
+export function useListMyPayments<TData = Awaited<ReturnType<typeof listMyPayments>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listMyPayments>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListMyPaymentsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 

@@ -22,6 +22,8 @@ tags:
     description: Multi-signal fraud risk scoring
   - name: admin
     description: Moderation (admin only)
+  - name: subscription
+    description: Subscription plans, checkout orders, and billing
 paths:
   /healthz:
     get:
@@ -420,6 +422,120 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/NumberReputation"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /subscription/plans:
+    get:
+      operationId: getSubscriptionPlans
+      tags: [subscription]
+      summary: List subscription plans
+      description: Returns the server-authoritative plan catalogue (pricing in paise).
+      responses:
+        "200":
+          description: Plans
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubscriptionPlanList"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /subscription:
+    get:
+      operationId: getMySubscription
+      tags: [subscription]
+      summary: Get the current user's subscription status
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Subscription status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubscriptionStatus"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /subscription/order:
+    post:
+      operationId: createSubscriptionOrder
+      tags: [subscription]
+      summary: Create a Razorpay order to upgrade to a paid plan
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOrderRequest"
+      responses:
+        "200":
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubscriptionOrder"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /subscription/verify:
+    post:
+      operationId: verifySubscriptionPayment
+      tags: [subscription]
+      summary: Verify a checkout payment and activate the subscription
+      description: Verifies the Razorpay signature server-side. Client payment status is never trusted.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyPaymentRequest"
+      responses:
+        "200":
+          description: Subscription status after activation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubscriptionStatus"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /subscription/cancel:
+    post:
+      operationId: cancelSubscription
+      tags: [subscription]
+      summary: Cancel auto-renewal (lapses to free at period end)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Subscription status after cancellation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubscriptionStatus"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /subscription/payments:
+    get:
+      operationId: listMyPayments
+      tags: [subscription]
+      summary: List the current user's payment history
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Payment history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentList"
         default:
           $ref: "#/components/responses/Error"
 
@@ -984,3 +1100,156 @@ components:
         - score
         - reasons
         - signals
+
+    SubscriptionPlan:
+      type: object
+      properties:
+        key:
+          type: string
+          enum: [free, premium, family]
+        amount:
+          type: integer
+          description: Price per interval in paise (0 for free)
+        currency:
+          type: string
+        interval:
+          type: string
+          enum: [month]
+        premium:
+          type: boolean
+          description: Whether this plan unlocks premium-gated features
+      required:
+        - key
+        - amount
+        - currency
+        - interval
+        - premium
+
+    SubscriptionPlanList:
+      type: object
+      properties:
+        plans:
+          type: array
+          items:
+            $ref: "#/components/schemas/SubscriptionPlan"
+      required:
+        - plans
+
+    SubscriptionStatus:
+      type: object
+      properties:
+        plan:
+          type: string
+          enum: [free, premium, family]
+        status:
+          type: string
+          enum: [active, canceled, expired, past_due]
+        currentPeriodStart:
+          type: string
+          format: date-time
+          nullable: true
+        currentPeriodEnd:
+          type: string
+          format: date-time
+          nullable: true
+        cancelAtPeriodEnd:
+          type: boolean
+        isPremium:
+          type: boolean
+          description: Server-computed — true when a paid plan is currently active
+      required:
+        - plan
+        - status
+        - cancelAtPeriodEnd
+        - isPremium
+
+    CreateOrderRequest:
+      type: object
+      properties:
+        plan:
+          type: string
+          enum: [premium, family]
+      required:
+        - plan
+
+    SubscriptionOrder:
+      type: object
+      properties:
+        orderId:
+          type: string
+        amount:
+          type: integer
+        currency:
+          type: string
+        keyId:
+          type: string
+          description: Razorpay public key id for the checkout SDK
+        plan:
+          type: string
+          enum: [premium, family]
+      required:
+        - orderId
+        - amount
+        - currency
+        - keyId
+        - plan
+
+    VerifyPaymentRequest:
+      type: object
+      properties:
+        orderId:
+          type: string
+        paymentId:
+          type: string
+        signature:
+          type: string
+      required:
+        - orderId
+        - paymentId
+        - signature
+
+    Payment:
+      type: object
+      properties:
+        id:
+          type: string
+        plan:
+          type: string
+        amount:
+          type: integer
+        currency:
+          type: string
+        status:
+          type: string
+          enum: [created, paid, failed]
+        razorpayPaymentId:
+          type: string
+          nullable: true
+        periodStart:
+          type: string
+          format: date-time
+          nullable: true
+        periodEnd:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - plan
+        - amount
+        - currency
+        - status
+        - createdAt
+
+    PaymentList:
+      type: object
+      properties:
+        payments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Payment"
+      required:
+        - payments
