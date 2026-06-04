@@ -125,7 +125,7 @@ export default function LoginScreen() {
   }
 
   async function handleVerify() {
-    if (code.trim().length !== 6) {
+    if (code.trim().length !== 4) {
       setError(t("auth.invalidOtp"));
       return;
     }
@@ -288,11 +288,11 @@ export default function LoginScreen() {
               placeholderTextColor="#94a3b8"
               value={code}
               onChangeText={(v) => {
-                setCode(v.replace(/\D/g, "").slice(0, 6));
+                setCode(v.replace(/\D/g, "").slice(0, 4));
                 setError(null);
               }}
               keyboardType="number-pad"
-              maxLength={6}
+              maxLength={4}
               returnKeyType="done"
               onSubmitEditing={handleVerify}
             />

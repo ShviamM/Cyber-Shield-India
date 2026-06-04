@@ -17,7 +17,7 @@ const phoneSchema = z.object({
 });
 
 const otpSchema = z.object({
-  code: z.string().min(6, "Code must be 6 digits"),
+  code: z.string().min(4, "Code must be 4 digits"),
   fullName: z.string().optional(),
   location: z.string().optional(),
 });
@@ -164,7 +164,7 @@ export default function Login() {
                       <FormItem>
                         <FormLabel>One-Time Password</FormLabel>
                         <FormControl>
-                          <Input placeholder="123456" {...field} disabled={otpBusy} maxLength={6} />
+                          <Input placeholder="1234" {...field} disabled={otpBusy} maxLength={4} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
