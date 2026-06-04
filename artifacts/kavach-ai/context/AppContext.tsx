@@ -14,6 +14,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { Platform } from "react-native";
 
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -101,8 +102,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
   const [guardianActive, setGuardianActive] = useState(true);
   const [recentChecks, setRecentChecks] = useState<CheckItem[]>([]);
-  const [callScreening, setCallScreeningState] = useState(false);
-  const [smsScreening, setSmsScreeningState] = useState(false);
+  // On-device screening only runs on Android, so default both toggles ON there
+  // for a fresh install. A stored preference (below) still overrides this.
+  const [callScreening, setCallScreeningState] = useState(
+    Platform.OS === "android",
+  );
+  const [smsScreening, setSmsScreeningState] = useState(
+    Platform.OS === "android",
+  );
   const [loaded, setLoaded] = useState(false);
   // Ephemeral, device-local overlay: ids of members flagged "warning" by the
   // live on-device screener. Not persisted server-side — it resets on reload.
@@ -171,6 +178,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     syncEngineData(deriveBlocklist(recentChecks));
   }, [loaded, recentChecks]);
 
+  // Keep the native engine's enabled flags in lock-step with the resolved
+  // toggle states. This is the single source of native sync: it covers the
+  // startup defaults/stored prefs (no manual flip needed) and any later user
+  // toggle, and is immune to async-hydration ordering. No-op off Android.
+  useEffect(() => {
+    if (!loaded) return;
+    nativeSetCall(callScreening);
+    nativeSetSms(smsScreening);
+  }, [loaded, callScreening, smsScreening]);
+
   // Live Family Shield: when the on-device engine screens a risky call/SMS and
   // the caller/sender matches a saved family contact, flag that member as
   // "warning" so their card surfaces the alert. No-op on web / non-Android.
@@ -204,14 +221,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     setGuardianActive((v) => !v);
   }
 
+  // Native sync is handled centrally by the effect above; the setters only
+  // update React state (which the effect observes).
   function setCallScreening(enabled: boolean) {
     setCallScreeningState(enabled);
-    nativeSetCall(enabled);
   }
 
   function setSmsScreening(enabled: boolean) {
     setSmsScreeningState(enabled);
-    nativeSetSms(enabled);
   }
 
   async function addFamilyMember(member: {
