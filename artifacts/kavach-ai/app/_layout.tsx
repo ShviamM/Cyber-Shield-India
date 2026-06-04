@@ -131,6 +131,10 @@ function RootLayoutNav() {
             animation: "slide_from_bottom",
           }}
         />
+        <Stack.Screen
+          name="notifications"
+          options={{ title: t("notifications.title") }}
+        />
         <Stack.Screen name="screening" options={{ title: t("screening.title") }} />
         <Stack.Screen name="report" options={{ title: t("report.title") }} />
         <Stack.Screen

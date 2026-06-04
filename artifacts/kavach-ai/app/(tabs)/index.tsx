@@ -29,6 +29,7 @@ import { BookPromo } from "@/components/BookPromo";
 import { useAppContext } from "@/context/AppContext";
 import { GOLDEN_RULES } from "@/constants/data";
 import { useColors } from "@/hooks/useColors";
+import { useNotifications } from "@/hooks/useNotifications";
 import { useNearbyCity } from "@/hooks/useNearbyCity";
 import { getCyberCellContact } from "@/lib/cyberContacts";
 import { formatChangePct, formatTimeAgo } from "@/lib/format";
@@ -48,6 +49,7 @@ export default function HomeScreen() {
   const { t, i18n } = useTranslation();
   const isHindi = i18n.language?.startsWith("hi");
   const { guardianActive, familyMembers, recentChecks, toggleGuardian } = useAppContext();
+  const { hasUnread: hasUnreadNotifications } = useNotifications();
   const {
     city: nearbyCity,
     status: nearbyStatus,
@@ -180,13 +182,13 @@ export default function HomeScreen() {
           <View style={s.headerIcons}>
             <TouchableOpacity
               onPress={() => {
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-                router.push("/call-alert");
+                Haptics.selectionAsync();
+                router.push("/notifications");
               }}
               style={s.headerIconBtn}
               activeOpacity={0.75}
             >
-              <View style={s.bellDot} />
+              {hasUnreadNotifications && <View style={s.bellDot} />}
               <Feather name="bell" size={18} color="rgba(255,255,255,0.8)" />
             </TouchableOpacity>
             <TouchableOpacity

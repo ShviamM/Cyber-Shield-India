@@ -536,6 +536,17 @@ export interface BroadcastList {
   broadcasts: Broadcast[];
 }
 
+export interface Notification {
+  id: string;
+  title: string;
+  body: string;
+  createdAt: string;
+}
+
+export interface NotificationList {
+  notifications: Notification[];
+}
+
 export interface SendBroadcastRequest {
   title: string;
   body: string;

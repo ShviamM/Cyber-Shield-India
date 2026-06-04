@@ -518,6 +518,19 @@ export const RegisterPushTokenResponse = zod.object({
 
 
 /**
+ * @summary List safety broadcasts sent to the current user
+ */
+export const ListNotificationsResponse = zod.object({
+  "notifications": zod.array(zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "body": zod.string(),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+
+/**
  * @summary List the current user's protected family members
  */
 export const ListFamilyMembersResponse = zod.object({

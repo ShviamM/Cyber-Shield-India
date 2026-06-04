@@ -646,6 +646,23 @@ paths:
         default:
           $ref: "#/components/responses/Error"
 
+  /notifications:
+    get:
+      operationId: listNotifications
+      tags: [notifications]
+      summary: List safety broadcasts sent to the current user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Recent broadcasts, newest first
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationList"
+        default:
+          $ref: "#/components/responses/Error"
+
   /family/members:
     get:
       operationId: listFamilyMembers
@@ -1645,6 +1662,34 @@ components:
             $ref: "#/components/schemas/Broadcast"
       required:
         - broadcasts
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - body
+        - createdAt
+
+    NotificationList:
+      type: object
+      properties:
+        notifications:
+          type: array
+          items:
+            $ref: "#/components/schemas/Notification"
+      required:
+        - notifications
 
     SendBroadcastRequest:
       type: object

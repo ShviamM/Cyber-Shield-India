@@ -42,6 +42,8 @@ export * from './getCityHotspotsParams';
 export * from './getTrendingScamsParams';
 export * from './healthStatus';
 export * from './listReportsParams';
+export * from './notification';
+export * from './notificationList';
 export * from './numberCategoryCount';
 export * from './numberCheckResponse';
 export * from './numberCheckResponseRiskLevel';

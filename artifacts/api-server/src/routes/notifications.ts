@@ -1,10 +1,43 @@
 import { Router, type IRouter } from "express";
-import { and, eq, ne } from "drizzle-orm";
-import { db, deviceTokensTable } from "@workspace/db";
-import { RegisterPushTokenBody, type SuccessResponse } from "@workspace/api-zod";
+import { and, desc, eq, ne } from "drizzle-orm";
+import { db, deviceTokensTable, broadcastsTable } from "@workspace/db";
+import {
+  RegisterPushTokenBody,
+  type SuccessResponse,
+  type NotificationList,
+} from "@workspace/api-zod";
 import { requireAuth } from "../middlewares/auth";
 
 const router: IRouter = Router();
+
+/**
+ * The in-app notification feed: the broadcasts an admin has sent to all users.
+ * Backed by the same `broadcasts` table the admin console writes to, so users
+ * see safety alerts in the app's bell even when OS push delivery is unavailable
+ * (e.g. Expo Go, web, or a device that never registered a push token).
+ */
+router.get("/notifications", requireAuth, async (_req, res) => {
+  const rows = await db
+    .select({
+      id: broadcastsTable.id,
+      title: broadcastsTable.title,
+      body: broadcastsTable.body,
+      createdAt: broadcastsTable.createdAt,
+    })
+    .from(broadcastsTable)
+    .orderBy(desc(broadcastsTable.createdAt))
+    .limit(100);
+
+  const response: NotificationList = {
+    notifications: rows.map((r) => ({
+      id: r.id,
+      title: r.title,
+      body: r.body,
+      createdAt: r.createdAt,
+    })),
+  };
+  res.json(response);
+});
 
 /**
  * Register (or re-bind) this device's Expo push token to the current user. The

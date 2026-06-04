@@ -45,6 +45,14 @@ const en = {
     profile: "Profile",
   },
 
+  notifications: {
+    title: "Notifications",
+    emptyTitle: "No alerts yet",
+    emptySub: "Scam alerts and safety updates from Netraksh will appear here.",
+    errorTitle: "Couldn't load alerts",
+    errorSub: "Please check your connection and try again.",
+  },
+
   auth: {
     tagline: "Thag se 2 kadam aage",
     welcomeTitle: "Welcome to Netraksh",
