@@ -73,7 +73,18 @@ export async function verifyAccessToken(accessToken: string): Promise<{ phone: s
     );
   }
 
-  const rawMobile = payload.data?.mobile ?? payload.data?.identifier ?? "";
+  // On success MSG91 returns the verified mobile directly in `message`
+  // (e.g. { type: "success", message: "919682824432" }). Some responses nest it
+  // under data.mobile/identifier instead. We only reach here when type is not
+  // "error", so `message` holds the number rather than an error string.
+  // Prefer the phone-bearing fields first: data.mobile, then the top-level
+  // `message` (observed success shape), then data.identifier last since for
+  // phone-only auth an identifier could be a non-phone value (e.g. email).
+  const rawMobile =
+    payload.data?.mobile ??
+    payload.message ??
+    payload.data?.identifier ??
+    "";
   const phone = normalizeIndianPhone(rawMobile);
   if (payload.data?.isVerified === false || !phone) {
     throw new HttpError(
