@@ -36,6 +36,11 @@ export interface VerifyTokenRequest {
   location?: string | null;
 }
 
+export interface AdminLoginRequest {
+  /** The shared admin console password */
+  password: string;
+}
+
 export interface User {
   id: string;
   fullName: string;

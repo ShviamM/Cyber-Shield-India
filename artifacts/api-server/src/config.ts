@@ -24,6 +24,11 @@ export const config = {
   // client from probing many phone numbers or replaying tokens.
   otpRequestMaxPerIpPerHour: intEnv("OTP_REQUEST_MAX_PER_IP_PER_HOUR", 30),
   otpVerifyMaxPerIpPerMinute: intEnv("OTP_VERIFY_MAX_PER_IP_PER_MINUTE", 10),
+  // Admin console login is a single-factor, single shared-credential entrypoint,
+  // so it gets its own stricter brute-force throttles (independent of OTP tuning):
+  // a tight per-minute cap plus a longer rolling per-hour cap.
+  adminLoginMaxPerIpPerMinute: intEnv("ADMIN_LOGIN_MAX_PER_IP_PER_MINUTE", 5),
+  adminLoginMaxPerIpPerHour: intEnv("ADMIN_LOGIN_MAX_PER_IP_PER_HOUR", 30),
   sessionTtlDays: intEnv("SESSION_TTL_DAYS", 60),
   reportDuplicateWindowHours: intEnv("REPORT_DUPLICATE_WINDOW_HOURS", 24),
   reportMaxPerHour: intEnv("REPORT_MAX_PER_HOUR", 20),

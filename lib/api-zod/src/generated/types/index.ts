@@ -7,6 +7,7 @@
  */
 
 export * from './adminListReportsParams';
+export * from './adminLoginRequest';
 export * from './adminReport';
 export * from './adminReportListResponse';
 export * from './adminStats';

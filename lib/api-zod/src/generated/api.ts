@@ -55,6 +55,28 @@ export const VerifyTokenResponse = zod.object({
 
 
 /**
+ * Authenticates the admin web console using a single shared admin password. On success, returns a session token bound to the configured admin account.
+ * @summary Sign in to the admin console with the shared admin password
+ */
+export const AdminLoginBody = zod.object({
+  "password": zod.string().describe('The shared admin console password')
+})
+
+export const AdminLoginResponse = zod.object({
+  "token": zod.string(),
+  "user": zod.object({
+  "id": zod.string(),
+  "fullName": zod.string(),
+  "phone": zod.string(),
+  "location": zod.string().nullish(),
+  "isAdmin": zod.boolean(),
+  "status": zod.string(),
+  "createdAt": zod.coerce.date()
+})
+})
+
+
+/**
  * @summary Get the current authenticated user
  */
 export const GetMeResponse = zod.object({

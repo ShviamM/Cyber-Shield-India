@@ -1,5 +1,5 @@
 - [KavachAI i18n](kavach-ai-i18n.md) — locale files aren't type-checked against en; verify key parity with a runtime flatten script, and rely on i18next fallbackLng (no manual deep-merge).
-- [OTP login via MSG91 Widget](otp-sms-provider.md) — approach B: widget sends+verifies OTP client-side, backend validates the access-token via verifyAccessToken; needs native dev build; self-managed OTP path removed.
+- [OTP login via MSG91 Widget](otp-sms-provider.md) — mobile: widget sends+verifies OTP client-side, backend validates access-token; admin web uses a SHARED PASSWORD (/auth/admin-login), NOT OTP; needs native dev build.
 - [Orval schema naming](orval-schema-naming.md) — a component schema named like an operationId's response collides in generated zod; name response schemas noun-first (e.g. FraudVerdict not FraudCheckResponse).
 - [Fraud engine fusion vs reputation scales](fraud-engine-fusion-vs-reputation.md) — medium weight tuned to 40 so a lone "medium" signal now flags medium; weights (not computeRiskLevel) decide the verdict band.
 - [API client codegen staleness](api-client-codegen.md) — generated api.ts can lag the spec (schema present, operation fn missing); run lib/api-spec codegen after adding endpoints.

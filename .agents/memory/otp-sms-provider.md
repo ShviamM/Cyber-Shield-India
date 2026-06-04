@@ -8,7 +8,9 @@ whole OTP exchange against MSG91 directly and the backend never sees the OTP; it
 only validates the resulting access-token via MSG91 `POST
 /api/v5/widget/verifyAccessToken` (header `authkey`, body `{ "access-token",
 widgetId }`) and issues our own opaque session. verifyAccessToken success →
-`data.mobile = "91XXXXXXXXXX"`, normalized to `+91…`.
+the verified mobile comes back in `message` (`{ type:"success", message:"91XXXXXXXXXX" }`),
+NOT in `data.mobile`; normalize to `+91…` and read `message` first (see
+msg91-widget-diagnosis.md for the full code-meaning table).
 
 - **Mobile (kavach-ai)** uses the RN SDK `@msg91comm/sendotp-react-native`:
   `OTPWidget.initializeWidget(widgetId, tokenAuth)` → `sendOTP({identifier})`
@@ -39,6 +41,15 @@ app can collect name/location for new users first) and `POST /auth/verify-token
 {accessToken, fullName?, location?} -> AuthResponse`. The client-sent phone is
 NOT trusted for identity — the phone comes from the validated token.
 
+**Admin web login is SEPARATE from OTP.** The admin console (artifacts/admin) does
+NOT use OTP — it uses a single shared password (`ADMIN_PASSWORD` secret) via `POST
+/auth/admin-login {password} -> AuthResponse`. Password is compared constant-time;
+the session is bound to the canonical admin user = `config.adminPhones[0]`
+(find-or-create, isAdmin=true). Mobile (kavach-ai) still uses the OTP widget. Do not
+reintroduce OTP into the admin app. **Why:** the admin is a small trusted group; a
+shared password is simpler than OTP for a desktop console. The admin entrypoint has
+its own stricter brute-force throttle (separate from OTP tuning) since it's single-factor.
+
 **Why:** Approach B (MSG91 OTP Widget sends+verifies on MSG91's side) was chosen
 over a self-managed OTP where MSG91 is delivery-only. The tradeoff: the widget
 needs a native dev build (won't run in Expo Go or web preview), and server-side
@@ -47,8 +58,8 @@ fallback (no otp_codes table, no request-otp/verify-otp); don't reintroduce one.
 
 **How to apply:**
 - MSG91 returns HTTP 200 even on logical failures, so verifyAccessToken must
-  check `payload.type === "error"` (and the presence of `data.mobile`), not just
-  the status code.
+  check `payload.type === "error"` first, then read the mobile from `payload.message`
+  (success shape), not just the status code.
 - Required server env: `MSG91_AUTH_KEY` (account auth key, server-only secret),
   `MSG91_WIDGET_ID`. Client env (kavach-ai): `EXPO_PUBLIC_MSG91_WIDGET_ID`,
   `EXPO_PUBLIC_MSG91_TOKEN_AUTH` — these are PUBLIC widget creds, embedded in the

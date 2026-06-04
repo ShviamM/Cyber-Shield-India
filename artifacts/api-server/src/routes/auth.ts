@@ -2,6 +2,7 @@ import { Router, type IRouter } from "express";
 import { eq } from "drizzle-orm";
 import { db, sessionsTable, usersTable } from "@workspace/db";
 import {
+  AdminLoginBody,
   CheckPhoneBody,
   UpdateMyLocationBody,
   VerifyTokenBody,
@@ -11,7 +12,7 @@ import {
 } from "@workspace/api-zod";
 import { config } from "../config";
 import { normalizeIndianPhone } from "../lib/phone";
-import { generateToken, hashToken } from "../lib/token";
+import { generateToken, hashToken, safeCompare } from "../lib/token";
 import { verifyAccessToken } from "../lib/msg91-widget";
 import { HttpError } from "../lib/http-error";
 import { hitRateLimit } from "../lib/rate-limit";
@@ -120,6 +121,77 @@ router.post("/auth/verify-token", async (req, res) => {
         .where(eq(usersTable.id, user.id))
         .returning();
     }
+  }
+
+  const token = generateToken();
+  const expiresAt = new Date(
+    Date.now() + config.sessionTtlDays * 24 * 60 * 60 * 1000,
+  );
+  await db
+    .insert(sessionsTable)
+    .values({ userId: user.id, tokenHash: hashToken(token), expiresAt });
+
+  const response: AuthResponse = { token, user: toUserDto(user) };
+  res.json(response);
+});
+
+// Password-only sign-in for the admin web console. A single shared password
+// (ADMIN_PASSWORD) is compared in constant time; on success we issue a session
+// for the configured admin account (first entry in ADMIN_PHONES).
+router.post("/auth/admin-login", async (req, res) => {
+  const clientKey = req.ip ?? "unknown";
+  // Two-tier per-IP throttle to slow brute-force guessing of the shared password.
+  const perMinute = hitRateLimit(
+    `admin-login:m:${clientKey}`,
+    config.adminLoginMaxPerIpPerMinute,
+    60_000,
+  );
+  const perHour = hitRateLimit(
+    `admin-login:h:${clientKey}`,
+    config.adminLoginMaxPerIpPerHour,
+    3_600_000,
+  );
+  if (!perMinute.allowed || !perHour.allowed) {
+    throw new HttpError(
+      429,
+      "too_many_attempts",
+      "Too many attempts from this device. Please try again later.",
+    );
+  }
+
+  const body = AdminLoginBody.parse(req.body);
+
+  const adminPhone = config.adminPhones[0];
+  if (!config.adminPassword || !adminPhone) {
+    throw new HttpError(
+      503,
+      "admin_login_unavailable",
+      "Admin login is not configured. Please contact the administrator.",
+    );
+  }
+
+  if (!safeCompare(body.password, config.adminPassword)) {
+    throw new HttpError(401, "invalid_credentials", "Incorrect password.");
+  }
+
+  // Find or create the canonical admin account, ensuring it is flagged admin.
+  let [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.phone, adminPhone))
+    .limit(1);
+
+  if (!user) {
+    [user] = await db
+      .insert(usersTable)
+      .values({ fullName: "Administrator", phone: adminPhone, isAdmin: true })
+      .returning();
+  } else if (!user.isAdmin) {
+    [user] = await db
+      .update(usersTable)
+      .set({ isAdmin: true, updatedAt: new Date() })
+      .where(eq(usersTable.id, user.id))
+      .returning();
   }
 
   const token = generateToken();
