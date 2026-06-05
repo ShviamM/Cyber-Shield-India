@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Link } from "wouter";
 import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState, useMemo } from "react";
+import bookTrailer from "@assets/DigitalDhokha_BookTrailer_1780691772101.mp4";
 import {
   ShieldCheck,
   Brain,
@@ -409,9 +410,19 @@ export default function Founder() {
           <div className="rounded-[2rem] bg-[#08183f] text-white overflow-hidden shadow-2xl">
             <div className="grid lg:grid-cols-2">
               <div className="relative flex items-center justify-center p-10 lg:p-14 bg-[radial-gradient(circle_at_50%_30%,rgba(255,103,19,0.18),transparent_60%)]">
-                <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="relative">
+                <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="relative w-full max-w-md">
                   <div className="absolute -inset-4 rounded-2xl bg-accent/25 blur-2xl" />
-                  <img src="/images/founder-book.png" alt="Digital Dhokha book cover by Shivam Malaviya" className="relative rounded-xl w-[230px] md:w-[270px] shadow-2xl border border-white/10" />
+                  <video
+                    src={bookTrailer}
+                    className="relative rounded-xl w-full shadow-2xl border border-white/10"
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    controls
+                    preload="metadata"
+                    aria-label="Digital Dhokha book trailer by Shivam Malaviya"
+                  />
                 </motion.div>
               </div>
               <div className="p-8 md:p-12 lg:py-14">
