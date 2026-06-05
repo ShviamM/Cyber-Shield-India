@@ -10,7 +10,7 @@ COPY . .
 RUN pnpm install --frozen-lockfile --filter @workspace/admin...
 # vite.config requires PORT and BASE_PATH at build time. Use "/" when the admin
 # is served at the domain root; set a subpath (e.g. /admin/) if hosted under one.
-ENV NODE_ENV=production PORT=5000 BASE_PATH=/
+ENV NODE_ENV=production PORT=5000 BASE_PATH=/admin/
 RUN pnpm --filter @workspace/admin build
 
 FROM nginx:alpine

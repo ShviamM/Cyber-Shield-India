@@ -27,7 +27,7 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
   }
 
   if (!user) {
-    window.location.href = "/login";
+    window.location.href = `${import.meta.env.BASE_URL}login`;
     return null;
   }
 
@@ -46,7 +46,7 @@ function SuperAdminRoute() {
   }
 
   if (!user) {
-    window.location.href = "/login";
+    window.location.href = `${import.meta.env.BASE_URL}login`;
     return null;
   }
 

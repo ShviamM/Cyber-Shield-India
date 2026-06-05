@@ -42,6 +42,48 @@ uri = "file://attached_assets/logo_concepts/netraksh_app_icon.png"
 type = "image"
 title = "netraksh app icon tricolor shield eye"
 
+[[generated]]
+id = "FP2UJ9y4BbZGWmw38eU_5"
+uri = "file://artifacts/website/public/images/family-protection.png"
+type = "image"
+title = "Son protecting elderly parents"
+
+[[generated]]
+id = "rczYpq5Qj-Q7DcMGMP6c9"
+uri = "file://artifacts/website/public/images/step-check-number.png"
+type = "image"
+title = "Check Number Illustration"
+
+[[generated]]
+id = "4mQFfYkrMoF_MwDTejQIz"
+uri = "file://artifacts/website/public/images/step-check-link.png"
+type = "image"
+title = "Check Link Illustration"
+
+[[generated]]
+id = "F74eQE5WWyfmb4oi6ViyA"
+uri = "file://artifacts/website/public/images/step-check-message.png"
+type = "image"
+title = "Check Message Illustration"
+
+[[generated]]
+id = "yNP11EXIpleKjkQMiga-a"
+uri = "file://artifacts/website/public/images/og-image.png"
+type = "image"
+title = "Netraksh OG Share Image"
+
+[[generated]]
+id = "VyrOs0BcIeVHhoKqx1AE-"
+uri = "file://artifacts/website/public/images/hero-mockup.png"
+type = "image"
+title = "Scam Call Detection Mockup"
+
+[[generated]]
+id = "jvtlkBtmAp3j4UPcH2FTj"
+uri = "file://artifacts/website/public/images/step-report-fraud.png"
+type = "image"
+title = "Report Fraud Illustration"
+
 [[outputs]]
 id = "_yMJQqiPPUGQxsjmFQfwi"
 uri = "file://attached_assets/logo_concepts/01_guardian_eye_shield.png"
