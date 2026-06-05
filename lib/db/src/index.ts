@@ -29,8 +29,24 @@ function resolveSsl() {
 
 const ssl = resolveSsl();
 
+// When we explicitly control TLS via the `ssl` option, strip any `sslmode`
+// query param from the connection string. Newer pg/pg-connection-string treat
+// `sslmode=require` as an alias for `verify-full`, which would override our
+// explicit `ssl` settings and reject the provider's self-signed CA chain.
+function buildConnectionString() {
+  const url = process.env.DATABASE_URL!;
+  if (!ssl) return url;
+  try {
+    const parsed = new URL(url);
+    parsed.searchParams.delete("sslmode");
+    return parsed.toString();
+  } catch {
+    return url;
+  }
+}
+
 export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: buildConnectionString(),
   ...(ssl ? { ssl } : {}),
 });
 export const db = drizzle(pool, { schema });
