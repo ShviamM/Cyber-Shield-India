@@ -139,7 +139,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="relative lg:ml-auto flex justify-center w-full"
             >
-              <div className="relative z-10 w-full max-w-[320px]">
+              <div className="relative z-10 w-full max-w-[250px] sm:max-w-[300px] lg:max-w-[320px]">
                 <PhoneMockup />
                 
                 {/* Floating Cards */}
@@ -148,7 +148,7 @@ export default function Home() {
                     <motion.div 
                       animate={{ y: [0, -10, 0], rotate: [0, -2, 0] }} 
                       transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
-                      className="absolute top-1/4 -left-12 bg-white p-3.5 rounded-2xl shadow-xl border border-gray-100 flex items-center gap-3 z-20"
+                      className="absolute top-1/4 -left-12 sm:-left-16 lg:-left-20 bg-white p-3.5 rounded-2xl shadow-xl border border-gray-100 flex items-center gap-3 z-20"
                     >
                       <div className="bg-red-50 p-2 rounded-full text-red-500"><ShieldAlert className="h-5 w-5" /></div>
                       <div>
@@ -160,7 +160,7 @@ export default function Home() {
                     <motion.div 
                       animate={{ y: [0, 15, 0], rotate: [0, 2, 0] }} 
                       transition={{ repeat: Infinity, duration: 7, ease: "easeInOut", delay: 1 }}
-                      className="absolute bottom-1/3 -right-16 bg-white p-3.5 rounded-2xl shadow-xl border border-gray-100 flex items-center gap-3 z-20"
+                      className="absolute bottom-1/3 -right-12 sm:-right-20 lg:-right-24 bg-white p-3.5 rounded-2xl shadow-xl border border-gray-100 flex items-center gap-3 z-20"
                     >
                       <div className="bg-green-50 p-2 rounded-full text-green-500"><CheckCircle className="h-5 w-5" /></div>
                       <div>
