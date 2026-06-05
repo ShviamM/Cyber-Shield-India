@@ -114,9 +114,10 @@ The mobile app is **not** deployed to a server — it ships to the app stores vi
 Expo Application Services (EAS):
 
 1. Install the EAS CLI and sign in: `npm i -g eas-cli && eas login`.
-2. Point the app at your deployed API by setting `EXPO_PUBLIC_API_DOMAIN` to your
-   API host (no protocol), e.g. `EXPO_PUBLIC_API_DOMAIN=api.yourdomain.com`.
-   The app then calls `https://<that domain>/api/...`.
+2. Point the app at your deployed API with `EXPO_PUBLIC_DOMAIN` (host only, no
+   protocol). The included `artifacts/kavach-ai/eas.json` already sets this to
+   `netraksh.com` for the `preview` and `production` build profiles, so the app
+   calls `https://netraksh.com/api/...`. Change it there to use a different host.
 3. Configure your bundle identifiers / signing in `artifacts/kavach-ai/app.json`.
 4. Build: `eas build --platform all` (requires Apple Developer + Google Play
    accounts).
@@ -259,8 +260,9 @@ the DNS zone, so use **Option A**.
 
 ### 6.7 Point the mobile app at production
 
-Set `EXPO_PUBLIC_API_DOMAIN=netraksh.com` for the EAS build (section 4) so the
-app calls `https://netraksh.com/api/...`.
+Already done: `artifacts/kavach-ai/eas.json` sets `EXPO_PUBLIC_DOMAIN=netraksh.com`
+for the `preview` and `production` EAS build profiles, so store builds call
+`https://netraksh.com/api/...`. Just run the EAS build (section 4).
 
 ---
 
