@@ -11,7 +11,7 @@ export default function FAQ() {
   const faqs = [
     {
       q: "What is Netraksh?",
-      a: "Netraksh is India's Digital Bodyguard—a comprehensive digital safety platform designed to protect citizens from scam calls, fraudulent SMS, malicious links, and UPI fraud using advanced AI threat detection."
+      a: "Netraksh is India's Digital Bodyguard, a comprehensive digital safety platform designed to protect citizens from scam calls, fraudulent SMS, malicious links, and UPI fraud using advanced AI threat detection."
     },
     {
       q: "How is Netraksh different from caller ID apps?",

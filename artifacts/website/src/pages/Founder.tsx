@@ -73,7 +73,7 @@ const insideTheBook = [
   { icon: FileSearch, title: "Real-World Case Studies", desc: "Actual cyber fraud incidents, decoded step by step." },
   { icon: Landmark, title: "Banking Fraud Prevention", desc: "Protect your accounts, cards, and life savings." },
   { icon: Smartphone, title: "UPI Scam Awareness", desc: "Spot and stop fraudulent payment requests." },
-  { icon: UserX, title: "Social Engineering", desc: "How scammers manipulate trust — and how to resist." },
+  { icon: UserX, title: "Social Engineering", desc: "How scammers manipulate trust, and how to resist." },
   { icon: ScanFace, title: "Deepfake & AI Scams", desc: "The new frontier of digital fraud, explained simply." },
   { icon: Users, title: "Cyber Safety for Families", desc: "Keep parents, children, and seniors protected." },
 ];
@@ -95,7 +95,7 @@ const timeline = [
 
 const achievements = [
   { no: "01", tag: "National Award", title: "Bharat Pratibha Samman", desc: "Awarded at Pradhanmantri Sangrahalaya for outstanding contributions to Cyber Crime Awareness across India.", icon: Award },
-  { no: "02", tag: "Author", title: "Digital Dhokha", desc: "India's first Cyber Crime Awareness book — on a mission to save 100 million Indians from digital fraud.", icon: BookOpen },
+  { no: "02", tag: "Author", title: "Digital Dhokha", desc: "India's first Cyber Crime Awareness book, on a mission to save 100 million Indians from digital fraud.", icon: BookOpen },
   { no: "03", tag: "Government Advisory", title: "FIFA World Cup, Qatar", desc: "Provided Cyber Hygiene Advisory support to the Government of Qatar during the world's most-watched sporting event.", icon: Globe2 },
 ];
 
@@ -198,7 +198,7 @@ const testimonials = [
   { quote: "Senior citizens in our community finally understand how digital arrest scams work.", role: "Community Welfare Organiser" },
   { quote: "A must-attend session for every college student in India.", role: "College Dean" },
   { quote: "Real case studies made the risks impossible to ignore.", role: "Bank Branch Manager" },
-  { quote: "Engaging and actionable — exactly what awareness programs should be.", role: "Govt. Training Coordinator" },
+  { quote: "Engaging and actionable, exactly what awareness programs should be.", role: "Govt. Training Coordinator" },
 ];
 
 const eventTypes = [
@@ -280,7 +280,7 @@ export default function Founder() {
 
   const handleBooking = (e: React.FormEvent) => {
     e.preventDefault();
-    const subject = `Booking enquiry: ${form.eventType || "Event"} — ${form.organization || form.name}`;
+    const subject = `Booking enquiry: ${form.eventType || "Event"} - ${form.organization || form.name}`;
     const body = `Name: ${form.name}\nOrganization: ${form.organization}\nEmail: ${form.email}\nPhone: ${form.phone}\nEvent Type: ${form.eventType}\n\nMessage:\n${form.message}`;
     window.location.href = `mailto:${BOOKING_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
@@ -292,8 +292,8 @@ export default function Founder() {
   return (
     <Layout>
       <SEOHead
-        title="Shivam Malaviya — Cyber Crime Specialist, Author & Speaker | Netraksh"
-        description="Shivam Malaviya — Cyber Crime Specialist, author of Digital Dhokha, public speaker and founder of Netraksh. Book a cyber awareness workshop or invite him to speak."
+        title="Shivam Malaviya: Cyber Crime Specialist, Author & Speaker | Netraksh"
+        description="Shivam Malaviya is a Cyber Crime Specialist, author of Digital Dhokha, public speaker and founder of Netraksh. Book a cyber awareness workshop or invite him to speak."
       />
 
       {/* Hero */}
@@ -321,7 +321,7 @@ export default function Founder() {
                 Cyber Crime Specialist · Author · Public Speaker · Cyber Awareness Evangelist
               </p>
               <p className="mt-4 max-w-xl text-blue-100/70 leading-relaxed">
-                Protecting India's digital future through awareness, education, and action —
+                Protecting India's digital future through awareness, education, and action,
                 helping citizens, students, businesses, and governments stay safe from cyber fraud.
               </p>
 
@@ -399,7 +399,7 @@ export default function Founder() {
         </div>
       </section>
 
-      {/* Book Showcase — Digital Dhokha */}
+      {/* Book Showcase - Digital Dhokha */}
       <section className="bg-gray-50 py-24">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-12">
@@ -418,7 +418,7 @@ export default function Founder() {
               </div>
               <div className="p-8 md:p-12 lg:py-14">
                 <p className="text-blue-100/80 leading-relaxed mb-6">
-                  India's first comprehensive cyber crime awareness book — packed with real-world case studies that show how everyday scams unfold, and exactly how to stop them.
+                  India's first comprehensive cyber crime awareness book, packed with real-world case studies that show how everyday scams unfold, and exactly how to stop them.
                 </p>
                 <div className="grid sm:grid-cols-2 gap-4 mb-8">
                   {insideTheBook.map((item) => (
@@ -437,7 +437,7 @@ export default function Founder() {
                   <p className="text-sm italic text-blue-100/80">
                     "I wrote Digital Dhokha so no Indian family has to learn about cyber fraud the hard way. Awareness is the strongest firewall."
                   </p>
-                  <p className="mt-2 text-xs font-semibold text-accent">— Shivam Malaviya</p>
+                  <p className="mt-2 text-xs font-semibold text-accent">Shivam Malaviya</p>
                 </div>
                 <div className="flex flex-wrap gap-4">
                   <Button asChild className="rounded-full bg-accent hover:bg-accent/90 text-white font-semibold px-7 h-12">
@@ -789,7 +789,7 @@ export default function Founder() {
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-3">Vision for India</h3>
               <p className="text-gray-600 leading-relaxed">
-                A world where cyber awareness is not a privilege but a fundamental right — taught in every school, every institution, across every nation. A digitally literate society where every citizen, from the schoolroom to the boardroom, is equipped to defend themselves in cyberspace.
+                A world where cyber awareness is not a privilege but a fundamental right, taught in every school, every institution, across every nation. A digitally literate society where every citizen, from the schoolroom to the boardroom, is equipped to defend themselves in cyberspace.
               </p>
             </motion.div>
             <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp} transition={{ duration: 0.6, delay: 0.1 }} className="rounded-3xl border border-gray-100 bg-white p-9 shadow-sm">
@@ -798,7 +798,7 @@ export default function Founder() {
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-3">Cyber Safety Movement</h3>
               <p className="text-gray-600 leading-relaxed">
-                Beyond an app, Netraksh is a national movement — securing nations, educating communities, and advising governments. Through workshops and awareness drives, the mission is to put practical cyber safety into the hands of every Indian family.
+                Beyond an app, Netraksh is a national movement, securing nations, educating communities, and advising governments. Through workshops and awareness drives, the mission is to put practical cyber safety into the hands of every Indian family.
               </p>
             </motion.div>
           </div>
@@ -826,7 +826,7 @@ export default function Founder() {
               <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">Book Shivam for an Event</span>
               <h2 className="mt-4 text-4xl md:text-5xl font-bold leading-tight">Invite Shivam to speak or train your audience</h2>
               <p className="mt-5 text-blue-100/75 leading-relaxed">
-                From school programs to government training and podcast appearances — share a few details and the team will get back to you.
+                From school programs to government training and podcast appearances. Share a few details and the team will get back to you.
               </p>
               <div className="mt-8 space-y-4">
                 <a href={`mailto:${BOOKING_EMAIL}`} className="flex items-center gap-3 text-blue-100/90 hover:text-accent transition-colors">

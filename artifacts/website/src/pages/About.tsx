@@ -21,7 +21,7 @@ export default function About() {
           <div>
             <h2 className="text-3xl font-bold mb-6">Why Netraksh Exists</h2>
             <p className="text-lg text-gray-600 mb-4 leading-relaxed">
-              India is digitizing at an unprecedented scale. With the rise of UPI and cheap internet access, everyday citizens have been empowered—but they have also been exposed.
+              India is digitizing at an unprecedented scale. With the rise of UPI and cheap internet access, everyday citizens have been empowered, but they have also been exposed.
             </p>
             <p className="text-lg text-gray-600 leading-relaxed">
               Cyber criminals are using increasingly sophisticated social engineering, from "Digital Arrests" targeting seniors to fake job offers targeting the youth. We built Netraksh because traditional caller IDs aren't enough anymore. India needs a dedicated digital bodyguard.
