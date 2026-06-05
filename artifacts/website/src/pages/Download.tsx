@@ -1,8 +1,9 @@
 import { Layout } from "@/components/layout/Layout";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
-import { Shield, Smartphone } from "lucide-react";
+import { Shield, Apple, Smartphone, Bell, ArrowRight } from "lucide-react";
 import { ScamCallScreen } from "@/components/ScamCallScreen";
+import { Link } from "wouter";
 
 export default function Download() {
   return (
@@ -20,20 +21,29 @@ export default function Download() {
                 Your Digital Bodyguard
               </div>
               <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">Get Netraksh for your smartphone.</h1>
-              <p className="text-xl text-gray-400 mb-10">
-                Join the growing community of Indians protecting their families and finances from digital fraud.
+              <p className="text-xl text-gray-400 mb-8">
+                The Netraksh app is launching soon on the App Store and Google Play. Be the first to know the moment it goes live.
               </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="rounded-full bg-white hover:bg-gray-100 text-gray-900 font-bold h-16 px-8 text-lg w-full sm:w-auto flex gap-3">
-                  <Smartphone className="w-6 h-6" />
-                  App Store <span className="text-xs font-normal opacity-70 ml-1">(Coming Soon)</span>
-                </Button>
-                <Button size="lg" className="rounded-full bg-primary hover:bg-primary/90 text-white font-bold h-16 px-8 text-lg w-full sm:w-auto flex gap-3">
-                  <Smartphone className="w-6 h-6" />
-                  Google Play <span className="text-xs font-normal opacity-70 ml-1">(Coming Soon)</span>
-                </Button>
+
+              <div className="flex flex-wrap items-center gap-3 mb-8">
+                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-gray-200 text-sm font-medium">
+                  <Apple className="w-4 h-4" /> App Store
+                </span>
+                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-gray-200 text-sm font-medium">
+                  <Smartphone className="w-4 h-4" /> Google Play
+                </span>
+                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/20 text-accent text-sm font-semibold">
+                  Launching soon
+                </span>
               </div>
+
+              <Link href="/contact">
+                <Button size="lg" className="rounded-full bg-accent hover:bg-accent/90 text-gray-900 font-bold h-16 px-8 text-lg w-full sm:w-auto flex gap-3">
+                  <Bell className="w-6 h-6" />
+                  Notify me at launch
+                  <ArrowRight className="w-5 h-5" />
+                </Button>
+              </Link>
             </div>
             
             <div className="hidden lg:flex items-center justify-center">

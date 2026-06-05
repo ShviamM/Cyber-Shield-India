@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Twitter, Linkedin, Github } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -23,15 +23,18 @@ export function Footer() {
             <p className="text-gray-400 mb-6 max-w-sm">
               India's Digital Bodyguard. Protecting every Indian from scam calls, fraud messages, fake links, and digital crime.
             </p>
-            <div className="flex items-center gap-4">
-              <a href="#" className="p-2 bg-gray-900 rounded-full hover:bg-primary hover:text-white transition-colors">
-                <Twitter className="h-5 w-5" />
+            <div className="space-y-3">
+              <a href="mailto:support@netraksh.com" className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors w-fit">
+                <span className="p-2 bg-gray-900 rounded-full">
+                  <Mail className="h-4 w-4" />
+                </span>
+                support@netraksh.com
               </a>
-              <a href="#" className="p-2 bg-gray-900 rounded-full hover:bg-primary hover:text-white transition-colors">
-                <Linkedin className="h-5 w-5" />
-              </a>
-              <a href="#" className="p-2 bg-gray-900 rounded-full hover:bg-primary hover:text-white transition-colors">
-                <Github className="h-5 w-5" />
+              <a href="tel:1930" className="flex items-center gap-3 text-gray-400 hover:text-white transition-colors w-fit">
+                <span className="p-2 bg-gray-900 rounded-full">
+                  <Phone className="h-4 w-4" />
+                </span>
+                Cyber Crime Helpline: 1930
               </a>
             </div>
           </div>
@@ -41,7 +44,7 @@ export function Footer() {
             <ul className="space-y-3">
               <li><Link href="/features" className="text-gray-400 hover:text-white transition-colors">Features</Link></li>
               <li><Link href="/download" className="text-gray-400 hover:text-white transition-colors">Download App</Link></li>
-              <li><Link href="/pricing" className="text-gray-400 hover:text-white transition-colors">Pricing</Link></li>
+              <li><Link href="/family-protection" className="text-gray-400 hover:text-white transition-colors">Family Protection</Link></li>
             </ul>
           </div>
 
@@ -61,8 +64,6 @@ export function Footer() {
               <li><Link href="/about" className="text-gray-400 hover:text-white transition-colors">About Us</Link></li>
               <li><Link href="/founder" className="text-gray-400 hover:text-white transition-colors">Founder</Link></li>
               <li><Link href="/contact" className="text-gray-400 hover:text-white transition-colors">Contact Us</Link></li>
-              <li><Link href="/careers" className="text-gray-400 hover:text-white transition-colors">Careers</Link></li>
-              <li><Link href="/media-kit" className="text-gray-400 hover:text-white transition-colors">Media Kit</Link></li>
             </ul>
           </div>
 

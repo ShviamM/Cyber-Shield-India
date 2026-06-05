@@ -3,9 +3,19 @@
   <url><loc>https://netraksh.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
   <url><loc>https://netraksh.com/features</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://netraksh.com/family-protection</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://netraksh.com/cyber-safety-center</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://netraksh.com/cyber-safety-center</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://netraksh.com/cyber-safety-center/digital-arrest-scam</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://netraksh.com/cyber-safety-center/upi-fraud</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://netraksh.com/cyber-safety-center/qr-code-fraud</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://netraksh.com/cyber-safety-center/whatsapp-scam</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://netraksh.com/cyber-safety-center/fake-loan-apps</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://netraksh.com/cyber-safety-center/investment-scam</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://netraksh.com/cyber-safety-center/job-scam</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://netraksh.com/cyber-safety-center/otp-fraud</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://netraksh.com/cyber-safety-center/kyc-fraud</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://netraksh.com/cyber-laws</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://netraksh.com/about</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://netraksh.com/founder</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
   <url><loc>https://netraksh.com/contact</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
   <url><loc>https://netraksh.com/faq</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://netraksh.com/download</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
@@ -18,4 +28,5 @@
   <url><loc>https://netraksh.com/acceptable-use</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
   <url><loc>https://netraksh.com/disclaimer</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
   <url><loc>https://netraksh.com/security</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://netraksh.com/compliance</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
 </urlset>

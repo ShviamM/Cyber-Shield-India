@@ -3,11 +3,12 @@ import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Lock } from "lucide-react";
+import { Lock, Smartphone, ArrowRight } from "lucide-react";
 import { useState } from "react";
+import { Link } from "wouter";
 
 export default function Login() {
-  const [step, setStep] = useState<"phone" | "otp">("phone");
+  const [step, setStep] = useState<"phone" | "otp" | "done">("phone");
   const [loading, setLoading] = useState(false);
 
   const handlePhoneSubmit = (e: React.FormEvent) => {
@@ -24,7 +25,7 @@ export default function Login() {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      alert("This is a presentational marketing site. User dashboard coming soon!");
+      setStep("done");
     }, 1000);
   };
 
@@ -53,7 +54,22 @@ export default function Login() {
           </div>
 
           <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
-            {step === "phone" ? (
+            {step === "done" ? (
+              <div className="text-center py-6">
+                <div className="w-16 h-16 bg-blue-50 text-primary rounded-2xl flex items-center justify-center mx-auto mb-6">
+                  <Smartphone className="w-8 h-8" />
+                </div>
+                <h3 className="text-2xl font-bold mb-2">Your protection lives in the app</h3>
+                <p className="text-gray-600 mb-6">
+                  The full Netraksh dashboard and real-time protection are part of the mobile app, launching soon. Get notified the moment it goes live.
+                </p>
+                <Link href="/download">
+                  <Button className="w-full h-12 text-lg rounded-xl flex gap-2">
+                    Get the app <ArrowRight className="w-5 h-5" />
+                  </Button>
+                </Link>
+              </div>
+            ) : step === "phone" ? (
               <form onSubmit={handlePhoneSubmit} className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="phone">Mobile Number</Label>
@@ -68,7 +84,7 @@ export default function Login() {
                   {loading ? "Sending OTP..." : "Get OTP"}
                 </Button>
                 <div className="text-center mt-6">
-                  <p className="text-sm text-gray-500">Don't have an account? <a href="#" className="text-primary font-medium hover:underline">Create one</a></p>
+                  <p className="text-sm text-gray-500">Don't have an account? <Link href="/download" className="text-primary font-medium hover:underline">Get the app</Link></p>
                 </div>
               </form>
             ) : (

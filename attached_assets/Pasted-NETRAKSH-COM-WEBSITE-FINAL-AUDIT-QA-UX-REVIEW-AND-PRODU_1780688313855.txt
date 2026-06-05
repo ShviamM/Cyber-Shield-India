@@ -1,0 +1,344 @@
+NETRAKSH.COM WEBSITE FINAL AUDIT, QA, UX REVIEW, AND PRODUCTION READINESS
+
+Act as:
+
+Senior Frontend Architect
+UX Designer
+QA Lead
+Product Owner
+SEO Expert
+Accessibility Specialist
+Conversion Rate Optimization Expert
+
+Perform a COMPLETE audit of the entire Netraksh website.
+
+DO NOT ASSUME ANYTHING IS WORKING.
+
+Validate every page, button, link, animation, article, navigation item, form, modal, and user journey.
+
+MISSION
+
+The website must feel like:
+
+India's Digital Bodyguard
+Premium Technology Brand
+National Cyber Safety Movement
+Investor Ready
+Media Ready
+Government Ready
+
+WEBSITE FUNCTIONALITY AUDIT
+
+Check EVERY clickable element on the website.
+
+Verify:
+
+Navigation menu links
+Footer links
+Buttons
+Cards
+Hero CTAs
+Social links
+Download buttons
+Login button
+Contact button
+Founder page
+Book page
+Family Protection page
+Cyber Safety Center
+Cyber Laws page
+FAQ page
+
+Every click must lead somewhere meaningful.
+
+No dead links.
+
+No placeholders.
+
+No "Coming Soon" pages.
+
+No broken navigation.
+
+CYBER SAFETY CENTER AUDIT
+
+This is a critical requirement.
+
+Verify every article opens correctly.
+
+Examples:
+
+Digital Arrest Scam
+UPI Fraud
+QR Fraud
+WhatsApp Scam
+Fake Loan Apps
+Investment Scam
+Job Scam
+OTP Fraud
+KYC Fraud
+
+Requirements:
+
+Dedicated article page
+Professional design
+Readable layout
+Mobile friendly
+Working URL
+Share button
+Related articles
+SEO metadata
+
+Generate articles if missing.
+
+No empty article pages.
+
+No placeholder content.
+
+ARTICLE QUALITY REVIEW
+
+Review every article.
+
+Verify:
+
+Simple language
+Indian context
+Non-technical explanations
+Actionable advice
+Scam indicators
+Protection steps
+
+Target audience:
+
+Parents
+Senior citizens
+Students
+Small business owners
+Non-technical users
+
+WEBSITE DESIGN REVIEW
+
+Audit:
+
+Spacing
+Alignment
+Typography
+Colors
+Contrast
+Mobile responsiveness
+
+Fix:
+
+Overlapping content
+Inconsistent spacing
+Broken layouts
+Mobile issues
+Overflow issues
+Misaligned sections
+
+Make every page visually premium.
+
+ANIMATION REVIEW
+
+Verify:
+
+Smooth scrolling
+Hero animations
+Counter animations
+Hover effects
+Transitions
+
+Requirements:
+
+Smooth
+Fast
+Professional
+Not distracting
+
+Remove anything that feels cheap or unfinished.
+
+MOBILE EXPERIENCE REVIEW
+
+Audit:
+
+Android
+iPhone
+Tablet
+
+Requirements:
+
+Fully responsive
+Touch friendly
+Large tap targets
+Fast loading
+
+Every section must look premium on mobile.
+
+PAGE LOAD PERFORMANCE
+
+Audit:
+
+Images
+Animations
+Scripts
+Fonts
+
+Target:
+
+Lighthouse > 90
+Mobile > 90
+Desktop > 95
+
+Optimize:
+
+Lazy loading
+Image compression
+Bundle size
+Font loading
+
+FOUNDER SECTION REVIEW
+
+Verify:
+
+Founder images load
+About page works
+Story section works
+Book section works
+
+Professional presentation only.
+
+Remove anything that feels self-promotional without purpose.
+
+BOOK SECTION REVIEW
+
+Verify:
+
+Digital Dhokha section.
+
+Requirements:
+
+Book image loads
+Purchase buttons work
+Amazon link works
+Flipkart link works
+
+Create a premium presentation.
+
+CONTACT PAGE REVIEW
+
+Verify:
+
+Contact form works
+Validation works
+Success messages work
+Error messages work
+
+LOGIN PAGE REVIEW
+
+Verify:
+
+Login screen works
+Register screen works
+OTP flow works
+Forgot password works
+
+LEGAL PAGES REVIEW
+
+Verify existence and functionality of:
+
+Privacy Policy
+Terms of Service
+Cookie Policy
+Responsible Disclosure
+Data Retention Policy
+
+No placeholders.
+
+SEO REVIEW
+
+Verify:
+
+Meta titles
+Meta descriptions
+Open Graph
+Structured Data
+Sitemap
+Robots.txt
+
+Generate missing SEO elements.
+
+ACCESSIBILITY REVIEW
+
+Verify:
+
+Keyboard navigation
+Screen reader support
+Color contrast
+Alt text
+Form labels
+
+TRUST REVIEW
+
+Remove anything that could reduce trust:
+
+Fake counters
+Fake statistics
+Fake testimonials
+Placeholder users
+Placeholder reviews
+
+Only use real content.
+
+FINAL UX TEST
+
+Simulate:
+
+First-time visitor
+Parent
+Senior citizen
+Investor
+Journalist
+Government official
+
+For each persona:
+
+Can they understand the purpose of Netraksh within 10 seconds?
+
+If not, redesign the section.
+
+FINAL REPORT
+
+Generate:
+
+PASS / FAIL
+
+for every page and feature.
+
+Provide:
+
+Broken Links Found
+Missing Pages
+Missing Articles
+Design Issues
+Mobile Issues
+SEO Issues
+Accessibility Issues
+Performance Issues
+
+Then automatically fix all issues.
+
+Do not mark the website production-ready until every critical issue has been resolved.
+
+FINAL OUTPUT
+
+Provide:
+
+Website Quality Score
+Design Score
+Trust Score
+SEO Score
+Accessibility Score
+Performance Score
+
+and
+
+GO-LIVE APPROVAL STATUS.
