@@ -106,9 +106,9 @@ export default function Home() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { label: "Reported Cyber Crimes (2023)", value: "1.1M+", desc: "According to National Cyber Crime Reporting Portal data" },
-              { label: "Financial Losses", value: "₹7,000 Cr+", desc: "Estimated public losses to digital fraud" },
-              { label: "Targeting Seniors & Families", value: "Rising", desc: "Highest growth in targeted manipulation" }
+              { label: "Cyber Crime Complaints (2024)", value: "22.7 Lakh", desc: "Filed on the National Cyber Crime Reporting Portal (I4C) — up ~42% over 2023" },
+              { label: "Financial Losses (2024)", value: "₹22,845 Cr", desc: "Lost to cyber fraud in 2024, a ~206% jump over the previous year (I4C)" },
+              { label: "Digital Arrest Scam Losses (2024)", value: "₹1,935 Cr", desc: "Across ~1.2 lakh cases — a fast-rising threat to seniors & families (I4C)" }
             ].map((stat, i) => (
               <div key={i} className="bg-gray-800/50 border border-gray-700 p-8 rounded-3xl backdrop-blur-sm">
                 <h3 className="text-gray-400 text-lg font-medium mb-2">{stat.label}</h3>
@@ -117,6 +117,12 @@ export default function Home() {
               </div>
             ))}
           </div>
+
+          <p className="text-center text-xs text-gray-500 mt-10 max-w-3xl mx-auto leading-relaxed">
+            Sources: Indian Cyber Crime Coordination Centre (I4C) — National Cyber Crime Reporting Portal &amp; CFCFRMS data
+            shared by the Ministry of Home Affairs in the Lok Sabha (July 2025); NCRB <em>Crime in India 2022</em>, which
+            recorded 65,893 cyber crime cases registered by police.
+          </p>
         </div>
       </section>
 
