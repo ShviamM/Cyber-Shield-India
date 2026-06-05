@@ -48,10 +48,10 @@ export type MessageClassification = {
 
 /**
  * The Replit-managed OpenAI integration auto-provisions these env vars. When
- * they are absent we skip the AI call entirely and let the engine fall back to
- * the non-AI signals, surfacing that explicitly in the verdict.
+ * they are absent we skip the OpenAI call and fall through to the Gemini
+ * fallback (or, if neither is configured, the non-AI signals).
  */
-export function isAiConfigured(): boolean {
+function isOpenAiConfigured(): boolean {
   return Boolean(
     (process.env.AI_INTEGRATIONS_OPENAI_BASE_URL &&
       process.env.AI_INTEGRATIONS_OPENAI_API_KEY) ||
@@ -59,9 +59,24 @@ export function isAiConfigured(): boolean {
   );
 }
 
+/** The Replit-managed Gemini integration, used as a content-filter-resilient fallback. */
+function isGeminiConfigured(): boolean {
+  return Boolean(
+    process.env.AI_INTEGRATIONS_GEMINI_BASE_URL &&
+      process.env.AI_INTEGRATIONS_GEMINI_API_KEY,
+  );
+}
+
+/** True when ANY AI provider is available. Callers degrade gracefully if false. */
+export function isAiConfigured(): boolean {
+  return isOpenAiConfigured() || isGeminiConfigured();
+}
+
 const SYSTEM_PROMPT = `You are a fraud-detection classifier for Netraksh, an Indian cyber-safety app.
 You receive a single SMS, chat, or call-transcript message and decide whether it is a scam targeting Indian consumers.
 Common scams: OTP theft, fake KYC/Aadhaar/PAN updates, lottery/prize wins, loan/credit-card offers, job/work-from-home tasks, UPI/payment tricks, digital-arrest/police impersonation, electricity-bill disconnection, courier/parcel customs holds, tech support, bank/government impersonation, investment/trading guarantees, and blackmail or extortion threats.
+A message is a scam only when it pressures the user to act in a risky way: share an OTP/PIN/CVV/password, click a link, call a number to "reverse"/"refund"/"reactivate"/"verify", install an app, or make a payment to claim or release money.
+Do NOT flag legitimate informational messages. In particular, a normal bank or wallet transaction alert that simply reports a debit/credit and includes a standard "Not you? Call <official number>" or "report" line is NOT a scam. Genuine delivery updates, payment confirmations, OTP-delivery messages ("123456 is your OTP, do not share"), and subsidy/credit notifications are NOT scams.
 Respond ONLY with a JSON object: {"is_scam": boolean, "category": string|null, "confidence": number, "rationale": string}.
 - "category" MUST be exactly one of the provided category keys, or null if none fit or the message is not a scam.
 - "confidence" is a number from 0 to 1.
@@ -91,9 +106,61 @@ type RawClassification = {
   rationale?: unknown;
 };
 
+/** Build the category list block, substituting filter-tripping keys with neutral aliases. */
+function buildCategoryList(categories: { key: string; nameEn: string }[]): string {
+  return categories
+    .map((c) => {
+      const alias = CATEGORY_PROMPT_ALIAS[c.key];
+      return alias ? `- ${alias.key}: ${alias.name}` : `- ${c.key}: ${c.nameEn}`;
+    })
+    .join("\n");
+}
+
+function buildUserPrompt(categoryList: string, trimmed: string): string {
+  return `Category keys:\n${categoryList}\n\nMessage:\n"""\n${trimmed.slice(0, 4000)}\n"""`;
+}
+
+/** Parse a model's JSON output into a normalized classification, or null if unusable. */
+function parseClassification(
+  content: string | undefined,
+  validKeys: Set<string>,
+): MessageClassification | null {
+  if (!content) return null;
+  let parsed: RawClassification;
+  try {
+    parsed = JSON.parse(content) as RawClassification;
+  } catch {
+    return null;
+  }
+
+  let rawCategory = typeof parsed.category === "string" ? parsed.category : null;
+  // Map any neutral alias the model returned back to the real stored key.
+  if (rawCategory && ALIAS_TO_REAL_KEY[rawCategory]) {
+    rawCategory = ALIAS_TO_REAL_KEY[rawCategory];
+  }
+  const category = rawCategory && validKeys.has(rawCategory) ? rawCategory : null;
+
+  const confidenceNum =
+    typeof parsed.confidence === "number" ? parsed.confidence : 0;
+  const confidence = Math.min(1, Math.max(0, confidenceNum));
+
+  return {
+    isScam: parsed.is_scam === true,
+    category,
+    confidence,
+    rationale:
+      typeof parsed.rationale === "string" && parsed.rationale.trim()
+        ? parsed.rationale.trim().slice(0, 280)
+        : "AI classified this message.",
+  };
+}
+
 /**
- * Classify a raw message via the Replit-managed OpenAI integration. Returns
- * null when AI is unavailable or the call fails, so callers degrade gracefully.
+ * Classify a raw message. Tries OpenAI first; if OpenAI is unavailable or its
+ * Azure-backed content filter rejects the prompt (which happens as a false
+ * positive on innocuous scam text), falls back to Gemini, whose safety
+ * thresholds we relax so it will actually analyze the message. Returns null
+ * only when every provider is unavailable, so callers degrade gracefully.
  */
 export async function classifyMessage(
   text: string,
@@ -105,82 +172,97 @@ export async function classifyMessage(
   if (!trimmed) return null;
 
   const validKeys = new Set(categories.map((c) => c.key));
-  // Substitute filter-tripping keys/names with neutral aliases for the prompt.
-  const categoryList = categories
-    .map((c) => {
-      const alias = CATEGORY_PROMPT_ALIAS[c.key];
-      return alias
-        ? `- ${alias.key}: ${alias.name}`
-        : `- ${c.key}: ${c.nameEn}`;
-    })
-    .join("\n");
+  const categoryList = buildCategoryList(categories);
+  const userPrompt = buildUserPrompt(categoryList, trimmed);
 
-  try {
-    // Lazy import so a missing integration never throws at module load.
-    const { openai } = await import("@workspace/integrations-openai-ai-server");
-
-    const completion = await openai.chat.completions.create({
-      model: "gpt-5-mini",
-      max_completion_tokens: 8192,
-      response_format: { type: "json_object" },
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        {
-          role: "user",
-          content: `Category keys:\n${categoryList}\n\nMessage:\n"""\n${trimmed.slice(0, 4000)}\n"""`,
-        },
-      ],
-    });
-
-    // Best-effort usage accounting for the Super Admin cost dashboard. Never
-    // let a logging failure affect classification.
-    void recordAiUsage("gpt-5-mini", "classify_message", completion.usage);
-
-    const content = completion.choices[0]?.message?.content?.trim();
-    if (!content) return null;
-
-    const parsed = JSON.parse(content) as RawClassification;
-
-    let rawCategory =
-      typeof parsed.category === "string" ? parsed.category : null;
-    // Map any neutral alias the model returned back to the real stored key.
-    if (rawCategory && ALIAS_TO_REAL_KEY[rawCategory]) {
-      rawCategory = ALIAS_TO_REAL_KEY[rawCategory];
-    }
-    const category =
-      rawCategory && validKeys.has(rawCategory) ? rawCategory : null;
-
-    const confidenceNum =
-      typeof parsed.confidence === "number" ? parsed.confidence : 0;
-    const confidence = Math.min(1, Math.max(0, confidenceNum));
-
-    return {
-      isScam: parsed.is_scam === true,
-      category,
-      confidence,
-      rationale:
-        typeof parsed.rationale === "string" && parsed.rationale.trim()
-          ? parsed.rationale.trim().slice(0, 280)
-          : "AI classified this message.",
-    };
-  } catch (err) {
-    // The upstream provider (Azure-backed) applies its own content-safety
-    // filter that can reject a prompt with HTTP 400 / code "content_filter".
-    // This fires both on genuinely explicit scam content AND as a false
-    // positive on innocuous messages, so we cannot safely infer a verdict
-    // from it. We degrade gracefully to the non-AI signals instead, and log
-    // it as an expected limitation rather than an error.
-    if (isContentFilterError(err)) {
-      logger.warn(
-        { requestId: extractRequestId(err) },
-        "AI classification skipped: prompt rejected by provider content filter",
+  // --- Primary: OpenAI (gpt-5-mini) ---
+  if (isOpenAiConfigured()) {
+    try {
+      const { openai } = await import("@workspace/integrations-openai-ai-server");
+      const completion = await openai.chat.completions.create({
+        model: "gpt-5-mini",
+        max_completion_tokens: 8192,
+        response_format: { type: "json_object" },
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: userPrompt },
+        ],
+      });
+      void recordAiUsage("gpt-5-mini", "classify_message", completion.usage);
+      const result = parseClassification(
+        completion.choices[0]?.message?.content?.trim(),
+        validKeys,
       );
-      return null;
+      if (result) return result;
+    } catch (err) {
+      // The Azure-backed OpenAI provider applies a content-safety filter that
+      // can reject a prompt with HTTP 400 / code "content_filter". It fires
+      // both on genuinely explicit content AND as a false positive on
+      // innocuous scam text (e.g. job/work-from-home offers), silently
+      // disabling AI for whole scam categories. Rather than infer a verdict
+      // from it, we fall back to Gemini below.
+      if (isContentFilterError(err)) {
+        logger.warn(
+          { requestId: extractRequestId(err) },
+          "OpenAI classification rejected by content filter; trying Gemini fallback",
+        );
+      } else {
+        logger.error({ err }, "OpenAI message classification failed; trying Gemini fallback");
+      }
     }
-
-    logger.error({ err }, "AI message classification failed");
-    return null;
   }
+
+  // --- Fallback: Gemini (gemini-2.5-flash) ---
+  if (isGeminiConfigured()) {
+    try {
+      return await classifyWithGemini(userPrompt, validKeys);
+    } catch (err) {
+      logger.error({ err }, "Gemini message classification failed");
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Gemini fallback. Safety thresholds are set to BLOCK_NONE because this is a
+ * fraud-detection classifier that must be able to read scam text; without this
+ * Gemini would refuse the same content Azure's filter blocks, defeating the
+ * purpose of the fallback.
+ */
+async function classifyWithGemini(
+  userPrompt: string,
+  validKeys: Set<string>,
+): Promise<MessageClassification | null> {
+  const { ai, HarmCategory, HarmBlockThreshold } = await import(
+    "@workspace/integrations-gemini-ai"
+  );
+
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+    config: {
+      systemInstruction: SYSTEM_PROMPT,
+      responseMimeType: "application/json",
+      maxOutputTokens: 8192,
+      temperature: 0,
+      safetySettings: [
+        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+      ],
+    },
+  });
+
+  const usage = response.usageMetadata;
+  void recordAiUsage("gemini-2.5-flash", "classify_message", {
+    prompt_tokens: usage?.promptTokenCount,
+    completion_tokens: usage?.candidatesTokenCount,
+    total_tokens: usage?.totalTokenCount,
+  });
+
+  return parseClassification(response.text?.trim(), validKeys);
 }
 
 /** True when the error is the provider's content-safety rejection. */

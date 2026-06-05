@@ -34,3 +34,30 @@ worse than "AI unavailable, used heuristics".
 **How to apply:** any new AI prompt on this gateway must avoid explicit
 sexual/violent trigger terms in static text; treat content_filter as a graceful
 no-op, and alias-map any taxonomy term that names such content.
+
+## The filter false-positives on innocuous USER text too — prompt hygiene is not enough
+
+Beyond our own prompt terms, Azure flags benign user messages unpredictably:
+e.g. a job/work-from-home scam ("earn money liking videos, pay a registration
+fee") was scored `sexual: high` and rejected. There is nothing sexual in it.
+So you cannot fix coverage by editing the prompt — whole scam categories were
+silently getting zero AI.
+
+**Resolution: a second AI provider as a fallback.** The classifier now tries
+OpenAI first, and on `content_filter` (or any failure / null result) falls back
+to **Gemini** (`gemini-2.5-flash`) with all `safetySettings` set to
+`BLOCK_NONE`. Unlike Azure's OpenAI, Gemini lets you relax safety thresholds,
+which a fraud-detection classifier needs (it must be able to *read* scam text).
+Returns null only when every provider fails.
+
+**Why:** Azure's content filter is not configurable on the managed OpenAI
+gateway, so the only robust path to full scam coverage is a provider that lets
+you disable safety blocking for analysis.
+
+**How to apply:** for any AI feature that must reliably analyze
+adversarial/abusive text on this stack, route through OpenAI but keep a Gemini
+fallback with BLOCK_NONE. Note: `@google/*` is externalized by the api-server
+esbuild config, so `@google/genai` must be a *direct* dep of api-server (not
+just the integration lib) or it won't resolve at runtime. The Replit Gemini
+client's `httpOptions.apiVersion: ""` is intentional (template default) — do not
+"fix" it.

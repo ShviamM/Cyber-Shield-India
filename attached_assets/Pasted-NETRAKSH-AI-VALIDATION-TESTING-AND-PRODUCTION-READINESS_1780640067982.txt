@@ -1,0 +1,281 @@
+NETRAKSH AI VALIDATION, TESTING, AND PRODUCTION READINESS AUDIT
+
+Act as a Senior AI Engineer, Cybersecurity Architect, QA Lead, Mobile Architect, and Production Release Manager.
+
+Your objective is to verify that every AI capability in Netraksh is fully functional, accurate, secure, and production-ready.
+
+DO NOT ASSUME AI IS WORKING.
+
+Perform end-to-end validation and generate evidence-based results.
+
+AI INVENTORY
+
+First identify and document every AI feature implemented in the application.
+
+Examples:
+
+Scam Message Analyzer
+WhatsApp Scam Detection
+SMS Scam Detection
+Scam Call Analysis
+QR Fraud Detection
+URL Risk Analysis
+UPI Fraud Analysis
+AI Assistant
+Risk Scoring Engine
+Family Protection Intelligence
+Reputation Engine
+
+List all AI-powered workflows and verify they are connected to production services.
+
+AI PROVIDER VALIDATION
+
+Verify:
+
+OpenAI integration
+Gemini integration
+Anthropic integration
+Local AI models
+AI fallback mechanisms
+
+Confirm:
+
+API keys are valid
+Responses are received
+Timeout handling works
+Retry logic exists
+Error handling exists
+
+FAIL deployment if AI services are disconnected.
+
+SCAM DETECTION TESTING
+
+Create a comprehensive test suite using:
+
+OTP Scam Examples
+
+UPI Scam Examples
+
+Digital Arrest Scams
+
+Investment Scams
+
+Job Scams
+
+Lottery Scams
+
+Fake Loan Scams
+
+KYC Update Scams
+
+Fake Courier Scams
+
+Bank Account Verification Scams
+
+Verify:
+
+Scam detection accuracy
+Risk classification
+Explanation quality
+User guidance quality
+
+Generate detection statistics.
+
+WHATSAPP ANALYZER TESTING
+
+Test:
+
+Shared messages
+Shared screenshots
+Shared URLs
+Shared text
+
+Verify:
+
+AI receives content
+AI analyzes correctly
+Scam classification works
+Results appear in UI
+
+SMS ANALYZER TESTING
+
+Test:
+
+Genuine SMS
+Banking SMS
+OTP SMS
+Fraud SMS
+Delivery SMS
+
+Verify false positives remain low.
+
+CALL SCREENING TESTING
+
+Verify:
+
+Incoming call detection
+Reputation lookup
+Risk calculation
+User notification
+
+Test:
+
+Known scam numbers
+Unknown numbers
+Legitimate numbers
+
+URL ANALYZER TESTING
+
+Test:
+
+Safe websites
+Government websites
+Banking websites
+Known phishing URLs
+
+Verify:
+
+Correct classification
+Proper explanations
+
+QR SCANNER TESTING
+
+Test:
+
+Genuine UPI QR codes
+Fraud QR codes
+Suspicious URLs
+Payment redirection attacks
+
+Verify AI recommendations.
+
+UPI FRAUD ANALYSIS
+
+Test:
+
+Legitimate UPI IDs
+Reported UPI IDs
+Unknown UPI IDs
+
+Verify risk assessment.
+
+AI RESPONSE QUALITY
+
+Verify every AI response is:
+
+Short
+Clear
+Actionable
+Easy for non-technical users
+
+Bad Example:
+
+"Potential phishing attempt with elevated confidence score."
+
+Good Example:
+
+"This message may be a scam. Do not share your OTP or send money."
+
+LANGUAGE TESTING
+
+Verify AI works in:
+
+All the languages
+
+Examples:
+
+"Ye message safe hai kya?"
+
+"Mujhe OTP share karna chahiye?"
+
+"Is QR code par payment kar sakta hoon?"
+
+AI must respond correctly.
+
+FALSE POSITIVE TESTING
+
+Verify legitimate content is not incorrectly flagged.
+
+Examples:
+
+Real bank SMS
+Real government SMS
+Genuine payment confirmations
+
+Generate:
+
+False Positive Rate
+
+False Negative Rate
+
+AI ACCURACY SCORE
+
+Calculate:
+
+Precision
+Recall
+Accuracy
+False Positive Rate
+False Negative Rate
+
+Target:
+
+Accuracy > 90%
+
+False Positives < 5%
+
+AI SAFETY REVIEW
+
+Verify:
+
+Prompt injection resistance
+Abuse prevention
+Jailbreak resistance
+Content moderation
+
+Ensure AI cannot be manipulated into giving dangerous advice.
+
+PERFORMANCE TESTING
+
+Measure:
+
+AI response time
+Average latency
+Peak latency
+
+Target:
+
+< 3 seconds average response.
+
+USER EXPERIENCE VALIDATION
+
+Verify users only see:
+
+✅ Safe
+
+⚠ Be Careful
+
+🚨 Dangerous
+
+Avoid technical cybersecurity terminology.
+
+PRODUCTION REPORT
+
+Generate final report:
+
+PASS / FAIL
+
+For every AI feature.
+
+Provide:
+
+AI Features Tested
+AI Accuracy
+False Positive Rate
+False Negative Rate
+Average Response Time
+Security Findings
+Missing Integrations
+Production Readiness Score
+
+Do not approve production release until all critical AI workflows pass validation.
