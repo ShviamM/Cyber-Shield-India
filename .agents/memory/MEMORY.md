@@ -4,6 +4,7 @@
 - [Fraud engine fusion vs reputation scales](fraud-engine-fusion-vs-reputation.md) — medium weight tuned to 40 so a lone "medium" signal now flags medium; weights (not computeRiskLevel) decide the verdict band.
 - [API client codegen staleness](api-client-codegen.md) — generated api.ts can lag the spec (schema present, operation fn missing); run lib/api-spec codegen after adding endpoints.
 - [Managed Postgres sslmode](managed-postgres-sslmode.md) — provider's `sslmode=require` in DATABASE_URL silently overrides explicit pg ssl:{rejectUnauthorized:false}; strip sslmode when controlling TLS yourself.
+- [DO App Platform env scoping](do-app-platform-env-scoping.md) — component-level env vars override app-level ones; real values added at app level are silently ignored if the component has placeholder duplicates.
 - [Azure content filter](azure-content-filter.md) — Replit OpenAI is Azure-backed; its content filter false-positives on benign scam text & kills whole categories; resolved with a Gemini fallback (BLOCK_NONE).
 - [Broadcast/push delivery](broadcast-delivery.md) — Expo Go/web can't register push tokens, so "notify all" must also be an in-app feed (GET /notifications over broadcasts table); push is best-effort only.
 - [Admin web brand theme](admin-brand-theme.md) — admin mirrors the mobile Netraksh brand; shadcn `--primary` must be NAVY not saffron (saffron+white fails contrast; app uses navy buttons, saffron only as accent).
