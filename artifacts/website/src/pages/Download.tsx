@@ -2,6 +2,7 @@ import { Layout } from "@/components/layout/Layout";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Shield, Smartphone } from "lucide-react";
+import { ScamCallScreen } from "@/components/ScamCallScreen";
 
 export default function Download() {
   return (
@@ -36,12 +37,8 @@ export default function Download() {
             </div>
             
             <div className="hidden lg:flex items-center justify-center">
-               <div className="relative w-full max-w-[280px] aspect-[9/19] rounded-[2.5rem] border-[6px] border-gray-800 bg-white shadow-2xl overflow-hidden transform rotate-[-5deg]">
-                <img 
-                  src="/images/hero-mockup.png" 
-                  alt="Netraksh App Interface" 
-                  className="w-full h-full object-cover"
-                />
+               <div className="relative w-full max-w-[280px] aspect-[9/19] rounded-[2.5rem] border-[6px] border-gray-800 bg-gray-900 shadow-2xl overflow-hidden transform rotate-[-5deg]">
+                <ScamCallScreen />
               </div>
             </div>
           </div>

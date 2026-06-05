@@ -1,0 +1,150 @@
+FOUNDER SPOTLIGHT SECTION – NETRAKSH
+
+Create a premium Founder section for the Netraksh website that feels comparable to Apple, Stripe, or leading mission-driven startups.
+
+IMPORTANT:
+
+Use professional founder photographs throughout the website.
+
+Display:
+
+* Founder Hero Portrait
+* Founder Story Section
+* Founder Mission Section
+* Founder Quote Section
+
+Use subtle animations, premium typography, glassmorphism effects, and trust-building visuals.
+
+FOUNDER INFORMATION
+
+Founder:
+Shivam Malaviya
+
+Title:
+Founder & CEO, Netraksh
+
+Positioning:
+
+Cybersecurity Professional, Threat Intelligence Specialist, and Founder of Netraksh.
+
+MISSION SECTION
+
+Headline:
+
+"Protecting India's Digital Future"
+
+Body:
+
+Netraksh was founded with a simple belief:
+
+Every Indian deserves protection from online fraud, cyber scams, and digital crime.
+
+As India rapidly embraces digital payments, online services, and connected technologies, cybercriminals are targeting ordinary citizens at an unprecedented scale.
+
+Netraksh was created to make cyber safety simple, accessible, and understandable for every Indian family.
+
+Whether it's a scam call, fake WhatsApp message, fraudulent QR code, phishing link, or digital arrest scam, our mission is to help people identify threats before they become victims.
+
+FOUNDER QUOTE
+
+Display as a premium quote block.
+
+"Cyber safety should not be limited to experts. Every Indian deserves a digital bodyguard."
+
+— Shivam Malaviya
+
+WHY NETRAKSH EXISTS
+
+Create a visual storytelling section.
+
+Show:
+
+India Going Digital
+↓
+Cyber Frauds Increasing
+↓
+Families Becoming Targets
+↓
+Netraksh Protects Citizens
+
+Include smooth scroll animations.
+
+FOUNDER TIMELINE
+
+Display:
+
+Cybersecurity Experience
+
+Threat Intelligence Leadership
+
+Security Operations Expertise
+
+National Cyber Safety Vision
+
+Founder of Netraksh
+
+TRUST SECTION
+
+Headline:
+
+"Built by Cybersecurity Professionals. Designed for Every Indian."
+
+Display trust cards:
+
+* Threat Intelligence
+* Cyber Defense
+* Digital Safety
+* Family Protection
+* AI-Powered Scam Detection
+
+PHOTO REQUIREMENTS
+
+Use founder photographs in:
+
+1. Hero Founder Section
+2. About Page
+3. Mission Section
+4. Media & Press Section
+
+Images should be:
+
+* Professional
+* High resolution
+* Confident
+* Trustworthy
+* Modern startup style
+
+Use subtle hover animations and premium framing.
+
+ABOUT THE FOUNDER PAGE
+
+Create dedicated page:
+
+/founder
+
+Sections:
+
+* Personal Mission
+* Why Netraksh Was Built
+* Vision For India
+* Cyber Safety Movement
+* Media & Speaking
+* Future Roadmap
+
+FINAL MESSAGE
+
+Headline:
+
+"One Mission. One Vision."
+
+Body:
+
+To make India the safest digital society in the world and ensure that every citizen has access to simple, powerful protection against cyber fraud.
+
+CTA:
+
+Join the Mission
+
+Protect Your Family
+
+Download Netraksh

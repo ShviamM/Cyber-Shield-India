@@ -1,9 +1,10 @@
 import { Layout } from "@/components/layout/Layout";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
-import { Shield, ShieldAlert, ShieldCheck, Smartphone, Users, ChevronRight, Lock, Bell, Search } from "lucide-react";
+import { Shield, ShieldCheck, Smartphone, Users, ChevronRight, Lock, Bell, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
+import { ScamCallScreen } from "@/components/ScamCallScreen";
 
 export default function Home() {
   return (
@@ -72,29 +73,11 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="relative lg:ml-auto flex justify-center"
             >
-              <div className="relative w-full max-w-[320px] aspect-[9/19] rounded-[2.5rem] border-[8px] border-gray-900 bg-white shadow-2xl overflow-hidden">
-                <img 
-                  src="/images/hero-mockup.png" 
-                  alt="Netraksh App Interface" 
-                  className="w-full h-full object-cover"
-                />
+              <div className="relative w-full max-w-[320px] aspect-[9/19] rounded-[2.5rem] border-[8px] border-gray-900 bg-gray-900 shadow-2xl overflow-hidden">
+                <ScamCallScreen />
               </div>
               
-              {/* Floating badges */}
-              <motion.div 
-                animate={{ y: [0, -10, 0] }} 
-                transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-                className="absolute top-1/4 -left-12 bg-white p-4 rounded-2xl shadow-xl border border-gray-100 flex items-center gap-3"
-              >
-                <div className="bg-red-100 p-2 rounded-full text-red-600">
-                  <ShieldAlert className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 font-medium">Incoming Call</p>
-                  <p className="text-sm font-bold text-gray-900">Scam Detected</p>
-                </div>
-              </motion.div>
-
+              {/* Floating badge */}
               <motion.div 
                 animate={{ y: [0, 10, 0] }} 
                 transition={{ repeat: Infinity, duration: 5, ease: "easeInOut", delay: 1 }}
