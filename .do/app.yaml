@@ -7,12 +7,14 @@
 # app stores via EAS and just points at https://netraksh.com/api.
 #
 # HOW TO USE
-# 1. Push this repo to GitHub (App Platform deploys from a git repo).
-# 2. Replace YOUR_GITHUB_USERNAME/YOUR_REPO below with your repo, and "main"
-#    with your default branch.
-# 3. Create the app from this spec:
+# 1. Push this repo to GitHub and make it PUBLIC (App Platform clones it over the
+#    generic git source below — no GitHub OAuth needed, but the repo must be
+#    publicly readable). Update repo_clone_url/branch below if yours differ.
+# 2. Create the app from this spec:
 #      doctl apps create --spec .do/app.yaml
 #    …or in the DO dashboard: Apps → Create → "Import from App Spec".
+#    NOTE: the generic git source does not auto-deploy on push; trigger
+#    redeploys with `doctl apps create-deployment <app-id>`.
 # 4. Set the SECRET values (DATABASE_URL, MSG91_*, RAZORPAY_*, ADMIN_PASSWORD)
 #    in the DO dashboard (App → Settings → each component → Environment
 #    Variables). They are marked type: SECRET so DO encrypts them.
@@ -34,10 +36,9 @@ services:
   - name: api
     dockerfile_path: artifacts/api-server/Dockerfile
     source_dir: /
-    github:
-      repo: YOUR_GITHUB_USERNAME/YOUR_REPO
+    git:
+      repo_clone_url: https://github.com/ShviamM/Cyber-Shield-India.git
       branch: main
-      deploy_on_push: true
     http_port: 8080
     instance_count: 1
     # Smallest paid instance. Bump to apps-s-1vcpu-1gb if you need more memory.
@@ -127,10 +128,9 @@ services:
   - name: admin
     dockerfile_path: artifacts/admin/Dockerfile
     source_dir: /
-    github:
-      repo: YOUR_GITHUB_USERNAME/YOUR_REPO
+    git:
+      repo_clone_url: https://github.com/ShviamM/Cyber-Shield-India.git
       branch: main
-      deploy_on_push: true
     http_port: 80
     instance_count: 1
     instance_size_slug: basic-xxs
