@@ -150,7 +150,121 @@ secrets management, and the Postgres password before any real deployment.
 
 ---
 
-## 6. Production checklist
+## 6. DigitalOcean App Platform (recommended managed path)
+
+App Platform builds from a git repo and the spec at **`.do/app.yaml`**, which
+declares two components behind one domain:
+
+- **api** — the Express API (Dockerfile), served at `/api/*`.
+- **admin** — the React dashboard (Dockerfile + nginx), served at `/*`.
+
+The mobile app is not part of this app; it ships via EAS (section 4) and points
+at `https://netraksh.com/api`.
+
+### 6.1 Push the repo to GitHub
+
+App Platform deploys from git. Push this repo to GitHub, then edit `.do/app.yaml`
+and replace `YOUR_GITHUB_USERNAME/YOUR_REPO` (and the branch, if not `main`) for
+**both** the `api` and `admin` components.
+
+### 6.2 Create the Managed PostgreSQL database
+
+In the DO dashboard: **Databases → Create → PostgreSQL** (pick the same region,
+`blr`, used in the spec). When it's ready, open the database → **Connection
+Details → Connection string** and copy it. It looks like:
+
+```
+postgresql://doadmin:PASSWORD@db-xxxx.b.db.ondigitalocean.com:25060/defaultdb?sslmode=require
+```
+
+This is the value for `DATABASE_URL`. The app enables TLS automatically because
+the spec sets `DATABASE_SSL_NO_VERIFY=true` (DO uses a private CA). For strict
+verification instead, download the database's **CA certificate** and set
+`DATABASE_CA_CERT` to its PEM contents (and drop `DATABASE_SSL_NO_VERIFY`).
+
+### 6.3 Create the app
+
+```bash
+# Install doctl and authenticate first: https://docs.digitalocean.com/reference/doctl/
+doctl apps create --spec .do/app.yaml
+```
+
+…or in the dashboard: **Apps → Create App → Import from App Spec** and paste
+`.do/app.yaml`.
+
+### 6.4 Set the secrets
+
+In the dashboard, go to **App → Settings →** (each component) **→ Environment
+Variables** and fill in the values marked `REPLACE_ME` / `REPLACE_WITH_...`:
+
+| Variable                  | Required | What it is                                  |
+| ------------------------- | -------- | ------------------------------------------- |
+| `DATABASE_URL`            | yes      | DO Managed Postgres connection string (6.2) |
+| `MSG91_AUTH_KEY`          | yes      | MSG91 account auth key (OTP Widget)         |
+| `MSG91_WIDGET_ID`         | yes      | MSG91 OTP Widget id                         |
+| `RAZORPAY_KEY_ID`         | yes      | Razorpay key id                             |
+| `RAZORPAY_KEY_SECRET`     | yes      | Razorpay key secret                         |
+| `RAZORPAY_WEBHOOK_SECRET` | yes      | Razorpay webhook signing secret             |
+| `ADMIN_PASSWORD`          | yes      | Password for the admin web console          |
+| `ADMIN_PHONES`            | yes      | Admin phone(s); first is the admin account  |
+| `OPENAI_API_KEY`          | no       | Enables AI scam classification              |
+
+> Admin login needs **both** `ADMIN_PASSWORD` and `ADMIN_PHONES` — with no admin
+> phone set, `/api/auth/admin-login` returns `503 admin_login_unavailable`.
+
+### 6.5 Create the database schema (one time)
+
+After the first deploy, open **App → Console** for the `api` component (or run
+locally with `DATABASE_URL` pointed at the DO database) and run:
+
+```bash
+pnpm --filter @workspace/db push
+```
+
+Re-run this whenever the schema changes.
+
+### 6.6 Point netraksh.com at the app (GoDaddy DNS)
+
+App Platform handles TLS automatically once DNS resolves. The apex domain
+(`netraksh.com`) on App Platform works most reliably when DigitalOcean manages
+the DNS zone, so use **Option A**.
+
+**Option A — let DigitalOcean manage DNS (recommended):**
+
+1. DO dashboard → **Networking → Domains** → add `netraksh.com`.
+2. In **GoDaddy** → your domain → **DNS → Nameservers → Change → Enter my own
+   nameservers**, and set all three:
+   ```
+   ns1.digitalocean.com
+   ns2.digitalocean.com
+   ns3.digitalocean.com
+   ```
+3. The domains are already declared in `.do/app.yaml` (`netraksh.com` primary,
+   `www.netraksh.com` alias). DO auto-creates the records and issues TLS.
+   Propagation can take a few hours (up to ~48h).
+
+> Switching nameservers moves *all* of `netraksh.com`'s DNS to DigitalOcean. If
+> you have existing records (email/MX, other subdomains), recreate them under DO
+> Networking → Domains first so nothing breaks.
+
+**Option B — keep GoDaddy DNS (www only, apex forwarded):**
+
+1. In DO **App → Settings → Domains**, add `www.netraksh.com`; DO shows a target
+   like `netraksh-xxxxx.ondigitalocean.app`.
+2. In GoDaddy DNS, add a **CNAME**: host `www` → that `ondigitalocean.app`
+   target.
+3. For the bare `netraksh.com`, use GoDaddy **Domain Forwarding** to
+   `https://www.netraksh.com` (GoDaddy can't CNAME the apex to App Platform).
+4. In `.do/app.yaml`, make `www.netraksh.com` the `PRIMARY` domain.
+
+### 6.7 Point the mobile app at production
+
+Set `EXPO_PUBLIC_API_DOMAIN=netraksh.com` for the EAS build (section 4) so the
+app calls `https://netraksh.com/api/...`.
+
+---
+
+## 7. Production checklist
 
 - [ ] Postgres provisioned and `pnpm --filter @workspace/db push` run.
 - [ ] API server env vars set (DB, MSG91, optional OpenAI/Safe Browsing).

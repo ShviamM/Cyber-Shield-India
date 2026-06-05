@@ -3,11 +3,11 @@
 FROM node:24-slim AS build
 RUN corepack enable
 WORKDIR /app
-# Workspace manifests first (better layer caching).
-COPY pnpm-workspace.yaml pnpm-lock.yaml package.json .npmrc tsconfig.base.json tsconfig.json ./
-COPY lib ./lib
-COPY artifacts/api-server ./artifacts/api-server
-RUN pnpm install --frozen-lockfile
+# Copy the whole monorepo (node_modules/dist are excluded via .dockerignore).
+# pnpm needs every workspace manifest present to resolve the lockfile, so we
+# copy the repo and then install only this package's dependency subgraph.
+COPY . .
+RUN pnpm install --frozen-lockfile --filter @workspace/api-server...
 RUN pnpm --filter @workspace/api-server build
 
 FROM node:24-slim AS runtime

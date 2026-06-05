@@ -1,0 +1,148 @@
+# ============================================================================
+# DigitalOcean App Platform spec for Netraksh
+# ============================================================================
+# This declares the whole app: the API service, the admin dashboard, and the
+# custom domain. Both components build from the existing Dockerfiles (build
+# context = repo root). The mobile app (kavach-ai) is NOT here — it ships to the
+# app stores via EAS and just points at https://netraksh.com/api.
+#
+# HOW TO USE
+# 1. Push this repo to GitHub (App Platform deploys from a git repo).
+# 2. Replace YOUR_GITHUB_USERNAME/YOUR_REPO below with your repo, and "main"
+#    with your default branch.
+# 3. Create the app from this spec:
+#      doctl apps create --spec .do/app.yaml
+#    …or in the DO dashboard: Apps → Create → "Import from App Spec".
+# 4. Set the SECRET values (DATABASE_URL, MSG91_*, RAZORPAY_*, ADMIN_PASSWORD)
+#    in the DO dashboard (App → Settings → each component → Environment
+#    Variables). They are marked type: SECRET so DO encrypts them.
+# 5. Create a DigitalOcean Managed PostgreSQL database (separately) and paste
+#    its connection string into DATABASE_URL.
+# 6. Point netraksh.com at the app (see DEPLOYMENT.md → DigitalOcean section).
+#
+# Routing under the single domain (https://netraksh.com):
+#   /api/*  -> api service   (path prefix preserved, so the server still sees /api)
+#   /*      -> admin static SPA
+# ============================================================================
+
+name: netraksh
+# Bangalore region keeps latency low for Indian users. Other options: nyc, sfo, ams, sgp, fra.
+region: blr
+
+services:
+  # --- Backend API (Express, Node 24, bundled by esbuild) -------------------
+  - name: api
+    dockerfile_path: artifacts/api-server/Dockerfile
+    source_dir: /
+    github:
+      repo: YOUR_GITHUB_USERNAME/YOUR_REPO
+      branch: main
+      deploy_on_push: true
+    http_port: 8080
+    instance_count: 1
+    # Smallest paid instance. Bump to apps-s-1vcpu-1gb if you need more memory.
+    instance_size_slug: basic-xxs
+    routes:
+      - path: /api
+        # The API defines its routes under /api (e.g. /api/healthz), so keep
+        # the prefix instead of letting App Platform strip it.
+        preserve_path_prefix: true
+    health_check:
+      http_path: /api/healthz
+    envs:
+      - key: NODE_ENV
+        scope: RUN_AND_BUILD_TIME
+        value: production
+      - key: PORT
+        scope: RUN_TIME
+        value: "8080"
+      # PostgreSQL — paste your DigitalOcean Managed Postgres connection string.
+      - key: DATABASE_URL
+        scope: RUN_TIME
+        type: SECRET
+        value: REPLACE_WITH_DO_MANAGED_POSTGRES_CONNECTION_STRING
+      # DO Managed Postgres uses a private CA. This enables TLS without needing
+      # to ship the CA cert. To verify the cert instead, remove this and set
+      # DATABASE_CA_CERT to the CA PEM from the DO database dashboard.
+      - key: DATABASE_SSL_NO_VERIFY
+        scope: RUN_TIME
+        value: "true"
+      # Lock browser CORS to the production domain(s). The admin is same-origin
+      # so this is belt-and-suspenders; mobile/native clients send no Origin.
+      - key: ADMIN_ORIGINS
+        scope: RUN_TIME
+        value: https://netraksh.com,https://www.netraksh.com
+      # --- OTP login (MSG91 OTP Widget) -----------------------------------
+      - key: MSG91_AUTH_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: REPLACE_ME
+      - key: MSG91_WIDGET_ID
+        scope: RUN_TIME
+        type: SECRET
+        value: REPLACE_ME
+      # --- Payments (Razorpay) --------------------------------------------
+      - key: RAZORPAY_KEY_ID
+        scope: RUN_TIME
+        type: SECRET
+        value: REPLACE_ME
+      - key: RAZORPAY_KEY_SECRET
+        scope: RUN_TIME
+        type: SECRET
+        value: REPLACE_ME
+      - key: RAZORPAY_WEBHOOK_SECRET
+        scope: RUN_TIME
+        type: SECRET
+        value: REPLACE_ME
+      # --- Admin console login --------------------------------------------
+      # Admin login needs BOTH a password AND at least one admin phone (the
+      # first ADMIN_PHONES entry becomes the canonical admin account). If
+      # ADMIN_PHONES is empty, /api/auth/admin-login returns 503.
+      - key: ADMIN_PASSWORD
+        scope: RUN_TIME
+        type: SECRET
+        value: REPLACE_ME
+      - key: ADMIN_PHONES
+        scope: RUN_TIME
+        # Comma-separated Indian-format numbers; the first is the admin account.
+        value: REPLACE_WITH_ADMIN_PHONE
+      # --- Optional ---------------------------------------------------------
+      # Extra phone numbers allowed into the Super Admin dashboard (defaults to
+      # ADMIN_PHONES when unset).
+      # - key: SUPER_ADMIN_PHONES
+      #   scope: RUN_TIME
+      #   value: ""
+      # AI scam classifier. Off Replit, set your own OpenAI key (or leave unset
+      # to fall back to non-AI fraud signals).
+      # - key: OPENAI_API_KEY
+      #   scope: RUN_TIME
+      #   type: SECRET
+      #   value: REPLACE_ME
+      # - key: GOOGLE_SAFE_BROWSING_API_KEY
+      #   scope: RUN_TIME
+      #   type: SECRET
+      #   value: REPLACE_ME
+
+  # --- Admin dashboard (static React SPA served by nginx) -------------------
+  - name: admin
+    dockerfile_path: artifacts/admin/Dockerfile
+    source_dir: /
+    github:
+      repo: YOUR_GITHUB_USERNAME/YOUR_REPO
+      branch: main
+      deploy_on_push: true
+    http_port: 80
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    routes:
+      - path: /
+
+# Custom domain. App Platform provisions and auto-renews TLS once DNS resolves.
+# See DEPLOYMENT.md (DigitalOcean section) for the GoDaddy DNS steps.
+domains:
+  - domain: netraksh.com
+    type: PRIMARY
+    zone: netraksh.com
+  - domain: www.netraksh.com
+    type: ALIAS
+    zone: netraksh.com
