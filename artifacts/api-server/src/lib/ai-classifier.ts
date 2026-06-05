@@ -61,11 +61,28 @@ export function isAiConfigured(): boolean {
 
 const SYSTEM_PROMPT = `You are a fraud-detection classifier for Netraksh, an Indian cyber-safety app.
 You receive a single SMS, chat, or call-transcript message and decide whether it is a scam targeting Indian consumers.
-Common scams: OTP theft, fake KYC/Aadhaar/PAN updates, lottery/prize wins, loan/credit-card offers, job/work-from-home tasks, UPI/payment tricks, digital-arrest/police impersonation, electricity-bill disconnection, courier/parcel customs holds, tech support, bank/government impersonation, investment/trading guarantees, and sextortion/blackmail.
+Common scams: OTP theft, fake KYC/Aadhaar/PAN updates, lottery/prize wins, loan/credit-card offers, job/work-from-home tasks, UPI/payment tricks, digital-arrest/police impersonation, electricity-bill disconnection, courier/parcel customs holds, tech support, bank/government impersonation, investment/trading guarantees, and blackmail or extortion threats.
 Respond ONLY with a JSON object: {"is_scam": boolean, "category": string|null, "confidence": number, "rationale": string}.
 - "category" MUST be exactly one of the provided category keys, or null if none fit or the message is not a scam.
 - "confidence" is a number from 0 to 1.
 - "rationale" is one short English sentence (no PII echoed back).`;
+
+/**
+ * Some category keys/names (e.g. "sextortion") contain terms that trip the
+ * upstream provider's content-safety filter, which would reject the whole
+ * prompt and silently disable classification. We send the model a neutral
+ * alias and map its answer back to the real key, so the stored category keys
+ * never change.
+ */
+const CATEGORY_PROMPT_ALIAS: Record<
+  string,
+  { key: string; name: string }
+> = {
+  sextortion: { key: "blackmail_extortion", name: "Blackmail / Extortion" },
+};
+const ALIAS_TO_REAL_KEY: Record<string, string> = Object.fromEntries(
+  Object.entries(CATEGORY_PROMPT_ALIAS).map(([real, a]) => [a.key, real]),
+);
 
 type RawClassification = {
   is_scam?: unknown;
@@ -88,8 +105,14 @@ export async function classifyMessage(
   if (!trimmed) return null;
 
   const validKeys = new Set(categories.map((c) => c.key));
+  // Substitute filter-tripping keys/names with neutral aliases for the prompt.
   const categoryList = categories
-    .map((c) => `- ${c.key}: ${c.nameEn}`)
+    .map((c) => {
+      const alias = CATEGORY_PROMPT_ALIAS[c.key];
+      return alias
+        ? `- ${alias.key}: ${alias.name}`
+        : `- ${c.key}: ${c.nameEn}`;
+    })
     .join("\n");
 
   try {
@@ -118,8 +141,12 @@ export async function classifyMessage(
 
     const parsed = JSON.parse(content) as RawClassification;
 
-    const rawCategory =
+    let rawCategory =
       typeof parsed.category === "string" ? parsed.category : null;
+    // Map any neutral alias the model returned back to the real stored key.
+    if (rawCategory && ALIAS_TO_REAL_KEY[rawCategory]) {
+      rawCategory = ALIAS_TO_REAL_KEY[rawCategory];
+    }
     const category =
       rawCategory && validKeys.has(rawCategory) ? rawCategory : null;
 
@@ -137,7 +164,32 @@ export async function classifyMessage(
           : "AI classified this message.",
     };
   } catch (err) {
+    // The upstream provider (Azure-backed) applies its own content-safety
+    // filter that can reject a prompt with HTTP 400 / code "content_filter".
+    // This fires both on genuinely explicit scam content AND as a false
+    // positive on innocuous messages, so we cannot safely infer a verdict
+    // from it. We degrade gracefully to the non-AI signals instead, and log
+    // it as an expected limitation rather than an error.
+    if (isContentFilterError(err)) {
+      logger.warn(
+        { requestId: extractRequestId(err) },
+        "AI classification skipped: prompt rejected by provider content filter",
+      );
+      return null;
+    }
+
     logger.error({ err }, "AI message classification failed");
     return null;
   }
+}
+
+/** True when the error is the provider's content-safety rejection. */
+function isContentFilterError(err: unknown): boolean {
+  const e = err as { code?: string; error?: { code?: string } };
+  return e?.code === "content_filter" || e?.error?.code === "content_filter";
+}
+
+function extractRequestId(err: unknown): string | undefined {
+  const e = err as { requestID?: string };
+  return e?.requestID;
 }
