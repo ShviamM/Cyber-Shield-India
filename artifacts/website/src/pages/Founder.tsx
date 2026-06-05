@@ -173,6 +173,7 @@ const galleryItems: GalleryItem[] = [
   { category: "Book Launch", h: "h-56", src: "/images/event-launch-5.jpg", alt: "Readers and guests with Digital Dhokha at the World Book Fair" },
   { category: "Book Launch", h: "h-64", src: "/images/event-launch-6.jpg", alt: "Welcome display for Shivam Malaviya at the New Delhi World Book Fair" },
   { category: "Public Speaking", h: "h-72", src: "/images/event-award-1.jpg", alt: "Shivam Malaviya speaking and honoured at the Pratibha Samman Samaroh" },
+  { category: "Community Outreach", h: "h-80", src: "/images/event-felicitation-2.jpg", alt: "Shivam Malaviya presenting a Cyber Empowered certificate at a digital safety recognition event" },
   { category: "Videos", h: "h-80", type: "video", src: "/videos/event-video-1.mp4", poster: "/images/event-video-1.jpg", alt: "Event highlight video from a Netraksh cyber awareness program" },
   { category: "Videos", h: "h-56", type: "video", src: "/videos/event-video-2.mp4", poster: "/images/event-video-2.jpg", alt: "Shivam Malaviya speaking at a cyber awareness event" },
   { category: "Videos", h: "h-56", type: "video", src: "/videos/event-video-3.mp4", poster: "/images/event-video-3.jpg", alt: "Highlights from a Netraksh awareness session" },
