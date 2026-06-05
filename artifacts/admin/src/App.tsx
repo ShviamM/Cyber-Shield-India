@@ -9,6 +9,7 @@ import BusinessMetrics from "@/pages/business-metrics";
 import FraudMap from "@/pages/fraud-map";
 import Broadcasts from "@/pages/broadcasts";
 import SuperAdmin from "@/pages/super-admin";
+import Privacy from "@/pages/privacy";
 import NotFound from "@/pages/not-found";
 import { Loader2 } from "lucide-react";
 
@@ -60,6 +61,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/login" component={Login} />
+      <Route path="/privacy" component={Privacy} />
       <Route path="/" component={() => <ProtectedRoute component={Dashboard} />} />
       <Route path="/business" component={() => <ProtectedRoute component={BusinessMetrics} />} />
       <Route path="/fraud-map" component={() => <ProtectedRoute component={FraudMap} />} />
