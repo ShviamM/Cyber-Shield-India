@@ -186,6 +186,33 @@ const en = {
       qrLabel: "Check QR Code",
       qrSub: "Safe to scan?",
     },
+    primaryActions: {
+      title: "What do you want to check?",
+      numberLabel: "Check Number",
+      numberSub: "Is this caller safe?",
+      linkLabel: "Check Link",
+      linkSub: "Is this link safe?",
+      messageLabel: "Check Message",
+      messageSub: "SMS or WhatsApp",
+      reportLabel: "Report Fraud",
+      reportSub: "Warn others",
+    },
+    scanBeforePay: "Scan Before You Pay",
+  },
+
+  onboarding: {
+    languageTitle: "Choose your language",
+    languageSub: "You can change this any time in Settings.",
+    hindi: "हिन्दी",
+    english: "English",
+    continue: "Continue",
+    guardianTitle: "Meet your Digital Bodyguard",
+    guardianBody:
+      "Netraksh watches for scam calls and fraud messages to help keep you safe.",
+    guardianPoint1: "Scam call screening",
+    guardianPoint2: "Scam SMS screening",
+    guardianPoint3: "Fraud alert monitoring",
+    getStarted: "Get Started",
   },
 
   verify: {

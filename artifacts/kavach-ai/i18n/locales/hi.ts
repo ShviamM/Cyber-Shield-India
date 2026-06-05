@@ -153,6 +153,33 @@ const hi = {
       qrLabel: "QR कोड जाँचें",
       qrSub: "स्कैन करना सुरक्षित?",
     },
+    primaryActions: {
+      title: "आप क्या जाँचना चाहते हैं?",
+      numberLabel: "नंबर जाँचें",
+      numberSub: "क्या यह कॉल सुरक्षित है?",
+      linkLabel: "लिंक जाँचें",
+      linkSub: "क्या यह लिंक सुरक्षित है?",
+      messageLabel: "मैसेज जाँचें",
+      messageSub: "SMS या WhatsApp",
+      reportLabel: "धोखाधड़ी रिपोर्ट करें",
+      reportSub: "दूसरों को सचेत करें",
+    },
+    scanBeforePay: "भुगतान से पहले स्कैन करें",
+  },
+
+  onboarding: {
+    languageTitle: "अपनी भाषा चुनें",
+    languageSub: "आप इसे कभी भी सेटिंग में बदल सकते हैं।",
+    hindi: "हिन्दी",
+    english: "English",
+    continue: "आगे बढ़ें",
+    guardianTitle: "आपका डिजिटल बॉडीगार्ड",
+    guardianBody:
+      "नेत्रक्ष स्कैम कॉल और धोखाधड़ी वाले मैसेज पर नज़र रखता है ताकि आप सुरक्षित रहें।",
+    guardianPoint1: "स्कैम कॉल स्क्रीनिंग",
+    guardianPoint2: "स्कैम SMS स्क्रीनिंग",
+    guardianPoint3: "धोखाधड़ी अलर्ट निगरानी",
+    getStarted: "शुरू करें",
   },
 
   verify: {

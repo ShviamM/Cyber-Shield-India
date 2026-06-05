@@ -131,20 +131,35 @@ export default function HomeScreen() {
   }, [nearbyStatus, nearbyCity, updateLocation]);
 
   const topInset = Platform.OS === "web" ? 0 : insets.top;
-  const bottomPad = (Platform.OS === "web" ? 34 : insets.bottom) + 80;
+  const bottomPad = (Platform.OS === "web" ? 34 : insets.bottom) + 140;
 
   const SERVICE_LINKS = [
-    { icon: "flag" as const, label: t("services.reportFraud"), color: "#dc2626", bg: "#fef2f2", route: "/report" },
     { icon: "grid" as const, label: t("services.scamCategories"), color: "#7c3aed", bg: "#f5f3ff", route: "/categories" },
     { icon: "book-open" as const, label: t("services.safetyTips"), color: "#138808", bg: "#f0fdf4", route: "/safety" },
     { icon: "phone-call" as const, label: t("services.helpline"), color: "#0B3D91", bg: "#EBF0FA", route: "/helpline" },
   ];
 
-  const QUICK_TOOLS = [
-    { icon: "phone" as const, label: t("home.quickTools.numberLabel"), sublabel: t("home.quickTools.numberSub"), bg: "#EBF0FA", color: NAVY },
-    { icon: "link" as const, label: t("home.quickTools.linkLabel"), sublabel: t("home.quickTools.linkSub"), bg: "#f5f3ff", color: "#7c3aed" },
-    { icon: "credit-card" as const, label: t("home.quickTools.upiLabel"), sublabel: t("home.quickTools.upiSub"), bg: "#f0fdf4", color: GREEN },
-    { icon: "maximize" as const, label: t("home.quickTools.qrLabel"), sublabel: t("home.quickTools.qrSub"), bg: "#fff7ed", color: SAFFRON },
+  function goVerify(type: "number" | "link" | "message") {
+    Haptics.selectionAsync();
+    router.push({
+      pathname: "/(tabs)/verify",
+      params: { type, ts: Date.now().toString() },
+    });
+  }
+
+  function goScan() {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    router.push({
+      pathname: "/(tabs)/verify",
+      params: { scan: "1", ts: Date.now().toString() },
+    });
+  }
+
+  const PRIMARY_ACTIONS = [
+    { icon: "phone" as const, label: t("home.primaryActions.numberLabel"), sub: t("home.primaryActions.numberSub"), bg: "#EBF0FA", color: NAVY, onPress: () => goVerify("number") },
+    { icon: "link" as const, label: t("home.primaryActions.linkLabel"), sub: t("home.primaryActions.linkSub"), bg: "#f5f3ff", color: "#7c3aed", onPress: () => goVerify("link") },
+    { icon: "message-square" as const, label: t("home.primaryActions.messageLabel"), sub: t("home.primaryActions.messageSub"), bg: "#ecfeff", color: "#0891b2", onPress: () => goVerify("message") },
+    { icon: "flag" as const, label: t("home.primaryActions.reportLabel"), sub: t("home.primaryActions.reportSub"), bg: "#fef2f2", color: "#dc2626", onPress: () => { Haptics.selectionAsync(); router.push("/report"); } },
   ];
 
   const todayChecks = recentChecks.filter((c) => Date.now() - c.timestamp < 86400000);
@@ -243,30 +258,30 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: bottomPad }}
       >
-        {/* Verify Before You Act */}
+        {/* Primary actions — the main things you can check, one tap each */}
         <View style={[s.section, s.verifyCard]}>
           <View style={s.sectionHeader}>
             <View style={[s.sectionIconBox, { backgroundColor: "#EBF0FA" }]}>
-              <Feather name="search" size={14} color={NAVY} />
+              <Feather name="shield" size={14} color={NAVY} />
             </View>
             <View>
-              <Text style={[s.sectionTitle, { color: "#0f172a" }]}>{t("home.verifyTitle")}</Text>
+              <Text style={[s.sectionTitle, { color: "#0f172a" }]}>{t("home.primaryActions.title")}</Text>
               <Text style={[s.sectionSub, { color: "#64748b" }]}>{t("home.verifySub")}</Text>
             </View>
           </View>
-          <View style={s.toolGrid}>
-            {QUICK_TOOLS.map((tool) => (
+          <View style={s.actionGrid}>
+            {PRIMARY_ACTIONS.map((a) => (
               <TouchableOpacity
-                key={tool.label}
-                style={[s.toolBtn, { backgroundColor: tool.bg }]}
-                onPress={() => { Haptics.selectionAsync(); router.push("/(tabs)/verify"); }}
-                activeOpacity={0.75}
+                key={a.label}
+                style={[s.actionBtn, { backgroundColor: a.bg }]}
+                onPress={a.onPress}
+                activeOpacity={0.8}
               >
-                <View style={[s.toolIconBox, { shadowColor: tool.color }]}>
-                  <Feather name={tool.icon} size={16} color={tool.color} />
+                <View style={[s.actionIconBox, { shadowColor: a.color }]}>
+                  <Feather name={a.icon} size={26} color={a.color} />
                 </View>
-                <Text style={s.toolLabel}>{tool.label}</Text>
-                <Text style={s.toolSublabel}>{tool.sublabel}</Text>
+                <Text style={s.actionLabel}>{a.label}</Text>
+                <Text style={s.actionSub} numberOfLines={1}>{a.sub}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -737,6 +752,16 @@ export default function HomeScreen() {
           </View>
         )}
       </ScrollView>
+
+      {/* Floating "Scan Before You Pay" action */}
+      <TouchableOpacity
+        style={[s.fab, { bottom: (Platform.OS === "web" ? 16 : insets.bottom) + 74 }]}
+        onPress={goScan}
+        activeOpacity={0.9}
+      >
+        <Feather name="maximize" size={20} color="#fff" />
+        <Text style={s.fabTxt}>{t("home.scanBeforePay")}</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -1033,4 +1058,42 @@ const s = StyleSheet.create({
   },
   demoBtnTitle: { fontSize: 13, fontWeight: "600" as const, color: "#0f172a" },
   demoBtnSub: { fontSize: 11, color: "#64748b", marginTop: 2 },
+
+  // Primary actions (4 big one-tap)
+  actionGrid: { flexDirection: "row", flexWrap: "wrap", gap: 10 },
+  actionBtn: {
+    width: "47.8%",
+    borderRadius: 16,
+    paddingVertical: 18,
+    paddingHorizontal: 14,
+    gap: 8,
+    alignItems: "flex-start",
+  },
+  actionIconBox: {
+    width: 48, height: 48, borderRadius: 14, backgroundColor: "#fff",
+    alignItems: "center", justifyContent: "center",
+    shadowOpacity: 0.18, shadowRadius: 8, shadowOffset: { width: 0, height: 3 },
+    elevation: 3,
+  },
+  actionLabel: { fontSize: 15, fontWeight: "800" as const, color: "#0f172a" },
+  actionSub: { fontSize: 11.5, color: "#64748b", marginTop: -2 },
+
+  // Floating "Scan Before You Pay"
+  fab: {
+    position: "absolute",
+    right: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    backgroundColor: SAFFRON,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    borderRadius: 30,
+    shadowColor: SAFFRON,
+    shadowOpacity: 0.45,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 8,
+  },
+  fabTxt: { color: "#fff", fontSize: 14, fontWeight: "800" as const },
 });

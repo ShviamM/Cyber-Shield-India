@@ -5,6 +5,7 @@ import {
   Inter_700Bold,
   useFonts,
 } from "@expo-google-fonts/inter";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { setAuthTokenGetter, setBaseUrl } from "@workspace/api-client-react";
 import Constants from "expo-constants";
@@ -20,6 +21,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { LaunchScreen } from "@/components/LaunchScreen";
+import { Onboarding } from "@/components/Onboarding";
 import { AppProvider } from "@/context/AppContext";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { initI18n } from "@/i18n";
@@ -68,6 +70,15 @@ function RootLayoutNav() {
     return () => clearTimeout(id);
   }, []);
   const launchExiting = minElapsed && status !== "loading";
+
+  // First-launch onboarding (language pick + Guardian explainer). Null until the
+  // stored flag resolves so we never flash it for a returning user.
+  const [onboarded, setOnboarded] = useState<boolean | null>(null);
+  useEffect(() => {
+    AsyncStorage.getItem("kv_onboarded")
+      .then((v) => setOnboarded(v === "true"))
+      .catch(() => setOnboarded(true));
+  }, []);
 
   // Sends a message/link shared into Netraksh from another app (WhatsApp, SMS, a
   // browser, …) to the Verify tab, prefilled and auto-run. Reuses the verify
@@ -151,6 +162,9 @@ function RootLayoutNav() {
       {launchHidden ? null : (
         <LaunchScreen exiting={launchExiting} onHidden={() => setLaunchHidden(true)} />
       )}
+      {launchHidden && onboarded === false ? (
+        <Onboarding onDone={() => setOnboarded(true)} />
+      ) : null}
     </View>
   );
 }

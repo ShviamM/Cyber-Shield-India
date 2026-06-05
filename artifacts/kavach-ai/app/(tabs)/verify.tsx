@@ -134,7 +134,13 @@ export default function VerifyScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const { recentChecks, addCheck } = useAppContext();
-  const params = useLocalSearchParams<{ q?: string | string[]; kind?: string | string[] }>();
+  const params = useLocalSearchParams<{
+    q?: string | string[];
+    kind?: string | string[];
+    type?: string | string[];
+    scan?: string | string[];
+    ts?: string | string[];
+  }>();
 
   const [selectedType, setSelectedType] = useState<CheckType>("number");
   const [input, setInput] = useState("");
@@ -280,6 +286,33 @@ export default function VerifyScreen() {
     runCheck(kind, q);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.q, params.kind]);
+
+  // Home quick-action deep-link: preselect a check type (and optionally open the
+  // QR scanner) without a prefilled value. Keyed off a `ts` nonce so repeated
+  // taps on the same action re-trigger even while this tab stays mounted.
+  const lastActionParam = useRef<string | null>(null);
+  useEffect(() => {
+    const first = (v?: string | string[]) => (Array.isArray(v) ? v[0] : v);
+    const typeRaw = first(params.type);
+    const scanRaw = first(params.scan);
+    if (!typeRaw && !scanRaw) return;
+    const sig = `${typeRaw ?? ""}|${scanRaw ?? ""}|${first(params.ts) ?? ""}`;
+    if (lastActionParam.current === sig) return;
+    lastActionParam.current = sig;
+    if (scanRaw) {
+      setSelectedType("qr");
+      setResult(null);
+      setInput("");
+      openScanner();
+      return;
+    }
+    if (typeRaw && TYPE_META.some((m) => m.key === typeRaw)) {
+      setSelectedType(typeRaw as CheckType);
+      setResult(null);
+      setInput("");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.type, params.scan, params.ts]);
 
   function handleClear() {
     setInput("");
