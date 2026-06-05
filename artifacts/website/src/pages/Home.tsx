@@ -31,9 +31,9 @@ export default function Home() {
               transition={{ duration: 0.6 }}
               className="max-w-2xl"
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-50 border border-orange-100 text-orange-600 text-sm font-medium mb-6">
-                <span className="flex h-2 w-2 rounded-full bg-orange-500 animate-pulse"></span>
-                Built for a Safer India
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-50 border border-orange-100 text-accent text-sm font-semibold mb-6">
+                <span className="flex h-2 w-2 rounded-full bg-accent animate-pulse"></span>
+                Thag se 2 kadam aage
               </div>
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 tracking-tight leading-[1.1] mb-6">
                 India's Digital <br/><span className="text-primary">Bodyguard.</span>

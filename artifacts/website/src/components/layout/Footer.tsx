@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { ShieldCheck, Twitter, Linkedin, Github } from "lucide-react";
+import { Twitter, Linkedin, Github } from "lucide-react";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -9,12 +9,17 @@ export function Footer() {
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10 mb-16">
           <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-6 group inline-flex">
-              <div className="bg-primary p-2 rounded-xl text-white">
-                <ShieldCheck className="h-6 w-6" />
-              </div>
-              <span className="font-bold text-2xl tracking-tight text-white">Netraksh</span>
+            <Link href="/" className="flex items-center gap-2.5 mb-5 group inline-flex">
+              <img
+                src="/images/netraksh-logo.png"
+                alt="Netraksh logo"
+                className="h-10 w-10 rounded-xl object-cover"
+              />
+              <span className="font-bold text-2xl tracking-tight text-white">
+                Netra<span className="text-accent">ksh</span>
+              </span>
             </Link>
+            <p className="text-accent font-semibold mb-3">Thag se 2 kadam aage</p>
             <p className="text-gray-400 mb-6 max-w-sm">
               India's Digital Bodyguard. Protecting every Indian from scam calls, fraud messages, fake links, and digital crime.
             </p>

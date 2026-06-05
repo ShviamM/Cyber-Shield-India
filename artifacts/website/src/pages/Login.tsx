@@ -3,7 +3,7 @@ import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ShieldCheck, Lock } from "lucide-react";
+import { Lock } from "lucide-react";
 import { useState } from "react";
 
 export default function Login() {
@@ -37,9 +37,14 @@ export default function Login() {
       <div className="min-h-[80vh] flex items-center justify-center py-20 px-4 bg-gray-50">
         <div className="max-w-md w-full">
           <div className="text-center mb-10">
-            <div className="bg-primary w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-white mb-6 shadow-lg shadow-primary/20">
-              <ShieldCheck className="h-8 w-8" />
-            </div>
+            <img
+              src="/images/netraksh-logo.png"
+              alt="Netraksh logo"
+              className="w-16 h-16 rounded-2xl mx-auto mb-4 object-cover shadow-lg shadow-primary/20"
+            />
+            <span className="block font-bold text-xl tracking-tight text-gray-900 mb-4">
+              Netra<span className="text-accent">ksh</span>
+            </span>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
             <p className="text-gray-600 flex items-center justify-center gap-2">
               <Lock className="w-4 h-4" />

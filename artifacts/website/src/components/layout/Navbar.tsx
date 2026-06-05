@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Menu, X, ShieldCheck } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -36,11 +36,15 @@ export function Navbar() {
     >
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between h-20">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="bg-primary p-2 rounded-xl text-white group-hover:bg-primary/90 transition-colors">
-              <ShieldCheck className="h-6 w-6" />
-            </div>
-            <span className="font-bold text-xl tracking-tight text-gray-900">Netraksh</span>
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <img
+              src="/images/netraksh-logo.png"
+              alt="Netraksh logo"
+              className="h-10 w-10 rounded-xl object-cover shadow-sm"
+            />
+            <span className="font-bold text-xl tracking-tight text-gray-900">
+              Netra<span className="text-accent">ksh</span>
+            </span>
           </Link>
 
           {/* Desktop Nav */}
