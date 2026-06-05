@@ -45,6 +45,7 @@ import {
   Phone,
   Mail,
   MessageCircle,
+  Play,
   ChevronLeft,
   ChevronRight,
   X,
@@ -137,9 +138,19 @@ const galleryCategories = [
   "Media Coverage",
   "Book Launch",
   "Community Outreach",
+  "Videos",
 ];
 
-const galleryItems = [
+type GalleryItem = {
+  category: string;
+  h: string;
+  src: string;
+  alt: string;
+  type?: "video";
+  poster?: string;
+};
+
+const galleryItems: GalleryItem[] = [
   { category: "School Programs", h: "h-64", src: "/images/event-school-1.jpg", alt: "Shivam Malaviya addressing a packed school auditorium during a cyber awareness program" },
   { category: "Public Speaking", h: "h-80", src: "/images/event-speaking-1.jpg", alt: "Shivam Malaviya honoured at a Faculty Development Program on blockchain technology" },
   { category: "Book Launch", h: "h-72", src: "/images/event-launch-1.jpg", alt: "Launch of Digital Dhokha by Shivam Malaviya" },
@@ -158,6 +169,14 @@ const galleryItems = [
   { category: "College Events", h: "h-64", src: "/images/event-college-2.jpg", alt: "College event attendees with Shivam Malaviya" },
   { category: "Workshops", h: "h-56", src: "/images/event-workshop-2.jpg", alt: "Workshop venue prepared for a Netraksh cyber awareness session" },
   { category: "Media Coverage", h: "h-72", src: "/images/event-press-3.jpg", alt: "Newspaper feature on community skill and awareness initiatives" },
+  { category: "School Programs", h: "h-64", src: "/images/event-school-5.jpg", alt: "Students gathered in an auditorium for a Netraksh cyber awareness program" },
+  { category: "Book Launch", h: "h-72", src: "/images/event-launch-4.jpg", alt: "Shivam Malaviya presenting Digital Dhokha at the New Delhi World Book Fair" },
+  { category: "Book Launch", h: "h-56", src: "/images/event-launch-5.jpg", alt: "Readers and guests with Digital Dhokha at the World Book Fair" },
+  { category: "Book Launch", h: "h-64", src: "/images/event-launch-6.jpg", alt: "Welcome display for Shivam Malaviya at the New Delhi World Book Fair" },
+  { category: "Public Speaking", h: "h-72", src: "/images/event-award-1.jpg", alt: "Shivam Malaviya speaking and honoured at the Pratibha Samman Samaroh" },
+  { category: "Videos", h: "h-80", type: "video", src: "/videos/event-video-1.mp4", poster: "/images/event-video-1.jpg", alt: "Event highlight video from a Netraksh cyber awareness program" },
+  { category: "Videos", h: "h-56", type: "video", src: "/videos/event-video-2.mp4", poster: "/images/event-video-2.jpg", alt: "Shivam Malaviya speaking at a cyber awareness event" },
+  { category: "Videos", h: "h-56", type: "video", src: "/videos/event-video-3.mp4", poster: "/images/event-video-3.jpg", alt: "Highlights from a Netraksh awareness session" },
 ];
 
 const mediaItems = [
@@ -658,12 +677,19 @@ export default function Founder() {
                 className={`group relative ${g.h} w-full mb-4 break-inside-avoid rounded-2xl overflow-hidden bg-gradient-to-br from-[#0e2350] to-[#08183f]`}
               >
                 <img
-                  src={g.src}
+                  src={g.type === "video" ? g.poster : g.src}
                   alt={g.alt}
                   loading="lazy"
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <span className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-black/0" />
+                {g.type === "video" && (
+                  <span className="absolute inset-0 flex items-center justify-center">
+                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/90 text-[#08183f] shadow-lg transition-transform group-hover:scale-110">
+                      <Play className="h-6 w-6 translate-x-0.5 fill-current" />
+                    </span>
+                  </span>
+                )}
                 <span className="absolute bottom-3 left-3 text-xs font-semibold text-white drop-shadow">{g.category}</span>
                 <span className="absolute inset-0 bg-accent/0 group-hover:bg-accent/10 transition-colors" />
               </button>
@@ -891,19 +917,35 @@ export default function Founder() {
 
       {/* Lightbox */}
       {lightbox !== null && filteredGallery[lightbox] && (
-        <div role="dialog" aria-modal="true" aria-label="Gallery image" className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6" onClick={() => setLightbox(null)}>
+        <div role="dialog" aria-modal="true" aria-label={filteredGallery[lightbox].type === "video" ? "Gallery video" : "Gallery image"} className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6" onClick={() => setLightbox(null)}>
           <button onClick={() => setLightbox(null)} className="absolute top-6 right-6 text-white/80 hover:text-white" aria-label="Close">
             <X className="h-7 w-7" />
           </button>
           <div className="relative w-full max-w-3xl rounded-2xl overflow-hidden bg-gradient-to-br from-[#0e2350] to-[#08183f]" onClick={(e) => e.stopPropagation()}>
-            <img
-              src={filteredGallery[lightbox].src}
-              alt={filteredGallery[lightbox].alt}
-              className="w-full max-h-[80vh] object-contain"
-            />
-            <span className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-5 py-4 text-white font-medium">
-              {filteredGallery[lightbox].category}
-            </span>
+            {filteredGallery[lightbox].type === "video" ? (
+              <>
+                <video
+                  src={filteredGallery[lightbox].src}
+                  poster={filteredGallery[lightbox].poster}
+                  controls
+                  autoPlay
+                  playsInline
+                  className="w-full max-h-[80vh] bg-black"
+                />
+                <span className="sr-only">{filteredGallery[lightbox].alt}</span>
+              </>
+            ) : (
+              <>
+                <img
+                  src={filteredGallery[lightbox].src}
+                  alt={filteredGallery[lightbox].alt}
+                  className="w-full max-h-[80vh] object-contain"
+                />
+                <span className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-5 py-4 text-white font-medium">
+                  {filteredGallery[lightbox].category}
+                </span>
+              </>
+            )}
           </div>
         </div>
       )}
