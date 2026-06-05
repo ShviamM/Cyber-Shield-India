@@ -10,6 +10,7 @@ import FamilyProtection from "@/pages/FamilyProtection";
 import CyberSafetyCenter from "@/pages/CyberSafetyCenter";
 import CyberLaws from "@/pages/CyberLaws";
 import About from "@/pages/About";
+import Founder from "@/pages/Founder";
 import Contact from "@/pages/Contact";
 import FAQ from "@/pages/FAQ";
 import Download from "@/pages/Download";
@@ -31,6 +32,7 @@ function Router() {
       <Route path="/cyber-safety-center" component={CyberSafetyCenter} />
       <Route path="/cyber-laws" component={CyberLaws} />
       <Route path="/about" component={About} />
+      <Route path="/founder" component={Founder} />
       <Route path="/contact" component={Contact} />
       <Route path="/faq" component={FAQ} />
       <Route path="/download" component={Download} />

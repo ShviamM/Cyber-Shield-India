@@ -1,0 +1,280 @@
+Create a premium, modern, mobile-first personal website for Shivam Malaviya, Cyber Crime Specialist, Author, Public Speaker, Social Impact Leader, and Founder.
+
+WEBSITE GOAL:
+Position Shivam Malaviya as one of India's leading cyber crime prevention advocates, helping citizens, students, businesses, government organizations, and law enforcement stay safe from cyber fraud.
+
+DESIGN STYLE:
+
+* Premium, trustworthy, modern
+* Cybersecurity-inspired visuals
+* Dark blue, black, white, and cyber-green theme
+* Professional government and corporate appeal
+* Smooth animations and modern UI
+* High-quality image galleries
+* Optimized for mobile and desktop
+* SEO optimized
+
+HOMEPAGE HERO SECTION:
+Headline:
+"Protecting India's Digital Future Through Awareness, Education & Action"
+
+Subheadline:
+Cyber Crime Specialist | Author | Public Speaker | Cyber Awareness Evangelist
+
+CTA Buttons:
+
+* Book a Workshop
+* Invite as Speaker
+* Buy the Book
+* Contact Now
+
+Include a professional hero image and social media links.
+
+---
+
+SECTION: ABOUT SHIVAM MALAVIYA
+
+Create a powerful biography highlighting:
+
+* Cyber Crime Prevention Advocate
+* Public Speaker
+* Author of "Digital Dhokha"
+* Conducting cyber awareness initiatives across India
+* Mission to make every Indian cyber aware
+* Focus on citizens, students, women, senior citizens, businesses and government organizations
+* Passionate about preventing cyber fraud through education
+
+Display achievements in animated counters.
+
+---
+
+SECTION: INDIA'S FIRST CYBER CRIME AWARENESS BOOK
+
+Feature the book prominently.
+
+Book Title:
+DIGITAL DHOKHA
+"Unmasking the Scams, Frauds and Lies Stealing India's Future"
+
+Highlight:
+
+* India's first comprehensive cyber crime awareness book
+* Real-world cyber fraud case studies
+* Banking fraud prevention
+* UPI scam awareness
+* Social engineering attacks
+* Deepfake and AI scams
+* Cyber safety guide for families
+
+Add:
+
+* Amazon Purchase Button
+* Flipkart Purchase Button
+* Book Cover Showcase
+* Author Message
+
+Include a dedicated "Inside the Book" section.
+
+---
+
+SECTION: WORKSHOPS & AWARENESS PROGRAMS
+
+Create a dynamic timeline showcasing:
+
+Cyber Safety Workshops
+School Awareness Sessions
+College Awareness Programs
+Corporate Cybersecurity Training
+Women Safety Awareness Sessions
+Senior Citizen Cyber Protection Programs
+Government Awareness Campaigns
+Police & Law Enforcement Collaborations
+
+For each workshop include:
+
+* Event photos
+* Audience size
+* Location
+* Key topics covered
+* Testimonials
+
+Create an interactive gallery section.
+
+---
+
+SECTION: PHOTO GALLERY
+
+Categories:
+
+* Workshops
+* School Programs
+* College Events
+* Public Speaking
+* Media Coverage
+* Book Launch Events
+* Community Outreach
+* Cyber Awareness Campaigns
+
+Enable:
+
+* Lightbox image viewing
+* Category filters
+* Masonry layout
+
+---
+
+SECTION: MEDIA & PRESS COVERAGE
+
+Display media mentions and news articles.
+
+Categories:
+
+* Book Launch Coverage
+* Cyber Awareness Campaigns
+* Expert Interviews
+* Media Features
+
+Add professional news cards.
+
+---
+
+SECTION: IMPACT ACROSS INDIA
+
+Interactive India Map showing:
+
+* Cities Visited
+* Workshops Conducted
+* Students Reached
+* Citizens Educated
+* Organizations Trained
+
+Show statistics visually.
+
+---
+
+SECTION: SERVICES
+
+1. Cyber Awareness Workshops
+2. School Cyber Safety Programs
+3. Corporate Training
+4. Government Awareness Campaigns
+5. Public Speaking Engagements
+6. Cyber Fraud Prevention Consulting
+7. Community Outreach Programs
+
+Each service should have:
+
+* Description
+* Benefits
+* Inquiry button
+
+---
+
+SECTION: WHY ORGANIZATIONS INVITE SHIVAM
+
+Cards:
+
+* Practical Real-Life Examples
+* Citizen-Focused Awareness
+* Hindi + English Delivery
+* Interactive Sessions
+* Actionable Prevention Techniques
+* Youth & Family Engagement
+
+---
+
+SECTION: TESTIMONIALS
+
+Create a carousel featuring:
+
+* Students
+* Schools
+* Colleges
+* Corporates
+* Government Officials
+* Community Leaders
+
+---
+
+SECTION: SOCIAL MEDIA WALL
+
+Integrate:
+Instagram Feed
+Facebook Feed
+YouTube Videos (future-ready)
+
+Show workshop images and awareness content.
+
+---
+
+SECTION: BOOK SHIVAM FOR AN EVENT
+
+Event Types:
+
+* School Program
+* College Event
+* Corporate Workshop
+* Government Training
+* Public Awareness Campaign
+* Podcast Appearance
+* Media Interview
+
+Contact Form:
+Name
+Organization
+Email
+Phone
+Event Type
+Message
+
+---
+
+SECTION: CONTACT
+
+Email
+Phone
+WhatsApp
+Instagram
+Facebook
+LinkedIn
+
+Include a floating WhatsApp button.
+
+---
+
+SPECIAL FEATURES
+
+* Cyber crime reporting resources
+* Emergency helpline section
+* Downloadable awareness posters
+* Workshop inquiry automation
+* Event booking calendar
+* Newsletter subscription
+* AI-powered FAQ chatbot
+
+---
+
+SEO KEYWORDS
+
+Shivam Malaviya
+Cyber Crime Expert India
+Cyber Awareness Speaker
+Cyber Crime Prevention
+Digital Dhokha Author
+Cyber Safety Workshop
+Cyber Security Awareness India
+UPI Fraud Awareness
+Online Scam Prevention
+Cyber Crime Speaker India
+
+---
+
+FINAL OBJECTIVE
+
+When someone visits the website, they should immediately understand that Shivam Malaviya is:
+
+* A recognized cyber crime awareness leader
+* Author of Digital Dhokha
+* Public speaker and educator
+* Conducting impactful cyber awareness initiatives
+* Helping build a cyber-safe India

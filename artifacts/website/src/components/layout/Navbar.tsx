@@ -26,6 +26,7 @@ export function Navbar() {
     { name: "Cyber Safety", href: "/cyber-safety-center" },
     { name: "Laws & SOPs", href: "/cyber-laws" },
     { name: "About", href: "/about" },
+    { name: "Founder", href: "/founder" },
   ];
 
   return (
