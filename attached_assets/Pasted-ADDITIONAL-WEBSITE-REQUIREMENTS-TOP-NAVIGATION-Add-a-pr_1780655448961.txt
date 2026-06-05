@@ -1,0 +1,235 @@
+ADDITIONAL WEBSITE REQUIREMENTS
+
+TOP NAVIGATION
+
+Add a premium sticky navigation bar.
+
+Menu:
+
+* Home
+* Features
+* Family Protection
+* Cyber Safety Center
+* Cyber Laws & SOPs
+* About Us
+* Contact
+* Login
+* Download App
+
+LOGIN SYSTEM
+
+Add a dedicated Login button in the header.
+
+User Portal:
+
+* Login
+* Register
+* OTP Login
+* Forgot Password
+
+Future-ready for:
+
+* User Dashboard
+* Family Dashboard
+* Subscription Management
+* Fraud Report Tracking
+
+Do not expose admin login publicly.
+
+FOOTER
+
+Professional enterprise-grade footer.
+
+Sections:
+
+Product
+
+* Features
+* Download App
+* Pricing
+
+Resources
+
+* Cyber Safety Center
+* Cyber Laws
+* SOPs
+* FAQ
+
+Company
+
+* About Us
+* Contact Us
+* Careers
+* Media Kit
+
+Legal
+
+* Privacy Policy
+* Terms of Service
+* Cookie Policy
+* Data Retention Policy
+* Responsible Disclosure Policy
+
+Trust
+
+* Security
+* Compliance
+* DPDP Alignment
+
+LEGAL PAGES
+
+Create complete pages for:
+
+Privacy Policy
+
+Terms of Service
+
+Cookie Policy
+
+Responsible Disclosure Policy
+
+Data Retention Policy
+
+Acceptable Use Policy
+
+DISCLAIMER PAGE
+
+Include:
+
+"Netraksh assists users in identifying potential cyber threats and scams. Users should independently verify critical decisions before sharing information, making payments, or taking legal action."
+
+CONTACT PAGE
+
+Professional contact page.
+
+Include:
+
+* Contact Form
+* Support Email
+* Business Enquiries
+* Partnership Requests
+* Media Requests
+
+ABOUT US PAGE
+
+Explain:
+
+Mission:
+Protect every Indian from cyber fraud.
+
+Vision:
+Build India's most trusted digital safety platform.
+
+Include:
+
+* Why Netraksh exists
+* Cyber fraud challenges in India
+* Family protection focus
+* Citizen empowerment
+
+FAQ PAGE
+
+Examples:
+
+What is Netraksh?
+
+How is Netraksh different from caller ID apps?
+
+How does scam detection work?
+
+Does Netraksh monitor WhatsApp?
+
+Can Netraksh protect my family?
+
+What should I do if I lose money to cyber fraud?
+
+DOWNLOAD PAGE
+
+Dedicated page for:
+
+Android App
+
+iOS App
+
+Features
+
+Screenshots
+
+Reviews
+
+LOGIN LANDING PAGE
+
+Premium design.
+
+Options:
+
+* Login with Mobile Number
+* Login with OTP
+* Create Account
+
+Trust messaging:
+
+"Your privacy and security are our priority."
+
+TRUST & COMPLIANCE SECTION
+
+Add trust indicators:
+
+* Data Privacy
+* Secure Authentication
+* Encrypted Communication
+* Responsible AI
+
+Include information aligned with:
+
+* DPDP Act
+* CERT-In guidance
+* Security best practices
+
+SEO & INDEXING
+
+Generate:
+
+* robots.txt
+* sitemap.xml
+* Open Graph metadata
+* Structured schema markup
+
+Ensure all public pages are indexed properly.
+
+FINAL WEBSITE STRUCTURE
+
+/
+Home
+
+/features
+
+/family-protection
+
+/cyber-safety-center
+
+/cyber-laws
+
+/about
+
+/contact
+
+/faq
+
+/download
+
+/login
+
+/privacy-policy
+
+/terms-of-service
+
+/cookie-policy
+
+/responsible-disclosure
+
+/data-retention-policy
+
+/security
+
+The website should feel like a premium technology company, a trusted consumer safety platform, and a national cyber-safety initiative—all while remaining simple and approachable for everyday Indian users.

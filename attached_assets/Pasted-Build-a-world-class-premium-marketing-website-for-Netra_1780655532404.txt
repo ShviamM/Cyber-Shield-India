@@ -1,0 +1,311 @@
+Build a world-class premium marketing website for Netraksh.
+
+Domain:
+netraksh.com
+
+Purpose:
+Promote Netraksh as India's Digital Bodyguard and the most trusted cyber safety platform for citizens.
+
+This is NOT an admin portal.
+
+This is NOT a product dashboard.
+
+This is a high-end public-facing website designed to drive:
+
+App installs
+Investor interest
+Government interest
+Media attention
+Trust
+
+DESIGN REQUIREMENTS
+
+Inspiration:
+
+Apple
+Stripe
+Linear
+Notion
+Arc Browser
+
+Visual Style:
+
+Premium
+Modern
+Trustworthy
+Futuristic
+Mobile-first
+
+Use:
+
+Smooth animations
+Scroll storytelling
+Interactive graphics
+Parallax effects
+Glassmorphism
+Modern typography
+
+Avoid:
+
+Generic cybersecurity stock designs
+Hacker imagery
+Matrix effects
+Dark web themes
+
+BRAND POSITIONING
+
+Hero Headline:
+
+India's Digital Bodyguard
+
+Subheadline:
+
+Protecting every Indian from scam calls, fraud messages, fake links, QR scams, UPI fraud and digital crime.
+
+CTA:
+
+Download Netraksh
+
+See How It Works
+
+HERO SECTION
+
+Full-screen animated hero.
+
+Show:
+
+Mobile device mockup
+Live scam detection animation
+Family protection animation
+
+Animation concept:
+
+Incoming Scam Call
+↓
+Netraksh Detects
+↓
+User Protected
+
+CURRENT INDIA CYBER CRIME SECTION
+
+Create a visually powerful section.
+
+Show:
+
+Annual fraud losses
+Growth in cyber fraud
+Scam categories
+Digital arrest scams
+UPI fraud
+Job scams
+Investment scams
+
+Use animated counters.
+
+Use interactive charts.
+
+Display information responsibly and cite official/public sources in the website content.
+
+WHY INDIA NEEDS NETRAKSH
+
+Interactive storytelling.
+
+Show:
+
+Scam Call
+WhatsApp Scam
+QR Fraud
+Fake Loan
+Investment Scam
+
+Each should animate into a protection scenario.
+
+HOW NETRAKSH WORKS
+
+4 simple steps:
+
+Check Number
+Check Link
+Check Message
+Report Fraud
+
+Large illustrations.
+
+Simple language.
+
+No technical terminology.
+
+FEATURES SECTION
+
+Highlight:
+
+Scam Call Protection
+
+Scam SMS Protection
+
+WhatsApp Scam Detection
+
+QR Fraud Scanner
+
+Family Protection
+
+AI Scam Analyzer
+
+Fraud Reporting
+
+Threat Intelligence
+
+Family Guardian
+
+Protect your parents and loved ones from digital fraud.
+
+Include emotional visuals.
+
+FAMILY PROTECTION SECTION
+
+Show:
+
+Son installs Netraksh
+↓
+Parents protected
+↓
+Family receives alerts
+
+Position as a premium feature.
+
+INDIA CYBER SAFETY CENTER
+
+Create a knowledge hub.
+
+Include:
+
+Latest Cyber Safety Tips
+
+Common Scam Types
+
+Digital Arrest Awareness
+
+UPI Safety
+
+Online Shopping Safety
+
+Senior Citizen Protection
+
+No login required.
+
+CYBER LAWS AND SOPS
+
+Create an educational section.
+
+Include:
+
+Reporting cyber fraud
+Cyber helpline awareness
+Citizen best practices
+Response guidance
+
+Present information in a simple and educational format.
+
+INDIA CYBER HEATMAP
+
+Interactive map.
+
+Show:
+
+Fraud trends
+
+Scam categories
+
+Threat trends
+
+Use aggregated public and platform intelligence.
+
+ANIMATIONS
+
+Create premium motion design:
+
+Smooth transitions
+Scroll-triggered animations
+Number counters
+Device animations
+Floating UI elements
+
+Performance must remain excellent.
+
+TRUST SECTION
+
+Display:
+
+Users Protected
+
+Scams Detected
+
+Reports Submitted
+
+Families Protected
+
+Use real metrics only.
+
+APP DOWNLOAD SECTION
+
+Prominent CTA.
+
+Google Play
+
+Apple App Store
+
+FAQ
+
+Answer:
+
+What is Netraksh?
+
+How is it different from caller ID apps?
+
+How does AI help?
+
+Can it protect my family?
+
+Is it free?
+
+SEO REQUIREMENTS
+
+Optimize for:
+
+Cyber Crime India
+
+Scam Protection App
+
+Digital Safety India
+
+Cyber Safety App
+
+UPI Fraud Protection
+
+Scam Call Protection
+
+Family Cyber Safety
+
+PERFORMANCE REQUIREMENTS
+
+Lighthouse Score > 90
+
+Mobile optimized
+
+Fast loading
+
+Accessibility compliant
+
+FINAL GOAL
+
+The website should feel like a national digital safety movement, not merely an app landing page.
+
+A visitor should immediately understand:
+
+India has a cyber fraud problem.
+
+Netraksh protects citizens.
+
+Netraksh protects families.
+
+Netraksh is India's Digital Bodyguard.
