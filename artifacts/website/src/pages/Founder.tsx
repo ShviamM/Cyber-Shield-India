@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Link } from "wouter";
 import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState, useMemo } from "react";
-import bookTrailer from "@assets/DigitalDhokha_BookTrailer_1780691772101.mp4";
+import bookTrailer from "@assets/DigitalDhokha_BookTrailer_web.mp4";
 import {
   ShieldCheck,
   Brain,
