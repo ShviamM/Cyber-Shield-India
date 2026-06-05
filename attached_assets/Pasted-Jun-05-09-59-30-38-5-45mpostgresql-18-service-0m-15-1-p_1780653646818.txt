@@ -1,0 +1,59 @@
+Jun 05 09:59:30 [38;5;45mpostgresql-18.service [0m [15-1] pid=34875,user=_doadmin_monitor,db=defaultdb,app=system-stats,client=[local] [38;5;6mLOG[0m  disconnection: session time: 0:00:00.028 user=_doadmin_monitor database=defaultdb host=[local] 
+
+Jun 05 09:59:30 [38;5;45mpostgresql-18.service [0m [15-1] pid=34873,user=_doadmin_monitor,db=_dodb,app=system-stats,client=[local] [38;5;6mLOG[0m  disconnection: session time: 0:00:00.063 user=_doadmin_monitor database=_dodb host=[local] 
+
+Jun 05 09:59:34 [38;5;45mpostgresql-18.service [0m [12-1] pid=34896,user=[unknown],db=[unknown],app=[unknown],client=[local] [38;5;6mLOG[0m  connection received: host=[local] 
+
+Jun 05 09:59:34 [38;5;45mpostgresql-18.service [0m [13-1] pid=34896,user=doadmin,db=defaultdb,app=[unknown],client=[local] [38;5;6mLOG[0m  connection authenticated: user="doadmin" method=trust (/var/lib/pgsql/18/data/pg_hba.conf:3) 
+
+Jun 05 09:59:34 [38;5;45mpostgresql-18.service [0m [14-1] pid=34896,user=doadmin,db=defaultdb,app=[unknown],client=[local] [38;5;6mLOG[0m  connection authorized: user=doadmin database=defaultdb application_name=management-agent 
+
+Jun 05 09:59:34 [38;5;45mpostgresql-18.service [0m [15-1] pid=34896,user=doadmin,db=defaultdb,app=management-agent,client=[local] [38;5;6mLOG[0m  disconnection: session time: 0:00:00.005 user=doadmin database=defaultdb host=[local] 
+
+Jun 05 09:59:58 [38;5;45mpostgresql-18.service [0m [12-1] pid=35014,user=[unknown],db=[unknown],app=[unknown],client=[local] [38;5;6mLOG[0m  connection received: host=[local] 
+
+Jun 05 09:59:58 [38;5;45mpostgresql-18.service [0m [13-1] pid=35014,user=_doadmin_monitor,db=_dodb,app=[unknown],client=[local] [38;5;6mLOG[0m  connection authenticated: user="_doadmin_monitor" method=trust (/var/lib/pgsql/18/data/pg_hba.conf:4) 
+
+Jun 05 09:59:58 [38;5;45mpostgresql-18.service [0m [14-1] pid=35014,user=_doadmin_monitor,db=_dodb,app=[unknown],client=[local] [38;5;6mLOG[0m  connection authorized: user=_doadmin_monitor database=_dodb application_name=system-stats 
+
+Jun 05 09:59:58 [38;5;45mpostgresql-18.service [0m [12-1] pid=35015,user=[unknown],db=[unknown],app=[unknown],client=[local] [38;5;6mLOG[0m  connection received: host=[local] 
+
+Jun 05 09:59:58 [38;5;45mpostgresql-18.service [0m [13-1] pid=35015,user=_doadmin_monitor,db=_dodb,app=[unknown],client=[local] [38;5;6mLOG[0m  connection authenticated: user="_doadmin_monitor" method=trust (/var/lib/pgsql/18/data/pg_hba.conf:4) 
+
+Jun 05 09:59:58 [38;5;45mpostgresql-18.service [0m [14-1] pid=35015,user=_doadmin_monitor,db=_dodb,app=[unknown],client=[local] [38;5;6mLOG[0m  connection authorized: user=_doadmin_monitor database=_dodb application_name=system-stats 
+
+Jun 05 09:59:58 [38;5;45mpostgresql-18.service [0m [12-1] pid=35016,user=[unknown],db=[unknown],app=[unknown],client=[local] [38;5;6mLOG[0m  connection received: host=[local] 
+
+Jun 05 09:59:58 [38;5;45mpostgresql-18.service [0m [13-1] pid=35016,user=_doadmin_monitor,db=defaultdb,app=[unknown],client=[local] [38;5;6mLOG[0m  connection authenticated: user="_doadmin_monitor" method=trust (/var/lib/pgsql/18/data/pg_hba.conf:4) 
+
+Jun 05 09:59:58 [38;5;45mpostgresql-18.service [0m [14-1] pid=35016,user=_doadmin_monitor,db=defaultdb,app=[unknown],client=[local] [38;5;6mLOG[0m  connection authorized: user=_doadmin_monitor database=defaultdb application_name=system-stats 
+
+Jun 05 09:59:58 [38;5;45mpostgresql-18.service [0m [15-1] pid=35015,user=_doadmin_monitor,db=_dodb,app=system-stats,client=[local] [38;5;6mLOG[0m  disconnection: session time: 0:00:00.040 user=_doadmin_monitor database=_dodb host=[local] 
+
+Jun 05 09:59:58 [38;5;45mpostgresql-18.service [0m [15-1] pid=35016,user=_doadmin_monitor,db=defaultdb,app=system-stats,client=[local] [38;5;6mLOG[0m  disconnection: session time: 0:00:00.011 user=_doadmin_monitor database=defaultdb host=[local] 
+
+Jun 05 09:59:58 [38;5;45mpostgresql-18.service [0m [15-1] pid=35014,user=_doadmin_monitor,db=_dodb,app=system-stats,client=[local] [38;5;6mLOG[0m  disconnection: session time: 0:00:00.124 user=_doadmin_monitor database=_dodb host=[local] 
+
+Jun 05 10:00:00 [38;5;45mpostgresql-18.service [0m [12-1] pid=35029,user=[unknown],db=[unknown],app=[unknown],client=[local] [38;5;6mLOG[0m  connection received: host=[local] 
+
+Jun 05 10:00:00 [38;5;45mpostgresql-18.service [0m [13-1] pid=35029,user=_doadmin_monitor,db=_dodb,app=[unknown],client=[local] [38;5;6mLOG[0m  connection authenticated: user="_doadmin_monitor" method=trust (/var/lib/pgsql/18/data/pg_hba.conf:4) 
+
+Jun 05 10:00:00 [38;5;45mpostgresql-18.service [0m [14-1] pid=35029,user=_doadmin_monitor,db=_dodb,app=[unknown],client=[local] [38;5;6mLOG[0m  connection authorized: user=_doadmin_monitor database=_dodb application_name=system-stats 
+
+Jun 05 10:00:00 [38;5;45mpostgresql-18.service [0m [12-1] pid=35030,user=[unknown],db=[unknown],app=[unknown],client=[local] [38;5;6mLOG[0m  connection received: host=[local] 
+
+Jun 05 10:00:00 [38;5;45mpostgresql-18.service [0m [13-1] pid=35030,user=_doadmin_monitor,db=_dodb,app=[unknown],client=[local] [38;5;6mLOG[0m  connection authenticated: user="_doadmin_monitor" method=trust (/var/lib/pgsql/18/data/pg_hba.conf:4) 
+
+Jun 05 10:00:00 [38;5;45mpostgresql-18.service [0m [14-1] pid=35030,user=_doadmin_monitor,db=_dodb,app=[unknown],client=[local] [38;5;6mLOG[0m  connection authorized: user=_doadmin_monitor database=_dodb application_name=system-stats 
+
+Jun 05 10:00:00 [38;5;45mpostgresql-18.service [0m [12-1] pid=35031,user=[unknown],db=[unknown],app=[unknown],client=[local] [38;5;6mLOG[0m  connection received: host=[local] 
+
+Jun 05 10:00:00 [38;5;45mpostgresql-18.service [0m [13-1] pid=35031,user=_doadmin_monitor,db=defaultdb,app=[unknown],client=[local] [38;5;6mLOG[0m  connection authenticated: user="_doadmin_monitor" method=trust (/var/lib/pgsql/18/data/pg_hba.conf:4) 
+
+Jun 05 10:00:00 [38;5;45mpostgresql-18.service [0m [14-1] pid=35031,user=_doadmin_monitor,db=defaultdb,app=[unknown],client=[local] [38;5;6mLOG[0m  connection authorized: user=_doadmin_monitor database=defaultdb application_name=system-stats 
+
+Jun 05 10:00:00 [38;5;45mpostgresql-18.service [0m [15-1] pid=35030,user=_doadmin_monitor,db=_dodb,app=system-stats,client=[local] [38;5;6mLOG[0m  disconnection: session time: 0:00:00.035 user=_doadmin_monitor database=_dodb host=[local] 
+
+Jun 05 10:00:00 [38;5;45mpostgresql-18.service [0m [15-1] pid=35029,user=_doadmin_monitor,db=_dodb,app=system-stats,client=[local] [38;5;6mLOG[0m  disconnection: session time: 0:00:00.067 user=_doadmin_monitor database=_dodb host=[local] 
+
+Jun 05 10:00:00 [38;5;45mpostgresql-18.service [0m [15-1] pid=35031,user=_doadmin_monitor,db=defaultdb,app=system-stats,client=[local] [38;5;6mLOG[0m  disconnection: session time: 0:00:00.033 user=_doadmin_monitor database=defaultdb host=[local] 
