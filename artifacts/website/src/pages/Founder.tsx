@@ -169,7 +169,6 @@ const galleryItems: GalleryItem[] = [
   { category: "College Events", h: "h-64", src: "/images/event-college-2.jpg", alt: "College event attendees with Shivam Malaviya" },
   { category: "Workshops", h: "h-56", src: "/images/event-workshop-2.jpg", alt: "Workshop venue prepared for a Netraksh cyber awareness session" },
   { category: "Media Coverage", h: "h-72", src: "/images/event-press-3.jpg", alt: "Newspaper feature on community skill and awareness initiatives" },
-  { category: "School Programs", h: "h-64", src: "/images/event-school-5.jpg", alt: "Students gathered in an auditorium for a Netraksh cyber awareness program" },
   { category: "Book Launch", h: "h-72", src: "/images/event-launch-4.jpg", alt: "Shivam Malaviya presenting Digital Dhokha at the New Delhi World Book Fair" },
   { category: "Book Launch", h: "h-56", src: "/images/event-launch-5.jpg", alt: "Readers and guests with Digital Dhokha at the World Book Fair" },
   { category: "Book Launch", h: "h-64", src: "/images/event-launch-6.jpg", alt: "Welcome display for Shivam Malaviya at the New Delhi World Book Fair" },
