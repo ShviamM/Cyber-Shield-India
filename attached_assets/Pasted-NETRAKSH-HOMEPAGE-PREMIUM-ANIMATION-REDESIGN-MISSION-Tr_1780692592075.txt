@@ -1,0 +1,307 @@
+NETRAKSH HOMEPAGE PREMIUM ANIMATION REDESIGN
+
+MISSION
+
+Transform the homepage from a static landing page into a premium interactive experience.
+
+The website should feel like:
+
+Apple
+Stripe
+Linear
+Arc Browser
+
+while remaining lightweight and mobile-friendly.
+
+DO NOT ADD CHEAP ANIMATIONS.
+
+All motion should feel intentional and premium.
+
+HERO SECTION ANIMATIONS
+
+CURRENT ISSUE
+
+The hero section feels static.
+
+GOAL
+
+Create a storytelling experience.
+
+HEADLINE ANIMATION
+
+Headline:
+
+India's Digital Bodyguard
+
+Animation:
+
+Fade in line by line
+Slight upward motion
+Smooth easing
+Duration 1.2 seconds
+
+BODYGUARD WORD EFFECT
+
+Animate:
+
+Bodyguard
+
+with:
+
+Gradient sweep
+Subtle glow
+Slow movement
+
+without being distracting.
+
+CTA BUTTON ANIMATION
+
+Download Netraksh
+
+Add:
+
+Soft pulse every 8 seconds
+Hover scale effect
+Magnetic hover effect
+
+See How It Works
+
+Add:
+
+Arrow animation
+Smooth hover transition
+
+PHONE MOCKUP ANIMATION
+
+Current phone is static.
+
+Make it interactive.
+
+ANIMATION LOOP
+
+Scenario 1
+
+Incoming Scam Call
+
+↓
+
+Red Alert Appears
+
+↓
+
+Scammer Detected
+
+↓
+
+Call Blocked
+
+↓
+
+Protected
+
+Pause
+
+Repeat
+
+Scenario 2
+
+Fraud SMS Received
+
+↓
+
+AI Analysis
+
+↓
+
+Dangerous
+
+↓
+
+Blocked
+
+Pause
+
+Repeat
+
+Scenario 3
+
+QR Scan
+
+↓
+
+Risk Analysis
+
+↓
+
+Safe
+
+Pause
+
+Repeat
+
+These should cycle automatically.
+
+FLOATING PROTECTION CARDS
+
+Around the phone.
+
+Floating elements:
+
+🛡 Scam Call Blocked
+
+📱 Fraud SMS Detected
+
+🔗 Link Verified
+
+👨‍👩‍👧 Family Protected
+
+Animations:
+
+Float slowly
+Slight rotation
+Depth effect
+
+SCROLL STORYTELLING
+
+As user scrolls:
+
+Phone mockup should slightly move.
+
+Cards should animate into view.
+
+Create depth.
+
+SCAM COUNTER
+
+Add live animated counter.
+
+Examples:
+
+Scam Reports Analyzed
+
+Protected Citizens
+
+Fraud Reports
+
+Families Protected
+
+Count up animation.
+
+TRUST BAR
+
+Add animated trust ticker.
+
+Examples:
+
+Latest Scam Alert
+
+UPI Fraud Alert
+
+WhatsApp Scam Warning
+
+Digital Arrest Alert
+
+Smooth horizontal motion.
+
+CYBER THREAT RADAR
+
+Add a premium radar visualization.
+
+Display:
+
+Digital Arrest
+
+UPI Fraud
+
+QR Fraud
+
+Investment Scam
+
+Radar should pulse.
+
+Use premium motion design.
+
+FAMILY PROTECTION SECTION
+
+Animation:
+
+Parent receives suspicious message
+
+↓
+
+Netraksh detects scam
+
+↓
+
+Family notified
+
+↓
+
+Protection enabled
+
+Create simple visual storytelling.
+
+SCROLL REVEALS
+
+Every section should:
+
+Fade in
+Slide slightly
+Stagger children
+
+Avoid large dramatic movements.
+
+BACKGROUND EFFECTS
+
+Add:
+
+Subtle gradient movement
+Soft floating particles
+Light reflections
+
+No hacker effects.
+
+No matrix effects.
+
+No neon cyberpunk.
+
+MOBILE OPTIMIZATION
+
+Animations must remain smooth on:
+
+Android
+iPhone
+Mid-range devices
+
+Automatically reduce animation complexity on weaker devices.
+
+PERFORMANCE
+
+Requirements:
+
+Lighthouse > 90
+
+No layout shift
+
+No animation jank
+
+No heavy libraries
+
+ACCESSIBILITY
+
+Respect:
+
+prefers-reduced-motion
+
+Users can disable animations.
+
+FINAL EXPERIENCE
+
+The homepage should immediately communicate:
+
+A scam is detected.
+Netraksh protects the user.
+Families are protected.
+India's Digital Bodyguard is always watching.
+
+The website should feel alive, premium, trustworthy, and memorable without becoming distracting.
