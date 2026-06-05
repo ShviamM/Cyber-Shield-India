@@ -8,25 +8,11 @@ import { useState } from "react";
 import { Link } from "wouter";
 
 export default function Login() {
-  const [step, setStep] = useState<"phone" | "otp" | "done">("phone");
-  const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState<"phone" | "done">("phone");
 
   const handlePhoneSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setStep("otp");
-    }, 1000);
-  };
-
-  const handleOtpSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setStep("done");
-    }, 1000);
+    setStep("done");
   };
 
   return (
@@ -69,7 +55,7 @@ export default function Login() {
                   </Button>
                 </Link>
               </div>
-            ) : step === "phone" ? (
+            ) : (
               <form onSubmit={handlePhoneSubmit} className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="phone">Mobile Number</Label>
@@ -79,28 +65,15 @@ export default function Login() {
                     </div>
                     <Input id="phone" type="tel" placeholder="Enter your 10-digit number" required className="h-12 flex-1" pattern="[0-9]{10}" />
                   </div>
+                  <p className="text-sm text-gray-500 mt-2">
+                    Sign-in and one-time-code verification happen securely inside the Netraksh app.
+                  </p>
                 </div>
-                <Button type="submit" className="w-full h-12 text-lg rounded-xl" disabled={loading}>
-                  {loading ? "Sending OTP..." : "Get OTP"}
+                <Button type="submit" className="w-full h-12 text-lg rounded-xl flex gap-2">
+                  Continue <ArrowRight className="w-5 h-5" />
                 </Button>
                 <div className="text-center mt-6">
                   <p className="text-sm text-gray-500">Don't have an account? <Link href="/download" className="text-primary font-medium hover:underline">Get the app</Link></p>
-                </div>
-              </form>
-            ) : (
-              <form onSubmit={handleOtpSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="otp">Enter OTP</Label>
-                  <Input id="otp" type="text" placeholder="6-digit code" required className="h-12 text-center text-xl tracking-[0.5em]" maxLength={6} pattern="[0-9]{6}" />
-                  <p className="text-sm text-gray-500 text-center mt-2">Code sent to your mobile number</p>
-                </div>
-                <Button type="submit" className="w-full h-12 text-lg rounded-xl" disabled={loading}>
-                  {loading ? "Verifying..." : "Verify & Login"}
-                </Button>
-                <div className="text-center mt-4">
-                  <button type="button" onClick={() => setStep("phone")} className="text-sm text-gray-500 hover:text-primary font-medium">
-                    Change mobile number
-                  </button>
                 </div>
               </form>
             )}

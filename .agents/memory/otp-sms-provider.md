@@ -50,6 +50,13 @@ reintroduce OTP into the admin app. **Why:** the admin is a small trusted group;
 shared password is simpler than OTP for a desktop console. The admin entrypoint has
 its own stricter brute-force throttle (separate from OTP tuning) since it's single-factor.
 
+**Marketing website (artifacts/website) has NO real OTP/auth.** Its `Login.tsx` is
+a funnel: collect a phone number, then route straight to a "verification happens in
+the Netraksh app / get the app" state. Do NOT add a fake OTP step there (an earlier
+version used a `setTimeout` mock that prompted a 6-digit code and never sent
+anything — it read as a real "OTP not received" bug). If real web login is ever
+wanted, wire the MSG91 **web** widget (`otp-provider.js`) like the admin console.
+
 **Why:** Approach B (MSG91 OTP Widget sends+verifies on MSG91's side) was chosen
 over a self-managed OTP where MSG91 is delivery-only. The tradeoff: the widget
 needs a native dev build (won't run in Expo Go or web preview), and server-side

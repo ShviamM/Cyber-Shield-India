@@ -1,18 +1,27 @@
 import { config } from "../config";
 import { normalizeIndianPhone } from "./phone";
 import { HttpError } from "./http-error";
+import { logger } from "./logger";
 
 const VERIFY_URL = "https://api.msg91.com/api/v5/widget/verifyAccessToken";
 
 interface VerifyAccessTokenResponse {
   type?: string;
   message?: string;
+  code?: string | number;
   data?: {
     mobile?: string;
     email?: string;
     identifier?: string;
     isVerified?: boolean;
   };
+}
+
+// Show only the last 4 digits so OTP-flow logs never carry a full phone number.
+function maskPhone(phone: string): string {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 4) return "***";
+  return `***${digits.slice(-4)}`;
 }
 
 /**
@@ -58,6 +67,12 @@ export async function verifyAccessToken(accessToken: string): Promise<{ phone: s
     // MSG91 can return HTTP 200 with type:"error" on logical failures, so the
     // status code alone is not sufficient — also inspect the payload.
     if (!res.ok || payload.type === "error") {
+      // Log MSG91's own code/message (never the token) so OTP verify failures
+      // are diagnosable: code 201/418 = authkey problem, 701 = bad/expired token.
+      logger.warn(
+        { httpStatus: res.status, msg91Type: payload.type, msg91Code: payload.code },
+        "MSG91 verifyAccessToken rejected token",
+      );
       throw new HttpError(
         401,
         "verification_failed",
@@ -66,6 +81,7 @@ export async function verifyAccessToken(accessToken: string): Promise<{ phone: s
     }
   } catch (err) {
     if (err instanceof HttpError) throw err;
+    logger.error({ err }, "MSG91 verifyAccessToken request failed");
     throw new HttpError(
       502,
       "verification_unavailable",
@@ -87,6 +103,10 @@ export async function verifyAccessToken(accessToken: string): Promise<{ phone: s
     "";
   const phone = normalizeIndianPhone(rawMobile);
   if (payload.data?.isVerified === false || !phone) {
+    logger.warn(
+      { isVerified: payload.data?.isVerified, hasPhone: Boolean(phone) },
+      "MSG91 verifyAccessToken returned no usable verified phone",
+    );
     throw new HttpError(
       401,
       "verification_failed",
@@ -94,5 +114,6 @@ export async function verifyAccessToken(accessToken: string): Promise<{ phone: s
     );
   }
 
+  logger.info({ phone: maskPhone(phone) }, "MSG91 access token verified");
   return { phone };
 }

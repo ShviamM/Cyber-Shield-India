@@ -1,0 +1,285 @@
+NETRAKSH OTP SYSTEM - CRITICAL PRODUCTION BUG FIX
+
+PRIORITY: HIGH
+
+Act as a Senior Backend Engineer, Mobile Engineer, QA Lead, and DevOps Engineer.
+
+We have identified critical issues in the OTP authentication workflow.
+
+MISSION
+
+Perform a complete end-to-end audit of the OTP system and fix all issues.
+
+ISSUE #1 - OTP LENGTH MISMATCH
+
+Current Behavior:
+
+The UI says:
+
+"Enter the 6-digit verification code"
+
+However, the backend is generating and validating a 4-digit OTP.
+
+Requirements:
+
+1. Identify the source of truth.
+2. Decide whether OTP should be 4 digits or 6 digits.
+3. Ensure consistency across:
+
+* Mobile App
+* Website
+* API
+* Database
+* SMS Template
+* Validation Logic
+* Error Messages
+
+4. Remove all references to incorrect OTP length.
+
+Examples:
+
+If OTP is 4 digits:
+
+"Enter the 4-digit verification code"
+
+If OTP is 6 digits:
+
+"Enter the 6-digit verification code"
+
+UI and backend must always match.
+
+ISSUE #2 - OTP NOT RECEIVED
+
+Investigate the entire OTP delivery flow.
+
+Verify:
+
+STEP 1
+
+User enters mobile number
+
+↓
+
+STEP 2
+
+API receives request
+
+↓
+
+STEP 3
+
+OTP generated
+
+↓
+
+STEP 4
+
+OTP stored in database
+
+↓
+
+STEP 5
+
+SMS provider called
+
+↓
+
+STEP 6
+
+Provider accepts request
+
+↓
+
+STEP 7
+
+SMS delivered
+
+↓
+
+STEP 8
+
+User receives OTP
+
+Audit every step.
+
+SMS PROVIDER AUDIT
+
+Identify which provider is configured:
+
+* MSG91
+* Gupshup
+* Twilio
+* Fast2SMS
+* Other
+
+Verify:
+
+* API Key
+* Authentication
+* Sender ID
+* DLT Template ID
+* DLT Entity ID
+* SMS Route
+* Environment Variables
+
+Check for:
+
+* Invalid credentials
+* Missing secrets
+* Expired credentials
+* Sandbox mode
+* Development mode
+* Wrong endpoint URLs
+
+LOGGING
+
+Add detailed logging.
+
+Log:
+
+OTP request received
+
+OTP generated
+
+SMS provider response
+
+Delivery status
+
+Errors
+
+Timeouts
+
+Failures
+
+Logs must never expose OTP values in production.
+
+DATABASE AUDIT
+
+Verify:
+
+otp_codes table
+
+Check:
+
+* Record creation
+* Expiry timestamp
+* Attempt count
+* Phone number storage
+* Verification status
+
+Ensure OTP records are being created.
+
+API AUDIT
+
+Verify:
+
+POST /request-otp
+
+POST /verify-otp
+
+Check:
+
+* Request validation
+* Error handling
+* Response handling
+* Rate limiting
+
+FRONTEND AUDIT
+
+Verify:
+
+* Mobile app
+* Website
+* Login page
+* Registration page
+
+Ensure:
+
+* OTP screen loads
+* Timer works
+* Resend button works
+* Validation works
+
+SMS DELIVERY TESTING
+
+Test with:
+
+* Real Indian mobile numbers
+* Airtel
+* Jio
+* Vi (Vodafone Idea)
+* BSNL
+
+Verify delivery success.
+
+DLT COMPLIANCE CHECK
+
+For India:
+
+Verify:
+
+* Approved template
+* Approved sender ID
+* Registered entity
+
+If DLT configuration is missing, generate instructions to fix it.
+
+ERROR HANDLING
+
+Show user-friendly messages.
+
+Example:
+
+Bad:
+
+"Internal server error"
+
+Good:
+
+"We couldn't send the OTP right now. Please try again in a few minutes."
+
+RESEND OTP
+
+Verify:
+
+* Resend works
+* Rate limiting works
+* Abuse prevention works
+
+SECURITY REVIEW
+
+Verify:
+
+* OTP expiry
+* OTP lockout
+* Brute-force protection
+* Rate limiting
+* Device protection
+
+FINAL REPORT
+
+Generate:
+
+PASS / FAIL
+
+for:
+
+* OTP Generation
+* OTP Storage
+* SMS Delivery
+* OTP Verification
+* Resend OTP
+* Mobile App
+* Website
+
+Provide:
+
+Root Cause
+
+Fix Applied
+
+Remaining Issues
+
+Production Readiness Status
+
+Do not mark OTP production-ready until a real OTP is successfully delivered and verified on a real Indian mobile number.
