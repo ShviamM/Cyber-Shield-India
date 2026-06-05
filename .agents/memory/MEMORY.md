@@ -24,3 +24,4 @@
 - [MSG91 client env vars](msg91-client-env.md) — EXPO_PUBLIC_/VITE_ MSG91 WIDGET_ID & TOKEN_AUTH are client-public by design (ship in bundles); secret scanners flag TOKEN_AUTH as a false positive. Real secret = MSG91_AUTH_KEY in secrets store.
 - [Expo Router tab re-entry](expo-router-tab-reentry.md) — tabs stay mounted; pass a changing ts nonce param so a repeat navigation re-runs its effect.
 - [DO subpath routing](do-subpath-routing.md) — multiple static Vite SPAs on one DO app: static SPAs use DEFAULT (strip) ingress + Vite base=subpath; only prefix-mounted backends use preserve_path_prefix:true.
+- [Reduced-motion coverage (web)](reduced-motion-web.md) — 3 layers needed: MotionConfig reducedMotion="user" (transforms), useReducedMotion guards on intervals/loops, global CSS @media reset (animate-pulse/hover/transition). Keep opacity fades.
