@@ -1,5 +1,6 @@
 import type { AdminReport, Report, User } from "@workspace/api-zod";
 import type { FraudReport, User as DbUser } from "@workspace/db";
+import { isSuperAdmin } from "./super-admin";
 
 export function toUserDto(u: DbUser): User {
   return {
@@ -8,6 +9,7 @@ export function toUserDto(u: DbUser): User {
     phone: u.phone,
     location: u.location,
     isAdmin: u.isAdmin,
+    isSuperAdmin: isSuperAdmin(u),
     status: u.status,
     createdAt: u.createdAt,
   };

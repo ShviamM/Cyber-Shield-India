@@ -12,6 +12,8 @@ export interface User {
   phone: string;
   location?: string | null;
   isAdmin: boolean;
+  /** True for platform owners who may access the Super Admin dashboard. */
+  isSuperAdmin: boolean;
   status: string;
   createdAt: Date;
 }

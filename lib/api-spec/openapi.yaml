@@ -468,6 +468,27 @@ paths:
         default:
           $ref: "#/components/responses/Error"
 
+  /admin/super/overview:
+    get:
+      operationId: superAdminOverview
+      tags: [admin]
+      summary: Platform owner operations overview
+      description: >-
+        Owner-only dashboard data: revenue, AI usage and estimated cost,
+        infrastructure health, database health, storage consumption, and cloud
+        cost. Restricted to platform owners (super admins).
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Super admin overview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuperAdminOverview"
+        default:
+          $ref: "#/components/responses/Error"
+
   /admin/business-metrics:
     get:
       operationId: adminBusinessMetrics
@@ -859,6 +880,10 @@ components:
           nullable: true
         isAdmin:
           type: boolean
+        isSuperAdmin:
+          type: boolean
+          description: >-
+            True for platform owners who may access the Super Admin dashboard.
         status:
           type: string
         createdAt:
@@ -869,6 +894,7 @@ components:
         - fullName
         - phone
         - isAdmin
+        - isSuperAdmin
         - status
         - createdAt
 
@@ -1228,6 +1254,136 @@ components:
         - familiesProtected
         - renewalsDue
         - newSubscriptions
+
+    SuperAdminOverview:
+      type: object
+      properties:
+        revenue:
+          type: object
+          properties:
+            totalPaise:
+              type: integer
+              description: All-time verified revenue, in paise.
+            thisMonthPaise:
+              type: integer
+              description: Verified revenue in the current calendar month, in paise.
+          required:
+            - totalPaise
+            - thisMonthPaise
+        aiCost:
+          type: object
+          description: Real recorded AI token usage with an estimated cost.
+          properties:
+            calls30d:
+              type: integer
+              description: Number of AI calls in the last 30 days.
+            promptTokens30d:
+              type: integer
+            completionTokens30d:
+              type: integer
+            totalTokens30d:
+              type: integer
+            estimatedCostUsd30d:
+              type: number
+              description: Estimated USD cost over the last 30 days.
+            estimatedCostUsdToday:
+              type: number
+              description: Estimated USD cost so far today.
+          required:
+            - calls30d
+            - promptTokens30d
+            - completionTokens30d
+            - totalTokens30d
+            - estimatedCostUsd30d
+            - estimatedCostUsdToday
+        cloudCost:
+          type: object
+          description: >-
+            Cloud/hosting cost. No billing data source is connected, so this is
+            reported as not configured rather than estimated.
+          properties:
+            configured:
+              type: boolean
+            note:
+              type: string
+          required:
+            - configured
+            - note
+        infrastructure:
+          type: object
+          properties:
+            status:
+              type: string
+              description: Overall API server health, e.g. "healthy".
+            uptimeSeconds:
+              type: number
+            nodeVersion:
+              type: string
+            memoryRssBytes:
+              type: integer
+            memoryHeapUsedBytes:
+              type: integer
+            memoryHeapTotalBytes:
+              type: integer
+          required:
+            - status
+            - uptimeSeconds
+            - nodeVersion
+            - memoryRssBytes
+            - memoryHeapUsedBytes
+            - memoryHeapTotalBytes
+        database:
+          type: object
+          properties:
+            status:
+              type: string
+              description: '"healthy" when reachable, "unreachable" on error.'
+            latencyMs:
+              type: number
+              nullable: true
+            version:
+              type: string
+              nullable: true
+            activeConnections:
+              type: integer
+              nullable: true
+          required:
+            - status
+            - latencyMs
+            - version
+            - activeConnections
+        storage:
+          type: object
+          properties:
+            databaseBytes:
+              type: integer
+              description: Total size of the application database, in bytes.
+            objectStorageConfigured:
+              type: boolean
+              description: Whether a separate object/file store is connected.
+            topTables:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  bytes:
+                    type: integer
+                required:
+                  - name
+                  - bytes
+          required:
+            - databaseBytes
+            - objectStorageConfigured
+            - topTables
+      required:
+        - revenue
+        - aiCost
+        - cloudCost
+        - infrastructure
+        - database
+        - storage
 
     FraudMapState:
       type: object

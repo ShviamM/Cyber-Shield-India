@@ -1,4 +1,40 @@
+import { db, aiUsageTable } from "@workspace/db";
 import { logger } from "./logger";
+
+type CompletionUsage = {
+  prompt_tokens?: number | null;
+  completion_tokens?: number | null;
+  total_tokens?: number | null;
+} | null | undefined;
+
+/**
+ * Persist a single AI call's token usage for the Super Admin cost dashboard.
+ * Best-effort: any failure is logged and swallowed so it can never affect the
+ * classification it is accounting for.
+ */
+async function recordAiUsage(
+  model: string,
+  operation: string,
+  usage: CompletionUsage,
+): Promise<void> {
+  try {
+    const prompt = Math.max(0, Math.round(usage?.prompt_tokens ?? 0));
+    const completion = Math.max(0, Math.round(usage?.completion_tokens ?? 0));
+    const total = Math.max(
+      0,
+      Math.round(usage?.total_tokens ?? prompt + completion),
+    );
+    await db.insert(aiUsageTable).values({
+      model,
+      operation,
+      promptTokens: prompt,
+      completionTokens: completion,
+      totalTokens: total,
+    });
+  } catch (err) {
+    logger.error({ err }, "Failed to record AI usage");
+  }
+}
 
 export type MessageClassification = {
   isScam: boolean;
@@ -72,6 +108,10 @@ export async function classifyMessage(
         },
       ],
     });
+
+    // Best-effort usage accounting for the Super Admin cost dashboard. Never
+    // let a logging failure affect classification.
+    void recordAiUsage("gpt-5-mini", "classify_message", completion.usage);
 
     const content = completion.choices[0]?.message?.content?.trim();
     if (!content) return null;

@@ -59,6 +59,7 @@ import type {
   SubscriptionPlanList,
   SubscriptionStatus,
   SuccessResponse,
+  SuperAdminOverview,
   TrendingScamListResponse,
   UpdateLocationRequest,
   UpdateReportStatusRequest,
@@ -1525,6 +1526,84 @@ export const useAdminVerifyNumber = <TError = ErrorType<ErrorResponse>,
       > => {
       return useMutation(getAdminVerifyNumberMutationOptions(options));
     }
+
+export const getSuperAdminOverviewUrl = () => {
+
+
+
+
+  return `/api/admin/super/overview`
+}
+
+/**
+ * Owner-only dashboard data: revenue, AI usage and estimated cost, infrastructure health, database health, storage consumption, and cloud cost. Restricted to platform owners (super admins).
+ * @summary Platform owner operations overview
+ */
+export const superAdminOverview = async ( options?: RequestInit): Promise<SuperAdminOverview> => {
+
+  return customFetch<SuperAdminOverview>(getSuperAdminOverviewUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getSuperAdminOverviewQueryKey = () => {
+    return [
+    `/api/admin/super/overview`
+    ] as const;
+    }
+
+
+export const getSuperAdminOverviewQueryOptions = <TData = Awaited<ReturnType<typeof superAdminOverview>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof superAdminOverview>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getSuperAdminOverviewQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof superAdminOverview>>> = ({ signal }) => superAdminOverview({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof superAdminOverview>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type SuperAdminOverviewQueryResult = NonNullable<Awaited<ReturnType<typeof superAdminOverview>>>
+export type SuperAdminOverviewQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Platform owner operations overview
+ */
+
+export function useSuperAdminOverview<TData = Awaited<ReturnType<typeof superAdminOverview>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof superAdminOverview>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getSuperAdminOverviewQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export const getAdminBusinessMetricsUrl = () => {
 

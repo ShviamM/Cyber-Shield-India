@@ -3,6 +3,7 @@ import { db, sessionsTable, usersTable, type User } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { hashToken } from "../lib/token";
 import { HttpError } from "../lib/http-error";
+import { isSuperAdmin } from "../lib/super-admin";
 
 function extractToken(req: Request): string | null {
   const header = req.headers.authorization;
@@ -57,6 +58,27 @@ export async function requireAdmin(
   }
   if (!user.isAdmin) {
     return next(new HttpError(403, "forbidden", "Admin access required"));
+  }
+  req.user = user;
+  next();
+}
+
+export async function requireSuperAdmin(
+  req: Request,
+  _res: Response,
+  next: NextFunction,
+): Promise<void> {
+  const user = await authenticate(req);
+  if (!user) {
+    return next(new HttpError(401, "unauthorized", "Authentication required"));
+  }
+  if (user.status === "blocked") {
+    return next(new HttpError(403, "blocked", "Your account has been blocked"));
+  }
+  if (!user.isAdmin || !isSuperAdmin(user)) {
+    return next(
+      new HttpError(403, "forbidden", "Platform owner access required"),
+    );
   }
   req.user = user;
   next();

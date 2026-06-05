@@ -9,6 +9,26 @@ function intEnv(name: string, fallback: number): number {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
+const adminPhones = (process.env.ADMIN_PHONES ?? "")
+  .split(",")
+  .map((p) => normalizeIndianPhone(p.trim()))
+  .filter((p): p is string => Boolean(p));
+
+// Platform owners who may see the Super Admin (cost/infra) dashboard. Defaults
+// to the admin accounts when SUPER_ADMIN_PHONES is unset, so the owner gets
+// access out of the box; set it to restrict the dashboard to a subset.
+const superAdminPhonesEnv = (process.env.SUPER_ADMIN_PHONES ?? "")
+  .split(",")
+  .map((p) => normalizeIndianPhone(p.trim()))
+  .filter((p): p is string => Boolean(p));
+
+function numEnv(name: string, fallback: number): number {
+  const raw = process.env[name];
+  if (!raw) return fallback;
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
+}
+
 export const config = {
   isProduction,
   // MSG91 OTP Widget. The widget (client-side RN SDK) sends and verifies the
@@ -44,10 +64,17 @@ export const config = {
   // Optional Google Safe Browsing API key. When unset, URL checks fall back to
   // structural heuristics only (explicitly noted in the verdict).
   safeBrowsingApiKey: (process.env.GOOGLE_SAFE_BROWSING_API_KEY ?? "").trim(),
-  adminPhones: (process.env.ADMIN_PHONES ?? "")
-    .split(",")
-    .map((p) => normalizeIndianPhone(p.trim()))
-    .filter((p): p is string => Boolean(p)),
+  adminPhones,
+  // Platform owners allowed into the Super Admin dashboard. Falls back to the
+  // admin accounts when unset.
+  superAdminPhones: superAdminPhonesEnv.length
+    ? superAdminPhonesEnv
+    : adminPhones,
+  // Estimated AI pricing (USD per 1M tokens) used to turn recorded token usage
+  // into a cost figure on the Super Admin dashboard. Defaults approximate
+  // gpt-5-mini; override per current provider pricing.
+  aiInputUsdPerMillionTokens: numEnv("AI_INPUT_USD_PER_MTOK", 0.25),
+  aiOutputUsdPerMillionTokens: numEnv("AI_OUTPUT_USD_PER_MTOK", 2),
   // Browser origins allowed to call the API (the admin web console). Mobile and
   // native clients send no Origin header and are always allowed (see app.ts).
   // The Replit preview/deploy domains are auto-allowed so the console works

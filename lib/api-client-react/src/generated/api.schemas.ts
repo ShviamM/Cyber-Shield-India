@@ -47,6 +47,8 @@ export interface User {
   phone: string;
   location?: string | null;
   isAdmin: boolean;
+  /** True for platform owners who may access the Super Admin dashboard. */
+  isSuperAdmin: boolean;
   status: string;
   createdAt: string;
 }
@@ -203,6 +205,78 @@ export interface BusinessMetrics {
   renewalsDue: number;
   /** Paid subscriptions started in the last 30 days. */
   newSubscriptions: number;
+}
+
+export type SuperAdminOverviewRevenue = {
+  /** All-time verified revenue, in paise. */
+  totalPaise: number;
+  /** Verified revenue in the current calendar month, in paise. */
+  thisMonthPaise: number;
+};
+
+/**
+ * Real recorded AI token usage with an estimated cost.
+ */
+export type SuperAdminOverviewAiCost = {
+  /** Number of AI calls in the last 30 days. */
+  calls30d: number;
+  promptTokens30d: number;
+  completionTokens30d: number;
+  totalTokens30d: number;
+  /** Estimated USD cost over the last 30 days. */
+  estimatedCostUsd30d: number;
+  /** Estimated USD cost so far today. */
+  estimatedCostUsdToday: number;
+};
+
+/**
+ * Cloud/hosting cost. No billing data source is connected, so this is reported as not configured rather than estimated.
+ */
+export type SuperAdminOverviewCloudCost = {
+  configured: boolean;
+  note: string;
+};
+
+export type SuperAdminOverviewInfrastructure = {
+  /** Overall API server health, e.g. "healthy". */
+  status: string;
+  uptimeSeconds: number;
+  nodeVersion: string;
+  memoryRssBytes: number;
+  memoryHeapUsedBytes: number;
+  memoryHeapTotalBytes: number;
+};
+
+export type SuperAdminOverviewDatabase = {
+  /** "healthy" when reachable, "unreachable" on error. */
+  status: string;
+  latencyMs: number | null;
+  version: string | null;
+  activeConnections: number | null;
+};
+
+export type SuperAdminOverviewStorageTopTablesItem = {
+  name: string;
+  bytes: number;
+};
+
+export type SuperAdminOverviewStorage = {
+  /** Total size of the application database, in bytes. */
+  databaseBytes: number;
+  /** Whether a separate object/file store is connected. */
+  objectStorageConfigured: boolean;
+  topTables: SuperAdminOverviewStorageTopTablesItem[];
+};
+
+export interface SuperAdminOverview {
+  revenue: SuperAdminOverviewRevenue;
+  /** Real recorded AI token usage with an estimated cost. */
+  aiCost: SuperAdminOverviewAiCost;
+  /** Cloud/hosting cost. No billing data source is connected, so this is reported as not configured rather than estimated. */
+  cloudCost: SuperAdminOverviewCloudCost;
+  infrastructure: SuperAdminOverviewInfrastructure;
+  database: SuperAdminOverviewDatabase;
+  storage: SuperAdminOverviewStorage;
 }
 
 export interface FraudMapState {

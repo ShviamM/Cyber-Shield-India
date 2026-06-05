@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { LogOut, ShieldCheck, BarChart3, MapPin, Megaphone, AlertTriangle } from "lucide-react";
+import { LogOut, ShieldCheck, BarChart3, MapPin, Megaphone, AlertTriangle, Crown } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { BrandLogo, Wordmark, BrandTaglines } from "@/components/brand";
 import { Button } from "@/components/ui/button";
@@ -8,11 +8,19 @@ import { useAuth } from "@/hooks/use-auth";
 import { useLogout } from "@workspace/api-client-react";
 import { cn } from "@/lib/utils";
 
-const NAV_ITEMS: { href: string; label: string; icon: LucideIcon }[] = [
+type NavItem = {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  superAdminOnly?: boolean;
+};
+
+const NAV_ITEMS: NavItem[] = [
   { href: "/", label: "Moderation", icon: ShieldCheck },
   { href: "/business", label: "Business Metrics", icon: BarChart3 },
   { href: "/fraud-map", label: "India Fraud Map", icon: MapPin },
   { href: "/broadcasts", label: "Broadcast Center", icon: Megaphone },
+  { href: "/super", label: "Super Admin", icon: Crown, superAdminOnly: true },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -73,7 +81,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
           <nav className="container mx-auto px-2 sm:px-4">
             <div className="flex items-center gap-1 overflow-x-auto">
-              {NAV_ITEMS.map((item) => {
+              {NAV_ITEMS.filter(
+                (item) => !item.superAdminOnly || user.isSuperAdmin,
+              ).map((item) => {
                 const Icon = item.icon;
                 const active = location === item.href;
                 return (

@@ -8,6 +8,7 @@ import Dashboard from "@/pages/dashboard";
 import BusinessMetrics from "@/pages/business-metrics";
 import FraudMap from "@/pages/fraud-map";
 import Broadcasts from "@/pages/broadcasts";
+import SuperAdmin from "@/pages/super-admin";
 import NotFound from "@/pages/not-found";
 import { Loader2 } from "lucide-react";
 
@@ -32,6 +33,29 @@ function ProtectedRoute({ component: Component }: { component: React.ComponentTy
   return <Component />;
 }
 
+function SuperAdminRoute() {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    window.location.href = "/login";
+    return null;
+  }
+
+  if (!user.isSuperAdmin) {
+    return <NotFound />;
+  }
+
+  return <SuperAdmin />;
+}
+
 function Router() {
   return (
     <Switch>
@@ -40,6 +64,7 @@ function Router() {
       <Route path="/business" component={() => <ProtectedRoute component={BusinessMetrics} />} />
       <Route path="/fraud-map" component={() => <ProtectedRoute component={FraudMap} />} />
       <Route path="/broadcasts" component={() => <ProtectedRoute component={Broadcasts} />} />
+      <Route path="/super" component={() => <SuperAdminRoute />} />
       <Route component={NotFound} />
     </Switch>
   );

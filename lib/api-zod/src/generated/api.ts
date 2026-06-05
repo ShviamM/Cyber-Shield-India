@@ -48,6 +48,7 @@ export const VerifyTokenResponse = zod.object({
   "phone": zod.string(),
   "location": zod.string().nullish(),
   "isAdmin": zod.boolean(),
+  "isSuperAdmin": zod.boolean().describe('True for platform owners who may access the Super Admin dashboard.'),
   "status": zod.string(),
   "createdAt": zod.coerce.date()
 })
@@ -70,6 +71,7 @@ export const AdminLoginResponse = zod.object({
   "phone": zod.string(),
   "location": zod.string().nullish(),
   "isAdmin": zod.boolean(),
+  "isSuperAdmin": zod.boolean().describe('True for platform owners who may access the Super Admin dashboard.'),
   "status": zod.string(),
   "createdAt": zod.coerce.date()
 })
@@ -85,6 +87,7 @@ export const GetMeResponse = zod.object({
   "phone": zod.string(),
   "location": zod.string().nullish(),
   "isAdmin": zod.boolean(),
+  "isSuperAdmin": zod.boolean().describe('True for platform owners who may access the Super Admin dashboard.'),
   "status": zod.string(),
   "createdAt": zod.coerce.date()
 })
@@ -237,6 +240,7 @@ export const UpdateMyLocationResponse = zod.object({
   "phone": zod.string(),
   "location": zod.string().nullish(),
   "isAdmin": zod.boolean(),
+  "isSuperAdmin": zod.boolean().describe('True for platform owners who may access the Super Admin dashboard.'),
   "status": zod.string(),
   "createdAt": zod.coerce.date()
 })
@@ -375,6 +379,52 @@ export const AdminVerifyNumberResponse = zod.object({
   "reportCount": zod.number(),
   "verifiedScam": zod.boolean(),
   "lastReportedAt": zod.coerce.date().nullish()
+})
+
+
+/**
+ * Owner-only dashboard data: revenue, AI usage and estimated cost, infrastructure health, database health, storage consumption, and cloud cost. Restricted to platform owners (super admins).
+ * @summary Platform owner operations overview
+ */
+export const SuperAdminOverviewResponse = zod.object({
+  "revenue": zod.object({
+  "totalPaise": zod.number().describe('All-time verified revenue, in paise.'),
+  "thisMonthPaise": zod.number().describe('Verified revenue in the current calendar month, in paise.')
+}),
+  "aiCost": zod.object({
+  "calls30d": zod.number().describe('Number of AI calls in the last 30 days.'),
+  "promptTokens30d": zod.number(),
+  "completionTokens30d": zod.number(),
+  "totalTokens30d": zod.number(),
+  "estimatedCostUsd30d": zod.number().describe('Estimated USD cost over the last 30 days.'),
+  "estimatedCostUsdToday": zod.number().describe('Estimated USD cost so far today.')
+}).describe('Real recorded AI token usage with an estimated cost.'),
+  "cloudCost": zod.object({
+  "configured": zod.boolean(),
+  "note": zod.string()
+}).describe('Cloud\/hosting cost. No billing data source is connected, so this is reported as not configured rather than estimated.'),
+  "infrastructure": zod.object({
+  "status": zod.string().describe('Overall API server health, e.g. \"healthy\".'),
+  "uptimeSeconds": zod.number(),
+  "nodeVersion": zod.string(),
+  "memoryRssBytes": zod.number(),
+  "memoryHeapUsedBytes": zod.number(),
+  "memoryHeapTotalBytes": zod.number()
+}),
+  "database": zod.object({
+  "status": zod.string().describe('\"healthy\" when reachable, \"unreachable\" on error.'),
+  "latencyMs": zod.number().nullable(),
+  "version": zod.string().nullable(),
+  "activeConnections": zod.number().nullable()
+}),
+  "storage": zod.object({
+  "databaseBytes": zod.number().describe('Total size of the application database, in bytes.'),
+  "objectStorageConfigured": zod.boolean().describe('Whether a separate object\/file store is connected.'),
+  "topTables": zod.array(zod.object({
+  "name": zod.string(),
+  "bytes": zod.number()
+}))
+})
 })
 
 
