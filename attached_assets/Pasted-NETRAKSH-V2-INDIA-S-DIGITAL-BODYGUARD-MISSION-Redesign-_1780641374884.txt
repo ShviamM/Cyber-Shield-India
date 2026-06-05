@@ -1,0 +1,246 @@
+NETRAKSH V2 – INDIA'S DIGITAL BODYGUARD
+
+MISSION
+
+Redesign Netraksh for ordinary Indian citizens, including senior citizens, homemakers, students, small business owners, and first-time smartphone users.
+
+The app must be usable by someone with little or no cybersecurity knowledge.
+
+The design philosophy is:
+
+"Less typing. More protection."
+
+COMPETITOR POSITIONING
+
+Do NOT copy Truecaller.
+
+Truecaller solves:
+
+* Caller Identification
+* Spam Calling
+
+Netraksh solves:
+
+* Scam Calls
+* Scam SMS
+* WhatsApp Scams
+* Fraud Links
+* QR Code Fraud
+* UPI Fraud
+* Online Shopping Fraud
+* Investment Scams
+* Job Scams
+* Family Digital Protection
+
+Position Netraksh as:
+
+"India's Digital Bodyguard"
+
+HOME SCREEN REDESIGN
+
+The home screen must have only 4 primary actions visible above the fold.
+
+1. Check Number
+2. Check Link
+3. Check Message
+4. Report Fraud
+
+Each action must be represented using:
+
+* Large icon
+* Large text
+* One tap access
+
+No complex menus.
+
+No technical dashboards.
+
+No cybersecurity terminology.
+
+QR SCANNER
+
+Add a floating action button.
+
+"Scan Before You Pay"
+
+One tap opens camera.
+
+Automatically scan:
+
+* QR Codes
+* UPI QR
+* Payment QR
+* Suspicious QR
+
+Display:
+
+✅ Safe
+
+⚠ Be Careful
+
+🚨 Dangerous
+
+VOICE-FIRST EXPERIENCE
+
+Add voice input everywhere.
+
+Users should be able to say:
+
+"Check this number"
+
+"Is this message safe?"
+
+"Can I trust this QR code?"
+
+Support: All languages which are currently here
+
+WHATSAPP INTEGRATION
+
+Implement Android and iOS share extensions.
+
+Allow users to:
+
+Share WhatsApp message
+Share SMS
+Share Screenshot
+Share Link
+
+Directly into Netraksh.
+
+The app should analyze content automatically.
+
+RISK LANGUAGE
+
+Never show:
+
+* Threat score
+* IOC
+* Phishing
+* Malware
+* Domain reputation
+
+Instead show:
+
+✅ Safe
+
+⚠ Be Careful
+
+🚨 Dangerous
+
+And explain in plain language.
+
+Example:
+
+"This message asks for money urgently. Please verify before sending money."
+
+HINDI-FIRST DESIGN
+
+On first launch ask:
+
+Preferred Language
+
+* हिन्दी
+* English
+
+All important screens must support Hindi.
+
+FAMILY PROTECTION
+
+Prominently display:
+
+"Protect Your Family"
+
+Allow:
+
+* Add Mother
+* Add Father
+* Add Children
+
+Features:
+
+* Scam alerts
+* Family notifications
+* Emergency help
+
+This should be one of the main premium features.
+
+GUARDIAN MODE
+
+Guardian Protection must be ON by default.
+
+Enable:
+
+* Scam Call Screening
+* Scam SMS Screening
+* Fraud Alert Monitoring
+
+On first launch explain:
+
+"Netraksh watches for scam calls and fraud messages to help keep you safe."
+
+ON-DEVICE PROTECTION
+
+Enable by default:
+
+* Scam Call Detection
+* Scam SMS Detection
+* Suspicious Link Detection
+
+Processing should happen on-device whenever possible.
+
+MINIMIZE USER EFFORT
+
+Users should never need to:
+
+* Type long text
+* Understand cybersecurity terms
+* Navigate deep menus
+
+Maximum actions:
+
+* Tap
+* Speak
+* Share
+
+TRUST DESIGN
+
+Every screen should answer:
+
+1. Is it safe?
+2. What should I do next?
+
+Examples:
+
+Safe:
+"You can continue."
+
+Be Careful:
+"Verify before sending money."
+
+Dangerous:
+"Do not click. This may be a scam."
+
+USER EXPERIENCE RULE
+
+A first-time smartphone user should understand every screen within 10 seconds.
+
+If a feature requires explanation, redesign it until it becomes obvious.
+
+SUCCESS METRIC
+
+The app should be usable by:
+
+* Senior citizens
+* Rural users
+* Non-English speakers
+* First-time smartphone users
+
+without training or technical knowledge.
+
+FINAL POSITIONING
+
+NETRAKSH
+
+India's Digital Bodyguard
+
+Protecting Every Indian from Scam Calls, Fraud Messages, Fake Links, QR Scams, and Online Fraud.
