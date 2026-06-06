@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Constants from "expo-constants";
-import React, { createContext, useContext, useEffect } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+} from "react";
 import { Platform } from "react-native";
 import Purchases, {
   type CustomerInfo,
@@ -82,6 +87,23 @@ async function resetRevenueCatUser(): Promise<void> {
 
 function useSubscriptionContext() {
   const enabled = isRevenueCatConfigured();
+  const { user } = useAuth();
+
+  // Confirm the RevenueCat customer is our signed-in user before a purchase, so
+  // the resulting transaction (and the backend webhook's app_user_id) maps to
+  // an account. Returns false if we can't link — callers must abort the buy,
+  // otherwise the purchase would be anonymous and never reconcile server-side.
+  const ensureIdentified = useCallback(async (): Promise<boolean> => {
+    if (!enabled || !user?.id) return false;
+    try {
+      const current = await Purchases.getAppUserID();
+      if (current === user.id) return true;
+      await Purchases.logIn(user.id);
+      return true;
+    } catch {
+      return false;
+    }
+  }, [enabled, user?.id]);
 
   const customerInfoQuery = useQuery<CustomerInfo>({
     queryKey: ["revenuecat", "customer-info"],
@@ -127,6 +149,7 @@ function useSubscriptionContext() {
     isSubscribed,
     activeProductId,
     isLoading: customerInfoQuery.isLoading || offeringsQuery.isLoading,
+    ensureIdentified,
     purchase: purchaseMutation.mutateAsync,
     restore: restoreMutation.mutateAsync,
     isPurchasing: purchaseMutation.isPending,

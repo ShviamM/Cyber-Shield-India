@@ -10,7 +10,6 @@ import {
   activateSubscriptionForOrder,
   markOrderFailed,
   reconcileRevenueCatSubscription,
-  type SubStatus,
 } from "../lib/subscription";
 import { type PlanKey } from "../lib/plans";
 
@@ -85,6 +84,17 @@ router.post("/webhooks/razorpay", async (req, res) => {
   res.json({ received: true });
 });
 
+/** RevenueCat event types that mean the user has active, paid access. Anything
+ * not listed (and not an explicit lapse/cancel) is ignored — only an
+ * EXPIRATION event lapses a subscription to free. */
+const ACTIVATING_EVENTS = new Set([
+  "INITIAL_PURCHASE",
+  "RENEWAL",
+  "PRODUCT_CHANGE",
+  "UNCANCELLATION",
+  "NON_RENEWING_PURCHASE",
+]);
+
 /** Map a store product identifier to one of our plans. Play Store products carry
  * a "{subscriptionId}:{basePlanId}" suffix we strip first. */
 function planFromProductId(productId: string | undefined): PlanKey | null {
@@ -143,8 +153,8 @@ router.post("/webhooks/revenuecat", async (req, res) => {
           ? new Date(event.expiration_at_ms)
           : null;
 
-        if (type === "EXPIRATION") {
-          // Lapse to free once the entitlement ends.
+        if (type === "EXPIRATION" || type === "SUBSCRIPTION_PAUSED") {
+          // Entitlement has ended (or is paused) — lapse to free.
           await reconcileRevenueCatSubscription({
             userId: user.id,
             plan: "free",
@@ -152,22 +162,34 @@ router.post("/webhooks/revenuecat", async (req, res) => {
             currentPeriodEnd: periodEnd,
             cancelAtPeriodEnd: false,
           });
-        } else {
+        } else if (type === "CANCELLATION") {
+          // Auto-renew turned off but access continues to the period end.
           const plan = planFromProductId(event?.product_id);
           if (plan) {
-            // CANCELLATION = auto-renew turned off but access continues to the
-            // period end; everything else keeps the plan actively renewing.
-            const cancelled = type === "CANCELLATION";
-            const status: SubStatus = cancelled ? "canceled" : "active";
             await reconcileRevenueCatSubscription({
               userId: user.id,
               plan,
-              status,
+              status: "canceled",
               currentPeriodEnd: periodEnd,
-              cancelAtPeriodEnd: cancelled,
+              cancelAtPeriodEnd: true,
+            });
+          }
+        } else if (ACTIVATING_EVENTS.has(type)) {
+          // A purchase, renewal, plan change or uncancellation — actively paid.
+          const plan = planFromProductId(event?.product_id);
+          if (plan) {
+            await reconcileRevenueCatSubscription({
+              userId: user.id,
+              plan,
+              status: "active",
+              currentPeriodEnd: periodEnd,
+              cancelAtPeriodEnd: false,
             });
           }
         }
+        // Other event types (TEST, TRANSFER, BILLING_ISSUE, SUBSCRIBER_ALIAS,
+        // etc.) carry no actionable entitlement change here and are ignored;
+        // a real lapse always arrives as EXPIRATION.
       } else {
         logger.warn({ userId }, "RevenueCat webhook for unknown user");
       }

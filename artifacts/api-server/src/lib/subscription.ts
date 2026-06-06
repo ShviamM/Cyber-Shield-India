@@ -253,6 +253,17 @@ export async function reconcileRevenueCatSubscription(params: {
     .limit(1);
 
   if (existing) {
+    // Guard against out-of-order webhook delivery: RevenueCat retries can land
+    // an older event after a newer one. The freshest truth always carries the
+    // latest billing period end, so never let an event move it backwards — a
+    // stale renewal, cancellation, or expiration would otherwise clobber newer
+    // state (e.g. a late first-period EXPIRATION wiping an already-renewed sub).
+    const incomingEnd = params.currentPeriodEnd?.getTime() ?? null;
+    const existingEnd = existing.currentPeriodEnd?.getTime() ?? null;
+    if (incomingEnd !== null && existingEnd !== null && incomingEnd < existingEnd) {
+      return;
+    }
+
     await db
       .update(subscriptionsTable)
       .set({

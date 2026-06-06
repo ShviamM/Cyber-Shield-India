@@ -772,6 +772,8 @@ const en = {
     testPurchaseMsg:
       "You're in test mode — no real money will be charged. Simulate subscribing to the {{plan}} plan?",
     testPurchaseConfirm: "Confirm",
+    linkAccountFailedMsg:
+      "We couldn't link this purchase to your account. Please try again.",
     payStatus: {
       created: "Pending",
       paid: "Paid",

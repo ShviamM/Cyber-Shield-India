@@ -118,6 +118,16 @@ export default function SubscriptionScreen() {
     }
     setBusyPlan(plan);
     try {
+      // The purchase must be attached to this account or the backend webhook
+      // can't reconcile it — abort rather than buy anonymously.
+      const linked = await rc.ensureIdentified();
+      if (!linked) {
+        Alert.alert(
+          t("subscription.failedTitle"),
+          t("subscription.linkAccountFailedMsg"),
+        );
+        return;
+      }
       await rc.purchase(pkg);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       // The backend reconciles via RevenueCat's webhook; refresh so the screen
