@@ -7,6 +7,7 @@
 - [DO App Platform env scoping](do-app-platform-env-scoping.md) — component-level env vars override app-level ones; real values added at app level are silently ignored if the component has placeholder duplicates.
 - [Admin CORS allowlist](cors-admin-origins.md) — login 500s with "Origin not allowed by CORS" unless ADMIN_ORIGINS lists every domain the SPA loads from (custom domain AND *.ondigitalocean.app); same-origin POSTs are checked too.
 - [Azure content filter](azure-content-filter.md) — Replit OpenAI is Azure-backed; its content filter false-positives on benign scam text & kills whole categories; resolved with a Gemini fallback (BLOCK_NONE).
+- [AI dead on external hosts](ai-prod-modelfarm-localhost.md) — Replit AI integrations point at localhost:1106 modelfarm (Replit-only); on DigitalOcean AI silently fails → text-only scams return "unknown". Fix needs a real OpenAI/Gemini key.
 - [Broadcast/push delivery](broadcast-delivery.md) — Expo Go/web can't register push tokens, so "notify all" must also be an in-app feed (GET /notifications over broadcasts table); push is best-effort only.
 - [Admin web brand theme](admin-brand-theme.md) — admin mirrors the mobile Netraksh brand; shadcn `--primary` must be NAVY not saffron (saffron+white fails contrast; app uses navy buttons, saffron only as accent).
 - [MSG91 widget diagnosis](msg91-widget-diagnosis.md) — probe MSG91 directly; 201=unknown authkey, 418=wrong-account authkey, 701=correct authkey/bad token; success returns mobile in `message` not data.mobile; viewEnvVars hides user secrets.
