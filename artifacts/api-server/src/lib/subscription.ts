@@ -231,6 +231,51 @@ export async function activateSubscriptionForOrder(params: {
   return getEffectiveSubscription(payment.userId);
 }
 
+/**
+ * Reconcile a subscription that was bought through an app store (Google Play /
+ * App Store) via RevenueCat. Unlike the Razorpay flow there is no order to
+ * verify — RevenueCat's webhook is the authoritative source — so we upsert the
+ * user's subscription row directly. Idempotent: re-delivering the same event
+ * just re-applies the same state.
+ */
+export async function reconcileRevenueCatSubscription(params: {
+  userId: string;
+  plan: PlanKey;
+  status: SubStatus;
+  currentPeriodEnd: Date | null;
+  cancelAtPeriodEnd: boolean;
+}): Promise<void> {
+  const now = new Date();
+  const [existing] = await db
+    .select()
+    .from(subscriptionsTable)
+    .where(eq(subscriptionsTable.userId, params.userId))
+    .limit(1);
+
+  if (existing) {
+    await db
+      .update(subscriptionsTable)
+      .set({
+        plan: params.plan,
+        status: params.status,
+        currentPeriodStart: existing.currentPeriodStart ?? now,
+        currentPeriodEnd: params.currentPeriodEnd,
+        cancelAtPeriodEnd: params.cancelAtPeriodEnd,
+        updatedAt: now,
+      })
+      .where(eq(subscriptionsTable.id, existing.id));
+  } else {
+    await db.insert(subscriptionsTable).values({
+      userId: params.userId,
+      plan: params.plan,
+      status: params.status,
+      currentPeriodStart: now,
+      currentPeriodEnd: params.currentPeriodEnd,
+      cancelAtPeriodEnd: params.cancelAtPeriodEnd,
+    });
+  }
+}
+
 /** Mark an order's payment as failed (best-effort; idempotent-friendly). */
 export async function markOrderFailed(orderId: string): Promise<void> {
   await db

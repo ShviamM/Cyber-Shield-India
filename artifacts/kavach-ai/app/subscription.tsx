@@ -3,11 +3,9 @@ import {
   getGetMySubscriptionQueryKey,
   getListMyPaymentsQueryKey,
   useCancelSubscription,
-  useCreateSubscriptionOrder,
   useGetMySubscription,
   useGetSubscriptionPlans,
   useListMyPayments,
-  useVerifySubscriptionPayment,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
@@ -16,6 +14,8 @@ import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   Alert,
+  Linking,
+  Modal,
   Platform,
   ScrollView,
   StyleSheet,
@@ -23,41 +23,23 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import type { PurchasesPackage } from "react-native-purchases";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ErrorState, LoadingState } from "@/components/StateViews";
-import { useAuth } from "@/context/AuthContext";
 import { useColors } from "@/hooks/useColors";
-import { formatIndianPhone } from "@/lib/phone";
+import {
+  IS_REVENUECAT_TEST_MODE,
+  REVENUECAT_ENTITLEMENT_IDENTIFIER,
+  useSubscription,
+} from "@/lib/revenuecat";
 
 const NAVY = "#0B3D91";
 const SAFFRON = "#FF6713";
 const GREEN = "#138808";
 
 type PlanKey = "free" | "premium" | "family";
-
-// react-native-razorpay is a native module — it only works inside an Android/iOS
-// dev/production build, not in Expo Go or the web preview. Load it defensively so
-// the screen still renders everywhere; the checkout button explains when it can't
-// run natively.
-function getRazorpayCheckout():
-  | { open: (options: Record<string, unknown>) => Promise<RazorpaySuccess> }
-  | null {
-  if (Platform.OS === "web") return null;
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const mod = require("react-native-razorpay");
-    return (mod?.default ?? mod) ?? null;
-  } catch {
-    return null;
-  }
-}
-
-interface RazorpaySuccess {
-  razorpay_payment_id: string;
-  razorpay_order_id: string;
-  razorpay_signature: string;
-}
+type PaidPlanKey = "premium" | "family";
 
 const PLAN_META: Record<
   PlanKey,
@@ -68,99 +50,156 @@ const PLAN_META: Record<
   family: { icon: "users", color: NAVY, bg: "#EBF0FA" },
 };
 
+/** RevenueCat package lookup keys, by plan (from the seeded "default" offering). */
+const PACKAGE_ID: Record<PaidPlanKey, string> = {
+  premium: "$rc_monthly",
+  family: "family",
+};
+
 function formatINR(paise: number): string {
   const rupees = paise / 100;
   return Number.isInteger(rupees) ? `₹${rupees}` : `₹${rupees.toFixed(2)}`;
+}
+
+/** Map a store product identifier back to one of our plans (mirrors the server). */
+function planFromProductId(productId?: string): PaidPlanKey | null {
+  if (!productId) return null;
+  const base = productId.split(":")[0];
+  if (base === "premium_monthly") return "premium";
+  if (base === "family_monthly") return "family";
+  return null;
 }
 
 export default function SubscriptionScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
-  const { user } = useAuth();
   const queryClient = useQueryClient();
+  const rc = useSubscription();
 
-  const [busyPlan, setBusyPlan] = useState<PlanKey | null>(null);
+  const [busyPlan, setBusyPlan] = useState<PaidPlanKey | null>(null);
+  // The plan awaiting confirmation in the test-mode purchase modal.
+  const [pendingPlan, setPendingPlan] = useState<PaidPlanKey | null>(null);
 
   const statusQuery = useGetMySubscription();
   const plansQuery = useGetSubscriptionPlans();
   const paymentsQuery = useListMyPayments();
-
-  const createOrder = useCreateSubscriptionOrder();
-  const verifyPayment = useVerifySubscriptionPayment();
   const cancel = useCancelSubscription();
 
   const bottomPad = (insets.bottom || 0) + 32;
+
+  // In-app subscriptions are sold through Google Play (via RevenueCat) on
+  // native; the website keeps using Razorpay. The web preview falls back to a
+  // "use the app" message since real billing only exists in the installed app.
+  const storeBilling = Platform.OS !== "web" && rc.available;
+  const offering = rc.offerings?.current ?? null;
+
+  function packageForPlan(plan: PaidPlanKey): PurchasesPackage | null {
+    if (!offering) return null;
+    return (
+      offering.availablePackages.find((p) => p.identifier === PACKAGE_ID[plan]) ??
+      null
+    );
+  }
 
   function refreshSubscriptionData() {
     queryClient.invalidateQueries({ queryKey: getGetMySubscriptionQueryKey() });
     queryClient.invalidateQueries({ queryKey: getListMyPaymentsQueryKey() });
   }
 
-  async function handleUpgrade(plan: "premium" | "family", planName: string) {
-    const Razorpay = getRazorpayCheckout();
-    if (!Razorpay) {
+  async function runPurchase(plan: PaidPlanKey, planName: string) {
+    const pkg = packageForPlan(plan);
+    if (!pkg) {
       Alert.alert(
         t("subscription.checkoutUnavailableTitle"),
         t("subscription.checkoutUnavailableMsg"),
       );
       return;
     }
-
     setBusyPlan(plan);
     try {
-      const order = await createOrder.mutateAsync({ data: { plan } });
-
-      const result = await Razorpay.open({
-        key: order.keyId,
-        order_id: order.orderId,
-        amount: order.amount,
-        currency: order.currency,
-        name: t("common.appName"),
-        description: planName,
-        prefill: {
-          name: user?.fullName ?? undefined,
-          contact: user?.phone ?? undefined,
-        },
-        theme: { color: NAVY },
-      });
-
-      await verifyPayment.mutateAsync({
-        data: {
-          orderId: order.orderId,
-          paymentId: result.razorpay_payment_id,
-          signature: result.razorpay_signature,
-        },
-      });
-
+      await rc.purchase(pkg);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      // The backend reconciles via RevenueCat's webhook; refresh so the screen
+      // reflects the new entitlement (RevenueCat state updates immediately).
       refreshSubscriptionData();
       Alert.alert(
         t("subscription.successTitle"),
         t("subscription.successMsg", { plan: planName }),
       );
     } catch (err) {
-      // A user-cancelled checkout reports code 0/2 — don't treat that as an error.
+      // A user-cancelled purchase reports `userCancelled` — not an error.
       const cancelled =
         err != null &&
         typeof err === "object" &&
-        "code" in err &&
-        ((err as { code?: number }).code === 0 ||
-          (err as { code?: number }).code === 2);
+        "userCancelled" in err &&
+        (err as { userCancelled?: boolean }).userCancelled === true;
       if (!cancelled) {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-        Alert.alert(
-          t("subscription.failedTitle"),
-          t("subscription.failedMsg"),
-        );
+        Alert.alert(t("subscription.failedTitle"), t("subscription.failedMsg"));
       }
     } finally {
       setBusyPlan(null);
     }
   }
 
+  function handleUpgrade(plan: PaidPlanKey, planName: string) {
+    if (!storeBilling) {
+      Alert.alert(
+        t("subscription.checkoutUnavailableTitle"),
+        t("subscription.checkoutUnavailableMsg"),
+      );
+      return;
+    }
+    // Test/sandbox purchases don't show a native store sheet, so confirm via our
+    // own modal first. Real Google Play purchases show the Play sheet directly.
+    if (IS_REVENUECAT_TEST_MODE) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      setPendingPlan(plan);
+      return;
+    }
+    void runPurchase(plan, planName);
+  }
+
+  async function handleRestore() {
+    try {
+      const info = await rc.restore();
+      const active =
+        info.entitlements.active?.[REVENUECAT_ENTITLEMENT_IDENTIFIER] !==
+        undefined;
+      if (active) {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        refreshSubscriptionData();
+        Alert.alert(
+          t("subscription.restoredTitle"),
+          t("subscription.restoredMsg"),
+        );
+      } else {
+        Alert.alert(
+          t("subscription.nothingToRestoreTitle"),
+          t("subscription.nothingToRestoreMsg"),
+        );
+      }
+    } catch {
+      Alert.alert(t("subscription.failedTitle"), t("subscription.failedMsg"));
+    }
+  }
+
+  function openStoreManagement() {
+    const url =
+      Platform.OS === "ios"
+        ? "https://apps.apple.com/account/subscriptions"
+        : "https://play.google.com/store/account/subscriptions";
+    Linking.openURL(url).catch(() => {});
+  }
+
   function confirmCancel() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    // A store-billed subscription can only be cancelled where it was bought.
+    if (storeBilling && rc.isSubscribed) {
+      openStoreManagement();
+      return;
+    }
     Alert.alert(
       t("subscription.cancelConfirmTitle"),
       t("subscription.cancelConfirmMsg"),
@@ -210,10 +249,23 @@ export default function SubscriptionScreen() {
   const plans = plansQuery.data!.plans;
   const payments = paymentsQuery.data?.payments ?? [];
 
-  const currentPlan = status.plan as PlanKey;
+  // Premium access is true if either the backend (website/Razorpay) or the
+  // on-device RevenueCat entitlement (store purchase) says so.
+  const premiumActive = status.isPremium || rc.isSubscribed;
+  const currentPlan: PlanKey = status.isPremium
+    ? (status.plan as PlanKey)
+    : rc.isSubscribed
+      ? (planFromProductId(rc.activeProductId) ?? "premium")
+      : "free";
+
+  const rcExpiration =
+    rc.customerInfo?.entitlements.active?.[REVENUECAT_ENTITLEMENT_IDENTIFIER]
+      ?.expirationDate ?? null;
   const periodEnd = status.currentPeriodEnd
     ? new Date(status.currentPeriodEnd)
-    : null;
+    : rcExpiration
+      ? new Date(rcExpiration)
+      : null;
   const periodEndStr = periodEnd
     ? periodEnd.toLocaleDateString(undefined, {
         day: "numeric",
@@ -222,11 +274,15 @@ export default function SubscriptionScreen() {
       })
     : null;
 
-  const statusBadge = status.isPremium
+  const statusBadge = premiumActive
     ? status.cancelAtPeriodEnd
       ? { label: t("subscription.statusEnding"), color: SAFFRON }
       : { label: t("subscription.statusActive"), color: GREEN }
     : { label: t("subscription.statusFree"), color: "#64748b" };
+
+  const pendingPlanName = pendingPlan
+    ? t(`subscription.plans.${pendingPlan}.name`)
+    : "";
 
   return (
     <ScrollView
@@ -254,7 +310,7 @@ export default function SubscriptionScreen() {
               {t(`subscription.plans.${currentPlan}.name`)}
             </Text>
             <Text style={s.statusSub}>
-              {status.isPremium
+              {premiumActive
                 ? t("subscription.currentPlanSub")
                 : t("subscription.freePlanSub")}
             </Text>
@@ -268,7 +324,7 @@ export default function SubscriptionScreen() {
           </View>
         </View>
 
-        {status.isPremium && periodEndStr ? (
+        {premiumActive && periodEndStr ? (
           <Text style={s.renewNote}>
             {status.cancelAtPeriodEnd
               ? t("subscription.accessUntil", { date: periodEndStr })
@@ -276,7 +332,7 @@ export default function SubscriptionScreen() {
           </Text>
         ) : null}
 
-        {status.isPremium && !status.cancelAtPeriodEnd ? (
+        {premiumActive && !status.cancelAtPeriodEnd ? (
           <TouchableOpacity
             style={s.cancelLink}
             onPress={confirmCancel}
@@ -287,7 +343,9 @@ export default function SubscriptionScreen() {
               <ActivityIndicator size="small" color="#dc2626" />
             ) : (
               <Text style={s.cancelLinkTxt}>
-                {t("subscription.cancelRenewal")}
+                {storeBilling && rc.isSubscribed
+                  ? t("subscription.manageOnStore")
+                  : t("subscription.cancelRenewal")}
               </Text>
             )}
           </TouchableOpacity>
@@ -299,11 +357,20 @@ export default function SubscriptionScreen() {
       {plans.map((plan) => {
         const key = plan.key as PlanKey;
         const meta = PLAN_META[key];
-        const isCurrent = key === currentPlan && (status.isPremium || key === "free");
+        const isCurrent =
+          key === currentPlan && (premiumActive || key === "free");
         const features = t(`subscription.plans.${key}.features`, {
           returnObjects: true,
         }) as string[];
         const featureList = Array.isArray(features) ? features : [];
+
+        // On native, show the live store price; fall back to server pricing.
+        const storePkg = plan.premium
+          ? packageForPlan(key as PaidPlanKey)
+          : null;
+        const priceLabel = plan.premium
+          ? (storePkg?.product.priceString ?? formatINR(plan.amount))
+          : t("subscription.free");
 
         return (
           <View
@@ -327,7 +394,7 @@ export default function SubscriptionScreen() {
               </View>
               <View style={s.priceCol}>
                 <Text style={[s.price, { color: meta.color }]}>
-                  {plan.premium ? formatINR(plan.amount) : t("subscription.free")}
+                  {priceLabel}
                 </Text>
                 {plan.premium ? (
                   <Text style={s.priceUnit}>{t("subscription.perMonth")}</Text>
@@ -356,7 +423,7 @@ export default function SubscriptionScreen() {
                 style={[s.upgradeBtn, { backgroundColor: meta.color }]}
                 onPress={() =>
                   handleUpgrade(
-                    key as "premium" | "family",
+                    key as PaidPlanKey,
                     t(`subscription.plans.${key}.name`),
                   )
                 }
@@ -367,7 +434,7 @@ export default function SubscriptionScreen() {
                   <ActivityIndicator size="small" color="#fff" />
                 ) : (
                   <Text style={s.upgradeBtnTxt}>
-                    {status.isPremium
+                    {premiumActive
                       ? t("subscription.switchTo", {
                           plan: t(`subscription.plans.${key}.name`),
                         })
@@ -381,6 +448,24 @@ export default function SubscriptionScreen() {
           </View>
         );
       })}
+
+      {/* Restore purchases (store-billed only) */}
+      {storeBilling ? (
+        <TouchableOpacity
+          style={s.restoreLink}
+          onPress={handleRestore}
+          disabled={rc.isRestoring}
+          activeOpacity={0.7}
+        >
+          {rc.isRestoring ? (
+            <ActivityIndicator size="small" color={NAVY} />
+          ) : (
+            <Text style={s.restoreLinkTxt}>
+              {t("subscription.restorePurchases")}
+            </Text>
+          )}
+        </TouchableOpacity>
+      ) : null}
 
       {/* Payment history */}
       {payments.length > 0 ? (
@@ -425,8 +510,56 @@ export default function SubscriptionScreen() {
 
       <Text style={s.secureNote}>
         <Feather name="lock" size={11} color="#94a3b8" />{" "}
-        {t("subscription.secureNote")}
+        {storeBilling
+          ? t("subscription.playSecureNote")
+          : t("subscription.secureNote")}
       </Text>
+
+      {/* Test-mode purchase confirmation (sandbox has no native store sheet) */}
+      <Modal
+        visible={pendingPlan !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setPendingPlan(null)}
+      >
+        <View style={s.modalOverlay}>
+          <View style={s.modalCard}>
+            <Text style={s.modalTitle}>
+              {t("subscription.testPurchaseTitle")}
+            </Text>
+            <Text style={s.modalMsg}>
+              {t("subscription.testPurchaseMsg", { plan: pendingPlanName })}
+            </Text>
+            <View style={s.modalBtns}>
+              <TouchableOpacity
+                style={[s.modalBtn, s.modalBtnGhost]}
+                onPress={() => setPendingPlan(null)}
+                activeOpacity={0.8}
+              >
+                <Text style={s.modalBtnGhostTxt}>{t("common.cancel")}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[s.modalBtn, s.modalBtnPrimary]}
+                onPress={() => {
+                  const plan = pendingPlan;
+                  setPendingPlan(null);
+                  if (plan) {
+                    void runPurchase(
+                      plan,
+                      t(`subscription.plans.${plan}.name`),
+                    );
+                  }
+                }}
+                activeOpacity={0.85}
+              >
+                <Text style={s.modalBtnPrimaryTxt}>
+                  {t("subscription.testPurchaseConfirm")}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -524,6 +657,15 @@ const s = StyleSheet.create({
   },
   currentBtnTxt: { fontSize: 14, fontWeight: "700" as const },
 
+  restoreLink: {
+    alignSelf: "center",
+    marginTop: 4,
+    marginBottom: 4,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+  },
+  restoreLinkTxt: { fontSize: 13, fontWeight: "700" as const, color: NAVY },
+
   historyCard: {
     backgroundColor: "#fff",
     borderRadius: 18,
@@ -550,4 +692,38 @@ const s = StyleSheet.create({
     marginTop: 20,
     lineHeight: 16,
   },
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(15,23,42,0.55)",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 28,
+  },
+  modalCard: {
+    width: "100%",
+    maxWidth: 360,
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 22,
+  },
+  modalTitle: {
+    fontSize: 17,
+    fontWeight: "800" as const,
+    color: "#0f172a",
+    marginBottom: 8,
+  },
+  modalMsg: { fontSize: 14, color: "#475569", lineHeight: 20 },
+  modalBtns: { flexDirection: "row", gap: 10, marginTop: 22 },
+  modalBtn: {
+    flex: 1,
+    height: 46,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalBtnGhost: { backgroundColor: "#f1f5f9" },
+  modalBtnGhostTxt: { fontSize: 14, fontWeight: "700" as const, color: "#475569" },
+  modalBtnPrimary: { backgroundColor: NAVY },
+  modalBtnPrimaryTxt: { fontSize: 14, fontWeight: "700" as const, color: "#fff" },
 });

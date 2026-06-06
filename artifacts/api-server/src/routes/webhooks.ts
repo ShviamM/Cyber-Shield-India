@@ -1,4 +1,6 @@
 import { Router, type IRouter } from "express";
+import { eq } from "drizzle-orm";
+import { db, usersTable } from "@workspace/db";
 import { logger } from "../lib/logger";
 import {
   isWebhookConfigured,
@@ -7,7 +9,10 @@ import {
 import {
   activateSubscriptionForOrder,
   markOrderFailed,
+  reconcileRevenueCatSubscription,
+  type SubStatus,
 } from "../lib/subscription";
+import { type PlanKey } from "../lib/plans";
 
 const router: IRouter = Router();
 
@@ -75,6 +80,100 @@ router.post("/webhooks/razorpay", async (req, res) => {
     // Log but still acknowledge: a 5xx makes Razorpay retry, and our handlers
     // are idempotent, so retries are safe — but noisy. Acknowledge and move on.
     logger.error({ err, event: name }, "Razorpay webhook handler error");
+  }
+
+  res.json({ received: true });
+});
+
+/** Map a store product identifier to one of our plans. Play Store products carry
+ * a "{subscriptionId}:{basePlanId}" suffix we strip first. */
+function planFromProductId(productId: string | undefined): PlanKey | null {
+  if (!productId) return null;
+  const base = productId.split(":")[0];
+  if (base === "premium_monthly") return "premium";
+  if (base === "family_monthly") return "family";
+  return null;
+}
+
+interface RevenueCatEvent {
+  type?: string;
+  app_user_id?: string;
+  product_id?: string;
+  expiration_at_ms?: number;
+  store?: string;
+}
+
+/**
+ * RevenueCat server-to-server webhook — the authoritative source of truth for
+ * in-app (Google Play / App Store) subscriptions bought through the mobile app.
+ * Authenticated with a shared bearer string configured both here and in the
+ * RevenueCat dashboard. The client identifies itself to RevenueCat with our
+ * `user.id` (Purchases.logIn), so `app_user_id` maps straight to a user row.
+ * We always answer 200 quickly so RevenueCat does not retry-storm.
+ */
+router.post("/webhooks/revenuecat", async (req, res) => {
+  const expected = process.env.REVENUECAT_WEBHOOK_AUTH;
+  if (!expected) {
+    res.status(503).json({ error: "revenuecat_webhook_not_configured" });
+    return;
+  }
+
+  if (req.header("authorization") !== expected) {
+    logger.warn("RevenueCat webhook authorization mismatch");
+    res.status(401).json({ error: "unauthorized" });
+    return;
+  }
+
+  const event = (req.body as { event?: RevenueCatEvent } | undefined)?.event;
+  const type = event?.type ?? "";
+
+  try {
+    const userId = event?.app_user_id;
+    // Anonymous RevenueCat ids ($RCAnonymousID:...) belong to users who never
+    // logged in — nothing to reconcile against an account.
+    if (userId && !userId.startsWith("$RCAnonymousID")) {
+      const [user] = await db
+        .select({ id: usersTable.id })
+        .from(usersTable)
+        .where(eq(usersTable.id, userId))
+        .limit(1);
+
+      if (user) {
+        const periodEnd = event?.expiration_at_ms
+          ? new Date(event.expiration_at_ms)
+          : null;
+
+        if (type === "EXPIRATION") {
+          // Lapse to free once the entitlement ends.
+          await reconcileRevenueCatSubscription({
+            userId: user.id,
+            plan: "free",
+            status: "expired",
+            currentPeriodEnd: periodEnd,
+            cancelAtPeriodEnd: false,
+          });
+        } else {
+          const plan = planFromProductId(event?.product_id);
+          if (plan) {
+            // CANCELLATION = auto-renew turned off but access continues to the
+            // period end; everything else keeps the plan actively renewing.
+            const cancelled = type === "CANCELLATION";
+            const status: SubStatus = cancelled ? "canceled" : "active";
+            await reconcileRevenueCatSubscription({
+              userId: user.id,
+              plan,
+              status,
+              currentPeriodEnd: periodEnd,
+              cancelAtPeriodEnd: cancelled,
+            });
+          }
+        }
+      } else {
+        logger.warn({ userId }, "RevenueCat webhook for unknown user");
+      }
+    }
+  } catch (err) {
+    logger.error({ err, event: type }, "RevenueCat webhook handler error");
   }
 
   res.json({ received: true });

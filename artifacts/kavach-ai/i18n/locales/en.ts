@@ -757,7 +757,21 @@ const en = {
     cancelConfirm: "Cancel renewal",
     checkoutUnavailableTitle: "Checkout unavailable",
     checkoutUnavailableMsg:
-      "Payments need the full Netraksh app. Please install or update it from the Play Store or App Store.",
+      "In-app purchases need the full Netraksh app. Please install or update it from the Play Store.",
+    playSecureNote:
+      "Subscriptions are billed securely through Google Play. Netraksh never sees your card details.",
+    manageOnStore: "Manage subscription",
+    restorePurchases: "Restore purchases",
+    restoring: "Restoring…",
+    restoredTitle: "Purchases restored",
+    restoredMsg: "Your subscription has been restored on this device.",
+    nothingToRestoreTitle: "Nothing to restore",
+    nothingToRestoreMsg:
+      "We couldn't find an active subscription for this account.",
+    testPurchaseTitle: "Confirm test purchase",
+    testPurchaseMsg:
+      "You're in test mode — no real money will be charged. Simulate subscribing to the {{plan}} plan?",
+    testPurchaseConfirm: "Confirm",
     payStatus: {
       created: "Pending",
       paid: "Paid",

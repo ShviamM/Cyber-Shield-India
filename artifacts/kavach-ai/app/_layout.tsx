@@ -25,6 +25,7 @@ import { Onboarding } from "@/components/Onboarding";
 import { AppProvider } from "@/context/AppContext";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { initI18n } from "@/i18n";
+import { initializeRevenueCat, SubscriptionProvider } from "@/lib/revenuecat";
 import { getToken } from "@/lib/session";
 
 SplashScreen.preventAutoHideAsync();
@@ -44,6 +45,15 @@ if (apiDomain) {
 setAuthTokenGetter(getToken);
 
 const queryClient = new QueryClient();
+
+// Configure RevenueCat once at module load (before any purchase UI mounts). It
+// runs in test/preview mode in Expo Go and on web, so this is safe everywhere;
+// a failure must never block app startup.
+try {
+  initializeRevenueCat();
+} catch (err) {
+  console.warn("RevenueCat unavailable:", err);
+}
 
 // Expo Go can't load the share-intent native module; disable it there so the
 // preview keeps working. Dev/production builds report a non-"expo" ownership.
@@ -198,9 +208,11 @@ export default function RootLayout() {
             <GestureHandlerRootView>
               <KeyboardProvider>
                 <AuthProvider>
-                  <AppProvider>
-                    <RootLayoutNav />
-                  </AppProvider>
+                  <SubscriptionProvider>
+                    <AppProvider>
+                      <RootLayoutNav />
+                    </AppProvider>
+                  </SubscriptionProvider>
                 </AuthProvider>
               </KeyboardProvider>
             </GestureHandlerRootView>
