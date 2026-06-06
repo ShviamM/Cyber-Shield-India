@@ -3,7 +3,7 @@ import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { motion, MotionConfig, useReducedMotion, type Variants } from "framer-motion";
-import { ShieldCheck, ArrowRight, ShieldAlert, CheckCircle, Bell, Users, Lock, ChevronRight } from "lucide-react";
+import { ShieldCheck, ArrowRight, ShieldAlert, CheckCircle, Bell, Users, Lock, ChevronRight, Footprints, Scan } from "lucide-react";
 import { ScamCounter } from "@/components/ScamCounter";
 import { TrustTicker } from "@/components/TrustTicker";
 import { CyberRadar } from "@/components/CyberRadar";
@@ -58,6 +58,42 @@ export default function Home() {
               className="absolute top-[20%] right-[15%] w-64 h-64 bg-primary/5 rounded-full blur-3xl"
             />
           )}
+
+          {/* Decorative dotted grid */}
+          <div
+            aria-hidden
+            className="absolute inset-0 opacity-[0.5] [background-image:radial-gradient(circle,rgba(11,61,145,0.12)_1px,transparent_1px)] [background-size:26px_26px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]"
+          />
+
+          {/* Floating security glyphs (desktop gap between text & phone) */}
+          {!prefersReducedMotion && (
+            <>
+              <motion.div
+                aria-hidden
+                animate={{ y: [0, -14, 0], rotate: [0, 6, 0] }}
+                transition={{ repeat: Infinity, duration: 7, ease: "easeInOut" }}
+                className="absolute top-[20%] left-[47%] h-12 w-12 rounded-2xl bg-white/70 backdrop-blur-sm border border-primary/10 shadow-lg hidden lg:flex items-center justify-center text-primary"
+              >
+                <ShieldCheck className="h-5 w-5" />
+              </motion.div>
+              <motion.div
+                aria-hidden
+                animate={{ y: [0, 16, 0], rotate: [0, -5, 0] }}
+                transition={{ repeat: Infinity, duration: 9, ease: "easeInOut", delay: 0.6 }}
+                className="absolute bottom-[16%] left-[42%] h-11 w-11 rounded-2xl bg-white/70 backdrop-blur-sm border border-accent/10 shadow-lg hidden lg:flex items-center justify-center text-accent"
+              >
+                <Lock className="h-5 w-5" />
+              </motion.div>
+              <motion.div
+                aria-hidden
+                animate={{ y: [0, -12, 0], rotate: [0, 4, 0] }}
+                transition={{ repeat: Infinity, duration: 8, ease: "easeInOut", delay: 1.2 }}
+                className="absolute top-[54%] left-[49%] h-10 w-10 rounded-2xl bg-white/70 backdrop-blur-sm border border-primary/10 shadow-lg hidden lg:flex items-center justify-center text-primary"
+              >
+                <Scan className="h-4 w-4" />
+              </motion.div>
+            </>
+          )}
         </div>
 
         <div className="container mx-auto px-4 md:px-6 relative z-10">
@@ -70,9 +106,24 @@ export default function Home() {
               variants={staggerContainer}
               className="max-w-2xl"
             >
-              <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-50 border border-orange-100 text-accent text-sm font-semibold mb-8 shadow-sm">
-                <span className="flex h-2 w-2 rounded-full bg-accent animate-pulse"></span>
-                Thag se 2 kadam aage
+              <motion.div variants={fadeInUp} className="relative inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200/70 text-accent text-sm font-bold mb-8 shadow-sm overflow-hidden">
+                {!prefersReducedMotion && (
+                  <motion.span
+                    aria-hidden
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/70 to-transparent"
+                    animate={{ x: ["-160%", "160%"] }}
+                    transition={{ repeat: Infinity, duration: 2.4, ease: "easeInOut", repeatDelay: 1.2 }}
+                  />
+                )}
+                <motion.span
+                  aria-hidden
+                  className="relative z-10 flex items-center justify-center h-6 w-6 rounded-full bg-accent/15 text-accent"
+                  animate={prefersReducedMotion ? {} : { x: [0, 3, 0] }}
+                  transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
+                >
+                  <Footprints className="h-3.5 w-3.5" />
+                </motion.span>
+                <span className="relative z-10">Thag se 2 kadam aage</span>
               </motion.div>
               
               <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 tracking-tight leading-[1.1] mb-6">
