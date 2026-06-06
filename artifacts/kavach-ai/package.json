@@ -64,6 +64,7 @@
     "expo-share-intent": "5.1.1",
     "i18next": "^26.3.0",
     "react-i18next": "^17.0.8",
+    "react-native-purchases": "^10.2.2",
     "react-native-razorpay": "^3.0.0"
   }
 }
