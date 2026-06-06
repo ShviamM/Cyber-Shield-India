@@ -24,8 +24,13 @@ off-Replit host you must use a real third-party key:
 - OpenAI: set `OPENAI_API_KEY` to a real key AND clear/override `AI_INTEGRATIONS_OPENAI_BASE_URL`
   + `AI_INTEGRATIONS_OPENAI_API_KEY` (the wrapper prefers AI_INTEGRATIONS_* over OPENAI_*; baseURL falls
   back to `OPENAI_BASE_URL` then the real api.openai.com default).
-- Gemini: set `AI_INTEGRATIONS_GEMINI_BASE_URL=https://generativelanguage.googleapis.com`
-  and `AI_INTEGRATIONS_GEMINI_API_KEY` to a real Google AI Studio key (the gemini wrapper
-  hard-requires both vars).
+- Gemini (DONE for Netraksh prod, June 2026): set `AI_INTEGRATIONS_GEMINI_BASE_URL` to
+  **`https://generativelanguage.googleapis.com/v1beta`** (the `/v1beta` MUST be in the base URL
+  because `lib/integrations-gemini-ai` hardcodes `httpOptions.apiVersion: ""`, and @google/genai
+  only appends a version segment when apiVersion is non-empty — verified in its dist URL builder)
+  and `AI_INTEGRATIONS_GEMINI_API_KEY` to a real Google AI Studio key (starts `AIza`). No code/git
+  push needed — env-var-only fix. Also REMOVE the `AI_INTEGRATIONS_OPENAI_*` vars on the external
+  host so `isOpenAiConfigured()` is false and the engine skips the dead localhost OpenAI attempt and
+  goes straight to Gemini. Apply via `doctl apps update <id> --spec` (edits trigger a redeploy).
 - Diagnose fast: `POST /api/check {"type":"message","value":"<text-only scam, no link>"}` —
   prod returns `unknown` (AI down) while Replit dev returns a real category+confidence.
