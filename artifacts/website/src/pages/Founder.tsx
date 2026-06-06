@@ -591,6 +591,59 @@ export default function Founder() {
         </div>
       </section>
 
+      {/* Photo Gallery */}
+      <section className="bg-gray-50 py-24">
+        <div className="container mx-auto px-4 md:px-6 max-w-6xl">
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-10">
+            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">Photo Gallery</span>
+            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">Moments from the field</h2>
+          </motion.div>
+          <div className="flex flex-wrap justify-center gap-2 mb-10">
+            {galleryCategories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => {
+                  setActiveCategory(cat);
+                  setLightbox(null);
+                }}
+                aria-pressed={activeCategory === cat}
+                className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                  activeCategory === cat ? "bg-accent text-white" : "bg-white text-gray-600 border border-gray-200 hover:border-accent/40"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+          <div className="columns-2 md:columns-3 gap-4 [column-fill:_balance]">
+            {filteredGallery.map((g, i) => (
+              <button
+                key={g.src}
+                onClick={() => setLightbox(i)}
+                className={`group relative ${g.h} w-full mb-4 break-inside-avoid rounded-2xl overflow-hidden bg-gradient-to-br from-[#0e2350] to-[#08183f]`}
+              >
+                <img
+                  src={g.type === "video" ? g.poster : g.src}
+                  alt={g.alt}
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <span className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-black/0" />
+                {g.type === "video" && (
+                  <span className="absolute inset-0 flex items-center justify-center">
+                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/90 text-[#08183f] shadow-lg transition-transform group-hover:scale-110">
+                      <Play className="h-6 w-6 translate-x-0.5 fill-current" />
+                    </span>
+                  </span>
+                )}
+                <span className="absolute bottom-3 left-3 text-xs font-semibold text-white drop-shadow">{g.category}</span>
+                <span className="absolute inset-0 bg-accent/0 group-hover:bg-accent/10 transition-colors" />
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Services */}
       <section className="bg-white py-24">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
@@ -655,59 +708,6 @@ export default function Founder() {
                   <p className="text-xs text-gray-600 leading-relaxed">{p.desc}</p>
                 </div>
               </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Photo Gallery */}
-      <section className="bg-gray-50 py-24">
-        <div className="container mx-auto px-4 md:px-6 max-w-6xl">
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-10">
-            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">Photo Gallery</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">Moments from the field</h2>
-          </motion.div>
-          <div className="flex flex-wrap justify-center gap-2 mb-10">
-            {galleryCategories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => {
-                  setActiveCategory(cat);
-                  setLightbox(null);
-                }}
-                aria-pressed={activeCategory === cat}
-                className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                  activeCategory === cat ? "bg-accent text-white" : "bg-white text-gray-600 border border-gray-200 hover:border-accent/40"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-          <div className="columns-2 md:columns-3 gap-4 [column-fill:_balance]">
-            {filteredGallery.map((g, i) => (
-              <button
-                key={g.src}
-                onClick={() => setLightbox(i)}
-                className={`group relative ${g.h} w-full mb-4 break-inside-avoid rounded-2xl overflow-hidden bg-gradient-to-br from-[#0e2350] to-[#08183f]`}
-              >
-                <img
-                  src={g.type === "video" ? g.poster : g.src}
-                  alt={g.alt}
-                  loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <span className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-black/0" />
-                {g.type === "video" && (
-                  <span className="absolute inset-0 flex items-center justify-center">
-                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/90 text-[#08183f] shadow-lg transition-transform group-hover:scale-110">
-                      <Play className="h-6 w-6 translate-x-0.5 fill-current" />
-                    </span>
-                  </span>
-                )}
-                <span className="absolute bottom-3 left-3 text-xs font-semibold text-white drop-shadow">{g.category}</span>
-                <span className="absolute inset-0 bg-accent/0 group-hover:bg-accent/10 transition-colors" />
-              </button>
             ))}
           </div>
         </div>
