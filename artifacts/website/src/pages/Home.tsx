@@ -3,7 +3,7 @@ import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { motion, MotionConfig, useReducedMotion, type Variants } from "framer-motion";
-import { ShieldCheck, ArrowRight, ShieldAlert, CheckCircle, Bell, Users, Lock, ChevronRight, Footprints, Scan } from "lucide-react";
+import { ShieldCheck, ArrowRight, ShieldAlert, CheckCircle, Bell, Users, ChevronRight, Footprints } from "lucide-react";
 import { ScamCounter } from "@/components/ScamCounter";
 import { TrustTicker } from "@/components/TrustTicker";
 import { CyberRadar } from "@/components/CyberRadar";
@@ -65,35 +65,6 @@ export default function Home() {
             className="absolute inset-0 opacity-[0.5] [background-image:radial-gradient(circle,rgba(11,61,145,0.12)_1px,transparent_1px)] [background-size:26px_26px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]"
           />
 
-          {/* Floating security glyphs (desktop gap between text & phone) */}
-          {!prefersReducedMotion && (
-            <>
-              <motion.div
-                aria-hidden
-                animate={{ y: [0, -14, 0], rotate: [0, 6, 0] }}
-                transition={{ repeat: Infinity, duration: 7, ease: "easeInOut" }}
-                className="absolute top-[20%] left-[47%] h-12 w-12 rounded-2xl bg-white/70 backdrop-blur-sm border border-primary/10 shadow-lg hidden lg:flex items-center justify-center text-primary"
-              >
-                <ShieldCheck className="h-5 w-5" />
-              </motion.div>
-              <motion.div
-                aria-hidden
-                animate={{ y: [0, 16, 0], rotate: [0, -5, 0] }}
-                transition={{ repeat: Infinity, duration: 9, ease: "easeInOut", delay: 0.6 }}
-                className="absolute bottom-[16%] left-[42%] h-11 w-11 rounded-2xl bg-white/70 backdrop-blur-sm border border-accent/10 shadow-lg hidden lg:flex items-center justify-center text-accent"
-              >
-                <Lock className="h-5 w-5" />
-              </motion.div>
-              <motion.div
-                aria-hidden
-                animate={{ y: [0, -12, 0], rotate: [0, 4, 0] }}
-                transition={{ repeat: Infinity, duration: 8, ease: "easeInOut", delay: 1.2 }}
-                className="absolute top-[54%] left-[49%] h-10 w-10 rounded-2xl bg-white/70 backdrop-blur-sm border border-primary/10 shadow-lg hidden lg:flex items-center justify-center text-primary"
-              >
-                <Scan className="h-4 w-4" />
-              </motion.div>
-            </>
-          )}
         </div>
 
         <div className="container mx-auto px-4 md:px-6 relative z-10">
