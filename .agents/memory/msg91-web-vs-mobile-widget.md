@@ -29,3 +29,18 @@ try every configured widget id. Config: `msg91WidgetId` (mobile) + `msg91WebWidg
 **How to apply:** when wiring website OTP, set VITE_MSG91_WIDGET_ID to the web widget,
 set MSG91_WEB_WIDGET_ID (backend) to the same, reuse the existing tokenAuth, and remember
 prod needs these baked into the DO build (see website-prod-vite-build-args.md).
+
+## Headless captcha ("Invalid Captcha Token")
+With `exposeMethods: true` the widget suppresses its own popup, so its captcha never
+renders and `sendOtp` is rejected server-side with **"Could not send the code Invalid
+Captcha Token"** (the web widget has Captcha Validation ON by default).
+Fix without disabling captcha (disabling weakens SMS-cost-abuse protection):
+- Pass `captchaRenderId: "<dom-id>"` in `initSendOTP` and render a `<div id="<dom-id>">`
+  that is **already in the DOM** at init time. MSG91 injects **hCaptcha** (not reCAPTCHA)
+  into it ("I am human" checkbox).
+- The widget also exposes `window.isCaptchaVerified(): boolean` — gate `sendOtp` on it.
+- Keep the captcha container **mounted** across UI steps (hide with CSS, don't unmount);
+  the widget injects hCaptcha once and won't re-inject into a remounted empty div, which
+  would strand the "change number"/resend flow.
+- On localhost the box shows a benign "Warning: localhost detected. Please use a valid
+  host." — it still works on the real domain.

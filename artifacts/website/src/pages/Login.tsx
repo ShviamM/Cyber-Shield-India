@@ -6,10 +6,18 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { checkPhone, verifyToken } from "@workspace/api-client-react";
-import { sendOtp, verifyOtp, retryOtp } from "@/lib/msg91";
+import {
+  sendOtp,
+  verifyOtp,
+  retryOtp,
+  prepareOtpWidget,
+  isCaptchaVerified,
+} from "@/lib/msg91";
 import { Lock, ArrowRight, Loader2, ShieldCheck } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
+
+const CAPTCHA_CONTAINER_ID = "msg91-captcha";
 
 function normalizePhone(raw: string): string | null {
   const digits = raw.replace(/\D/g, "");
@@ -41,6 +49,18 @@ export default function Login() {
   const [fullName, setFullName] = useState("");
   const [isNewUser, setIsNewUser] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [widgetReady, setWidgetReady] = useState(false);
+
+  // Initialize the OTP widget once the captcha container is in the DOM so the
+  // captcha can render before the user requests a code. Only enable "Send code"
+  // once it resolves, so we never call sendOtp before the captcha is rendered.
+  useEffect(() => {
+    prepareOtpWidget(CAPTCHA_CONTAINER_ID)
+      .then(() => setWidgetReady(true))
+      .catch(() => {
+        /* surfaced when the user tries to send a code */
+      });
+  }, []);
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +69,15 @@ export default function Login() {
       toast({
         title: "Invalid number",
         description: "Enter a valid 10-digit Indian mobile number.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isCaptchaVerified()) {
+      toast({
+        title: "Complete the captcha",
+        description: "Please tick the captcha box to confirm you're human.",
         variant: "destructive",
       });
       return;
@@ -158,7 +187,7 @@ export default function Login() {
           </div>
 
           <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
-            {step === "phone" ? (
+            <div className={step === "phone" ? "" : "hidden"}>
               <form onSubmit={handlePhoneSubmit} className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="phone">Mobile Number</Label>
@@ -183,10 +212,14 @@ export default function Login() {
                     number as your Netraksh app to unlock your plan there.
                   </p>
                 </div>
+                <div
+                  id={CAPTCHA_CONTAINER_ID}
+                  className="flex justify-center [&:empty]:hidden"
+                />
                 <Button
                   type="submit"
                   className="w-full h-12 text-lg rounded-xl flex gap-2"
-                  disabled={submitting}
+                  disabled={submitting || !widgetReady}
                 >
                   {submitting ? (
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -197,7 +230,8 @@ export default function Login() {
                   )}
                 </Button>
               </form>
-            ) : (
+            </div>
+            {step === "otp" && (
               <form onSubmit={handleOtpSubmit} className="space-y-6">
                 {isNewUser && (
                   <div className="space-y-2">
