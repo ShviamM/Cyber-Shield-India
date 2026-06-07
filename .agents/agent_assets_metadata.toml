@@ -125,3 +125,9 @@ id = "y7WCn-sLHrFLy3JH2bB6N"
 uri = "file://website-review.md"
 type = "text"
 title = "Netraksh Website Review"
+
+[[outputs]]
+id = "5wdJD8t2h1t2fRLG3b1dj"
+uri = "file://NETRAKSH_PRELAUNCH_AUDIT.md"
+type = "text"
+title = "Netraksh — Pre-Launch Audit & Play Store Readiness Report"
