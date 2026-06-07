@@ -279,7 +279,7 @@ export default function CyberLaws() {
         />
 
         {/* HERO */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white pt-24 pb-16">
+        <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white pt-12 pb-16">
           <div className="absolute inset-0 pointer-events-none opacity-[0.6]">
             <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
             <div className="absolute top-1/2 -left-24 h-80 w-80 rounded-full bg-accent/10 blur-3xl" />

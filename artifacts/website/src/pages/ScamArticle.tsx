@@ -224,7 +224,31 @@ export default function ScamArticle() {
             ))}
           </div>
 
-          <div className="mt-12 p-8 rounded-3xl bg-gray-900 text-white text-center">
+          <div className="mt-12 rounded-3xl border border-primary/15 bg-gradient-to-br from-blue-50 to-white p-7 md:p-8 flex flex-col sm:flex-row items-center gap-6">
+            <div className="flex items-center gap-4 flex-1">
+              <div className="p-3 bg-primary/10 text-primary rounded-2xl shrink-0">
+                <ShieldCheck className="h-7 w-7" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">
+                  Protect yourself automatically
+                </h3>
+                <p className="text-gray-600">
+                  Netraksh blocks scam calls, fake links and fraud messages like
+                  this in real time — before they reach you.
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/download"
+              className="inline-flex items-center gap-2 bg-primary text-white font-bold px-6 py-3 rounded-full hover:bg-primary/90 transition-colors whitespace-nowrap shrink-0"
+            >
+              Download Netraksh
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          <div className="mt-6 p-8 rounded-3xl bg-gray-900 text-white text-center">
             <ShieldCheck className="h-10 w-10 text-accent mx-auto mb-4" />
             <h3 className="text-2xl font-bold mb-3">
               Report fraud immediately

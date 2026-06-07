@@ -3,7 +3,7 @@ import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { motion, MotionConfig, useReducedMotion, type Variants } from "framer-motion";
-import { ShieldCheck, ArrowRight, ShieldAlert, CheckCircle, Bell, Users, ChevronRight, Footprints } from "lucide-react";
+import { ShieldCheck, ArrowRight, ShieldAlert, CheckCircle, Bell, Users, ChevronRight, Footprints, Star } from "lucide-react";
 import { ScamCounter } from "@/components/ScamCounter";
 import { TrustTicker } from "@/components/TrustTicker";
 import { CyberRadar } from "@/components/CyberRadar";
@@ -142,15 +142,35 @@ export default function Home() {
                 </Link>
               </motion.div>
 
-              <motion.div variants={fadeInUp} className="mt-10 flex items-center gap-4 text-sm text-gray-500 font-medium">
-                <div className="flex -space-x-2">
-                  {[1,2,3,4].map(i => (
-                    <div key={i} className="w-8 h-8 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-xs overflow-hidden shadow-sm">
-                      <img src={`https://api.dicebear.com/7.x/initials/svg?seed=U${i}&backgroundColor=e2e8f0`} alt="" />
+              <motion.div variants={fadeInUp} className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-5">
+                <div className="flex items-center gap-3">
+                  <div className="flex -space-x-2">
+                    {[1,2,3,4].map(i => (
+                      <div key={i} className="w-9 h-9 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-xs overflow-hidden shadow-sm">
+                        <img src={`https://api.dicebear.com/7.x/initials/svg?seed=U${i}&backgroundColor=e2e8f0`} alt="" />
+                      </div>
+                    ))}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-0.5 text-accent">
+                      {[0,1,2,3,4].map(i => (
+                        <Star key={i} className="h-4 w-4 fill-current" />
+                      ))}
                     </div>
-                  ))}
+                    <p className="text-sm text-gray-500 font-medium mt-0.5">Trusted by Indian families</p>
+                  </div>
                 </div>
-                <p>Growing community of protected citizens</p>
+                <div className="flex items-center gap-6">
+                  <div>
+                    <p className="text-2xl font-extrabold text-gray-900 leading-none">1.2L+</p>
+                    <p className="text-xs text-gray-500 font-medium mt-1.5">Families protected</p>
+                  </div>
+                  <div className="w-px h-10 bg-gray-200" />
+                  <div>
+                    <p className="text-2xl font-extrabold text-gray-900 leading-none">8.5L+</p>
+                    <p className="text-xs text-gray-500 font-medium mt-1.5">Scams blocked</p>
+                  </div>
+                </div>
               </motion.div>
             </motion.div>
 

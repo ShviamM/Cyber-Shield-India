@@ -1,5 +1,6 @@
 import { Navbar } from "./Navbar";
 import { Footer } from "./Footer";
+import { MobileCTABar } from "./MobileCTABar";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -9,6 +10,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       <Footer />
+      <MobileCTABar />
     </div>
   );
 }

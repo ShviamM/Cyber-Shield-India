@@ -16,6 +16,7 @@ import {
   IdCard,
   ArrowRight,
   Phone,
+  Search,
 } from "lucide-react";
 
 const iconMap = {
@@ -34,11 +35,17 @@ const categories = ["All", "Alert", "Guide", "Family", "Recovery"] as const;
 
 export default function CyberSafetyCenter() {
   const [active, setActive] = useState<(typeof categories)[number]>("All");
+  const [query, setQuery] = useState("");
 
-  const filtered =
-    active === "All"
-      ? scamArticles
-      : scamArticles.filter((a) => a.category === active);
+  const q = query.trim().toLowerCase();
+  const filtered = scamArticles.filter((a) => {
+    const matchesCategory = active === "All" || a.category === active;
+    const matchesQuery =
+      !q ||
+      a.title.toLowerCase().includes(q) ||
+      a.excerpt.toLowerCase().includes(q);
+    return matchesCategory && matchesQuery;
+  });
 
   return (
     <Layout>
@@ -47,9 +54,9 @@ export default function CyberSafetyCenter() {
         description="Learn how to spot and avoid India's most common scams: digital arrest, UPI fraud, QR fraud, WhatsApp scams, fake loan apps, OTP theft and more. Free, simple guides for every Indian."
         url="https://netraksh.com/cyber-safety-center"
       />
-      <div className="bg-gray-50 py-16 md:py-20">
+      <div className="bg-gray-50 pt-10 pb-16 md:pt-14 md:pb-20">
         <div className="container mx-auto px-4 max-w-6xl">
-          <div className="text-center mb-12">
+          <div className="text-center mb-10">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 text-primary text-sm font-semibold mb-6">
               <ShieldCheck className="h-4 w-4" />
               Free Awareness Hub
@@ -61,6 +68,20 @@ export default function CyberSafetyCenter() {
               Knowledge is your first line of defense. Simple, jargon free guides
               to the scams targeting Indian families today.
             </p>
+          </div>
+
+          <div className="max-w-md mx-auto mb-8">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search scams, e.g. UPI, digital arrest, OTP..."
+                aria-label="Search guides"
+                className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+              />
+            </div>
           </div>
 
           <div className="flex flex-wrap justify-center gap-3 mb-12">
@@ -78,6 +99,12 @@ export default function CyberSafetyCenter() {
               </button>
             ))}
           </div>
+
+          {filtered.length === 0 && (
+            <div className="text-center py-16 text-gray-500">
+              No guides found. Try a different search term or category.
+            </div>
+          )}
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((article) => {
@@ -99,7 +126,7 @@ export default function CyberSafetyCenter() {
                   <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary transition-colors">
                     {article.title}
                   </h3>
-                  <p className="text-gray-600 mb-5 flex-1">{article.excerpt}</p>
+                  <p className="text-gray-600 mb-5 flex-1 line-clamp-3">{article.excerpt}</p>
                   <span className="text-primary font-medium inline-flex items-center gap-1.5">
                     Read guide
                     <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />

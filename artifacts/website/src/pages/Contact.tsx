@@ -21,7 +21,7 @@ export default function Contact() {
         title="Contact Us | Netraksh Support" 
         description="Get in touch with the Netraksh team for support, business enquiries, partnership requests, or media."
       />
-      <div className="container mx-auto px-4 py-20 max-w-6xl">
+      <div className="container mx-auto px-4 pt-10 pb-16 max-w-6xl">
         <div className="grid lg:grid-cols-2 gap-16">
           <div>
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Get in touch</h1>
