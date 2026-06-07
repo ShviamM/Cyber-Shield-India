@@ -9,6 +9,7 @@ import {
   getMySubscription,
   createSubscriptionOrder,
   verifySubscriptionPayment,
+  startSubscriptionTrial,
   type SubscriptionPlan,
   type SubscriptionStatus,
 } from "@workspace/api-client-react";
@@ -64,6 +65,10 @@ function formatPrice(amountPaise: number): string {
   return `₹${Number.isInteger(rupees) ? rupees : rupees.toFixed(2)}`;
 }
 
+function monthlyEquivalent(amountPaise: number): string {
+  return `₹${Math.round(amountPaise / 12 / 100)}`;
+}
+
 function errorMessage(error: unknown, fallback: string): string {
   if (error instanceof Error && error.message) return error.message;
   return fallback;
@@ -78,6 +83,7 @@ export default function Pricing() {
   const [subscription, setSubscription] = useState<SubscriptionStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [pendingPlan, setPendingPlan] = useState<PaidPlan | null>(null);
+  const [trialPlan, setTrialPlan] = useState<PaidPlan | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -156,13 +162,45 @@ export default function Pricing() {
     }
   };
 
-  const currentPlan = subscription?.status === "active" ? subscription.plan : "free";
+  const handleTrial = async (plan: PaidPlan) => {
+    if (authLoading) return;
+    if (!user) {
+      setLocation(`/login?next=${encodeURIComponent("/pricing")}`);
+      return;
+    }
+
+    setTrialPlan(plan);
+    try {
+      const status = await startSubscriptionTrial({ plan });
+      setSubscription(status);
+      toast({
+        title: "Your 7-day free trial is active",
+        description: `Enjoy ${PLAN_META[plan]?.name ?? plan} free for 7 days — no card needed.`,
+      });
+      setLocation("/account");
+    } catch (error) {
+      toast({
+        title: "Couldn't start trial",
+        description: errorMessage(error, "Please try again in a moment."),
+        variant: "destructive",
+      });
+    } finally {
+      setTrialPlan(null);
+    }
+  };
+
+  // The plan the user is actively on (active paid OR running trial).
+  const currentPlan = subscription?.isPremium ? subscription.plan : "free";
+  // Eligible for the one-time free trial. Logged-out visitors see the trial CTA
+  // (clicking sends them to login first).
+  const trialEligible = subscription ? subscription.trialEligible : true;
+  const busy = pendingPlan !== null || trialPlan !== null;
 
   return (
     <Layout>
       <SEOHead
         title="Pricing & Plans | Netraksh"
-        description="Choose a Netraksh plan — Premium for full real-time scam protection, or Family to protect up to 5 loved ones. Affordable monthly pricing in INR."
+        description="Start a 7-day free trial of Netraksh — Premium at ₹99/year for full real-time scam protection, or Family at ₹449/year to protect up to 5 loved ones."
       />
       <section className="py-20 px-4 bg-gradient-to-b from-white to-gray-50">
         <div className="container mx-auto max-w-6xl">
@@ -171,8 +209,9 @@ export default function Pricing() {
               Protection that fits your life
             </h1>
             <p className="text-lg text-gray-600">
-              Start free, upgrade anytime. Cancel whenever you like. Your plan unlocks
-              instantly in the Netraksh app on the same mobile number.
+              Try Premium free for 7 days — no card needed. After that, keep your
+              protection for just ₹99/year. Your plan unlocks instantly in the
+              Netraksh app on the same mobile number.
             </p>
           </div>
 
@@ -221,12 +260,24 @@ export default function Pricing() {
                       {key === "free" ? (
                         <span className="text-4xl font-bold text-gray-900">Free</span>
                       ) : (
-                        <div className="flex items-end gap-1">
-                          <span className="text-4xl font-bold text-gray-900">
-                            {plan ? formatPrice(plan.amount) : "—"}
-                          </span>
-                          <span className="text-gray-500 mb-1">/ month</span>
-                        </div>
+                        <>
+                          <div className="flex items-end gap-1">
+                            <span className="text-4xl font-bold text-gray-900">
+                              {plan ? formatPrice(plan.amount) : "—"}
+                            </span>
+                            <span className="text-gray-500 mb-1">/ year</span>
+                          </div>
+                          {plan && (
+                            <div className="mt-2 flex items-center gap-2">
+                              <span className="text-sm text-gray-500">
+                                ≈ {monthlyEquivalent(plan.amount)}/mo, billed yearly
+                              </span>
+                              <span className="text-xs font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
+                                2 months free
+                              </span>
+                            </div>
+                          )}
+                        </>
                       )}
                     </div>
 
@@ -241,13 +292,28 @@ export default function Pricing() {
 
                     {isCurrent ? (
                       <Button disabled className="w-full h-12 rounded-xl" variant="secondary">
-                        Current plan
+                        {subscription?.status === "trialing"
+                          ? "Trial active"
+                          : "Current plan"}
+                      </Button>
+                    ) : isPaid && trialEligible ? (
+                      <Button
+                        className="w-full h-12 rounded-xl text-base"
+                        variant={meta.highlight ? "default" : "outline"}
+                        disabled={busy}
+                        onClick={() => handleTrial(key as PaidPlan)}
+                      >
+                        {trialPlan === key ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          "Start 7-day free trial"
+                        )}
                       </Button>
                     ) : isPaid ? (
                       <Button
                         className="w-full h-12 rounded-xl text-base"
                         variant={meta.highlight ? "default" : "outline"}
-                        disabled={pendingPlan !== null}
+                        disabled={busy}
                         onClick={() => handleSubscribe(key as PaidPlan)}
                       >
                         {pendingPlan === key ? (
@@ -268,8 +334,9 @@ export default function Pricing() {
           )}
 
           <p className="text-center text-sm text-gray-500 mt-10">
-            Payments are processed securely by Razorpay. Prices are in Indian Rupees and
-            billed monthly. You can cancel anytime from your account.
+            Your 7-day free trial needs no card. After it ends, pay once a year to keep
+            premium — there's no auto-charge. Payments are processed securely by Razorpay
+            in Indian Rupees, and you're never billed without choosing to.
           </p>
         </div>
       </section>

@@ -58,6 +58,8 @@ export * from './reportListResponse';
 export * from './scamCategory';
 export * from './scamOfDay';
 export * from './sendBroadcastRequest';
+export * from './startTrialRequest';
+export * from './startTrialRequestPlan';
 export * from './subscriptionOrder';
 export * from './subscriptionOrderPlan';
 export * from './subscriptionPlan';

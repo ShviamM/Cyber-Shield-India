@@ -27,6 +27,7 @@
 - [MSG91 client env vars](msg91-client-env.md) — EXPO_PUBLIC_/VITE_ MSG91 WIDGET_ID & TOKEN_AUTH are client-public by design (ship in bundles); secret scanners flag TOKEN_AUTH as a false positive. Real secret = MSG91_AUTH_KEY in secrets store.
 - [Expo Router tab re-entry](expo-router-tab-reentry.md) — tabs stay mounted; pass a changing ts nonce param so a repeat navigation re-runs its effect.
 - [DO subpath routing](do-subpath-routing.md) — multiple static Vite SPAs on one DO app: static SPAs use DEFAULT (strip) ingress + Vite base=subpath; only prefix-mounted backends use preserve_path_prefix:true.
+- [Cross-channel trial eligibility](trial-eligibility-cross-channel.md) — website free-trial gate must count RevenueCat (no payments row) paid history; a paid plan w/ period end but null trialStartedAt = prior paid; startTrial must be atomic.
 - [Paywall billing-period dimension](paywall-billing-period.md) — monthly/annual is a first-class dimension; `isCurrent`+CTA must be period-aware (not plan-only) or same-plan period switches get hidden; trial badge only from real store introPrice.
 - [RevenueCat ↔ backend reconciliation](revenuecat-reconciliation.md) — store purchases aren't authoritative; reconcile via webhook to the subscriptions table. Guards: identify before buy, no period-end regress, event allowlist.
 - [Reduced-motion coverage (web)](reduced-motion-web.md) — 3 layers needed: MotionConfig reducedMotion="user" (transforms), useReducedMotion guards on intervals/loops, global CSS @media reset (animate-pulse/hover/transition). Keep opacity fades.

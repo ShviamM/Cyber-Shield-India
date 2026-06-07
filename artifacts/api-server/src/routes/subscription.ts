@@ -4,6 +4,7 @@ import { db, paymentsTable, subscriptionsTable } from "@workspace/db";
 import {
   CreateSubscriptionOrderBody,
   VerifySubscriptionPaymentBody,
+  StartSubscriptionTrialBody,
   type SubscriptionPlanList,
   type SubscriptionOrder,
   type PaymentList,
@@ -19,6 +20,7 @@ import {
 import {
   activateSubscriptionForOrder,
   getEffectiveSubscription,
+  startTrial,
   toPaymentDto,
   toSubscriptionStatusDto,
 } from "../lib/subscription";
@@ -89,6 +91,32 @@ router.post("/subscription/order", requireAuth, async (req, res) => {
     plan: def.key as SubscriptionOrder["plan"],
   };
   res.json(response);
+});
+
+// Start a 7-day no-card free trial on a paid plan.
+router.post("/subscription/trial", requireAuth, async (req, res) => {
+  const user = req.user!;
+  const body = StartSubscriptionTrialBody.parse(req.body);
+
+  const def = getPlan(body.plan);
+  if (!def || !def.premium) {
+    throw new HttpError(
+      400,
+      "invalid_plan",
+      "Choose a paid plan (Premium or Family) to start a trial.",
+    );
+  }
+
+  const sub = await startTrial(user.id, def.key);
+  if (!sub) {
+    throw new HttpError(
+      400,
+      "trial_not_available",
+      "You've already used your free trial. Subscribe to keep your protection.",
+    );
+  }
+
+  res.json(toSubscriptionStatusDto(sub));
 });
 
 // Verify a checkout payment server-side and activate the subscription.

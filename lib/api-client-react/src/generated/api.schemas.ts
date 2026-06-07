@@ -448,6 +448,7 @@ export type SubscriptionPlanInterval = typeof SubscriptionPlanInterval[keyof typ
 
 export const SubscriptionPlanInterval = {
   month: 'month',
+  year: 'year',
 } as const;
 
 export interface SubscriptionPlan {
@@ -481,6 +482,7 @@ export const SubscriptionStatusStatus = {
   canceled: 'canceled',
   expired: 'expired',
   past_due: 'past_due',
+  trialing: 'trialing',
 } as const;
 
 export interface SubscriptionStatus {
@@ -491,6 +493,8 @@ export interface SubscriptionStatus {
   cancelAtPeriodEnd: boolean;
   /** Server-computed — true when a paid plan is currently active */
   isPremium: boolean;
+  /** Server-computed — true when the user can still start a free trial */
+  trialEligible: boolean;
 }
 
 export type CreateOrderRequestPlan = typeof CreateOrderRequestPlan[keyof typeof CreateOrderRequestPlan];
@@ -520,6 +524,18 @@ export interface SubscriptionOrder {
   /** Razorpay public key id for the checkout SDK */
   keyId: string;
   plan: SubscriptionOrderPlan;
+}
+
+export type StartTrialRequestPlan = typeof StartTrialRequestPlan[keyof typeof StartTrialRequestPlan];
+
+
+export const StartTrialRequestPlan = {
+  premium: 'premium',
+  family: 'family',
+} as const;
+
+export interface StartTrialRequest {
+  plan: StartTrialRequestPlan;
 }
 
 export interface VerifyPaymentRequest {

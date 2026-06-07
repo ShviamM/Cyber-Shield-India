@@ -627,6 +627,33 @@ paths:
         default:
           $ref: "#/components/responses/Error"
 
+  /subscription/trial:
+    post:
+      operationId: startSubscriptionTrial
+      tags: [subscription]
+      summary: Start a 7-day free trial (no card required)
+      description: >
+        Grants 7 days of the chosen paid plan with no payment. After the trial
+        ends the plan lapses to free and the user must pay to continue. Each user
+        is eligible for one trial only.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StartTrialRequest"
+      responses:
+        "200":
+          description: Subscription status after starting the trial
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubscriptionStatus"
+        default:
+          $ref: "#/components/responses/Error"
+
   /subscription/cancel:
     post:
       operationId: cancelSubscription
@@ -1597,7 +1624,7 @@ components:
           type: string
         interval:
           type: string
-          enum: [month]
+          enum: [month, year]
         premium:
           type: boolean
           description: Whether this plan unlocks premium-gated features
@@ -1626,7 +1653,7 @@ components:
           enum: [free, premium, family]
         status:
           type: string
-          enum: [active, canceled, expired, past_due]
+          enum: [active, canceled, expired, past_due, trialing]
         currentPeriodStart:
           type: string
           format: date-time
@@ -1640,11 +1667,15 @@ components:
         isPremium:
           type: boolean
           description: Server-computed — true when a paid plan is currently active
+        trialEligible:
+          type: boolean
+          description: Server-computed — true when the user can still start a free trial
       required:
         - plan
         - status
         - cancelAtPeriodEnd
         - isPremium
+        - trialEligible
 
     CreateOrderRequest:
       type: object
@@ -1675,6 +1706,15 @@ components:
         - amount
         - currency
         - keyId
+        - plan
+
+    StartTrialRequest:
+      type: object
+      properties:
+        plan:
+          type: string
+          enum: [premium, family]
+      required:
         - plan
 
     VerifyPaymentRequest:

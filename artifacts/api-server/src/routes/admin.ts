@@ -34,7 +34,7 @@ import { normalizeIndianPhone } from "../lib/phone";
 import { HttpError, isUuid } from "../lib/http-error";
 import { toAdminReportDto } from "../lib/dto";
 import { recomputeReputation, setVerifiedScam } from "../lib/reputation";
-import { PLANS } from "../lib/plans";
+import { PLANS, monthlyAmount } from "../lib/plans";
 import { resolveState } from "../lib/states";
 import { requireAdmin } from "../middlewares/auth";
 
@@ -300,8 +300,8 @@ router.get("/admin/business-metrics", requireAdmin, async (_req, res) => {
     revenuePaise: Number(revenueAll?.value ?? 0),
     revenueThisMonthPaise: Number(revenueMonth?.value ?? 0),
     mrrPaise:
-      planCount(recurringByPlan, "premium") * PLANS.premium.amount +
-      planCount(recurringByPlan, "family") * PLANS.family.amount,
+      planCount(recurringByPlan, "premium") * monthlyAmount(PLANS.premium) +
+      planCount(recurringByPlan, "family") * monthlyAmount(PLANS.family),
     activeSubscriptions: premiumSubscriptions + familySubscriptions,
     premiumSubscriptions,
     familySubscriptions,

@@ -23,7 +23,7 @@ export const subscriptionsTable = pgTable(
       .references(() => usersTable.id, { onDelete: "cascade" }),
     // "free" | "premium" | "family"
     plan: text("plan").notNull().default("free"),
-    // "active" | "canceled" | "expired" | "past_due"
+    // "active" | "canceled" | "expired" | "past_due" | "trialing"
     status: text("status").notNull().default("active"),
     currentPeriodStart: timestamp("current_period_start", {
       withTimezone: true,
@@ -32,6 +32,9 @@ export const subscriptionsTable = pgTable(
     currentPeriodEnd: timestamp("current_period_end", { withTimezone: true }),
     // When true the paid plan will not renew and lapses to free at period end.
     cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull().default(false),
+    // Set the first time a user starts a free trial; used to enforce one trial
+    // per user. Null means the user has never started a trial.
+    trialStartedAt: timestamp("trial_started_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

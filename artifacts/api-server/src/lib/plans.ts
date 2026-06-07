@@ -6,12 +6,14 @@
 
 export type PlanKey = "free" | "premium" | "family";
 
+export type BillingInterval = "month" | "year";
+
 export interface PlanDef {
   key: PlanKey;
   /** Price per interval in the smallest currency unit (paise for INR). */
   amount: number;
   currency: "INR";
-  interval: "month";
+  interval: BillingInterval;
   /** Whether this plan unlocks premium-gated features. */
   premium: boolean;
 }
@@ -21,24 +23,27 @@ export const PLANS: Record<PlanKey, PlanDef> = {
     key: "free",
     amount: 0,
     currency: "INR",
-    interval: "month",
+    interval: "year",
     premium: false,
   },
   premium: {
     key: "premium",
-    amount: 1000, // ₹10.00
+    amount: 9900, // ₹99.00 / year
     currency: "INR",
-    interval: "month",
+    interval: "year",
     premium: true,
   },
   family: {
     key: "family",
-    amount: 4900, // ₹49.00
+    amount: 44900, // ₹449.00 / year
     currency: "INR",
-    interval: "month",
+    interval: "year",
     premium: true,
   },
 };
+
+/** Length of the no-card free trial granted on a paid plan, in days. */
+export const TRIAL_DAYS = 7;
 
 /**
  * Maximum protected family members allowed per plan. Server-enforced — only the
@@ -68,10 +73,20 @@ export function getPlan(key: string): PlanDef | null {
 export const PAID_PLAN_KEYS = PLAN_KEYS.filter((k) => PLANS[k].amount > 0);
 
 /** Add one billing interval to a date (used to compute the next period end). */
-export function addInterval(from: Date, interval: "month"): Date {
+export function addInterval(from: Date, interval: BillingInterval): Date {
   const next = new Date(from);
-  if (interval === "month") {
+  if (interval === "year") {
+    next.setFullYear(next.getFullYear() + 1);
+  } else {
     next.setMonth(next.getMonth() + 1);
   }
   return next;
+}
+
+/**
+ * The plan's contribution to monthly recurring revenue, in paise. Annual plans
+ * are amortized over 12 months so MRR stays a true monthly figure.
+ */
+export function monthlyAmount(plan: PlanDef): number {
+  return plan.interval === "year" ? Math.round(plan.amount / 12) : plan.amount;
 }

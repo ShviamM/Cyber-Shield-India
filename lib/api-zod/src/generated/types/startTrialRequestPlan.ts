@@ -6,10 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type SubscriptionPlanInterval = typeof SubscriptionPlanInterval[keyof typeof SubscriptionPlanInterval];
+export type StartTrialRequestPlan = typeof StartTrialRequestPlan[keyof typeof StartTrialRequestPlan];
 
 
-export const SubscriptionPlanInterval = {
-  month: 'month',
-  year: 'year',
+export const StartTrialRequestPlan = {
+  premium: 'premium',
+  family: 'family',
 } as const;

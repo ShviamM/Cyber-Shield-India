@@ -55,6 +55,7 @@ import type {
   ReportListResponse,
   ScamOfDay,
   SendBroadcastRequest,
+  StartTrialRequest,
   SubscriptionOrder,
   SubscriptionPlanList,
   SubscriptionStatus,
@@ -2127,6 +2128,79 @@ export const useVerifySubscriptionPayment = <TError = ErrorType<ErrorResponse>,
         TContext
       > => {
       return useMutation(getVerifySubscriptionPaymentMutationOptions(options));
+    }
+
+export const getStartSubscriptionTrialUrl = () => {
+
+
+
+
+  return `/api/subscription/trial`
+}
+
+/**
+ * Grants 7 days of the chosen paid plan with no payment. After the trial ends the plan lapses to free and the user must pay to continue. Each user is eligible for one trial only.
+
+ * @summary Start a 7-day free trial (no card required)
+ */
+export const startSubscriptionTrial = async (startTrialRequest: StartTrialRequest, options?: RequestInit): Promise<SubscriptionStatus> => {
+
+  return customFetch<SubscriptionStatus>(getStartSubscriptionTrialUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      startTrialRequest,)
+  }
+);}
+
+
+
+
+export const getStartSubscriptionTrialMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startSubscriptionTrial>>, TError,{data: BodyType<StartTrialRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof startSubscriptionTrial>>, TError,{data: BodyType<StartTrialRequest>}, TContext> => {
+
+const mutationKey = ['startSubscriptionTrial'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof startSubscriptionTrial>>, {data: BodyType<StartTrialRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  startSubscriptionTrial(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type StartSubscriptionTrialMutationResult = NonNullable<Awaited<ReturnType<typeof startSubscriptionTrial>>>
+    export type StartSubscriptionTrialMutationBody = BodyType<StartTrialRequest>
+    export type StartSubscriptionTrialMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Start a 7-day free trial (no card required)
+ */
+export const useStartSubscriptionTrial = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startSubscriptionTrial>>, TError,{data: BodyType<StartTrialRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof startSubscriptionTrial>>,
+        TError,
+        {data: BodyType<StartTrialRequest>},
+        TContext
+      > => {
+      return useMutation(getStartSubscriptionTrialMutationOptions(options));
     }
 
 export const getCancelSubscriptionUrl = () => {

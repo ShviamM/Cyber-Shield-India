@@ -31,7 +31,17 @@ const STATUS_LABELS: Record<string, string> = {
   canceled: "Cancelled",
   expired: "Expired",
   past_due: "Past due",
+  trialing: "Free trial",
 };
+
+function daysLeft(value?: string | null): number | null {
+  if (!value) return null;
+  const end = new Date(value).getTime();
+  if (Number.isNaN(end)) return null;
+  const ms = end - Date.now();
+  if (ms <= 0) return 0;
+  return Math.ceil(ms / (1000 * 60 * 60 * 24));
+}
 
 function formatDate(value?: string | null): string {
   if (!value) return "—";
@@ -131,10 +141,12 @@ export default function Account() {
   if (!user) return null;
 
   const isPremium = subscription?.isPremium ?? false;
+  const isTrial = subscription?.status === "trialing";
   const planLabel = PLAN_LABELS[subscription?.plan ?? "free"] ?? "Free";
   const statusLabel = STATUS_LABELS[subscription?.status ?? "active"] ?? "—";
   const canCancel =
     isPremium && subscription?.status === "active" && !subscription?.cancelAtPeriodEnd;
+  const trialDaysLeft = isTrial ? daysLeft(subscription?.currentPeriodEnd) : null;
 
   return (
     <Layout>
@@ -183,24 +195,45 @@ export default function Account() {
               </span>
             </div>
 
-            {isPremium && (
+            {isTrial && (
+              <div className="mt-6 rounded-xl bg-accent/10 border border-accent/20 p-4 text-sm">
+                <p className="font-semibold text-gray-900">
+                  {trialDaysLeft === 0
+                    ? "Your free trial ends today"
+                    : `${trialDaysLeft} day${trialDaysLeft === 1 ? "" : "s"} left in your free trial`}
+                </p>
+                <p className="text-gray-600 mt-1">
+                  Trial ends on {formatDate(subscription?.currentPeriodEnd)}. Subscribe
+                  before then to keep your protection — there's no automatic charge.
+                </p>
+              </div>
+            )}
+
+            {isPremium && !isTrial && (
               <div className="grid sm:grid-cols-2 gap-4 mt-6 text-sm">
                 <div className="bg-gray-50 rounded-xl p-4">
-                  <p className="text-gray-500">Renews / expires on</p>
+                  <p className="text-gray-500">Active until</p>
                   <p className="font-semibold text-gray-900 mt-1">
                     {formatDate(subscription?.currentPeriodEnd)}
                   </p>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-4">
-                  <p className="text-gray-500">Auto-renew</p>
+                  <p className="text-gray-500">Renewal</p>
                   <p className="font-semibold text-gray-900 mt-1">
-                    {subscription?.cancelAtPeriodEnd ? "Off (cancels at period end)" : "On"}
+                    Pay yearly to renew (no auto-charge)
                   </p>
                 </div>
               </div>
             )}
 
             <div className="mt-6 flex flex-wrap gap-3">
+              {isTrial && (
+                <Link href="/pricing">
+                  <Button className="gap-2 rounded-xl">
+                    Subscribe to keep {planLabel} <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </Link>
+              )}
               {!isPremium && (
                 <Link href="/pricing">
                   <Button className="gap-2 rounded-xl">
@@ -208,7 +241,7 @@ export default function Account() {
                   </Button>
                 </Link>
               )}
-              {isPremium && (
+              {isPremium && !isTrial && (
                 <Link href="/pricing">
                   <Button variant="outline" className="rounded-xl">
                     Change plan

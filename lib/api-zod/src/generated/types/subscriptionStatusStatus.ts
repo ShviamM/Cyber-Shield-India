@@ -14,4 +14,5 @@ export const SubscriptionStatusStatus = {
   canceled: 'canceled',
   expired: 'expired',
   past_due: 'past_due',
+  trialing: 'trialing',
 } as const;

@@ -476,7 +476,7 @@ export const GetSubscriptionPlansResponse = zod.object({
   "key": zod.enum(['free', 'premium', 'family']),
   "amount": zod.number().describe('Price per interval in paise (0 for free)'),
   "currency": zod.string(),
-  "interval": zod.enum(['month']),
+  "interval": zod.enum(['month', 'year']),
   "premium": zod.boolean().describe('Whether this plan unlocks premium-gated features')
 }))
 })
@@ -487,11 +487,12 @@ export const GetSubscriptionPlansResponse = zod.object({
  */
 export const GetMySubscriptionResponse = zod.object({
   "plan": zod.enum(['free', 'premium', 'family']),
-  "status": zod.enum(['active', 'canceled', 'expired', 'past_due']),
+  "status": zod.enum(['active', 'canceled', 'expired', 'past_due', 'trialing']),
   "currentPeriodStart": zod.coerce.date().nullish(),
   "currentPeriodEnd": zod.coerce.date().nullish(),
   "cancelAtPeriodEnd": zod.boolean(),
-  "isPremium": zod.boolean().describe('Server-computed — true when a paid plan is currently active')
+  "isPremium": zod.boolean().describe('Server-computed — true when a paid plan is currently active'),
+  "trialEligible": zod.boolean().describe('Server-computed — true when the user can still start a free trial')
 })
 
 
@@ -523,11 +524,32 @@ export const VerifySubscriptionPaymentBody = zod.object({
 
 export const VerifySubscriptionPaymentResponse = zod.object({
   "plan": zod.enum(['free', 'premium', 'family']),
-  "status": zod.enum(['active', 'canceled', 'expired', 'past_due']),
+  "status": zod.enum(['active', 'canceled', 'expired', 'past_due', 'trialing']),
   "currentPeriodStart": zod.coerce.date().nullish(),
   "currentPeriodEnd": zod.coerce.date().nullish(),
   "cancelAtPeriodEnd": zod.boolean(),
-  "isPremium": zod.boolean().describe('Server-computed — true when a paid plan is currently active')
+  "isPremium": zod.boolean().describe('Server-computed — true when a paid plan is currently active'),
+  "trialEligible": zod.boolean().describe('Server-computed — true when the user can still start a free trial')
+})
+
+
+/**
+ * Grants 7 days of the chosen paid plan with no payment. After the trial ends the plan lapses to free and the user must pay to continue. Each user is eligible for one trial only.
+
+ * @summary Start a 7-day free trial (no card required)
+ */
+export const StartSubscriptionTrialBody = zod.object({
+  "plan": zod.enum(['premium', 'family'])
+})
+
+export const StartSubscriptionTrialResponse = zod.object({
+  "plan": zod.enum(['free', 'premium', 'family']),
+  "status": zod.enum(['active', 'canceled', 'expired', 'past_due', 'trialing']),
+  "currentPeriodStart": zod.coerce.date().nullish(),
+  "currentPeriodEnd": zod.coerce.date().nullish(),
+  "cancelAtPeriodEnd": zod.boolean(),
+  "isPremium": zod.boolean().describe('Server-computed — true when a paid plan is currently active'),
+  "trialEligible": zod.boolean().describe('Server-computed — true when the user can still start a free trial')
 })
 
 
@@ -536,11 +558,12 @@ export const VerifySubscriptionPaymentResponse = zod.object({
  */
 export const CancelSubscriptionResponse = zod.object({
   "plan": zod.enum(['free', 'premium', 'family']),
-  "status": zod.enum(['active', 'canceled', 'expired', 'past_due']),
+  "status": zod.enum(['active', 'canceled', 'expired', 'past_due', 'trialing']),
   "currentPeriodStart": zod.coerce.date().nullish(),
   "currentPeriodEnd": zod.coerce.date().nullish(),
   "cancelAtPeriodEnd": zod.boolean(),
-  "isPremium": zod.boolean().describe('Server-computed — true when a paid plan is currently active')
+  "isPremium": zod.boolean().describe('Server-computed — true when a paid plan is currently active'),
+  "trialEligible": zod.boolean().describe('Server-computed — true when the user can still start a free trial')
 })
 
 
