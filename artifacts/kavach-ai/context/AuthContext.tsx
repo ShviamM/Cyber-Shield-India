@@ -1,6 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
 import type { AuthResponse, User } from "@workspace/api-client-react";
-import { getMe, logout as logoutRequest } from "@workspace/api-client-react";
+import {
+  deleteMyAccount,
+  getMe,
+  logout as logoutRequest,
+} from "@workspace/api-client-react";
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 import { clearToken, loadToken, saveToken } from "@/lib/session";
@@ -15,6 +19,8 @@ type AuthContextType = {
   signIn: (auth: AuthResponse) => Promise<void>;
   /** Clear the session locally (and best-effort on the server). */
   signOut: () => Promise<void>;
+  /** Permanently delete the account on the server, then clear locally. */
+  deleteAccount: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
@@ -64,8 +70,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     queryClient.clear();
   }, [queryClient]);
 
+  // Deletes the account server-side first; only clears the local session if the
+  // server confirms deletion, so a failed request leaves the user signed in to
+  // retry. Errors propagate to the caller to surface a message.
+  const deleteAccount = useCallback(async () => {
+    await deleteMyAccount();
+    await clearToken();
+    setUser(null);
+    setStatus("unauthenticated");
+    queryClient.clear();
+  }, [queryClient]);
+
   return (
-    <AuthContext.Provider value={{ status, user, signIn, signOut }}>
+    <AuthContext.Provider
+      value={{ status, user, signIn, signOut, deleteAccount }}
+    >
       {children}
     </AuthContext.Provider>
   );

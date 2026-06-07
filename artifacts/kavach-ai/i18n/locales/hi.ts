@@ -74,6 +74,16 @@ const hi = {
     signOut: "साइन आउट",
     signOutConfirmTitle: "साइन आउट",
     signOutConfirmMsg: "दोबारा साइन इन करने के लिए आपको अपना नंबर फिर से जाँचना होगा।",
+    deleteAccount: "खाता हटाएँ",
+    deleteAccountConfirmTitle: "अपना खाता हटाएँ?",
+    deleteAccountConfirmMsg:
+      "इससे आपका खाता, जाँच इतिहास, परिवार सूची और सदस्यता रिकॉर्ड हमेशा के लिए मिट जाएँगे। इसे पूर्ववत नहीं किया जा सकता।",
+    deleteAccountConfirmCta: "हटाएँ",
+    deleteAccountFinalTitle: "क्या आप बिल्कुल निश्चित हैं?",
+    deleteAccountFinalMsg: "आपका खाता और सारा डेटा तुरंत हटा दिया जाएगा।",
+    deleteAccountErrorTitle: "खाता नहीं हटाया जा सका",
+    deleteAccountErrorMsg:
+      "कुछ गड़बड़ हो गई। कृपया अपना कनेक्शन जाँचें और दोबारा प्रयास करें।",
     member: "Netraksh सदस्य",
     protected: "सुरक्षित",
     paused: "रुका हुआ",
@@ -522,6 +532,9 @@ const hi = {
     callSub: "जब कोई उच्च-जोखिम नंबर कॉल करे तो चेतावनी देता है",
     smsTitle: "ठगी SMS स्क्रीनिंग",
     smsSub: "आते ही संभावित ठगी संदेशों को चिह्नित करता है",
+    smsShareTitle: "किसी भी SMS को तुरंत जाँचें",
+    smsShareSub:
+      "किसी संदिग्ध संदेश को अपने Messages ऐप से Netraksh पर साझा करें — किसी SMS अनुमति की ज़रूरत नहीं।",
     statusCallRole: "Netraksh आपका कॉल स्क्रीनिंग ऐप है",
     statusSmsPerm: "SMS एक्सेस दी गई",
     statusNotif: "अलर्ट सूचनाएँ अनुमत",

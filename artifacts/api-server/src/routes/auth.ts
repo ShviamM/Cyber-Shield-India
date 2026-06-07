@@ -249,4 +249,16 @@ router.post("/auth/logout", requireAuth, async (req, res) => {
   res.json(response);
 });
 
+// Self-service account deletion (required by Google Play for apps with
+// accounts). Deleting the user row cascades to sessions, family members,
+// subscriptions, payments, fraud reports and device tokens — every FK that
+// references the user uses onDelete: "cascade" — so this erases all of the
+// account's data in a single statement.
+router.delete("/me", requireAuth, async (req, res) => {
+  const user = req.user!;
+  await db.delete(usersTable).where(eq(usersTable.id, user.id));
+  const response: SuccessResponse = { success: true };
+  res.json(response);
+});
+
 export default router;

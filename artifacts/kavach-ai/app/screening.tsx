@@ -29,22 +29,6 @@ const NAVY = "#0B3D91";
 const SAFFRON = "#FF6713";
 const GREEN = "#138808";
 
-async function requestSmsPermissions(): Promise<boolean> {
-  if (Platform.OS !== "android") return false;
-  try {
-    const results = await PermissionsAndroid.requestMultiple([
-      PermissionsAndroid.PERMISSIONS.RECEIVE_SMS,
-      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-    ]);
-    return (
-      results[PermissionsAndroid.PERMISSIONS.RECEIVE_SMS] ===
-      PermissionsAndroid.RESULTS.GRANTED
-    );
-  } catch {
-    return false;
-  }
-}
-
 async function requestNotificationPermission(): Promise<void> {
   if (Platform.OS !== "android") return;
   try {
@@ -60,7 +44,7 @@ export default function ScreeningScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
-  const { callScreening, smsScreening, setCallScreening, setSmsScreening } = useAppContext();
+  const { callScreening, setCallScreening } = useAppContext();
 
   const topInset = Platform.OS === "web" ? 0 : insets.top;
   const bottomPad = (Platform.OS === "web" ? 34 : insets.bottom) + 24;
@@ -87,25 +71,6 @@ export default function ScreeningScreen() {
       setCallScreening(true);
     } else {
       setCallScreening(false);
-    }
-    refreshStatus();
-  }
-
-  async function toggleSms(next: boolean) {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    if (!supported) {
-      setSmsScreening(next);
-      return;
-    }
-    if (next) {
-      const granted = await requestSmsPermissions();
-      if (!granted) {
-        Alert.alert(t("screening.smsDeniedTitle"), t("screening.smsDeniedMsg"));
-        return;
-      }
-      setSmsScreening(true);
-    } else {
-      setSmsScreening(false);
     }
     refreshStatus();
   }
@@ -187,30 +152,19 @@ export default function ScreeningScreen() {
               <Feather name="message-square" size={18} color="#0891b2" />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={s.rowLabel}>{t("screening.smsTitle")}</Text>
-              <Text style={s.rowSub}>{t("screening.smsSub")}</Text>
+              <Text style={s.rowLabel}>{t("screening.smsShareTitle")}</Text>
+              <Text style={s.rowSub}>{t("screening.smsShareSub")}</Text>
             </View>
-            <Switch
-              value={smsScreening}
-              onValueChange={toggleSms}
-              trackColor={{ false: "#e2e8f0", true: NAVY }}
-              thumbColor="#FFFFFF"
-            />
           </View>
         </View>
 
         {/* Live status (native only) */}
-        {supported && (callScreening || smsScreening) && (
+        {supported && callScreening && (
           <View style={s.statusCard}>
             <StatusLine
               ok={status.hasCallRole}
               label={t("screening.statusCallRole")}
               show={callScreening}
-            />
-            <StatusLine
-              ok={status.hasSmsPermission}
-              label={t("screening.statusSmsPerm")}
-              show={smsScreening}
             />
             <StatusLine
               ok={status.hasNotificationPermission}

@@ -171,6 +171,24 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     ]).catch(() => {});
   }, [guardianActive, recentChecks, callScreening, smsScreening, loaded]);
 
+  // Wipe device-local user data on an actual sign-out / account deletion
+  // (authenticated -> unauthenticated), so a deleted or switched account leaves
+  // no check history or preferences behind on the device. Resetting in-memory
+  // state lets the persistence effect above re-write cleared defaults; we never
+  // wipe on the initial unauthenticated load (prev was never "authenticated").
+  const prevAuthStatus = useRef(authStatus);
+  useEffect(() => {
+    const prev = prevAuthStatus.current;
+    prevAuthStatus.current = authStatus;
+    if (prev === "authenticated" && authStatus === "unauthenticated") {
+      setRecentChecks([]);
+      setWarnings(new Set());
+      setGuardianActive(true);
+      setCallScreeningState(Platform.OS === "android");
+      setSmsScreeningState(Platform.OS === "android");
+    }
+  }, [authStatus]);
+
   // Keep the native on-device engine in sync with the user's risk data and
   // toggles. No-op on web / non-Android builds.
   useEffect(() => {

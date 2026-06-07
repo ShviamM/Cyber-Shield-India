@@ -34,7 +34,7 @@ export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const { t, i18n } = useTranslation();
   const { guardianActive, toggleGuardian } = useAppContext();
-  const { user, signOut } = useAuth();
+  const { user, signOut, deleteAccount } = useAuth();
 
   const topInset = Platform.OS === "web" ? 0 : insets.top;
   const bottomPad = (Platform.OS === "web" ? 34 : insets.bottom) + 80;
@@ -72,6 +72,46 @@ export default function ProfileScreen() {
       { text: t("common.cancel"), style: "cancel" },
       { text: t("profile.signOut"), style: "destructive", onPress: () => signOut() },
     ]);
+  }
+
+  // Two-step confirmation for the irreversible account deletion required by the
+  // Play Store. Only the second prompt actually calls the server.
+  function confirmDeleteAccount() {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    Alert.alert(
+      t("profile.deleteAccountConfirmTitle"),
+      t("profile.deleteAccountConfirmMsg"),
+      [
+        { text: t("common.cancel"), style: "cancel" },
+        {
+          text: t("profile.deleteAccountConfirmCta"),
+          style: "destructive",
+          onPress: () => {
+            Alert.alert(
+              t("profile.deleteAccountFinalTitle"),
+              t("profile.deleteAccountFinalMsg"),
+              [
+                { text: t("common.cancel"), style: "cancel" },
+                {
+                  text: t("profile.deleteAccountConfirmCta"),
+                  style: "destructive",
+                  onPress: async () => {
+                    try {
+                      await deleteAccount();
+                    } catch {
+                      Alert.alert(
+                        t("profile.deleteAccountErrorTitle"),
+                        t("profile.deleteAccountErrorMsg"),
+                      );
+                    }
+                  },
+                },
+              ],
+            );
+          },
+        },
+      ],
+    );
   }
 
   const QUICK_SERVICES = [
@@ -290,6 +330,15 @@ export default function ProfileScreen() {
           <Text style={s.signOutTxt}>{t("profile.signOut")}</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity
+          style={s.deleteBtn}
+          onPress={confirmDeleteAccount}
+          activeOpacity={0.7}
+        >
+          <Feather name="trash-2" size={15} color="#94a3b8" />
+          <Text style={s.deleteTxt}>{t("profile.deleteAccount")}</Text>
+        </TouchableOpacity>
+
         <Text style={s.version}>{t("profile.version")}</Text>
       </ScrollView>
     </View>
@@ -432,5 +481,10 @@ const s = StyleSheet.create({
     borderWidth: 1, borderColor: "rgba(220,38,38,0.2)",
   },
   signOutTxt: { fontSize: 15, fontWeight: "700" as const, color: "#dc2626" },
+  deleteBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 7,
+    paddingVertical: 14, marginTop: 10,
+  },
+  deleteTxt: { fontSize: 13, fontWeight: "600" as const, color: "#94a3b8" },
   version: { textAlign: "center", fontSize: 12, color: "#94a3b8", marginTop: 16, marginBottom: 8 },
 });

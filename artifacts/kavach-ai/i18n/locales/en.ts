@@ -89,6 +89,16 @@ const en = {
     signOut: "Sign Out",
     signOutConfirmTitle: "Sign Out",
     signOutConfirmMsg: "You'll need to verify your number again to sign back in.",
+    deleteAccount: "Delete Account",
+    deleteAccountConfirmTitle: "Delete your account?",
+    deleteAccountConfirmMsg:
+      "This permanently erases your account, check history, family list and subscription records. This can't be undone.",
+    deleteAccountConfirmCta: "Delete",
+    deleteAccountFinalTitle: "Are you absolutely sure?",
+    deleteAccountFinalMsg: "Your account and all your data will be deleted right away.",
+    deleteAccountErrorTitle: "Couldn't delete account",
+    deleteAccountErrorMsg:
+      "Something went wrong. Please check your connection and try again.",
     member: "Netraksh member",
     protected: "Protected",
     paused: "Paused",
@@ -593,6 +603,9 @@ const en = {
     callSub: "Warns you when a high-risk number calls",
     smsTitle: "Scam SMS Screening",
     smsSub: "Flags likely scam texts as they arrive",
+    smsShareTitle: "Check any SMS instantly",
+    smsShareSub:
+      "Share a suspicious text to Netraksh from your Messages app to scan it — no SMS permission needed.",
     statusCallRole: "Netraksh is your call screening app",
     statusSmsPerm: "SMS access granted",
     statusNotif: "Alert notifications allowed",

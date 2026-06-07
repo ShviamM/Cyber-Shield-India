@@ -25,14 +25,10 @@
       "package": "com.kavachai.app",
       "backgroundColor": "#0B3D91",
       "permissions": [
-        "android.permission.READ_PHONE_STATE",
-        "android.permission.READ_CALL_LOG",
-        "android.permission.RECEIVE_SMS",
         "android.permission.POST_NOTIFICATIONS",
         "android.permission.CAMERA",
         "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.ACCESS_FINE_LOCATION",
-        "android.permission.RECORD_AUDIO"
+        "android.permission.ACCESS_FINE_LOCATION"
       ],
       "intentFilters": [
         {

@@ -102,6 +102,14 @@ export const LogoutResponse = zod.object({
 
 
 /**
+ * @summary Permanently delete the current user's account and all associated data
+ */
+export const DeleteMyAccountResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
  * @summary List scam categories
  */
 export const ListCategoriesResponse = zod.object({
