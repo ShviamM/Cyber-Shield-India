@@ -228,52 +228,62 @@ export default function Pricing() {
                 const isCurrent = currentPlan === key;
                 const isPaid = key === "premium" || key === "family";
 
+                const featured = !!meta.highlight;
+
                 return (
                   <div
                     key={key}
-                    className={`relative flex flex-col rounded-3xl border p-8 bg-white ${
-                      meta.highlight
-                        ? "border-primary shadow-xl shadow-primary/10 md:-translate-y-2"
-                        : "border-gray-200 shadow-sm"
+                    className={`relative flex flex-col rounded-3xl p-8 transition-transform ${
+                      featured
+                        ? "bg-gradient-to-br from-[#0B3D91] to-[#06245c] text-white shadow-2xl shadow-primary/30 md:-translate-y-4 ring-1 ring-white/10"
+                        : "bg-white border border-gray-200 shadow-sm"
                     }`}
                   >
-                    {meta.highlight && (
-                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-white text-xs font-semibold px-4 py-1 rounded-full">
-                        Most popular
+                    {featured && (
+                      <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 bg-accent text-white text-xs font-bold tracking-wide px-4 py-1.5 rounded-full shadow-lg shadow-accent/40">
+                        <Sparkles className="w-3.5 h-3.5" /> Most popular
                       </span>
                     )}
 
                     <div className="flex items-center gap-3 mb-4">
                       <div
                         className={`w-11 h-11 rounded-xl flex items-center justify-center ${
-                          meta.highlight ? "bg-primary text-white" : "bg-primary/10 text-primary"
+                          featured ? "bg-accent text-white" : "bg-primary/10 text-primary"
                         }`}
                       >
                         <Icon className="w-6 h-6" />
                       </div>
-                      <h2 className="text-xl font-bold text-gray-900">{meta.name}</h2>
+                      <h2 className={`text-xl font-bold ${featured ? "text-white" : "text-gray-900"}`}>
+                        {meta.name}
+                      </h2>
                     </div>
 
-                    <p className="text-gray-600 text-sm mb-6">{meta.tagline}</p>
+                    <p className={`text-sm mb-6 ${featured ? "text-blue-100" : "text-gray-600"}`}>
+                      {meta.tagline}
+                    </p>
 
                     <div className="mb-6">
                       {key === "free" ? (
                         <span className="text-4xl font-bold text-gray-900">Free</span>
                       ) : (
                         <>
-                          <div className="flex items-end gap-1">
-                            <span className="text-4xl font-bold text-gray-900">
+                          <div className="flex items-end gap-1.5">
+                            <span className={`text-5xl font-extrabold tracking-tight ${featured ? "text-white" : "text-gray-900"}`}>
                               {plan ? formatPrice(plan.amount) : "—"}
                             </span>
-                            <span className="text-gray-500 mb-1">/ year</span>
+                            <span className={`mb-1.5 ${featured ? "text-blue-200" : "text-gray-500"}`}>/ year</span>
                           </div>
                           {plan && (
-                            <div className="mt-2 flex items-center gap-2">
-                              <span className="text-sm text-gray-500">
-                                ≈ {monthlyEquivalent(plan.amount)}/mo, billed yearly
+                            <div className="mt-3 flex flex-wrap items-center gap-2">
+                              <span className={`text-sm ${featured ? "text-blue-100" : "text-gray-500"}`}>
+                                Just {monthlyEquivalent(plan.amount)}/month, billed yearly
                               </span>
-                              <span className="text-xs font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
-                                2 months free
+                              <span
+                                className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                                  featured ? "bg-accent text-white" : "text-green-700 bg-green-100"
+                                }`}
+                              >
+                                Save 2 months
                               </span>
                             </div>
                           )}
@@ -281,25 +291,45 @@ export default function Pricing() {
                       )}
                     </div>
 
+                    {isPaid && (
+                      <div
+                        className={`flex items-center gap-2 mb-6 rounded-xl px-3 py-2.5 text-sm font-medium ${
+                          featured ? "bg-white/10 text-white" : "bg-green-50 text-green-800"
+                        }`}
+                      >
+                        <Sparkles className={`w-4 h-4 shrink-0 ${featured ? "text-accent" : "text-green-600"}`} />
+                        <span>7-day free trial · no card needed</span>
+                      </div>
+                    )}
+
                     <ul className="space-y-3 mb-8 flex-1">
                       {meta.features.map((feature) => (
-                        <li key={feature} className="flex items-start gap-3 text-sm text-gray-700">
-                          <Check className="w-5 h-5 text-green-600 shrink-0 mt-0.5" />
+                        <li
+                          key={feature}
+                          className={`flex items-start gap-3 text-sm ${featured ? "text-blue-50" : "text-gray-700"}`}
+                        >
+                          <Check className={`w-5 h-5 shrink-0 mt-0.5 ${featured ? "text-accent" : "text-green-600"}`} />
                           <span>{feature}</span>
                         </li>
                       ))}
                     </ul>
 
                     {isCurrent ? (
-                      <Button disabled className="w-full h-12 rounded-xl" variant="secondary">
+                      <Button
+                        disabled
+                        className={`w-full h-12 rounded-xl ${featured ? "bg-white/15 text-white hover:bg-white/15" : ""}`}
+                        variant={featured ? "default" : "secondary"}
+                      >
                         {subscription?.status === "trialing"
                           ? "Trial active"
                           : "Current plan"}
                       </Button>
                     ) : isPaid && trialEligible ? (
                       <Button
-                        className="w-full h-12 rounded-xl text-base"
-                        variant={meta.highlight ? "default" : "outline"}
+                        className={`w-full h-12 rounded-xl text-base font-semibold ${
+                          featured ? "bg-white hover:bg-blue-50 text-primary shadow-lg shadow-black/20" : ""
+                        }`}
+                        variant={featured ? "default" : "outline"}
                         disabled={busy}
                         onClick={() => handleTrial(key as PaidPlan)}
                       >
@@ -311,8 +341,10 @@ export default function Pricing() {
                       </Button>
                     ) : isPaid ? (
                       <Button
-                        className="w-full h-12 rounded-xl text-base"
-                        variant={meta.highlight ? "default" : "outline"}
+                        className={`w-full h-12 rounded-xl text-base font-semibold ${
+                          featured ? "bg-white hover:bg-blue-50 text-primary shadow-lg shadow-black/20" : ""
+                        }`}
+                        variant={featured ? "default" : "outline"}
                         disabled={busy}
                         onClick={() => handleSubscribe(key as PaidPlan)}
                       >

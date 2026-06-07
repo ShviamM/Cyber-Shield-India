@@ -741,6 +741,7 @@ const en = {
     entryTitle: "Netraksh Premium",
     entrySub: "Unlock advanced protection for you and your family",
     choosePlan: "Choose your plan",
+    mostPopular: "Most popular",
     free: "Free",
     perMonth: "/month",
     perYear: "/year",

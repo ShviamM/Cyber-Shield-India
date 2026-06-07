@@ -612,6 +612,7 @@ const ur = {
     entryTitle: "نیتْرَکش پریمیم",
     entrySub: "اپنے اور اپنے خاندان کے لیے جدید تحفظ کھولیں",
     choosePlan: "اپنا پلان منتخب کریں",
+    mostPopular: "سب سے مقبول",
     free: "مفت",
     perMonth: "/ماہ",
     currentPlan: "موجودہ پلان",

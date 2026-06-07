@@ -612,6 +612,7 @@ const gu = {
     entryTitle: "નેત્રક્ષ પ્રીમિયમ",
     entrySub: "તમારા અને તમારા પરિવાર માટે અદ્યતન સુરક્ષા અનલૉક કરો",
     choosePlan: "તમારી યોજના પસંદ કરો",
+    mostPopular: "સૌથી લોકપ્રિય",
     free: "મફત",
     perMonth: "/મહિને",
     currentPlan: "વર્તમાન યોજના",

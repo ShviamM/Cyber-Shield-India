@@ -15,3 +15,10 @@ shadcn `--primary` to saffron turns every default Button/Badge saffron+white and
 both fails contrast and misrepresents the app.
 **How to apply:** keep `--primary`/`--ring` navy; express saffron explicitly in
 brand elements only (wordmark accent, tricolor). `--destructive` stays red.
+
+**Inverted/dark surfaces (e.g. a featured pricing card on a navy gradient):** the
+same rule holds — do NOT make the primary CTA a saffron fill with white text
+(~2.9:1, fails AA). Use a WHITE button with navy text; it both pops on the dark
+card and keeps saffron as accent-only (ribbons, icons, badges, checkmarks). Small
+saffron+white promo pills/ribbons are an accepted accent tradeoff, but never the
+primary action control.

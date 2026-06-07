@@ -445,6 +445,10 @@ export default function SubscriptionScreen() {
         }) as string[];
         const featureList = Array.isArray(features) ? features : [];
 
+        // Spotlight Premium as the recommended upsell for free users — draws the
+        // eye to the best-value plan without overriding the "current plan" state.
+        const isRecommended = key === "premium" && currentPlan === "free";
+
         // On native, show the live store price for the selected billing period;
         // fall back to server/monthly or a display-only annual price when the
         // store package isn't configured yet (web preview, or annual not set up).
@@ -513,9 +517,18 @@ export default function SubscriptionScreen() {
             key={key}
             style={[
               s.planCard,
+              isRecommended && s.planCardFeatured,
               isCurrent && { borderColor: meta.color, borderWidth: 2 },
             ]}
           >
+            {isRecommended ? (
+              <View style={s.popularRibbon}>
+                <Feather name="star" size={11} color="#fff" />
+                <Text style={s.popularRibbonTxt}>
+                  {t("subscription.mostPopular")}
+                </Text>
+              </View>
+            ) : null}
             <View style={s.planHeader}>
               <View style={[s.planIconBg, { backgroundColor: meta.bg }]}>
                 <Feather name={meta.icon} size={18} color={meta.color} />
@@ -787,6 +800,32 @@ const s = StyleSheet.create({
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 2 },
     elevation: 1,
+  },
+  planCardFeatured: {
+    borderColor: NAVY,
+    borderWidth: 1.5,
+    shadowColor: NAVY,
+    shadowOpacity: 0.16,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 5,
+  },
+  popularRibbon: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    gap: 4,
+    backgroundColor: SAFFRON,
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    marginBottom: 12,
+  },
+  popularRibbonTxt: {
+    fontSize: 11,
+    fontWeight: "800" as const,
+    color: "#fff",
+    letterSpacing: 0.3,
   },
   planHeader: { flexDirection: "row", alignItems: "center", gap: 12 },
   planIconBg: {

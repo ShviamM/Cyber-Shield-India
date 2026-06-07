@@ -612,6 +612,7 @@ const pa = {
     entryTitle: "ਨੇਤਰਕਸ਼ ਪ੍ਰੀਮੀਅਮ",
     entrySub: "ਆਪਣੇ ਅਤੇ ਆਪਣੇ ਪਰਿਵਾਰ ਲਈ ਉੱਨਤ ਸੁਰੱਖਿਆ ਅਨਲਾਕ ਕਰੋ",
     choosePlan: "ਆਪਣੀ ਯੋਜਨਾ ਚੁਣੋ",
+    mostPopular: "ਸਭ ਤੋਂ ਪ੍ਰਸਿੱਧ",
     free: "ਮੁਫ਼ਤ",
     perMonth: "/ਮਹੀਨਾ",
     currentPlan: "ਮੌਜੂਦਾ ਯੋਜਨਾ",

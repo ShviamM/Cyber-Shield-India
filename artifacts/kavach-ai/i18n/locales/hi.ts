@@ -668,6 +668,7 @@ const hi = {
     entryTitle: "नेत्रक्ष प्रीमियम",
     entrySub: "अपने और अपने परिवार के लिए उन्नत सुरक्षा अनलॉक करें",
     choosePlan: "अपनी योजना चुनें",
+    mostPopular: "सबसे लोकप्रिय",
     free: "निःशुल्क",
     perMonth: "/माह",
     perYear: "/वर्ष",
