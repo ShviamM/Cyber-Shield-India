@@ -10,7 +10,14 @@ COPY . .
 RUN pnpm install --frozen-lockfile --filter @workspace/website...
 # vite.config requires PORT and BASE_PATH at build time. The marketing site is
 # served at the domain root, so BASE_PATH is "/".
-ENV NODE_ENV=production PORT=5000 BASE_PATH=/
+# The MSG91 OTP widget credentials are client-public (they ship in the bundle by
+# design) and must be present at build time so Vite inlines them; DigitalOcean
+# passes the matching BUILD_TIME env vars in as Docker build args.
+ARG VITE_MSG91_WIDGET_ID
+ARG VITE_MSG91_TOKEN_AUTH
+ENV NODE_ENV=production PORT=5000 BASE_PATH=/ \
+    VITE_MSG91_WIDGET_ID=$VITE_MSG91_WIDGET_ID \
+    VITE_MSG91_TOKEN_AUTH=$VITE_MSG91_TOKEN_AUTH
 RUN pnpm --filter @workspace/website build
 
 FROM nginx:alpine
