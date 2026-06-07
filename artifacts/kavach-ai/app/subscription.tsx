@@ -40,6 +40,7 @@ const GREEN = "#138808";
 
 type PlanKey = "free" | "premium" | "family";
 type PaidPlanKey = "premium" | "family";
+type BillingPeriod = "monthly" | "annual";
 
 const PLAN_META: Record<
   PlanKey,
@@ -50,10 +51,20 @@ const PLAN_META: Record<
   family: { icon: "users", color: NAVY, bg: "#EBF0FA" },
 };
 
-/** RevenueCat package lookup keys, by plan (from the seeded "default" offering). */
-const PACKAGE_ID: Record<PaidPlanKey, string> = {
-  premium: "$rc_monthly",
-  family: "family",
+/** RevenueCat package lookup keys, by plan and billing period (from the seeded
+ * "default" offering). Annual packages only resolve once they're configured in
+ * the store + RevenueCat; the paywall degrades gracefully until then. */
+const PACKAGE_ID: Record<PaidPlanKey, Record<BillingPeriod, string>> = {
+  premium: { monthly: "$rc_monthly", annual: "$rc_annual" },
+  family: { monthly: "family", annual: "family_annual" },
+};
+
+/** Display-only annual prices (INR paise) shown before the store packages are
+ * configured (web preview, or annual not yet set up). The authoritative price
+ * always comes from the live store package when it's available. */
+const ANNUAL_FALLBACK_PAISE: Record<PaidPlanKey, number> = {
+  premium: 9900,
+  family: 44900,
 };
 
 function formatINR(paise: number): string {
@@ -65,8 +76,17 @@ function formatINR(paise: number): string {
 function planFromProductId(productId?: string): PaidPlanKey | null {
   if (!productId) return null;
   const base = productId.split(":")[0];
-  if (base === "premium_monthly") return "premium";
-  if (base === "family_monthly") return "family";
+  if (base === "premium_monthly" || base === "premium_annual") return "premium";
+  if (base === "family_monthly" || base === "family_annual") return "family";
+  return null;
+}
+
+/** Infer the active billing period from a store product identifier. */
+function periodFromProductId(productId?: string): BillingPeriod | null {
+  if (!productId) return null;
+  const base = productId.split(":")[0];
+  if (base.endsWith("_annual")) return "annual";
+  if (base.endsWith("_monthly")) return "monthly";
   return null;
 }
 
@@ -78,8 +98,11 @@ export default function SubscriptionScreen() {
   const rc = useSubscription();
 
   const [busyPlan, setBusyPlan] = useState<PaidPlanKey | null>(null);
-  // The plan awaiting confirmation in the test-mode purchase modal.
+  // The plan + billing period awaiting confirmation in the test-mode modal.
   const [pendingPlan, setPendingPlan] = useState<PaidPlanKey | null>(null);
+  const [pendingPeriod, setPendingPeriod] = useState<BillingPeriod>("monthly");
+  // Monthly vs annual billing for the paid plans.
+  const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>("monthly");
 
   const statusQuery = useGetMySubscription();
   const plansQuery = useGetSubscriptionPlans();
@@ -94,11 +117,15 @@ export default function SubscriptionScreen() {
   const storeBilling = Platform.OS !== "web" && rc.available;
   const offering = rc.offerings?.current ?? null;
 
-  function packageForPlan(plan: PaidPlanKey): PurchasesPackage | null {
+  function packageForPlan(
+    plan: PaidPlanKey,
+    period: BillingPeriod,
+  ): PurchasesPackage | null {
     if (!offering) return null;
     return (
-      offering.availablePackages.find((p) => p.identifier === PACKAGE_ID[plan]) ??
-      null
+      offering.availablePackages.find(
+        (p) => p.identifier === PACKAGE_ID[plan][period],
+      ) ?? null
     );
   }
 
@@ -107,8 +134,12 @@ export default function SubscriptionScreen() {
     queryClient.invalidateQueries({ queryKey: getListMyPaymentsQueryKey() });
   }
 
-  async function runPurchase(plan: PaidPlanKey, planName: string) {
-    const pkg = packageForPlan(plan);
+  async function runPurchase(
+    plan: PaidPlanKey,
+    planName: string,
+    period: BillingPeriod,
+  ) {
+    const pkg = packageForPlan(plan, period);
     if (!pkg) {
       Alert.alert(
         t("subscription.checkoutUnavailableTitle"),
@@ -153,7 +184,11 @@ export default function SubscriptionScreen() {
     }
   }
 
-  function handleUpgrade(plan: PaidPlanKey, planName: string) {
+  function handleUpgrade(
+    plan: PaidPlanKey,
+    planName: string,
+    period: BillingPeriod,
+  ) {
     if (!storeBilling) {
       Alert.alert(
         t("subscription.checkoutUnavailableTitle"),
@@ -166,9 +201,10 @@ export default function SubscriptionScreen() {
     if (IS_REVENUECAT_TEST_MODE) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       setPendingPlan(plan);
+      setPendingPeriod(period);
       return;
     }
-    void runPurchase(plan, planName);
+    void runPurchase(plan, planName, period);
   }
 
   async function handleRestore() {
@@ -267,6 +303,13 @@ export default function SubscriptionScreen() {
     : rc.isSubscribed
       ? (planFromProductId(rc.activeProductId) ?? "premium")
       : "free";
+  // The billing period of the active subscription. Razorpay (website) plans are
+  // monthly; store purchases derive it from the product id.
+  const currentPeriod: BillingPeriod = status.isPremium
+    ? "monthly"
+    : rc.isSubscribed
+      ? (periodFromProductId(rc.activeProductId) ?? "monthly")
+      : "monthly";
 
   const rcExpiration =
     rc.customerInfo?.entitlements.active?.[REVENUECAT_ENTITLEMENT_IDENTIFIER]
@@ -364,23 +407,106 @@ export default function SubscriptionScreen() {
 
       {/* Plan comparison */}
       <Text style={s.sectionLabel}>{t("subscription.choosePlan")}</Text>
+      <View style={s.periodToggle}>
+        {(["monthly", "annual"] as BillingPeriod[]).map((p) => {
+          const active = billingPeriod === p;
+          return (
+            <TouchableOpacity
+              key={p}
+              style={[s.periodOpt, active && s.periodOptActive]}
+              onPress={() => {
+                Haptics.selectionAsync();
+                setBillingPeriod(p);
+              }}
+              activeOpacity={0.85}
+            >
+              <Text style={[s.periodOptTxt, active && s.periodOptTxtActive]}>
+                {p === "monthly"
+                  ? t("subscription.billingMonthly")
+                  : t("subscription.billingAnnual")}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
       {plans.map((plan) => {
         const key = plan.key as PlanKey;
         const meta = PLAN_META[key];
+        // "Current" must match both plan and the selected billing period, so an
+        // existing monthly subscriber still sees a CTA to switch to annual.
         const isCurrent =
-          key === currentPlan && (premiumActive || key === "free");
+          key === "free"
+            ? currentPlan === "free"
+            : key === currentPlan &&
+              premiumActive &&
+              billingPeriod === currentPeriod;
         const features = t(`subscription.plans.${key}.features`, {
           returnObjects: true,
         }) as string[];
         const featureList = Array.isArray(features) ? features : [];
 
-        // On native, show the live store price; fall back to server pricing.
-        const storePkg = plan.premium
-          ? packageForPlan(key as PaidPlanKey)
+        // On native, show the live store price for the selected billing period;
+        // fall back to server/monthly or a display-only annual price when the
+        // store package isn't configured yet (web preview, or annual not set up).
+        const paidKey = plan.premium ? (key as PaidPlanKey) : null;
+        const storePkg = paidKey
+          ? packageForPlan(paidKey, billingPeriod)
           : null;
-        const priceLabel = plan.premium
-          ? (storePkg?.product.priceString ?? formatINR(plan.amount))
-          : t("subscription.free");
+        const monthlyPkg = paidKey ? packageForPlan(paidKey, "monthly") : null;
+        const annualPkg = paidKey ? packageForPlan(paidKey, "annual") : null;
+
+        let priceLabel: string;
+        if (!plan.premium) {
+          priceLabel = t("subscription.free");
+        } else if (storePkg) {
+          priceLabel = storePkg.product.priceString;
+        } else {
+          priceLabel = formatINR(
+            billingPeriod === "annual"
+              ? ANNUAL_FALLBACK_PAISE[key as PaidPlanKey]
+              : plan.amount,
+          );
+        }
+
+        // Annual savings vs 12x monthly (live store prices when available).
+        let savingsPercent = 0;
+        if (paidKey && billingPeriod === "annual") {
+          const monthlyMajor = monthlyPkg?.product.price ?? plan.amount / 100;
+          const annualMajor =
+            annualPkg?.product.price ?? ANNUAL_FALLBACK_PAISE[paidKey] / 100;
+          if (monthlyMajor > 0 && annualMajor > 0) {
+            savingsPercent = Math.round(
+              (1 - annualMajor / (monthlyMajor * 12)) * 100,
+            );
+          }
+        }
+
+        // On a real store build, annual isn't purchasable until its package is
+        // configured — show a "coming soon" state instead of a dead-end alert.
+        const annualUnavailable =
+          !!paidKey && storeBilling && billingPeriod === "annual" && !annualPkg;
+        // Same plan, different billing period → offer a period switch CTA.
+        const samePlanDiffPeriod =
+          premiumActive &&
+          key === currentPlan &&
+          billingPeriod !== currentPeriod;
+
+        // Free trial badge — only when a real store intro offer (price 0) exists.
+        let trialLabel: string | null = null;
+        const intro = storePkg?.product.introPrice;
+        if (intro && intro.price === 0) {
+          const n = intro.periodNumberOfUnits ?? 0;
+          const days =
+            intro.periodUnit === "WEEK"
+              ? n * 7
+              : intro.periodUnit === "DAY"
+                ? n
+                : 0;
+          trialLabel =
+            days > 0
+              ? t("subscription.freeTrial", { count: days })
+              : t("subscription.freeTrialGeneric");
+        }
 
         return (
           <View
@@ -407,10 +533,30 @@ export default function SubscriptionScreen() {
                   {priceLabel}
                 </Text>
                 {plan.premium ? (
-                  <Text style={s.priceUnit}>{t("subscription.perMonth")}</Text>
+                  <Text style={s.priceUnit}>
+                    {billingPeriod === "annual"
+                      ? t("subscription.perYear")
+                      : t("subscription.perMonth")}
+                  </Text>
                 ) : null}
               </View>
             </View>
+
+            {plan.premium && billingPeriod === "annual" && savingsPercent > 0 ? (
+              <View style={s.saveBadge}>
+                <Text style={s.saveBadgeTxt}>
+                  {t("subscription.annualSavePercent", {
+                    percent: savingsPercent,
+                  })}
+                </Text>
+              </View>
+            ) : null}
+            {plan.premium && trialLabel ? (
+              <View style={s.trialBadge}>
+                <Feather name="gift" size={12} color={GREEN} />
+                <Text style={s.trialBadgeTxt}>{trialLabel}</Text>
+              </View>
+            ) : null}
 
             <View style={s.featureList}>
               {featureList.map((f, i) => (
@@ -428,6 +574,13 @@ export default function SubscriptionScreen() {
                   {t("subscription.currentPlan")}
                 </Text>
               </View>
+            ) : plan.premium && annualUnavailable ? (
+              <View style={s.currentBtn}>
+                <Feather name="clock" size={15} color="#94a3b8" />
+                <Text style={[s.currentBtnTxt, { color: "#94a3b8" }]}>
+                  {t("subscription.annualComingSoon")}
+                </Text>
+              </View>
             ) : plan.premium ? (
               <TouchableOpacity
                 style={[s.upgradeBtn, { backgroundColor: meta.color }]}
@@ -435,6 +588,7 @@ export default function SubscriptionScreen() {
                   handleUpgrade(
                     key as PaidPlanKey,
                     t(`subscription.plans.${key}.name`),
+                    billingPeriod,
                   )
                 }
                 disabled={busyPlan !== null}
@@ -444,13 +598,17 @@ export default function SubscriptionScreen() {
                   <ActivityIndicator size="small" color="#fff" />
                 ) : (
                   <Text style={s.upgradeBtnTxt}>
-                    {premiumActive
-                      ? t("subscription.switchTo", {
-                          plan: t(`subscription.plans.${key}.name`),
-                        })
-                      : t("subscription.upgradeTo", {
-                          plan: t(`subscription.plans.${key}.name`),
-                        })}
+                    {samePlanDiffPeriod
+                      ? billingPeriod === "annual"
+                        ? t("subscription.switchToAnnual")
+                        : t("subscription.switchToMonthly")
+                      : premiumActive
+                        ? t("subscription.switchTo", {
+                            plan: t(`subscription.plans.${key}.name`),
+                          })
+                        : t("subscription.upgradeTo", {
+                            plan: t(`subscription.plans.${key}.name`),
+                          })}
                   </Text>
                 )}
               </TouchableOpacity>
@@ -557,6 +715,7 @@ export default function SubscriptionScreen() {
                     void runPurchase(
                       plan,
                       t(`subscription.plans.${plan}.name`),
+                      pendingPeriod,
                     );
                   }
                 }}
@@ -642,6 +801,48 @@ const s = StyleSheet.create({
   priceCol: { alignItems: "flex-end" },
   price: { fontSize: 20, fontWeight: "900" as const },
   priceUnit: { fontSize: 10, color: "#94a3b8", marginTop: 1 },
+
+  periodToggle: {
+    flexDirection: "row",
+    backgroundColor: "#f1f5f9",
+    borderRadius: 12,
+    padding: 4,
+    marginBottom: 14,
+  },
+  periodOpt: {
+    flex: 1,
+    height: 38,
+    borderRadius: 9,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  periodOptActive: {
+    backgroundColor: "#fff",
+    shadowColor: NAVY,
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 1 },
+    elevation: 1,
+  },
+  periodOptTxt: { fontSize: 14, fontWeight: "700" as const, color: "#64748b" },
+  periodOptTxtActive: { color: NAVY },
+  saveBadge: {
+    alignSelf: "flex-start",
+    backgroundColor: "rgba(19,136,8,0.1)",
+    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    marginTop: 12,
+  },
+  saveBadgeTxt: { fontSize: 11, fontWeight: "800" as const, color: GREEN },
+  trialBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    alignSelf: "flex-start",
+    marginTop: 8,
+  },
+  trialBadgeTxt: { fontSize: 12, fontWeight: "700" as const, color: GREEN },
 
   featureList: { marginTop: 14, gap: 8 },
   featureRow: { flexDirection: "row", alignItems: "center", gap: 8 },

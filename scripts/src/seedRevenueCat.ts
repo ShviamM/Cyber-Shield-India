@@ -80,6 +80,28 @@ const PRODUCTS: ProductConfig[] = [
     // Test store only (USD). Real ₹49/mo price is configured in the Play Console.
     prices: [{ amount_micros: 4_990_000, currency: "USD" }],
   },
+  {
+    baseIdentifier: "premium_annual",
+    playStoreIdentifier: "premium_annual:annual",
+    displayName: "Premium Annual",
+    userFacingTitle: "Premium",
+    duration: "P1Y",
+    packageLookupKey: "$rc_annual",
+    packageDisplayName: "Premium Annual",
+    // Test store only (USD). Real ₹99/yr price (~2 months free) is set in Play Console.
+    prices: [{ amount_micros: 9_990_000, currency: "USD" }],
+  },
+  {
+    baseIdentifier: "family_annual",
+    playStoreIdentifier: "family_annual:annual",
+    displayName: "Family Annual",
+    userFacingTitle: "Family",
+    duration: "P1Y",
+    packageLookupKey: "family_annual",
+    packageDisplayName: "Family Annual",
+    // Test store only (USD). Real ₹449/yr price (~2 months free) is set in Play Console.
+    prices: [{ amount_micros: 44_990_000, currency: "USD" }],
+  },
 ];
 
 type TestStorePricesResponse = {
