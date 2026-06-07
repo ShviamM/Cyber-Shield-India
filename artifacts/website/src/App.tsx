@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { AuthProvider } from "@/hooks/use-auth";
 import { legalContent } from "@/data/legalContent";
 
 // Main Pages
@@ -18,6 +19,8 @@ import Contact from "@/pages/Contact";
 import FAQ from "@/pages/FAQ";
 import Download from "@/pages/Download";
 import Login from "@/pages/Login";
+import Pricing from "@/pages/Pricing";
+import Account from "@/pages/Account";
 import NotFound from "@/pages/not-found";
 
 // Legal Pages
@@ -40,7 +43,9 @@ function Router() {
       <Route path="/contact" component={Contact} />
       <Route path="/faq" component={FAQ} />
       <Route path="/download" component={Download} />
+      <Route path="/pricing" component={Pricing} />
       <Route path="/login" component={Login} />
+      <Route path="/account" component={Account} />
       <Route path="/disclaimer" component={Disclaimer} />
 
       {/* Legal & Trust Pages */}
@@ -127,8 +132,10 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <ScrollToTop />
-          <Router />
+          <AuthProvider>
+            <ScrollToTop />
+            <Router />
+          </AuthProvider>
         </WouterRouter>
         <Toaster />
       </TooltipProvider>

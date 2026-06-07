@@ -17,6 +17,16 @@ generation (or an edit that only refreshed schemas) leaves them out of sync.
 **How to apply:** before wiring a newly-added endpoint into an artifact, confirm
 the operation function exists in `generated/api.ts`; if not, run codegen first.
 
+## Editing index re-exports needs a dist rebuild for consumers
+The package's `exports` map points at `src/index.ts` (so Vite/runtime see edits
+instantly), but consumer artifacts **typecheck via TS project references**, which
+read the package's emitted `dist/*.d.ts`, not src. So adding a new re-export to
+`lib/api-client-react/src/index.ts` (e.g. exporting `ApiError` from
+`custom-fetch`) compiles at runtime but fails the artifact's `typecheck` with
+TS2305 until you rebuild declarations: `npx tsc -b lib/api-client-react/tsconfig.json`.
+**Why:** package tsconfig is `composite`+`emitDeclarationOnly`; `tsc -p ... --noEmit`
+in the artifact does not rebuild referenced projects, it just consumes stale d.ts.
+
 ## Overriding query options requires an explicit queryKey
 When you pass a `query: {...}` options object to a generated `useGetXxx` hook
 (e.g. to set `refetchInterval`/`enabled`), TypeScript requires `queryKey` too

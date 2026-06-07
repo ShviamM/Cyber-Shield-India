@@ -1,12 +1,14 @@
 import { Link, useLocation } from "wouter";
-import { Menu, X } from "lucide-react";
+import { Menu, X, UserCircle } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [location] = useLocation();
+  const { user } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,6 +27,7 @@ export function Navbar() {
     { name: "Family Protection", href: "/family-protection" },
     { name: "Cyber Safety", href: "/cyber-safety-center" },
     { name: "Laws & SOPs", href: "/cyber-laws" },
+    { name: "Pricing", href: "/pricing" },
     { name: "About", href: "/about" },
     { name: "Founder", href: "/founder" },
   ];
@@ -64,9 +67,19 @@ export function Navbar() {
           </nav>
 
           <div className="hidden lg:flex items-center gap-4">
-            <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-primary transition-colors">
-              Login
-            </Link>
+            {user ? (
+              <Link
+                href="/account"
+                className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-primary transition-colors"
+              >
+                <UserCircle className="w-5 h-5" />
+                Account
+              </Link>
+            ) : (
+              <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-primary transition-colors">
+                Login
+              </Link>
+            )}
             <Link href="/download">
               <Button className="rounded-full bg-primary hover:bg-primary/90 text-white font-medium px-6">
                 Download App
@@ -100,8 +113,11 @@ export function Navbar() {
             </Link>
           ))}
           <div className="h-px bg-gray-100 my-2" />
-          <Link href="/login" className="text-lg font-medium p-2 text-gray-900">
-            Login
+          <Link
+            href={user ? "/account" : "/login"}
+            className="text-lg font-medium p-2 text-gray-900"
+          >
+            {user ? "My Account" : "Login"}
           </Link>
           <Link href="/download" className="mt-2">
             <Button className="w-full rounded-xl bg-primary hover:bg-primary/90 text-white py-6 text-lg">
