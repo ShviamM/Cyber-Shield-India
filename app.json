@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "2116506f-5b5e-40ee-9d24-58ceb2260abb"
+      }
+    },
+    "android": {
+      "package": "com.netraksh.workspace"
+    }
+  }
+}
