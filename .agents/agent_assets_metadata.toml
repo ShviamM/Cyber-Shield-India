@@ -119,3 +119,9 @@ id = "_-BdeKvyod9cU9uGdGcMQ"
 uri = "file://exports/netraksh-source.tar.gz"
 type = "unspecified"
 title = "Netraksh — source (third-party deploy ready)"
+
+[[outputs]]
+id = "y7WCn-sLHrFLy3JH2bB6N"
+uri = "file://website-review.md"
+type = "text"
+title = "Netraksh Website Review"

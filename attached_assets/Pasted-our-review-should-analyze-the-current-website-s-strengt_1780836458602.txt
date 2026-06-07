@@ -1,0 +1,127 @@
+our review should analyze the current website's strengths and weaknesses across the following categories:
+
+* **Design Aesthetics:** Evaluate the overall visual appeal, color palette, imagery, and layout.
+
+* **User Interface (UI) & User Experience (UX):** Assess navigation, ease of use, intuitiveness, mobile responsiveness, and accessibility.
+
+* **Typography:** Examine font choices, readability, hierarchy, and consistency.
+
+* **Content Presentation:** Review text formatting, visual aids (images, videos), and overall clarity of information.
+
+* **Call to Actions (CTAs):** Evaluate the effectiveness, placement, and clarity of CTAs.
+
+For each category, provide specific, actionable recommendations for improvement. Prioritize suggestions that will have the most significant impact on user engagement and satisfaction.
+
+# Output Format
+
+Provide the review as a well-structured markdown document. Each category should be a distinct section with bullet points detailing your observations and recommendations.
+
+# Examples
+
+**Input:** A URL to a website for a local bakery.
+
+**Output:**
+
+### Website Review: [Bakery Name]
+
+#### Design Aesthetics
+
+* **Strengths:**
+
+* Warm color palette evokes a cozy atmosphere.
+
+* High-quality images of baked goods are appealing.
+
+* **Weaknesses:**
+
+* Layout feels cluttered on the homepage, overwhelming visitors.
+
+* Inconsistent use of graphical elements.
+
+* **Recommendations:**
+
+* Simplify the homepage layout with more white space.
+
+* Develop a consistent style guide for graphical elements.
+
+* Consider a slightly more modern font for headings to increase readability.
+
+#### User Interface (UI) & User Experience (UX)
+
+* **Strengths:**
+
+* Clear contact information is readily available.
+
+* **Weaknesses:**
+
+* Navigation menu is not immediately intuitive; categories could be clearer.
+
+* Website is not fully responsive on mobile devices, leading to a poor experience.
+
+* No clear search function.
+
+* **Recommendations:**
+
+* Restructure the navigation menu with clearer labels (e.g., "Our Breads," "Cakes & Pastries," "Custom Orders").
+
+* Implement a fully responsive design to ensure optimal viewing on all devices.
+
+* Add a search bar to help users quickly find specific items.
+
+#### Typography
+
+* **Strengths:**
+
+* Body text is generally readable.
+
+* **Weaknesses:**
+
+* Heading fonts are difficult to read at smaller sizes.
+
+* Font sizes are inconsistent across different sections.
+
+* **Recommendations:**
+
+* Select a more legible font for headings or ensure headings are adequately large.
+
+* Establish a clear typographic hierarchy with consistent font sizes for headings, subheadings, and body text.
+
+#### Content Presentation
+
+* **Strengths:**
+
+* Product descriptions are detailed and enticing.
+
+* **Weaknesses:**
+
+* Lack of visual aids for some product categories (e.g., custom cakes).
+
+* Long blocks of text without sufficient formatting.
+
+* **Recommendations:**
+
+* Add a gallery for custom cake designs.
+
+* Break up long text passages with bullet points, subheadings, and relevant imagery.
+
+#### Call to Actions (CTAs)
+
+* **Strengths:**
+
+* "Order Now" button is visible.
+
+* **Weaknesses:**
+
+* CTAs are not consistently placed throughout the site.
+
+* The purpose of some buttons is unclear.
+
+* **Recommendations:**
+
+* Strategically place CTAs on relevant pages (e.g., "View Our Menu" on the homepage, "Request a Quote" on the custom order page).
+
+* Ensure CTA button text is action-oriented and unambiguous.
+
+# Notes
+
+Ensure recommendations are practical and consider potential implementation effort. Focus on changes that will directly enhance the user's journey on the website.
