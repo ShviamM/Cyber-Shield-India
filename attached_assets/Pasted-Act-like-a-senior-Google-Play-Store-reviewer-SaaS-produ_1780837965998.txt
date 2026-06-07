@@ -1,0 +1,196 @@
+Act like a senior Google Play Store reviewer, SaaS product architect, mobile app QA lead, fintech compliance expert, AI product strategist, cybersecurity consultant, and subscription business specialist.
+
+Your objective is to perform a complete pre-launch audit of the Netraksh application and identify every missing feature, risk, compliance issue, payment problem, user experience gap, security vulnerability, and monetization opportunity before publishing on Google Play Store.
+
+Task:
+Analyze the entire product as if you are preparing it for launch to 100,000+ users.
+
+Review the application in the following order:
+
+1. Product Understanding
+- Explain what the application does.
+- Identify target users.
+- Identify the core value proposition.
+- Determine whether users will understand the app within 30 seconds.
+
+2. Complete Functionality Audit
+Create a detailed inventory of:
+- All existing features
+- Missing features
+- Critical launch-blocking issues
+- Nice-to-have future enhancements
+
+3. Authentication & User Management
+Review:
+- Mobile OTP login
+- Email OTP login
+- Social login (Google, Apple, Facebook)
+- Passwordless authentication
+- Account recovery
+- Session management
+- Multi-device support
+- Logout flow
+- User profile management
+
+Identify:
+- Security risks
+- Missing flows
+- User friction points
+
+4. AI Feature Audit
+Review:
+- AI functionality
+- AI workflows
+- AI user experience
+- AI reliability
+- AI response quality
+- AI hallucination risks
+- AI cost optimization
+
+Recommend:
+- Additional AI features
+- AI-powered automation opportunities
+- Premium AI capabilities for paid plans
+
+5. Payment System Audit
+Review:
+- Google Play Billing
+- Subscription setup
+- One-time payments
+- Trial periods
+- Coupon codes
+- Refund process
+- Upgrade/downgrade plans
+- Failed payment handling
+- Payment recovery flow
+
+Verify:
+- Google Play compliance
+- Revenue optimization opportunities
+- Billing security
+
+6. Subscription & Monetization Review
+Evaluate:
+- Free plan
+- Paid plans
+- Pricing structure
+- Feature gating
+- Usage limits
+- Premium AI access
+- Enterprise plans
+
+Recommend:
+- Best pricing model
+- Subscription tiers
+- Monthly vs yearly plans
+- Revenue growth opportunities
+
+7. End-to-End User Journey Testing
+Simulate:
+- New user onboarding
+- OTP verification
+- First-time usage
+- Premium upgrade
+- Subscription renewal
+- Subscription cancellation
+- Re-login process
+- Customer support request
+
+Identify:
+- Drop-off points
+- Confusing screens
+- Conversion blockers
+
+8. Security Audit
+Review:
+- Authentication security
+- OTP abuse prevention
+- API security
+- Payment security
+- Data encryption
+- User privacy
+- GDPR compliance
+- Google Play compliance
+- AI security
+
+List:
+- High-risk vulnerabilities
+- Medium-risk vulnerabilities
+- Low-risk vulnerabilities
+
+9. Play Store Readiness Audit
+Verify:
+- Google Play policies
+- Privacy policy requirements
+- Terms of service
+- Subscription disclosures
+- Data collection disclosures
+- Permissions usage
+- Billing compliance
+
+Highlight anything that may cause Play Store rejection.
+
+10. Scalability Review
+Evaluate:
+- Backend architecture
+- Database design
+- API performance
+- AI scalability
+- Payment scalability
+- User growth readiness
+
+11. Launch Readiness Score
+Provide scores out of 100 for:
+- Product Quality
+- UX
+- Security
+- AI
+- Payments
+- Subscriptions
+- Compliance
+- Scalability
+- Monetization
+- Play Store Readiness
+
+12. Final Launch Report
+
+Output:
+
+A. Executive Summary
+
+B. Critical Issues That Must Be Fixed Before Launch
+
+C. Missing Features
+
+D. Authentication & OTP Review
+
+E. AI Review
+
+F. Payment & Billing Review
+
+G. Subscription Review
+
+H. Security Review
+
+I. Compliance Review
+
+J. Google Play Rejection Risks
+
+K. Top 20 Improvements Ranked by Impact
+
+L. Final Recommendation:
+- Ready for Launch
+- Launch After Minor Fixes
+- Launch After Major Fixes
+- Not Ready for Launch
+
+Constraints:
+- Be extremely detailed.
+- Think like a Google Play reviewer and SaaS CTO.
+- Assume real users, real payments, and real security risks.
+- Do not overlook any authentication, billing, AI, subscription, compliance, or privacy issue.
+- Identify every possible failure scenario before launch.
+
+Before finalizing, perform a complete launch-readiness checklist and verify that every user flow, payment flow, subscription flow, OTP flow, AI workflow, and compliance requirement has been reviewed.
+
+Take a deep breath and work on this problem step-by-step.
