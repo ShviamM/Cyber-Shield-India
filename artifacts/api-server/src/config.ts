@@ -37,6 +37,12 @@ export const config = {
   // auth key (server-side only); `msg91WidgetId` is the public widget id.
   msg91AuthKey: (process.env.MSG91_AUTH_KEY ?? "").trim(),
   msg91WidgetId: (process.env.MSG91_WIDGET_ID ?? "").trim(),
+  // The mobile app and the website use SEPARATE MSG91 widgets: the mobile widget
+  // has "Mobile Integration" ON (required by the RN SDK), which makes MSG91 reject
+  // web requests; the website therefore needs its own widget with that toggle OFF.
+  // verifyAccessToken validates a token against a specific widgetId, so the backend
+  // must try every configured widget. This is the optional web widget id.
+  msg91WebWidgetId: (process.env.MSG91_WEB_WIDGET_ID ?? "").trim(),
   // Single shared password for the admin web console (password-only login).
   // Server-side only; never sent to clients.
   adminPassword: (process.env.ADMIN_PASSWORD ?? "").trim(),

@@ -36,6 +36,36 @@ function maskPhone(phone: string): string {
  * Returns the verified phone normalized to +91XXXXXXXXXX. Throws HttpError on
  * any failure (misconfiguration, invalid/expired token, unverified result).
  */
+async function verifyWithWidget(
+  token: string,
+  widgetId: string,
+): Promise<{ ok: true; payload: VerifyAccessTokenResponse } | { ok: false; payload: VerifyAccessTokenResponse }> {
+  const res = await fetch(VERIFY_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      authkey: config.msg91AuthKey,
+    },
+    body: JSON.stringify({
+      "access-token": token,
+      widgetId,
+    }),
+  });
+  const payload = (await res.json().catch(() => ({}))) as VerifyAccessTokenResponse;
+  // MSG91 can return HTTP 200 with type:"error" on logical failures, so the
+  // status code alone is not sufficient — also inspect the payload.
+  if (!res.ok || payload.type === "error") {
+    // Log MSG91's own code/message (never the token) so OTP verify failures
+    // are diagnosable: code 201/418 = authkey problem, 701 = bad/expired token.
+    logger.warn(
+      { httpStatus: res.status, msg91Type: payload.type, msg91Code: payload.code },
+      "MSG91 verifyAccessToken rejected token",
+    );
+    return { ok: false, payload };
+  }
+  return { ok: true, payload };
+}
+
 export async function verifyAccessToken(accessToken: string): Promise<{ phone: string }> {
   if (!config.msg91AuthKey || !config.msg91WidgetId) {
     throw new HttpError(
@@ -50,34 +80,19 @@ export async function verifyAccessToken(accessToken: string): Promise<{ phone: s
     throw new HttpError(400, "invalid_token", "Missing verification token.");
   }
 
-  let payload: VerifyAccessTokenResponse;
+  // A token is issued by one specific widget and only validates against that
+  // widget's id. The mobile app and website use different widgets, so try each
+  // configured widget id and accept the first that MSG91 confirms.
+  const widgetIds = [config.msg91WidgetId, config.msg91WebWidgetId].filter(Boolean);
+
+  let payload: VerifyAccessTokenResponse | undefined;
   try {
-    const res = await fetch(VERIFY_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        authkey: config.msg91AuthKey,
-      },
-      body: JSON.stringify({
-        "access-token": token,
-        widgetId: config.msg91WidgetId,
-      }),
-    });
-    payload = (await res.json().catch(() => ({}))) as VerifyAccessTokenResponse;
-    // MSG91 can return HTTP 200 with type:"error" on logical failures, so the
-    // status code alone is not sufficient — also inspect the payload.
-    if (!res.ok || payload.type === "error") {
-      // Log MSG91's own code/message (never the token) so OTP verify failures
-      // are diagnosable: code 201/418 = authkey problem, 701 = bad/expired token.
-      logger.warn(
-        { httpStatus: res.status, msg91Type: payload.type, msg91Code: payload.code },
-        "MSG91 verifyAccessToken rejected token",
-      );
-      throw new HttpError(
-        401,
-        "verification_failed",
-        "Couldn't verify this code. Please try signing in again.",
-      );
+    for (const widgetId of widgetIds) {
+      const result = await verifyWithWidget(token, widgetId);
+      if (result.ok) {
+        payload = result.payload;
+        break;
+      }
     }
   } catch (err) {
     if (err instanceof HttpError) throw err;
@@ -86,6 +101,14 @@ export async function verifyAccessToken(accessToken: string): Promise<{ phone: s
       502,
       "verification_unavailable",
       "Couldn't reach the verification service. Please try again shortly.",
+    );
+  }
+
+  if (!payload) {
+    throw new HttpError(
+      401,
+      "verification_failed",
+      "Couldn't verify this code. Please try signing in again.",
     );
   }
 
