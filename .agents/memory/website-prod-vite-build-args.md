@@ -20,11 +20,22 @@ DigitalOcean website build had no env block, so the prod bundle shipped them as 
    is mandatory or the value is silently dropped.
 2. The DO app spec website component needs those keys as `scope: BUILD_TIME` envs.
 
+**Replit→GitHub is NOT automatic:** Replit checkpoints commit locally and push to the
+`gitsafe-backup` remote ONLY. They do NOT push to the connected GitHub repo (remote
+`subrepl-*` → github.com/ShviamM/Cyber-Shield-India). After a checkpoint, local HEAD moves ahead
+but GitHub `main` stays behind (verify with `curl -s https://api.github.com/repos/ShviamM/Cyber-Shield-India/commits/main`).
+The user must push to GitHub manually via Replit's version-control pane; the main agent cannot
+`git push`/`git fetch` (blocked as destructive) and there's no GitHub connector token available.
+DO builds from GitHub `main`, so a deploy before the user pushes builds stale code.
+
 **DO deploy-timing trap:** the website component uses a generic `git:` source (`repo_clone_url`),
 NOT a `github:` source. `deploy_on_push` is INVALID for generic git sources (spec validation rejects
-the field), so pushes to GitHub do NOT auto-deploy. After Replit auto-commits/pushes a code change to
-GitHub (happens at turn end), you must manually run `doctl apps create-deployment <app-id>` to pick it
-up. A deploy triggered before the push builds stale code.
+the field), so even once code is on GitHub, pushes do NOT auto-deploy — run
+`doctl apps create-deployment <app-id>` manually AFTER the user pushes to GitHub.
+
+**Verify without sending a real OTP:** fetch the live bundle and check the widget id is inlined:
+`curl -s <site>/ | grep -oE '/assets/[^"]+\.js'` then grep the bundle for `$VITE_MSG91_WIDGET_ID`.
+If the bundle hash is unchanged after a deploy, the build got stale code (GitHub wasn't updated).
 
 **`doctl apps spec validate` quirk:** it validates as if creating a NEW app and rejects the existing
 encrypted `EV[...]` secret values ("secret env value must not be encrypted before app is created").
