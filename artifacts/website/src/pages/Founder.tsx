@@ -12,7 +12,6 @@ import bookTrailer from "@assets/DigitalDhokha_BookTrailer_web_24s.mp4";
 import leaderMahana from "@assets/Satish_Mahana_-_Loksabha_Speaker_Uttar_Pradesh_1780923550200.jpeg";
 import leaderKapoor from "@assets/Sanjay_Kapoor_Cricket_Association_Kanpur_1780923623980.jpeg";
 import leaderVishwakarma from "@assets/Add_SP_Anjali_Vishkarma_Cyber_1780923818911.jpeg";
-import nationalEmblem from "@assets/national_emblem_india_emblem.png";
 import {
   ShieldCheck,
   Brain,
@@ -436,7 +435,6 @@ export default function Founder() {
       <section className="bg-gray-50 py-24">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-14">
-            <img src={nationalEmblem} alt={t("leaders.emblemAlt")} className="mx-auto mb-5 h-20 w-auto opacity-90" />
             <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("leaders.eyebrow")}</span>
             <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("leaders.title")}</h2>
             <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">{t("leaders.subtitle")}</p>

@@ -43,6 +43,7 @@ export default {
     colCompany: "Company",
     colLegal: "Legal & Trust",
     rights: "All rights reserved.",
+    msme: "MSME Registered Company",
     links: {
       features: "Features",
       downloadApp: "Download App",

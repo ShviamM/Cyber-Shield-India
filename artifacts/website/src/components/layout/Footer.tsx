@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { Mail, Phone } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import nationalEmblem from "@assets/national_emblem_india_white.png";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -80,13 +81,19 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
+        <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-gray-500">
           <p>© {currentYear} Netraksh. {t("footer.rights")}</p>
-          <div className="flex gap-4">
-            <Link href="/cookie-policy" className="hover:text-white transition-colors">{t("footer.links.cookiePolicy")}</Link>
-            <Link href="/data-retention-policy" className="hover:text-white transition-colors">{t("footer.links.dataRetention")}</Link>
-            <Link href="/responsible-disclosure" className="hover:text-white transition-colors">{t("footer.links.responsibleDisclosure")}</Link>
-            <Link href="/disclaimer" className="hover:text-white transition-colors">{t("footer.links.disclaimer")}</Link>
+          <div className="flex flex-col items-center md:items-end gap-4">
+            <div className="flex items-center gap-3">
+              <img src={nationalEmblem} alt={t("footer.msme")} className="h-10 w-auto opacity-90" />
+              <span className="font-semibold tracking-wide text-gray-300">{t("footer.msme")}</span>
+            </div>
+            <div className="flex flex-wrap justify-center gap-4 md:justify-end">
+              <Link href="/cookie-policy" className="hover:text-white transition-colors">{t("footer.links.cookiePolicy")}</Link>
+              <Link href="/data-retention-policy" className="hover:text-white transition-colors">{t("footer.links.dataRetention")}</Link>
+              <Link href="/responsible-disclosure" className="hover:text-white transition-colors">{t("footer.links.responsibleDisclosure")}</Link>
+              <Link href="/disclaimer" className="hover:text-white transition-colors">{t("footer.links.disclaimer")}</Link>
+            </div>
           </div>
         </div>
       </div>

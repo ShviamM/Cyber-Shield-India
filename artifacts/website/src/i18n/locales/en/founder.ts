@@ -89,7 +89,6 @@ export default {
     ],
   },
   leaders: {
-    emblemAlt: "State Emblem of India",
     eyebrow: "Conversations on Cyber Safety",
     title: "In conversation with leaders",
     subtitle:

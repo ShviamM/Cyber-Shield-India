@@ -43,6 +43,7 @@ export default {
     colCompany: "कंपनी",
     colLegal: "कानूनी और भरोसा",
     rights: "सर्वाधिकार सुरक्षित।",
+    msme: "MSME पंजीकृत कंपनी",
     links: {
       features: "फ़ीचर्स",
       downloadApp: "ऐप डाउनलोड करें",

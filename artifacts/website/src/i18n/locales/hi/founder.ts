@@ -89,7 +89,6 @@ export default {
     ],
   },
   leaders: {
-    emblemAlt: "भारत का राज्य चिन्ह",
     eyebrow: "साइबर सुरक्षा पर संवाद",
     title: "नेतृत्वकर्ताओं के साथ संवाद",
     subtitle:
