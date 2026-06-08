@@ -211,6 +211,10 @@ const hi = {
       "हो सकता है आप ऑफ़लाइन हों, या सेवा व्यस्त हो। अपना कनेक्शन जाँचें और फिर से कोशिश करें।",
     tryAgain: "फिर से कोशिश करें",
     recentChecks: "हाल की जाँचें",
+    freeChecksLeft: "आज {{n}} मुफ़्त जाँच बाकी",
+    freeChecksLeftNumber: "आज {{n}} मुफ़्त नंबर जाँच बाकी",
+    noChecksLeft: "आज की मुफ़्त सीमा समाप्त",
+    upgradeCta: "अपग्रेड करें",
     verdict: {
       whyTitle: "यह नतीजा क्यों",
       high: {

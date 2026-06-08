@@ -1,6 +1,12 @@
 import { Feather } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
-import { checkNumber, fraudCheck, listCategories } from "@workspace/api-client-react";
+import {
+  ApiError,
+  checkNumber,
+  fraudCheck,
+  listCategories,
+  useGetUsage,
+} from "@workspace/api-client-react";
 import type { FraudCheckRequestType, FraudVerdict } from "@workspace/api-client-react";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import * as Haptics from "expo-haptics";
@@ -154,6 +160,14 @@ export default function VerifyScreen() {
     queryKey: ["categories"],
     queryFn: () => listCategories(),
   });
+  const usageQuery = useGetUsage();
+  const usage = usageQuery.data;
+
+  function goToPaywall() {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    router.push("/subscription");
+  }
+
   const categoryName = (key: string) =>
     catData?.categories.find((c) => c.key === key)?.nameEn ?? key;
 
@@ -194,7 +208,13 @@ export default function VerifyScreen() {
             verifiedScam: res.verifiedScam,
             categories: res.categories.map((c) => c.key),
           };
-        } catch {
+        } catch (err) {
+          if (err instanceof ApiError && err.status === 402) {
+            setChecking(false);
+            void usageQuery.refetch();
+            goToPaywall();
+            return;
+          }
           r = { status: "invalid", isError: true, headline: t("verify.checkFailedGeneric"), detail: t("verify.checkFailedDetail") };
         }
       }
@@ -202,13 +222,20 @@ export default function VerifyScreen() {
       try {
         const verdict = await fraudCheck({ type: ENGINE_TYPE[type], value });
         r = verdictToResult(verdict, t);
-      } catch {
+      } catch (err) {
+        if (err instanceof ApiError && err.status === 402) {
+          setChecking(false);
+          void usageQuery.refetch();
+          goToPaywall();
+          return;
+        }
         r = { status: "invalid", isError: true, headline: t("verify.checkFailedGeneric"), detail: t("verify.checkFailedDetail") };
       }
     }
 
     setResult(r);
     setChecking(false);
+    if (!r.isError) void usageQuery.refetch();
     if (!r.isError && r.status !== "invalid") {
       addCheck({ type, value, result: r.status });
     }
@@ -433,6 +460,33 @@ export default function VerifyScreen() {
             )}
           </>
         )}
+
+        {/* Free-tier usage meter (premium users are unmetered, so it's hidden) */}
+        {usage && !usage.isPremium && (() => {
+          const meter = selectedType === "number" ? usage.numberChecks : usage.aiChecks;
+          const exhausted = meter.remaining <= 0;
+          return (
+            <TouchableOpacity
+              style={[s.usageBanner, exhausted && s.usageBannerEmpty]}
+              onPress={goToPaywall}
+              activeOpacity={0.85}
+            >
+              <Feather
+                name={exhausted ? "lock" : "zap"}
+                size={13}
+                color={exhausted ? "#dc2626" : SAFFRON}
+              />
+              <Text style={[s.usageBannerTxt, exhausted && { color: "#dc2626" }]}>
+                {exhausted
+                  ? t("verify.noChecksLeft")
+                  : selectedType === "number"
+                    ? t("verify.freeChecksLeftNumber", { n: meter.remaining })
+                    : t("verify.freeChecksLeft", { n: meter.remaining })}
+              </Text>
+              <Text style={s.usageUpgrade}>{t("verify.upgradeCta")}</Text>
+            </TouchableOpacity>
+          );
+        })()}
 
         {/* Check button */}
         <TouchableOpacity
@@ -686,6 +740,16 @@ const s = StyleSheet.create({
     elevation: 4,
   },
   checkBtnText: { fontSize: 16, fontWeight: "700" as const, color: "#fff" },
+  usageBanner: {
+    flexDirection: "row", alignItems: "center", gap: 8,
+    backgroundColor: "#fff7ed", borderRadius: 12, paddingVertical: 10, paddingHorizontal: 12,
+    marginBottom: 12, borderWidth: 1, borderColor: "rgba(255,103,19,0.25)",
+  },
+  usageBannerEmpty: {
+    backgroundColor: "rgba(220,38,38,0.06)", borderColor: "rgba(220,38,38,0.25)",
+  },
+  usageBannerTxt: { flex: 1, fontSize: 12.5, fontWeight: "600" as const, color: "#9a3412" },
+  usageUpgrade: { fontSize: 12.5, fontWeight: "800" as const, color: SAFFRON },
   scanBtn: {
     flexDirection: "row", alignItems: "center", justifyContent: "center",
     gap: 8, height: 50, borderRadius: 16, marginBottom: 12,

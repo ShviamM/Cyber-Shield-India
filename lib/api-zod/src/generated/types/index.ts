@@ -107,6 +107,8 @@ export * from './updateReportStatusRequestStatus';
 export * from './updateUserRoleRequest';
 export * from './updateUserStatusRequest';
 export * from './updateUserStatusRequestStatus';
+export * from './usageMeter';
+export * from './usageStatus';
 export * from './user';
 export * from './userListResponse';
 export * from './verifyNumberRequest';

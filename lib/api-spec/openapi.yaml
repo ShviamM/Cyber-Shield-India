@@ -370,6 +370,23 @@ paths:
         default:
           $ref: "#/components/responses/Error"
 
+  /me/usage:
+    get:
+      operationId: getUsage
+      tags: [usage]
+      summary: Current user's daily check usage and premium status
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Usage status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsageStatus"
+        default:
+          $ref: "#/components/responses/Error"
+
   /admin/stats:
     get:
       operationId: adminStats
@@ -2393,6 +2410,38 @@ components:
         - cancelAtPeriodEnd
         - isPremium
         - trialEligible
+
+    UsageMeter:
+      type: object
+      properties:
+        used:
+          type: integer
+          description: Checks used today (always 0 for premium users)
+        limit:
+          type: integer
+          description: Free daily allowance for this check kind
+        remaining:
+          type: integer
+          description: Checks left today before the free cap is hit
+      required:
+        - used
+        - limit
+        - remaining
+
+    UsageStatus:
+      type: object
+      properties:
+        isPremium:
+          type: boolean
+          description: Server-computed — true when a paid plan is currently active
+        numberChecks:
+          $ref: "#/components/schemas/UsageMeter"
+        aiChecks:
+          $ref: "#/components/schemas/UsageMeter"
+      required:
+        - isPremium
+        - numberChecks
+        - aiChecks
 
     CreateOrderRequest:
       type: object

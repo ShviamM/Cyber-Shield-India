@@ -78,6 +78,7 @@ import type {
   UpdateReportStatusRequest,
   UpdateUserRoleRequest,
   UpdateUserStatusRequest,
+  UsageStatus,
   User,
   VerifyNumberRequest,
   VerifyPaymentRequest,
@@ -1306,6 +1307,83 @@ export const useFraudCheck = <TError = ErrorType<ErrorResponse>,
       > => {
       return useMutation(getFraudCheckMutationOptions(options));
     }
+
+export const getGetUsageUrl = () => {
+
+
+
+
+  return `/api/me/usage`
+}
+
+/**
+ * @summary Current user's daily check usage and premium status
+ */
+export const getUsage = async ( options?: RequestInit): Promise<UsageStatus> => {
+
+  return customFetch<UsageStatus>(getGetUsageUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetUsageQueryKey = () => {
+    return [
+    `/api/me/usage`
+    ] as const;
+    }
+
+
+export const getGetUsageQueryOptions = <TData = Awaited<ReturnType<typeof getUsage>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getUsage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetUsageQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getUsage>>> = ({ signal }) => getUsage({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getUsage>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetUsageQueryResult = NonNullable<Awaited<ReturnType<typeof getUsage>>>
+export type GetUsageQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Current user's daily check usage and premium status
+ */
+
+export function useGetUsage<TData = Awaited<ReturnType<typeof getUsage>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getUsage>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetUsageQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export const getAdminStatsUrl = () => {
 

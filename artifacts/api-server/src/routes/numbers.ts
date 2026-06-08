@@ -5,6 +5,8 @@ import { CheckNumberParams, type NumberCheckResponse } from "@workspace/api-zod"
 import { normalizeIndianPhone } from "../lib/phone";
 import { HttpError } from "../lib/http-error";
 import { computeRiskLevel, getCategoriesForNumber } from "../lib/reputation";
+import { resolveOptionalCaller, usageSubject } from "../lib/caller";
+import { enforceDailyQuota } from "../lib/usage";
 
 const router: IRouter = Router();
 
@@ -17,6 +19,13 @@ router.get("/numbers/:phone/check", async (req, res) => {
       "invalid_phone",
       "Enter a valid 10-digit Indian mobile number",
     );
+  }
+
+  // Freemium gate: free users get a daily allowance of number lookups; premium
+  // users are unlimited. A 402 ("free_limit_reached") drives the in-app paywall.
+  const caller = await resolveOptionalCaller(req);
+  if (!caller?.isPremium) {
+    await enforceDailyQuota(usageSubject(req, caller), "number_check");
   }
 
   const [rep] = await db

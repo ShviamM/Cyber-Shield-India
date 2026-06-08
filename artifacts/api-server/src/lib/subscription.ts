@@ -1,4 +1,4 @@
-import { and, eq, ne, lte, or, isNull, sql } from "drizzle-orm";
+import { and, eq, ne, gt, lte, or, isNull, inArray, sql } from "drizzle-orm";
 import {
   db,
   subscriptionsTable,
@@ -43,6 +43,23 @@ const FREE_DEFAULT: EffectiveSubscription = {
 
 export function isPaidPlan(plan: string): boolean {
   return Boolean(getPlan(plan)?.premium);
+}
+
+/**
+ * SQL predicate (on subscriptionsTable) matching a *currently premium* row: a
+ * paid plan, in an unlapsed period, with an access-granting status. Mirrors
+ * computeEffective().isPremium for set-based queries such as targeting premium
+ * users' devices for priority push alerts.
+ */
+export function isPremiumNowCondition(now: Date = new Date()) {
+  return and(
+    ne(subscriptionsTable.plan, "free"),
+    inArray(subscriptionsTable.status, ["active", "canceled", "trialing"]),
+    or(
+      isNull(subscriptionsTable.currentPeriodEnd),
+      gt(subscriptionsTable.currentPeriodEnd, now),
+    ),
+  );
 }
 
 /**

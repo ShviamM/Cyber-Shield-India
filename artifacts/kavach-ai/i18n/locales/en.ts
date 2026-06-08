@@ -244,6 +244,10 @@ const en = {
       "You may be offline, or the service is busy. Check your connection and try again.",
     tryAgain: "Try again",
     recentChecks: "RECENT CHECKS",
+    freeChecksLeft: "{{n}} free checks left today",
+    freeChecksLeftNumber: "{{n}} free number checks left today",
+    noChecksLeft: "Daily free limit reached",
+    upgradeCta: "Upgrade",
     verdict: {
       whyTitle: "Why this verdict",
       high: {

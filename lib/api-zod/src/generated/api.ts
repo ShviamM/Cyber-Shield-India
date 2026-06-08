@@ -300,6 +300,24 @@ export const FraudCheckResponse = zod.object({
 
 
 /**
+ * @summary Current user's daily check usage and premium status
+ */
+export const GetUsageResponse = zod.object({
+  "isPremium": zod.boolean().describe('Server-computed — true when a paid plan is currently active'),
+  "numberChecks": zod.object({
+  "used": zod.number().describe('Checks used today (always 0 for premium users)'),
+  "limit": zod.number().describe('Free daily allowance for this check kind'),
+  "remaining": zod.number().describe('Checks left today before the free cap is hit')
+}),
+  "aiChecks": zod.object({
+  "used": zod.number().describe('Checks used today (always 0 for premium users)'),
+  "limit": zod.number().describe('Free daily allowance for this check kind'),
+  "remaining": zod.number().describe('Checks left today before the free cap is hit')
+})
+})
+
+
+/**
  * @summary Dashboard metrics overview
  */
 export const AdminStatsResponse = zod.object({

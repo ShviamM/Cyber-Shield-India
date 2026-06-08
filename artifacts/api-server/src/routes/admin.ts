@@ -36,6 +36,7 @@ import { HttpError, isUuid } from "../lib/http-error";
 import { toAdminReportDto } from "../lib/dto";
 import { recomputeReputation, setVerifiedScam } from "../lib/reputation";
 import { PLANS, monthlyAmount } from "../lib/plans";
+import { isPremiumNowCondition } from "../lib/subscription";
 import { resolveState } from "../lib/states";
 import { requirePermission } from "../middlewares/auth";
 import { PERMISSIONS } from "../lib/rbac";
@@ -434,9 +435,17 @@ router.post("/admin/broadcasts", requirePermission(PERMISSIONS.SEND_BROADCASTS),
     );
   }
 
+  // Priority alerts are a premium benefit: real-time push goes only to devices
+  // of currently-premium users. Free users still see every broadcast in the
+  // in-app feed (GET /notifications), which is their "in-app alerts only" tier.
   const tokenRows = await db
     .select({ token: deviceTokensTable.token })
-    .from(deviceTokensTable);
+    .from(deviceTokensTable)
+    .innerJoin(
+      subscriptionsTable,
+      eq(subscriptionsTable.userId, deviceTokensTable.userId),
+    )
+    .where(isPremiumNowCondition());
   const tokens = tokenRows.map((r) => r.token);
 
   const { successCount, invalidTokens } = await sendExpoPush(

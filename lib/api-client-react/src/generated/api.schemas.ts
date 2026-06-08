@@ -683,6 +683,22 @@ export interface SubscriptionPlanList {
   plans: SubscriptionPlan[];
 }
 
+export interface UsageMeter {
+  /** Checks used today (always 0 for premium users) */
+  used: number;
+  /** Free daily allowance for this check kind */
+  limit: number;
+  /** Checks left today before the free cap is hit */
+  remaining: number;
+}
+
+export interface UsageStatus {
+  /** Server-computed — true when a paid plan is currently active */
+  isPremium: boolean;
+  numberChecks: UsageMeter;
+  aiChecks: UsageMeter;
+}
+
 export type CreateOrderRequestPlan = typeof CreateOrderRequestPlan[keyof typeof CreateOrderRequestPlan];
 
 
