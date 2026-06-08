@@ -41,6 +41,14 @@ export interface AdminLoginRequest {
   password: string;
 }
 
+export interface DevLoginRequest {
+  /** Indian mobile number in any common format */
+  phone: string;
+  /** Required when registering a new number */
+  fullName?: string | null;
+  location?: string | null;
+}
+
 export interface User {
   id: string;
   fullName: string;

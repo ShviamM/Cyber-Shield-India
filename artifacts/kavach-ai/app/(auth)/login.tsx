@@ -1,4 +1,8 @@
-import { useCheckPhone, useVerifyToken } from "@workspace/api-client-react";
+import {
+  useCheckPhone,
+  useDevLogin,
+  useVerifyToken,
+} from "@workspace/api-client-react";
 import * as Haptics from "expo-haptics";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -39,6 +43,7 @@ export default function LoginScreen() {
   const { signIn } = useAuth();
   const checkPhone = useCheckPhone();
   const verifyToken = useVerifyToken();
+  const devLogin = useDevLogin();
 
   const [step, setStep] = useState<Step>("phone");
   const [phone, setPhone] = useState("");
@@ -46,6 +51,7 @@ export default function LoginScreen() {
   const [location, setLocation] = useState("");
   const [code, setCode] = useState("");
   const [isNewUser, setIsNewUser] = useState(false);
+  const [devFlow, setDevFlow] = useState(false);
   const [reqId, setReqId] = useState<string | null>(null);
   const [otpSending, setOtpSending] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -121,7 +127,56 @@ export default function LoginScreen() {
       return;
     }
     setError(null);
-    await startOtp();
+    if (devFlow) {
+      await doDevLogin();
+    } else {
+      await startOtp();
+    }
+  }
+
+  // Development-only sign-in that skips OTP entirely. Gated by __DEV__ on the
+  // client and by NODE_ENV on the server (the endpoint 404s in production), so
+  // it can never be used in a published build.
+  async function doDevLogin() {
+    setVerifying(true);
+    setError(null);
+    try {
+      const auth = await devLogin.mutateAsync({
+        data: {
+          phone,
+          fullName: isNewUser ? fullName.trim() : undefined,
+          location: isNewUser && location.trim() ? location.trim() : undefined,
+        },
+      });
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      await signIn(auth);
+    } catch {
+      setError(t("auth.verifyFailed"));
+    } finally {
+      setVerifying(false);
+    }
+  }
+
+  // From the phone step in dev: check if the number is new (to collect a name)
+  // then sign in without OTP.
+  async function startDevLogin() {
+    if (!isValidIndianPhone(phone)) {
+      setError(t("auth.invalidPhone"));
+      return;
+    }
+    setError(null);
+    try {
+      const res = await checkPhone.mutateAsync({ data: { phone } });
+      setIsNewUser(res.isNewUser);
+      if (res.isNewUser) {
+        setDevFlow(true);
+        setStep("details");
+      } else {
+        await doDevLogin();
+      }
+    } catch {
+      setError(t("auth.requestFailed"));
+    }
   }
 
   async function handleVerify() {
@@ -159,6 +214,7 @@ export default function LoginScreen() {
     setCode("");
     setReqId(null);
     setError(null);
+    setDevFlow(false);
   }
 
   const checking = checkPhone.isPending;
@@ -226,6 +282,20 @@ export default function LoginScreen() {
               loading={checking || otpSending}
               onPress={proceedFromPhone}
             />
+
+            {__DEV__ && (
+              <>
+                <TouchableOpacity
+                  style={s.devBtn}
+                  onPress={startDevLogin}
+                  disabled={checking || verifying}
+                  activeOpacity={0.85}
+                >
+                  <Text style={s.devBtnTxt}>{t("auth.devTestLogin")}</Text>
+                </TouchableOpacity>
+                <Text style={s.devHint}>{t("auth.devLoginHint")}</Text>
+              </>
+            )}
           </View>
         )}
 
@@ -265,7 +335,7 @@ export default function LoginScreen() {
 
             <PrimaryButton
               label={t("common.continue")}
-              loading={otpSending}
+              loading={otpSending || verifying}
               onPress={proceedFromDetails}
             />
             <TouchableOpacity style={s.linkBtn} onPress={resetToPhone}>
@@ -399,4 +469,12 @@ const s = StyleSheet.create({
   btnTxt: { fontSize: 16, fontWeight: "700" as const, color: "#fff" },
   linkBtn: { alignItems: "center", paddingVertical: 10, marginTop: 4 },
   linkTxt: { fontSize: 13, fontWeight: "600" as const, color: NAVY },
+  devBtn: {
+    height: 48, borderRadius: 14, marginTop: 12,
+    alignItems: "center", justifyContent: "center",
+    borderWidth: 1.5, borderColor: "rgba(11,61,145,0.25)",
+    borderStyle: "dashed", backgroundColor: "#F8FAFC",
+  },
+  devBtnTxt: { fontSize: 14, fontWeight: "700" as const, color: NAVY },
+  devHint: { fontSize: 11, color: "#94a3b8", marginTop: 8, textAlign: "center" },
 });

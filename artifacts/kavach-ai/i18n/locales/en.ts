@@ -83,6 +83,8 @@ const en = {
     verifyFailed: "Could not verify the code. Please try again.",
     otpUnavailable:
       "Phone verification isn't available in this preview. Please use the installed app.",
+    devTestLogin: "Dev test login (skip OTP)",
+    devLoginHint: "Development only — disabled in the published app.",
   },
 
   profile: {

@@ -1,4 +1,4 @@
-import { afterAll, describe, expect, it, vi } from "vitest";
+import { afterAll, afterEach, describe, expect, it, vi } from "vitest";
 import request from "supertest";
 import { eq } from "drizzle-orm";
 
@@ -106,5 +106,68 @@ describe("POST /auth/verify-token", () => {
 
     expect(res.status).toBe(401);
     expect(res.body.error).toBe("verification_failed");
+  });
+});
+
+describe("POST /auth/dev-login", () => {
+  const ENABLE = process.env.ENABLE_DEV_LOGIN;
+  const NODE = process.env.NODE_ENV;
+
+  afterEach(() => {
+    // Restore env after each test so the gate state never leaks between tests.
+    if (ENABLE === undefined) delete process.env.ENABLE_DEV_LOGIN;
+    else process.env.ENABLE_DEV_LOGIN = ENABLE;
+    if (NODE === undefined) delete process.env.NODE_ENV;
+    else process.env.NODE_ENV = NODE;
+  });
+
+  it("404s when the opt-in flag is absent (fail-closed by default)", async () => {
+    delete process.env.ENABLE_DEV_LOGIN;
+    const res = await request(app)
+      .post("/api/auth/dev-login")
+      .send({ phone: randomPhone(), fullName: "Test User" });
+    expect(res.status).toBe(404);
+  });
+
+  it("404s in production even with the opt-in flag set", async () => {
+    process.env.NODE_ENV = "production";
+    process.env.ENABLE_DEV_LOGIN = "true";
+    const res = await request(app)
+      .post("/api/auth/dev-login")
+      .send({ phone: randomPhone(), fullName: "Test User" });
+    expect(res.status).toBe(404);
+  });
+
+  it("requires a full name when registering a new number", async () => {
+    process.env.ENABLE_DEV_LOGIN = "true";
+    const phone = randomPhone();
+    usedPhones.push(phone);
+    const res = await request(app)
+      .post("/api/auth/dev-login")
+      .send({ phone });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe("registration_required");
+  });
+
+  it("creates an account and issues a session when enabled", async () => {
+    process.env.ENABLE_DEV_LOGIN = "true";
+    const phone = randomPhone();
+    usedPhones.push(phone);
+
+    const res = await request(app)
+      .post("/api/auth/dev-login")
+      .send({ phone, fullName: "Dev Tester" });
+
+    expect(res.status).toBe(200);
+    expect(typeof res.body.token).toBe("string");
+    expect(res.body.token.length).toBeGreaterThan(0);
+    expect(res.body.user.phone).toBe(phone);
+
+    // Existing user can sign in again without re-sending the name.
+    const again = await request(app)
+      .post("/api/auth/dev-login")
+      .send({ phone });
+    expect(again.status).toBe(200);
+    expect(again.body.user.id).toBe(res.body.user.id);
   });
 });

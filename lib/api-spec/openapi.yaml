@@ -109,6 +109,32 @@ paths:
         default:
           $ref: "#/components/responses/Error"
 
+  /auth/dev-login:
+    post:
+      operationId: devLogin
+      tags: [auth]
+      summary: Development-only test login (no OTP)
+      description: >-
+        Signs a user in without OTP for local testing in Expo Go, where the
+        MSG91 native widget cannot run. Enabled only when the server is not in
+        production (NODE_ENV !== "production"); returns 404 in production. For a
+        new phone number, fullName is required and an account is created.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DevLoginRequest"
+      responses:
+        "200":
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
   /auth/me:
     get:
       operationId: getMe
@@ -1239,6 +1265,22 @@ components:
           description: The shared admin console password
       required:
         - password
+
+    DevLoginRequest:
+      type: object
+      properties:
+        phone:
+          type: string
+          description: Indian mobile number in any common format
+        fullName:
+          type: string
+          nullable: true
+          description: Required when registering a new number
+        location:
+          type: string
+          nullable: true
+      required:
+        - phone
 
     User:
       type: object

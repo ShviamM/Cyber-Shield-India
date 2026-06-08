@@ -4,13 +4,14 @@ import { db, sessionsTable, usersTable } from "@workspace/db";
 import {
   AdminLoginBody,
   CheckPhoneBody,
+  DevLoginBody,
   UpdateMyLocationBody,
   VerifyTokenBody,
   type AuthResponse,
   type CheckPhoneResult,
   type SuccessResponse,
 } from "@workspace/api-zod";
-import { config } from "../config";
+import { config, isDevLoginEnabled } from "../config";
 import { normalizeIndianPhone } from "../lib/phone";
 import { generateToken, hashToken, safeCompare } from "../lib/token";
 import { verifyAccessToken } from "../lib/msg91-widget";
@@ -192,6 +193,95 @@ router.post("/auth/admin-login", async (req, res) => {
       .set({ isAdmin: true, updatedAt: new Date() })
       .where(eq(usersTable.id, user.id))
       .returning();
+  }
+
+  const token = generateToken();
+  const expiresAt = new Date(
+    Date.now() + config.sessionTtlDays * 24 * 60 * 60 * 1000,
+  );
+  await db
+    .insert(sessionsTable)
+    .values({ userId: user.id, tokenHash: hashToken(token), expiresAt });
+
+  const response: AuthResponse = { token, user: toUserDto(user) };
+  res.json(response);
+});
+
+// Development-only test login. The mobile OTP relies on MSG91's native widget,
+// which cannot run inside Expo Go or the web preview, so this lets us sign in
+// without OTP while testing those environments. It is fail-closed: enabled only
+// when isDevLoginEnabled() (non-production NODE_ENV *and* an explicit
+// ENABLE_DEV_LOGIN opt-in). Otherwise it 404s so the endpoint is invisible. The
+// gate is server-side only — nothing the client sends can turn it on.
+router.post("/auth/dev-login", async (req, res) => {
+  if (!isDevLoginEnabled()) {
+    throw new HttpError(404, "not_found", "Not found.");
+  }
+
+  const clientKey = req.ip ?? "unknown";
+  const ipLimit = hitRateLimit(
+    `dev-login:${clientKey}`,
+    config.devLoginMaxPerIpPerMinute,
+    60_000,
+  );
+  if (!ipLimit.allowed) {
+    throw new HttpError(
+      429,
+      "too_many_attempts",
+      "Too many attempts from this device. Please try again later.",
+    );
+  }
+
+  const body = DevLoginBody.parse(req.body);
+  const phone = normalizeIndianPhone(body.phone);
+  if (!phone) {
+    throw new HttpError(
+      400,
+      "invalid_phone",
+      "Enter a valid 10-digit Indian mobile number",
+    );
+  }
+
+  let [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.phone, phone))
+    .limit(1);
+
+  const shouldBeAdmin = config.adminPhones.includes(phone);
+
+  if (!user && !body.fullName?.trim()) {
+    throw new HttpError(
+      400,
+      "registration_required",
+      "Full name is required to create your account.",
+    );
+  }
+
+  if (!user) {
+    [user] = await db
+      .insert(usersTable)
+      .values({
+        fullName: body.fullName!.trim(),
+        phone,
+        location: body.location?.trim() || null,
+        isAdmin: shouldBeAdmin,
+      })
+      .returning();
+  } else {
+    // Mirror verify-token: keep name/location fresh and never silently strip
+    // an existing admin's privileges.
+    const updates: Partial<typeof usersTable.$inferInsert> = {};
+    if (body.fullName?.trim()) updates.fullName = body.fullName.trim();
+    if (body.location?.trim()) updates.location = body.location.trim();
+    if (shouldBeAdmin && !user.isAdmin) updates.isAdmin = true;
+    if (Object.keys(updates).length > 0) {
+      [user] = await db
+        .update(usersTable)
+        .set({ ...updates, updatedAt: new Date() })
+        .where(eq(usersTable.id, user.id))
+        .returning();
+    }
   }
 
   const token = generateToken();

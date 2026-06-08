@@ -44,6 +44,7 @@ import type {
   CityHotspotListResponse,
   CreateOrderRequest,
   CreateReportRequest,
+  DevLoginRequest,
   ErrorResponse,
   ExtendTrialRequest,
   FamilyMember,
@@ -389,6 +390,78 @@ export const useAdminLogin = <TError = ErrorType<ErrorResponse>,
         TContext
       > => {
       return useMutation(getAdminLoginMutationOptions(options));
+    }
+
+export const getDevLoginUrl = () => {
+
+
+
+
+  return `/api/auth/dev-login`
+}
+
+/**
+ * Signs a user in without OTP for local testing in Expo Go, where the MSG91 native widget cannot run. Enabled only when the server is not in production (NODE_ENV !== "production"); returns 404 in production. For a new phone number, fullName is required and an account is created.
+ * @summary Development-only test login (no OTP)
+ */
+export const devLogin = async (devLoginRequest: DevLoginRequest, options?: RequestInit): Promise<AuthResponse> => {
+
+  return customFetch<AuthResponse>(getDevLoginUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      devLoginRequest,)
+  }
+);}
+
+
+
+
+export const getDevLoginMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof devLogin>>, TError,{data: BodyType<DevLoginRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof devLogin>>, TError,{data: BodyType<DevLoginRequest>}, TContext> => {
+
+const mutationKey = ['devLogin'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof devLogin>>, {data: BodyType<DevLoginRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  devLogin(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DevLoginMutationResult = NonNullable<Awaited<ReturnType<typeof devLogin>>>
+    export type DevLoginMutationBody = BodyType<DevLoginRequest>
+    export type DevLoginMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Development-only test login (no OTP)
+ */
+export const useDevLogin = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof devLogin>>, TError,{data: BodyType<DevLoginRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof devLogin>>,
+        TError,
+        {data: BodyType<DevLoginRequest>},
+        TContext
+      > => {
+      return useMutation(getDevLoginMutationOptions(options));
     }
 
 export const getGetMeUrl = () => {

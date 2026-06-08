@@ -79,6 +79,31 @@ export const AdminLoginResponse = zod.object({
 
 
 /**
+ * Signs a user in without OTP for local testing in Expo Go, where the MSG91 native widget cannot run. Enabled only when the server is not in production (NODE_ENV !== "production"); returns 404 in production. For a new phone number, fullName is required and an account is created.
+ * @summary Development-only test login (no OTP)
+ */
+export const DevLoginBody = zod.object({
+  "phone": zod.string().describe('Indian mobile number in any common format'),
+  "fullName": zod.string().nullish().describe('Required when registering a new number'),
+  "location": zod.string().nullish()
+})
+
+export const DevLoginResponse = zod.object({
+  "token": zod.string(),
+  "user": zod.object({
+  "id": zod.string(),
+  "fullName": zod.string(),
+  "phone": zod.string(),
+  "location": zod.string().nullish(),
+  "isAdmin": zod.boolean(),
+  "isSuperAdmin": zod.boolean().describe('True for platform owners who may access the Super Admin dashboard.'),
+  "status": zod.string(),
+  "createdAt": zod.coerce.date()
+})
+})
+
+
+/**
  * @summary Get the current authenticated user
  */
 export const GetMeResponse = zod.object({

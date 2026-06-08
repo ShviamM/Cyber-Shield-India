@@ -29,6 +29,21 @@ function numEnv(name: string, fallback: number): number {
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback;
 }
 
+/**
+ * Whether the OTP-bypass test login (POST /auth/dev-login) is allowed. It is
+ * fail-closed by design: it requires BOTH a non-production NODE_ENV AND an
+ * explicit ENABLE_DEV_LOGIN="true" opt-in. A prod deployment that is merely
+ * misconfigured (e.g. NODE_ENV unset, "staging", etc.) still keeps the route
+ * disabled because the opt-in flag is absent. Read live (not cached) so it can
+ * never be accidentally baked in and so it is unit-testable.
+ */
+export function isDevLoginEnabled(): boolean {
+  return (
+    process.env.NODE_ENV !== "production" &&
+    process.env.ENABLE_DEV_LOGIN === "true"
+  );
+}
+
 export const config = {
   isProduction,
   // MSG91 OTP Widget. The widget (client-side RN SDK) sends and verifies the
@@ -55,6 +70,8 @@ export const config = {
   // a tight per-minute cap plus a longer rolling per-hour cap.
   adminLoginMaxPerIpPerMinute: intEnv("ADMIN_LOGIN_MAX_PER_IP_PER_MINUTE", 5),
   adminLoginMaxPerIpPerHour: intEnv("ADMIN_LOGIN_MAX_PER_IP_PER_HOUR", 30),
+  // Per-IP throttle for the development-only test login (see isDevLoginEnabled).
+  devLoginMaxPerIpPerMinute: intEnv("DEV_LOGIN_MAX_PER_IP_PER_MINUTE", 10),
   sessionTtlDays: intEnv("SESSION_TTL_DAYS", 60),
   reportDuplicateWindowHours: intEnv("REPORT_DUPLICATE_WINDOW_HOURS", 24),
   reportMaxPerHour: intEnv("REPORT_MAX_PER_HOUR", 20),
