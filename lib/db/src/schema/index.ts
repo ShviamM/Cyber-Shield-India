@@ -1,4 +1,6 @@
 export * from "./users";
+export * from "./roles";
+export * from "./admin-audit-log";
 export * from "./sessions";
 export * from "./scam-categories";
 export * from "./fraud-reports";

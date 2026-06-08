@@ -229,6 +229,164 @@ export async function startTrial(
   return getEffectiveSubscription(userId);
 }
 
+export interface AdminTrialResult {
+  effective: EffectiveSubscription;
+  /** Subscription status before the change ("none" when no row existed). */
+  previousStatus: SubStatus | "none";
+  previousEnd: Date | null;
+  newEnd: Date | null;
+  plan: PlanKey;
+}
+
+/** Error thrown when an admin trial action is not allowed for the user's state. */
+export class TrialActionError extends Error {
+  constructor(
+    public readonly code: string,
+    message: string,
+  ) {
+    super(message);
+    this.name = "TrialActionError";
+  }
+}
+
+/**
+ * Guard: a currently-paying subscriber must never be silently downgraded to a
+ * trial. Refuse trial grants/resets while a paid plan is still active.
+ */
+function assertNotActivePaid(row: Subscription | undefined): void {
+  if (!row) return;
+  const liveEnd =
+    row.currentPeriodEnd != null && row.currentPeriodEnd.getTime() > Date.now();
+  if (isPaidPlan(row.plan) && row.status === "active" && liveEnd) {
+    throw new TrialActionError(
+      "active_subscriber",
+      "This user has an active paid subscription. Manage their plan instead of granting a trial.",
+    );
+  }
+}
+
+/**
+ * Admin-granted trial. `extend` adds days from the later of now and any live
+ * period end (so an active trial is lengthened); `activate` always starts a
+ * fresh window from now (reactivating an expired or never-started trial). Either
+ * mode unlocks premium immediately. Refuses to downgrade active paid subscribers.
+ */
+export async function adminGrantTrial(params: {
+  userId: string;
+  plan: PlanKey;
+  days: number;
+  mode: "extend" | "activate";
+}): Promise<AdminTrialResult> {
+  const def = getPlan(params.plan);
+  if (!def || !def.premium) {
+    throw new TrialActionError("invalid_plan", "Trials require a paid plan.");
+  }
+  if (!Number.isInteger(params.days) || params.days <= 0 || params.days > 365) {
+    throw new TrialActionError(
+      "invalid_days",
+      "Days must be a whole number between 1 and 365.",
+    );
+  }
+
+  const now = new Date();
+  const [existing] = await db
+    .select()
+    .from(subscriptionsTable)
+    .where(eq(subscriptionsTable.userId, params.userId))
+    .limit(1);
+
+  assertNotActivePaid(existing);
+
+  const previousStatus: SubStatus | "none" = existing
+    ? (existing.status as SubStatus)
+    : "none";
+  const previousEnd = existing?.currentPeriodEnd ?? null;
+
+  let base = now;
+  if (
+    params.mode === "extend" &&
+    existing?.currentPeriodEnd &&
+    existing.currentPeriodEnd.getTime() > now.getTime()
+  ) {
+    base = existing.currentPeriodEnd;
+  }
+  const newEnd = new Date(base);
+  newEnd.setDate(newEnd.getDate() + params.days);
+
+  if (existing) {
+    await db
+      .update(subscriptionsTable)
+      .set({
+        plan: params.plan,
+        status: "trialing",
+        currentPeriodStart: existing.currentPeriodStart ?? now,
+        currentPeriodEnd: newEnd,
+        cancelAtPeriodEnd: false,
+        trialStartedAt: existing.trialStartedAt ?? now,
+        updatedAt: now,
+      })
+      .where(eq(subscriptionsTable.id, existing.id));
+  } else {
+    await db
+      .insert(subscriptionsTable)
+      .values({
+        userId: params.userId,
+        plan: params.plan,
+        status: "trialing",
+        currentPeriodStart: now,
+        currentPeriodEnd: newEnd,
+        cancelAtPeriodEnd: false,
+        trialStartedAt: now,
+      })
+      .onConflictDoNothing({ target: subscriptionsTable.userId });
+  }
+
+  const effective = await getEffectiveSubscription(params.userId);
+  return { effective, previousStatus, previousEnd, newEnd, plan: params.plan };
+}
+
+/**
+ * Reset a user's trial so they become eligible to start a fresh free trial from
+ * the app. Clears the trial stamp and drops the row back to free/expired.
+ * Refuses to wipe an active paid subscription.
+ */
+export async function adminResetTrial(userId: string): Promise<{
+  effective: EffectiveSubscription;
+  previousStatus: SubStatus | "none";
+  previousEnd: Date | null;
+}> {
+  const [existing] = await db
+    .select()
+    .from(subscriptionsTable)
+    .where(eq(subscriptionsTable.userId, userId))
+    .limit(1);
+
+  assertNotActivePaid(existing);
+
+  const previousStatus: SubStatus | "none" = existing
+    ? (existing.status as SubStatus)
+    : "none";
+  const previousEnd = existing?.currentPeriodEnd ?? null;
+
+  if (existing) {
+    await db
+      .update(subscriptionsTable)
+      .set({
+        plan: "free",
+        status: "expired",
+        currentPeriodStart: null,
+        currentPeriodEnd: null,
+        cancelAtPeriodEnd: false,
+        trialStartedAt: null,
+        updatedAt: new Date(),
+      })
+      .where(eq(subscriptionsTable.id, existing.id));
+  }
+
+  const effective = await getEffectiveSubscription(userId);
+  return { effective, previousStatus, previousEnd };
+}
+
 export function toPaymentDto(p: DbPayment): PaymentDto {
   return {
     id: p.id,

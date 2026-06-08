@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { hashToken } from "../lib/token";
 import { HttpError } from "../lib/http-error";
 import { isSuperAdmin } from "../lib/super-admin";
+import { userHasPermission } from "../lib/rbac";
 
 function extractToken(req: Request): string | null {
   const header = req.headers.authorization;
@@ -37,7 +38,7 @@ export async function requireAuth(
   if (!user) {
     return next(new HttpError(401, "unauthorized", "Authentication required"));
   }
-  if (user.status === "blocked") {
+  if (user.status === "blocked" || user.status === "suspended") {
     return next(new HttpError(403, "blocked", "Your account has been blocked"));
   }
   req.user = user;
@@ -53,7 +54,7 @@ export async function requireAdmin(
   if (!user) {
     return next(new HttpError(401, "unauthorized", "Authentication required"));
   }
-  if (user.status === "blocked") {
+  if (user.status === "blocked" || user.status === "suspended") {
     return next(new HttpError(403, "blocked", "Your account has been blocked"));
   }
   if (!user.isAdmin) {
@@ -72,7 +73,7 @@ export async function requireSuperAdmin(
   if (!user) {
     return next(new HttpError(401, "unauthorized", "Authentication required"));
   }
-  if (user.status === "blocked") {
+  if (user.status === "blocked" || user.status === "suspended") {
     return next(new HttpError(403, "blocked", "Your account has been blocked"));
   }
   if (!user.isAdmin || !isSuperAdmin(user)) {
@@ -82,4 +83,34 @@ export async function requireSuperAdmin(
   }
   req.user = user;
   next();
+}
+
+/**
+ * Authorize a request by data-driven permission rather than a fixed flag. The
+ * authenticated user's role (resolved from the `roles` table, with the platform
+ * owner always granted the wildcard) must include the required permission.
+ */
+export function requirePermission(permission: string) {
+  return async function (
+    req: Request,
+    _res: Response,
+    next: NextFunction,
+  ): Promise<void> {
+    const user = await authenticate(req);
+    if (!user) {
+      return next(new HttpError(401, "unauthorized", "Authentication required"));
+    }
+    if (user.status === "blocked" || user.status === "suspended") {
+      return next(
+        new HttpError(403, "blocked", "Your account has been suspended"),
+      );
+    }
+    if (!(await userHasPermission(user, permission))) {
+      return next(
+        new HttpError(403, "forbidden", "You do not have access to this action"),
+      );
+    }
+    req.user = user;
+    next();
+  };
 }

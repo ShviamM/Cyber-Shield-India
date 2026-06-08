@@ -6,6 +6,7 @@ import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import Login from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
 import BusinessMetrics from "@/pages/business-metrics";
+import Users from "@/pages/users";
 import FraudMap from "@/pages/fraud-map";
 import Broadcasts from "@/pages/broadcasts";
 import SuperAdmin from "@/pages/super-admin";
@@ -64,6 +65,7 @@ function Router() {
       <Route path="/privacy" component={Privacy} />
       <Route path="/" component={() => <ProtectedRoute component={Dashboard} />} />
       <Route path="/business" component={() => <ProtectedRoute component={BusinessMetrics} />} />
+      <Route path="/users" component={() => <ProtectedRoute component={Users} />} />
       <Route path="/fraud-map" component={() => <ProtectedRoute component={FraudMap} />} />
       <Route path="/broadcasts" component={() => <ProtectedRoute component={Broadcasts} />} />
       <Route path="/super" component={() => <SuperAdminRoute />} />

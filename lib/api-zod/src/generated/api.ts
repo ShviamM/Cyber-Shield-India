@@ -474,22 +474,259 @@ export const AdminListTrialsResponse = zod.object({
 
 
 /**
- * Every registered user, including older accounts that never started a trial or subscription, with their current plan and subscription status (if any). Newest registrations first.
- * @summary List all registered users
+ * The data-driven roles catalogue used to populate the role selector. New roles can be added as rows without code changes.
+ * @summary List assignable roles
  */
-export const AdminListUsersResponse = zod.object({
+export const AdminListRolesResponse = zod.object({
+  "roles": zod.array(zod.object({
+  "name": zod.string(),
+  "label": zod.string(),
+  "description": zod.string().nullish(),
+  "permissions": zod.array(zod.string()),
+  "isSystem": zod.boolean()
+}))
+})
+
+
+/**
+ * Every registered user with role, account status, plan/subscription status, device count and number of scam reports filed. Supports search by name or phone, filtering by role and status, and pagination.
+ * @summary List registered users with search, filters and pagination
+ */
+export const adminUsersQueryPageDefault = 1;
+export const adminUsersQueryPageSizeDefault = 20;
+
+export const AdminUsersQueryParams = zod.object({
+  "search": zod.coerce.string().optional(),
+  "role": zod.coerce.string().optional(),
+  "status": zod.coerce.string().optional(),
+  "page": zod.coerce.number().default(adminUsersQueryPageDefault),
+  "pageSize": zod.coerce.number().default(adminUsersQueryPageSizeDefault)
+})
+
+export const AdminUsersResponse = zod.object({
   "users": zod.array(zod.object({
   "id": zod.string(),
   "fullName": zod.string(),
   "phone": zod.string(),
   "location": zod.string().nullish(),
+  "role": zod.string(),
   "isAdmin": zod.boolean(),
   "status": zod.string(),
-  "plan": zod.string().nullish().describe('Current subscription plan, or null if the user never subscribed.'),
-  "subscriptionStatus": zod.string().nullish().describe('Current subscription status, or null if the user has no subscription.'),
+  "plan": zod.string().nullish(),
+  "subscriptionStatus": zod.string().nullish(),
+  "currentPeriodEnd": zod.coerce.date().nullish(),
+  "trialStartedAt": zod.coerce.date().nullish(),
+  "deviceCount": zod.number(),
+  "reportsFiled": zod.number(),
   "createdAt": zod.coerce.date()
 })),
-  "total": zod.number()
+  "total": zod.number(),
+  "page": zod.number(),
+  "pageSize": zod.number()
+})
+
+
+/**
+ * Full profile for one user: registration date, device count, last login, trial/subscription status, role and number of scam reports filed.
+ * @summary Get a single user's detail
+ */
+export const AdminGetUserParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const AdminGetUserResponse = zod.object({
+  "id": zod.string(),
+  "fullName": zod.string(),
+  "phone": zod.string(),
+  "location": zod.string().nullish(),
+  "role": zod.string(),
+  "isAdmin": zod.boolean(),
+  "isSuperAdmin": zod.boolean(),
+  "status": zod.string(),
+  "deviceCount": zod.number(),
+  "reportsFiled": zod.number(),
+  "lastLoginAt": zod.coerce.date().nullish(),
+  "registeredAt": zod.coerce.date(),
+  "subscription": zod.object({
+  "plan": zod.enum(['free', 'premium', 'family']),
+  "status": zod.enum(['active', 'canceled', 'expired', 'past_due', 'trialing']),
+  "currentPeriodStart": zod.coerce.date().nullish(),
+  "currentPeriodEnd": zod.coerce.date().nullish(),
+  "cancelAtPeriodEnd": zod.boolean(),
+  "isPremium": zod.boolean().describe('Server-computed — true when a paid plan is currently active'),
+  "trialEligible": zod.boolean().describe('Server-computed — true when the user can still start a free trial')
+}),
+  "trialStartedAt": zod.coerce.date().nullish()
+})
+
+
+/**
+ * Add days to a user's trial (lengthening an active trial or reactivating an expired one). Sends a push notification and records an audit entry.
+ * @summary Extend a user's trial
+ */
+export const AdminExtendTrialParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const AdminExtendTrialBody = zod.object({
+  "days": zod.number().describe('Number of days to add (1-365).'),
+  "plan": zod.enum(['premium', 'family']).optional().describe('Plan to grant the trial on. Defaults to premium.'),
+  "reason": zod.string().nullish(),
+  "note": zod.string().nullish()
+})
+
+export const AdminExtendTrialResponse = zod.object({
+  "subscription": zod.object({
+  "plan": zod.enum(['free', 'premium', 'family']),
+  "status": zod.enum(['active', 'canceled', 'expired', 'past_due', 'trialing']),
+  "currentPeriodStart": zod.coerce.date().nullish(),
+  "currentPeriodEnd": zod.coerce.date().nullish(),
+  "cancelAtPeriodEnd": zod.boolean(),
+  "isPremium": zod.boolean().describe('Server-computed — true when a paid plan is currently active'),
+  "trialEligible": zod.boolean().describe('Server-computed — true when the user can still start a free trial')
+}),
+  "previousStatus": zod.string(),
+  "previousEnd": zod.coerce.date().nullish(),
+  "newEnd": zod.coerce.date().nullish(),
+  "plan": zod.string()
+})
+
+
+/**
+ * Start a fresh trial window from now for an expired or never-started trial. Sends a push notification and records an audit entry.
+ * @summary Activate (reactivate / start) a user's trial
+ */
+export const AdminActivateTrialParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const AdminActivateTrialBody = zod.object({
+  "days": zod.number().describe('Length of the fresh trial window in days (1-365).'),
+  "plan": zod.enum(['premium', 'family']).optional(),
+  "reason": zod.string().nullish(),
+  "note": zod.string().nullish()
+})
+
+export const AdminActivateTrialResponse = zod.object({
+  "subscription": zod.object({
+  "plan": zod.enum(['free', 'premium', 'family']),
+  "status": zod.enum(['active', 'canceled', 'expired', 'past_due', 'trialing']),
+  "currentPeriodStart": zod.coerce.date().nullish(),
+  "currentPeriodEnd": zod.coerce.date().nullish(),
+  "cancelAtPeriodEnd": zod.boolean(),
+  "isPremium": zod.boolean().describe('Server-computed — true when a paid plan is currently active'),
+  "trialEligible": zod.boolean().describe('Server-computed — true when the user can still start a free trial')
+}),
+  "previousStatus": zod.string(),
+  "previousEnd": zod.coerce.date().nullish(),
+  "newEnd": zod.coerce.date().nullish(),
+  "plan": zod.string()
+})
+
+
+/**
+ * Clear the trial so the user can start a fresh free trial from the app. Records an audit entry.
+ * @summary Reset a user's trial eligibility
+ */
+export const AdminResetTrialParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const AdminResetTrialBody = zod.object({
+  "reason": zod.string().nullish(),
+  "note": zod.string().nullish()
+})
+
+export const AdminResetTrialResponse = zod.object({
+  "subscription": zod.object({
+  "plan": zod.enum(['free', 'premium', 'family']),
+  "status": zod.enum(['active', 'canceled', 'expired', 'past_due', 'trialing']),
+  "currentPeriodStart": zod.coerce.date().nullish(),
+  "currentPeriodEnd": zod.coerce.date().nullish(),
+  "cancelAtPeriodEnd": zod.boolean(),
+  "isPremium": zod.boolean().describe('Server-computed — true when a paid plan is currently active'),
+  "trialEligible": zod.boolean().describe('Server-computed — true when the user can still start a free trial')
+}),
+  "previousStatus": zod.string(),
+  "previousEnd": zod.coerce.date().nullish(),
+  "newEnd": zod.coerce.date().nullish(),
+  "plan": zod.string()
+})
+
+
+/**
+ * @summary Change a user's role
+ */
+export const AdminUpdateUserRoleParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const AdminUpdateUserRoleBody = zod.object({
+  "role": zod.string(),
+  "reason": zod.string().nullish()
+})
+
+export const AdminUpdateUserRoleResponse = zod.object({
+  "id": zod.string(),
+  "role": zod.string()
+})
+
+
+/**
+ * @summary Change a user's account status (active / suspended / blocked)
+ */
+export const AdminUpdateUserStatusParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const AdminUpdateUserStatusBody = zod.object({
+  "status": zod.enum(['active', 'suspended', 'blocked']),
+  "reason": zod.string().nullish()
+})
+
+export const AdminUpdateUserStatusResponse = zod.object({
+  "id": zod.string(),
+  "status": zod.string()
+})
+
+
+/**
+ * Privileged admin actions taken against this user, newest first.
+ * @summary Audit history for a user
+ */
+export const AdminGetUserAuditParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const AdminGetUserAuditResponse = zod.object({
+  "entries": zod.array(zod.object({
+  "id": zod.string(),
+  "actorPhone": zod.string().nullish(),
+  "actorRole": zod.string().nullish(),
+  "action": zod.string(),
+  "targetPhone": zod.string().nullish(),
+  "reason": zod.string().nullish(),
+  "metadata": zod.record(zod.string(), zod.unknown()).nullish(),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+
+/**
+ * Recent privileged admin actions across all users, newest first.
+ * @summary Global admin audit log
+ */
+export const AdminListAuditResponse = zod.object({
+  "entries": zod.array(zod.object({
+  "id": zod.string(),
+  "actorPhone": zod.string().nullish(),
+  "actorRole": zod.string().nullish(),
+  "action": zod.string(),
+  "targetPhone": zod.string().nullish(),
+  "reason": zod.string().nullish(),
+  "metadata": zod.record(zod.string(), zod.unknown()).nullish(),
+  "createdAt": zod.coerce.date()
+}))
 })
 
 

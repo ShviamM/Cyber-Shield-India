@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { LogOut, ShieldCheck, BarChart3, MapPin, Megaphone, AlertTriangle, Crown } from "lucide-react";
+import { LogOut, ShieldCheck, BarChart3, MapPin, Megaphone, AlertTriangle, Crown, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { BrandLogo, Wordmark, BrandTaglines } from "@/components/brand";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ type NavItem = {
 const NAV_ITEMS: NavItem[] = [
   { href: "/", label: "Moderation", icon: ShieldCheck },
   { href: "/business", label: "Business Metrics", icon: BarChart3 },
+  { href: "/users", label: "User Management", icon: Users },
   { href: "/fraud-map", label: "India Fraud Map", icon: MapPin },
   { href: "/broadcasts", label: "Broadcast Center", icon: Megaphone },
   { href: "/super", label: "Super Admin", icon: Crown, superAdminOnly: true },

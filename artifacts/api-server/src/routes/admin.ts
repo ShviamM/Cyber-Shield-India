@@ -29,7 +29,6 @@ import {
   type FraudMapState,
   type NumberReputation,
   type TrialListResponse as TrialList,
-  type UserListResponse as UserList,
 } from "@workspace/api-zod";
 import { sendExpoPush } from "../lib/expo-push";
 import { normalizeIndianPhone } from "../lib/phone";
@@ -355,40 +354,6 @@ router.get("/admin/trials", requireAdmin, async (_req, res) => {
       plan: r.plan,
       trialStartedAt: r.trialStartedAt,
       currentPeriodEnd: r.currentPeriodEnd,
-      createdAt: r.createdAt,
-    })),
-    total: rows.length,
-  };
-  res.json(response);
-});
-
-router.get("/admin/users", requireAdmin, async (_req, res) => {
-  const rows = await db
-    .select({
-      id: usersTable.id,
-      fullName: usersTable.fullName,
-      phone: usersTable.phone,
-      location: usersTable.location,
-      isAdmin: usersTable.isAdmin,
-      status: usersTable.status,
-      plan: subscriptionsTable.plan,
-      subscriptionStatus: subscriptionsTable.status,
-      createdAt: usersTable.createdAt,
-    })
-    .from(usersTable)
-    .leftJoin(subscriptionsTable, eq(subscriptionsTable.userId, usersTable.id))
-    .orderBy(desc(usersTable.createdAt));
-
-  const response: UserList = {
-    users: rows.map((r) => ({
-      id: r.id,
-      fullName: r.fullName,
-      phone: r.phone,
-      location: r.location,
-      isAdmin: r.isAdmin,
-      status: r.status,
-      plan: r.plan,
-      subscriptionStatus: r.subscriptionStatus,
       createdAt: r.createdAt,
     })),
     total: rows.length,

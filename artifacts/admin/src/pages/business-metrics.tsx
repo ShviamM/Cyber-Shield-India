@@ -8,8 +8,8 @@ import {
   getAdminBusinessMetricsQueryKey,
   useAdminListTrials,
   getAdminListTrialsQueryKey,
-  useAdminListUsers,
-  getAdminListUsersQueryKey,
+  useAdminUsers,
+  getAdminUsersQueryKey,
 } from "@workspace/api-client-react";
 
 function formatRupees(paise: number): string {
@@ -45,9 +45,10 @@ export default function BusinessMetrics() {
     query: { queryKey: getAdminListTrialsQueryKey() },
   });
   const trials = trialsData?.trials ?? [];
-  const { data: usersData, isLoading: usersLoading } = useAdminListUsers({
-    query: { queryKey: getAdminListUsersQueryKey() },
-  });
+  const { data: usersData, isLoading: usersLoading } = useAdminUsers(
+    undefined,
+    { query: { queryKey: getAdminUsersQueryKey() } },
+  );
   const users = usersData?.users ?? [];
 
   const headlineCards: {

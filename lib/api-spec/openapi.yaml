@@ -549,24 +549,294 @@ paths:
         default:
           $ref: "#/components/responses/Error"
 
-  /admin/users:
+  /admin/roles:
     get:
-      operationId: adminListUsers
+      operationId: adminListRoles
       tags: [admin]
-      summary: List all registered users
+      summary: List assignable roles
       description: >-
-        Every registered user, including older accounts that never started a
-        trial or subscription, with their current plan and subscription status
-        (if any). Newest registrations first.
+        The data-driven roles catalogue used to populate the role selector. New
+        roles can be added as rows without code changes.
       security:
         - bearerAuth: []
+      responses:
+        "200":
+          description: Roles
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RolesListResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /admin/users:
+    get:
+      operationId: adminUsers
+      tags: [admin]
+      summary: List registered users with search, filters and pagination
+      description: >-
+        Every registered user with role, account status, plan/subscription
+        status, device count and number of scam reports filed. Supports search
+        by name or phone, filtering by role and status, and pagination.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: role
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
       responses:
         "200":
           description: Registered users
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserListResponse"
+                $ref: "#/components/schemas/AdminUsersListResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /admin/users/{id}:
+    get:
+      operationId: adminGetUser
+      tags: [admin]
+      summary: Get a single user's detail
+      description: >-
+        Full profile for one user: registration date, device count, last login,
+        trial/subscription status, role and number of scam reports filed.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUserDetail"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /admin/users/{id}/trial/extend:
+    post:
+      operationId: adminExtendTrial
+      tags: [admin]
+      summary: Extend a user's trial
+      description: >-
+        Add days to a user's trial (lengthening an active trial or reactivating
+        an expired one). Sends a push notification and records an audit entry.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExtendTrialRequest"
+      responses:
+        "200":
+          description: Updated trial
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminTrialActionResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /admin/users/{id}/trial/activate:
+    post:
+      operationId: adminActivateTrial
+      tags: [admin]
+      summary: Activate (reactivate / start) a user's trial
+      description: >-
+        Start a fresh trial window from now for an expired or never-started
+        trial. Sends a push notification and records an audit entry.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActivateTrialRequest"
+      responses:
+        "200":
+          description: Updated trial
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminTrialActionResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /admin/users/{id}/trial/reset:
+    post:
+      operationId: adminResetTrial
+      tags: [admin]
+      summary: Reset a user's trial eligibility
+      description: >-
+        Clear the trial so the user can start a fresh free trial from the app.
+        Records an audit entry.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetTrialRequest"
+      responses:
+        "200":
+          description: Updated subscription
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminTrialActionResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /admin/users/{id}/role:
+    patch:
+      operationId: adminUpdateUserRole
+      tags: [admin]
+      summary: Change a user's role
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRoleRequest"
+      responses:
+        "200":
+          description: Role updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUserRoleResult"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /admin/users/{id}/status:
+    patch:
+      operationId: adminUpdateUserStatus
+      tags: [admin]
+      summary: Change a user's account status (active / suspended / blocked)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserStatusRequest"
+      responses:
+        "200":
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminUserStatusResult"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /admin/users/{id}/audit:
+    get:
+      operationId: adminGetUserAudit
+      tags: [admin]
+      summary: Audit history for a user
+      description: Privileged admin actions taken against this user, newest first.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Audit entries
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAuditLogListResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /admin/audit:
+    get:
+      operationId: adminListAudit
+      tags: [admin]
+      summary: Global admin audit log
+      description: Recent privileged admin actions across all users, newest first.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Audit entries
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAuditLogListResponse"
         default:
           $ref: "#/components/responses/Error"
 
@@ -1439,6 +1709,312 @@ components:
       required:
         - users
         - total
+
+    RoleInfo:
+      type: object
+      properties:
+        name:
+          type: string
+        label:
+          type: string
+        description:
+          type: string
+          nullable: true
+        permissions:
+          type: array
+          items:
+            type: string
+        isSystem:
+          type: boolean
+      required:
+        - name
+        - label
+        - permissions
+        - isSystem
+
+    RolesListResponse:
+      type: object
+      properties:
+        roles:
+          type: array
+          items:
+            $ref: "#/components/schemas/RoleInfo"
+      required:
+        - roles
+
+    AdminUserSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        fullName:
+          type: string
+        phone:
+          type: string
+        location:
+          type: string
+          nullable: true
+        role:
+          type: string
+        isAdmin:
+          type: boolean
+        status:
+          type: string
+        plan:
+          type: string
+          nullable: true
+        subscriptionStatus:
+          type: string
+          nullable: true
+        currentPeriodEnd:
+          type: string
+          format: date-time
+          nullable: true
+        trialStartedAt:
+          type: string
+          format: date-time
+          nullable: true
+        deviceCount:
+          type: integer
+        reportsFiled:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - fullName
+        - phone
+        - role
+        - isAdmin
+        - status
+        - deviceCount
+        - reportsFiled
+        - createdAt
+
+    AdminUsersListResponse:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminUserSummary"
+        total:
+          type: integer
+        page:
+          type: integer
+        pageSize:
+          type: integer
+      required:
+        - users
+        - total
+        - page
+        - pageSize
+
+    AdminUserDetail:
+      type: object
+      properties:
+        id:
+          type: string
+        fullName:
+          type: string
+        phone:
+          type: string
+        location:
+          type: string
+          nullable: true
+        role:
+          type: string
+        isAdmin:
+          type: boolean
+        isSuperAdmin:
+          type: boolean
+        status:
+          type: string
+        deviceCount:
+          type: integer
+        reportsFiled:
+          type: integer
+        lastLoginAt:
+          type: string
+          format: date-time
+          nullable: true
+        registeredAt:
+          type: string
+          format: date-time
+        subscription:
+          $ref: "#/components/schemas/SubscriptionStatus"
+        trialStartedAt:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - id
+        - fullName
+        - phone
+        - role
+        - isAdmin
+        - isSuperAdmin
+        - status
+        - deviceCount
+        - reportsFiled
+        - registeredAt
+        - subscription
+
+    ExtendTrialRequest:
+      type: object
+      properties:
+        days:
+          type: integer
+          description: Number of days to add (1-365).
+        plan:
+          type: string
+          enum: [premium, family]
+          description: Plan to grant the trial on. Defaults to premium.
+        reason:
+          type: string
+          nullable: true
+        note:
+          type: string
+          nullable: true
+      required:
+        - days
+
+    ActivateTrialRequest:
+      type: object
+      properties:
+        days:
+          type: integer
+          description: Length of the fresh trial window in days (1-365).
+        plan:
+          type: string
+          enum: [premium, family]
+        reason:
+          type: string
+          nullable: true
+        note:
+          type: string
+          nullable: true
+      required:
+        - days
+
+    ResetTrialRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+          nullable: true
+        note:
+          type: string
+          nullable: true
+
+    AdminTrialActionResponse:
+      type: object
+      properties:
+        subscription:
+          $ref: "#/components/schemas/SubscriptionStatus"
+        previousStatus:
+          type: string
+        previousEnd:
+          type: string
+          format: date-time
+          nullable: true
+        newEnd:
+          type: string
+          format: date-time
+          nullable: true
+        plan:
+          type: string
+      required:
+        - subscription
+        - previousStatus
+        - plan
+
+    UpdateUserRoleRequest:
+      type: object
+      properties:
+        role:
+          type: string
+        reason:
+          type: string
+          nullable: true
+      required:
+        - role
+
+    AdminUserRoleResult:
+      type: object
+      properties:
+        id:
+          type: string
+        role:
+          type: string
+      required:
+        - id
+        - role
+
+    UpdateUserStatusRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [active, suspended, blocked]
+        reason:
+          type: string
+          nullable: true
+      required:
+        - status
+
+    AdminUserStatusResult:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+      required:
+        - id
+        - status
+
+    AdminAuditLogEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        actorPhone:
+          type: string
+          nullable: true
+        actorRole:
+          type: string
+          nullable: true
+        action:
+          type: string
+        targetPhone:
+          type: string
+          nullable: true
+        reason:
+          type: string
+          nullable: true
+        metadata:
+          type: object
+          additionalProperties: true
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - action
+        - createdAt
+
+    AdminAuditLogListResponse:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminAuditLogEntry"
+      required:
+        - entries
 
     SuperAdminOverview:
       type: object

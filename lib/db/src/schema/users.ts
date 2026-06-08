@@ -8,6 +8,10 @@ export const usersTable = pgTable(
     phone: text("phone").notNull().unique(),
     location: text("location"),
     isAdmin: boolean("is_admin").notNull().default(false),
+    // Data-driven RBAC role name (FK by value to roles.name). Defaults to the
+    // baseline end-user role; staff roles (support/admin/super_admin) are
+    // assigned by a super admin. isAdmin is kept in sync for backward compat.
+    role: text("role").notNull().default("user"),
     status: text("status").notNull().default("active"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),

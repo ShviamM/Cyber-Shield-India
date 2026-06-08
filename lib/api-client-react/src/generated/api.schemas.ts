@@ -245,6 +245,186 @@ export interface UserListResponse {
   total: number;
 }
 
+export interface RoleInfo {
+  name: string;
+  label: string;
+  description?: string | null;
+  permissions: string[];
+  isSystem: boolean;
+}
+
+export interface RolesListResponse {
+  roles: RoleInfo[];
+}
+
+export interface AdminUserSummary {
+  id: string;
+  fullName: string;
+  phone: string;
+  location?: string | null;
+  role: string;
+  isAdmin: boolean;
+  status: string;
+  plan?: string | null;
+  subscriptionStatus?: string | null;
+  currentPeriodEnd?: string | null;
+  trialStartedAt?: string | null;
+  deviceCount: number;
+  reportsFiled: number;
+  createdAt: string;
+}
+
+export interface AdminUsersListResponse {
+  users: AdminUserSummary[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export type SubscriptionStatusPlan = typeof SubscriptionStatusPlan[keyof typeof SubscriptionStatusPlan];
+
+
+export const SubscriptionStatusPlan = {
+  free: 'free',
+  premium: 'premium',
+  family: 'family',
+} as const;
+
+export type SubscriptionStatusStatus = typeof SubscriptionStatusStatus[keyof typeof SubscriptionStatusStatus];
+
+
+export const SubscriptionStatusStatus = {
+  active: 'active',
+  canceled: 'canceled',
+  expired: 'expired',
+  past_due: 'past_due',
+  trialing: 'trialing',
+} as const;
+
+export interface SubscriptionStatus {
+  plan: SubscriptionStatusPlan;
+  status: SubscriptionStatusStatus;
+  currentPeriodStart?: string | null;
+  currentPeriodEnd?: string | null;
+  cancelAtPeriodEnd: boolean;
+  /** Server-computed — true when a paid plan is currently active */
+  isPremium: boolean;
+  /** Server-computed — true when the user can still start a free trial */
+  trialEligible: boolean;
+}
+
+export interface AdminUserDetail {
+  id: string;
+  fullName: string;
+  phone: string;
+  location?: string | null;
+  role: string;
+  isAdmin: boolean;
+  isSuperAdmin: boolean;
+  status: string;
+  deviceCount: number;
+  reportsFiled: number;
+  lastLoginAt?: string | null;
+  registeredAt: string;
+  subscription: SubscriptionStatus;
+  trialStartedAt?: string | null;
+}
+
+/**
+ * Plan to grant the trial on. Defaults to premium.
+ */
+export type ExtendTrialRequestPlan = typeof ExtendTrialRequestPlan[keyof typeof ExtendTrialRequestPlan];
+
+
+export const ExtendTrialRequestPlan = {
+  premium: 'premium',
+  family: 'family',
+} as const;
+
+export interface ExtendTrialRequest {
+  /** Number of days to add (1-365). */
+  days: number;
+  /** Plan to grant the trial on. Defaults to premium. */
+  plan?: ExtendTrialRequestPlan;
+  reason?: string | null;
+  note?: string | null;
+}
+
+export type ActivateTrialRequestPlan = typeof ActivateTrialRequestPlan[keyof typeof ActivateTrialRequestPlan];
+
+
+export const ActivateTrialRequestPlan = {
+  premium: 'premium',
+  family: 'family',
+} as const;
+
+export interface ActivateTrialRequest {
+  /** Length of the fresh trial window in days (1-365). */
+  days: number;
+  plan?: ActivateTrialRequestPlan;
+  reason?: string | null;
+  note?: string | null;
+}
+
+export interface ResetTrialRequest {
+  reason?: string | null;
+  note?: string | null;
+}
+
+export interface AdminTrialActionResponse {
+  subscription: SubscriptionStatus;
+  previousStatus: string;
+  previousEnd?: string | null;
+  newEnd?: string | null;
+  plan: string;
+}
+
+export interface UpdateUserRoleRequest {
+  role: string;
+  reason?: string | null;
+}
+
+export interface AdminUserRoleResult {
+  id: string;
+  role: string;
+}
+
+export type UpdateUserStatusRequestStatus = typeof UpdateUserStatusRequestStatus[keyof typeof UpdateUserStatusRequestStatus];
+
+
+export const UpdateUserStatusRequestStatus = {
+  active: 'active',
+  suspended: 'suspended',
+  blocked: 'blocked',
+} as const;
+
+export interface UpdateUserStatusRequest {
+  status: UpdateUserStatusRequestStatus;
+  reason?: string | null;
+}
+
+export interface AdminUserStatusResult {
+  id: string;
+  status: string;
+}
+
+export type AdminAuditLogEntryMetadata = { [key: string]: unknown } | null;
+
+export interface AdminAuditLogEntry {
+  id: string;
+  actorPhone?: string | null;
+  actorRole?: string | null;
+  action: string;
+  targetPhone?: string | null;
+  reason?: string | null;
+  metadata?: AdminAuditLogEntryMetadata;
+  createdAt: string;
+}
+
+export interface AdminAuditLogListResponse {
+  entries: AdminAuditLogEntry[];
+}
+
 export type SuperAdminOverviewRevenue = {
   /** All-time verified revenue, in paise. */
   totalPaise: number;
@@ -503,38 +683,6 @@ export interface SubscriptionPlanList {
   plans: SubscriptionPlan[];
 }
 
-export type SubscriptionStatusPlan = typeof SubscriptionStatusPlan[keyof typeof SubscriptionStatusPlan];
-
-
-export const SubscriptionStatusPlan = {
-  free: 'free',
-  premium: 'premium',
-  family: 'family',
-} as const;
-
-export type SubscriptionStatusStatus = typeof SubscriptionStatusStatus[keyof typeof SubscriptionStatusStatus];
-
-
-export const SubscriptionStatusStatus = {
-  active: 'active',
-  canceled: 'canceled',
-  expired: 'expired',
-  past_due: 'past_due',
-  trialing: 'trialing',
-} as const;
-
-export interface SubscriptionStatus {
-  plan: SubscriptionStatusPlan;
-  status: SubscriptionStatusStatus;
-  currentPeriodStart?: string | null;
-  currentPeriodEnd?: string | null;
-  cancelAtPeriodEnd: boolean;
-  /** Server-computed — true when a paid plan is currently active */
-  isPremium: boolean;
-  /** Server-computed — true when the user can still start a free trial */
-  trialEligible: boolean;
-}
-
 export type CreateOrderRequestPlan = typeof CreateOrderRequestPlan[keyof typeof CreateOrderRequestPlan];
 
 
@@ -700,5 +848,13 @@ status?: string;
 phone?: string;
 limit?: number;
 offset?: number;
+};
+
+export type AdminUsersParams = {
+search?: string;
+role?: string;
+status?: string;
+page?: number;
+pageSize?: number;
 };
 
