@@ -87,7 +87,7 @@ const achievementMeta = [
 ];
 
 const leaderImages = [leaderMahana, leaderKapoor, leaderVishwakarma];
-const leaderImagePositions = ["object-top", "object-top", "object-center"];
+const leaderImagePositions = ["object-top", "object-top", "object-[center_33%]"];
 
 const serviceIcons = [Presentation, School, Building2, Flag, Mic, ShieldCheck, Handshake];
 
