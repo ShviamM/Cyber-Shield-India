@@ -1,9 +1,14 @@
-import { IndianRupee, TrendingUp, CreditCard, RefreshCw, Users2, Crown, UserPlus, CalendarClock } from "lucide-react";
+import { IndianRupee, TrendingUp, CreditCard, RefreshCw, Users2, Crown, UserPlus, CalendarClock, Gift } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAdminBusinessMetrics, getAdminBusinessMetricsQueryKey } from "@workspace/api-client-react";
+import {
+  useAdminBusinessMetrics,
+  getAdminBusinessMetricsQueryKey,
+  useAdminListTrials,
+  getAdminListTrialsQueryKey,
+} from "@workspace/api-client-react";
 
 function formatRupees(paise: number): string {
   return `₹${(paise / 100).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
@@ -13,10 +18,31 @@ function formatCount(value: number): string {
   return value.toLocaleString("en-IN");
 }
 
+function formatDate(value: string | null | undefined): string {
+  if (!value) return "—";
+  return new Date(value).toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+function daysLeft(end: string | null | undefined): string {
+  if (!end) return "—";
+  const ms = new Date(end).getTime() - Date.now();
+  const days = Math.ceil(ms / (24 * 60 * 60 * 1000));
+  if (days <= 0) return "Ending today";
+  return `${days} day${days === 1 ? "" : "s"} left`;
+}
+
 export default function BusinessMetrics() {
   const { data, isLoading } = useAdminBusinessMetrics({
     query: { queryKey: getAdminBusinessMetricsQueryKey() },
   });
+  const { data: trialsData, isLoading: trialsLoading } = useAdminListTrials({
+    query: { queryKey: getAdminListTrialsQueryKey() },
+  });
+  const trials = trialsData?.trials ?? [];
 
   const headlineCards: {
     label: string;
@@ -66,6 +92,7 @@ export default function BusinessMetrics() {
     icon: LucideIcon;
     format: (v: number) => string;
   }[] = [
+    { label: "Active Trials", value: data?.activeTrials, icon: Gift, format: formatCount },
     { label: "Premium Members", value: data?.premiumSubscriptions, icon: Crown, format: formatCount },
     { label: "Families Protected", value: data?.familiesProtected, icon: Users2, format: formatCount },
     { label: "New Subscriptions (30 days)", value: data?.newSubscriptions, icon: UserPlus, format: formatCount },
@@ -133,6 +160,69 @@ export default function BusinessMetrics() {
             );
           })}
         </div>
+      </section>
+
+      <section className="mt-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+            Active Trials
+          </h2>
+          {!trialsLoading && (
+            <span className="text-xs text-muted-foreground">
+              {formatCount(trials.length)} on trial
+            </span>
+          )}
+        </div>
+        <Card>
+          <CardContent className="p-0">
+            {trialsLoading ? (
+              <div className="p-5 space-y-3">
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-2/3" />
+              </div>
+            ) : trials.length === 0 ? (
+              <div className="p-8 text-center">
+                <Gift className="w-8 h-8 text-muted-foreground/50 mx-auto mb-3" />
+                <p className="text-sm font-medium">No active trials</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Members who start a free trial on the website or app appear here until it ends.
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b text-left text-xs uppercase tracking-wider text-muted-foreground">
+                      <th className="px-4 py-3 font-medium">Member</th>
+                      <th className="px-4 py-3 font-medium">Phone</th>
+                      <th className="px-4 py-3 font-medium">Plan</th>
+                      <th className="px-4 py-3 font-medium">Started</th>
+                      <th className="px-4 py-3 font-medium">Ends</th>
+                      <th className="px-4 py-3 font-medium text-right">Remaining</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {trials.map((t) => (
+                      <tr key={t.userId} className="border-b last:border-0 hover:bg-muted/40">
+                        <td className="px-4 py-3 font-medium">{t.fullName || "—"}</td>
+                        <td className="px-4 py-3 tabular-nums text-muted-foreground">{t.phone}</td>
+                        <td className="px-4 py-3 capitalize">{t.plan}</td>
+                        <td className="px-4 py-3 text-muted-foreground">{formatDate(t.trialStartedAt)}</td>
+                        <td className="px-4 py-3 text-muted-foreground">{formatDate(t.currentPeriodEnd)}</td>
+                        <td className="px-4 py-3 text-right">
+                          <span className="inline-flex items-center rounded-full bg-[#0B3D91]/10 px-2.5 py-0.5 text-xs font-medium text-[#0B3D91]">
+                            {daysLeft(t.currentPeriodEnd)}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </section>
 
       {!isLoading && data && data.activeSubscriptions === 0 && data.revenuePaise === 0 && (

@@ -62,6 +62,7 @@ import type {
   SuccessResponse,
   SuperAdminOverview,
   TrendingScamListResponse,
+  TrialListResponse,
   UpdateLocationRequest,
   UpdateReportStatusRequest,
   User,
@@ -1742,6 +1743,84 @@ export function useAdminBusinessMetrics<TData = Awaited<ReturnType<typeof adminB
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getAdminBusinessMetricsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getAdminListTrialsUrl = () => {
+
+
+
+
+  return `/api/admin/trials`
+}
+
+/**
+ * Members whose subscription is in the "trialing" state and has not yet expired, with the user's name, phone, plan, when the trial started and when it ends. Trials are started without a card from either the website or the mobile app and reconciled into the same subscriptions table.
+ * @summary List members currently on a free trial
+ */
+export const adminListTrials = async ( options?: RequestInit): Promise<TrialListResponse> => {
+
+  return customFetch<TrialListResponse>(getAdminListTrialsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getAdminListTrialsQueryKey = () => {
+    return [
+    `/api/admin/trials`
+    ] as const;
+    }
+
+
+export const getAdminListTrialsQueryOptions = <TData = Awaited<ReturnType<typeof adminListTrials>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminListTrials>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdminListTrialsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListTrials>>> = ({ signal }) => adminListTrials({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminListTrials>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type AdminListTrialsQueryResult = NonNullable<Awaited<ReturnType<typeof adminListTrials>>>
+export type AdminListTrialsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List members currently on a free trial
+ */
+
+export function useAdminListTrials<TData = Awaited<ReturnType<typeof adminListTrials>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminListTrials>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getAdminListTrialsQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

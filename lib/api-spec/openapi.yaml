@@ -527,6 +527,28 @@ paths:
         default:
           $ref: "#/components/responses/Error"
 
+  /admin/trials:
+    get:
+      operationId: adminListTrials
+      tags: [admin]
+      summary: List members currently on a free trial
+      description: >-
+        Members whose subscription is in the "trialing" state and has not yet
+        expired, with the user's name, phone, plan, when the trial started and
+        when it ends. Trials are started without a card from either the website
+        or the mobile app and reconciled into the same subscriptions table.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Active trials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrialListResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
   /admin/fraud-map:
     get:
       operationId: adminFraudMap
@@ -1288,6 +1310,9 @@ components:
         newSubscriptions:
           type: integer
           description: Paid subscriptions started in the last 30 days.
+        activeTrials:
+          type: integer
+          description: Members currently on a non-expired free trial.
       required:
         - revenuePaise
         - revenueThisMonthPaise
@@ -1298,6 +1323,49 @@ components:
         - familiesProtected
         - renewalsDue
         - newSubscriptions
+        - activeTrials
+
+    Trial:
+      type: object
+      properties:
+        userId:
+          type: string
+        fullName:
+          type: string
+          nullable: true
+        phone:
+          type: string
+        plan:
+          type: string
+        trialStartedAt:
+          type: string
+          format: date-time
+          nullable: true
+        currentPeriodEnd:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - userId
+        - phone
+        - plan
+        - createdAt
+
+    TrialListResponse:
+      type: object
+      properties:
+        trials:
+          type: array
+          items:
+            $ref: "#/components/schemas/Trial"
+        total:
+          type: integer
+      required:
+        - trials
+        - total
 
     SuperAdminOverview:
       type: object

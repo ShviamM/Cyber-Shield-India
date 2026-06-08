@@ -23,4 +23,6 @@ export interface BusinessMetrics {
   renewalsDue: number;
   /** Paid subscriptions started in the last 30 days. */
   newSubscriptions: number;
+  /** Members currently on a non-expired free trial. */
+  activeTrials: number;
 }

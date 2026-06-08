@@ -81,6 +81,8 @@ export * from './superAdminOverviewStorageTopTablesItem';
 export * from './trendingScam';
 export * from './trendingScamListResponse';
 export * from './trendingScamTrend';
+export * from './trial';
+export * from './trialListResponse';
 export * from './updateLocationRequest';
 export * from './updateReportStatusRequest';
 export * from './updateReportStatusRequestStatus';

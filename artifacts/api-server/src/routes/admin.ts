@@ -28,6 +28,7 @@ import {
   type FraudMapResponse,
   type FraudMapState,
   type NumberReputation,
+  type TrialListResponse as TrialList,
 } from "@workspace/api-zod";
 import { sendExpoPush } from "../lib/expo-push";
 import { normalizeIndianPhone } from "../lib/phone";
@@ -244,6 +245,7 @@ router.get("/admin/business-metrics", requireAdmin, async (_req, res) => {
     recurringByPlan,
     [renewalsRow],
     [newSubsRow],
+    [trialsRow],
   ] = await Promise.all([
     db
       .select({ value: sql<string>`coalesce(sum(${paymentsTable.amount}), 0)` })
@@ -286,6 +288,10 @@ router.get("/admin/business-metrics", requireAdmin, async (_req, res) => {
           gte(subscriptionsTable.createdAt, ago30Days),
         ),
       ),
+    db
+      .select({ value: count() })
+      .from(subscriptionsTable)
+      .where(and(eq(subscriptionsTable.status, "trialing"), notExpired)),
   ]);
 
   const planCount = (
@@ -308,6 +314,46 @@ router.get("/admin/business-metrics", requireAdmin, async (_req, res) => {
     familiesProtected: familySubscriptions,
     renewalsDue: Number(renewalsRow?.value ?? 0),
     newSubscriptions: Number(newSubsRow?.value ?? 0),
+    activeTrials: Number(trialsRow?.value ?? 0),
+  };
+  res.json(response);
+});
+
+router.get("/admin/trials", requireAdmin, async (_req, res) => {
+  const now = new Date();
+
+  const rows = await db
+    .select({
+      userId: subscriptionsTable.userId,
+      fullName: usersTable.fullName,
+      phone: usersTable.phone,
+      plan: subscriptionsTable.plan,
+      trialStartedAt: subscriptionsTable.trialStartedAt,
+      currentPeriodEnd: subscriptionsTable.currentPeriodEnd,
+      createdAt: subscriptionsTable.createdAt,
+    })
+    .from(subscriptionsTable)
+    .innerJoin(usersTable, eq(subscriptionsTable.userId, usersTable.id))
+    .where(
+      and(
+        eq(subscriptionsTable.status, "trialing"),
+        sql`${subscriptionsTable.currentPeriodEnd} is not null`,
+        gte(subscriptionsTable.currentPeriodEnd, now),
+      ),
+    )
+    .orderBy(desc(subscriptionsTable.trialStartedAt));
+
+  const response: TrialList = {
+    trials: rows.map((r) => ({
+      userId: r.userId,
+      fullName: r.fullName,
+      phone: r.phone,
+      plan: r.plan,
+      trialStartedAt: r.trialStartedAt,
+      currentPeriodEnd: r.currentPeriodEnd,
+      createdAt: r.createdAt,
+    })),
+    total: rows.length,
   };
   res.json(response);
 });

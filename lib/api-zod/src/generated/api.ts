@@ -449,7 +449,26 @@ export const AdminBusinessMetricsResponse = zod.object({
   "familySubscriptions": zod.number(),
   "familiesProtected": zod.number().describe('Active family-plan subscriptions (one per protected family).'),
   "renewalsDue": zod.number().describe('Active paid subscriptions renewing in the next 30 days.'),
-  "newSubscriptions": zod.number().describe('Paid subscriptions started in the last 30 days.')
+  "newSubscriptions": zod.number().describe('Paid subscriptions started in the last 30 days.'),
+  "activeTrials": zod.number().describe('Members currently on a non-expired free trial.')
+})
+
+
+/**
+ * Members whose subscription is in the "trialing" state and has not yet expired, with the user's name, phone, plan, when the trial started and when it ends. Trials are started without a card from either the website or the mobile app and reconciled into the same subscriptions table.
+ * @summary List members currently on a free trial
+ */
+export const AdminListTrialsResponse = zod.object({
+  "trials": zod.array(zod.object({
+  "userId": zod.string(),
+  "fullName": zod.string().nullish(),
+  "phone": zod.string(),
+  "plan": zod.string(),
+  "trialStartedAt": zod.coerce.date().nullish(),
+  "currentPeriodEnd": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+})),
+  "total": zod.number()
 })
 
 

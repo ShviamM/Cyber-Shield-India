@@ -205,6 +205,23 @@ export interface BusinessMetrics {
   renewalsDue: number;
   /** Paid subscriptions started in the last 30 days. */
   newSubscriptions: number;
+  /** Members currently on a non-expired free trial. */
+  activeTrials: number;
+}
+
+export interface Trial {
+  userId: string;
+  fullName?: string | null;
+  phone: string;
+  plan: string;
+  trialStartedAt?: string | null;
+  currentPeriodEnd?: string | null;
+  createdAt: string;
+}
+
+export interface TrialListResponse {
+  trials: Trial[];
+  total: number;
 }
 
 export type SuperAdminOverviewRevenue = {

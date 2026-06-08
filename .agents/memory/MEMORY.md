@@ -3,6 +3,7 @@
 - [Website i18n](website-i18n.md) — EN/HI; per-page namespace files auto-loaded by Vite glob (parallel-subagent safe); icons merged by index; bilingual data via lang.startsWith("hi"); verify parity at runtime.
 - [Native call screening](kavach-screening-native.md) — CallScreeningService+ROLE_CALL_SCREENING avoids Play Permissions Declaration (no READ_CALL_LOG/SMS); service warns, never blocks; EAS-build only.
 - [OTP login via MSG91 Widget](otp-sms-provider.md) — mobile: widget sends+verifies OTP client-side, backend validates access-token; admin web uses a SHARED PASSWORD (/auth/admin-login), NOT OTP; needs native dev build.
+- [RevenueCat vs Razorpay scope](revenuecat-vs-razorpay-scope.md) — RevenueCat=mobile only, website=Razorpay; both reconcile into the same `subscriptions` table. Website trials never show in RevenueCat; that's by design, verify via DB.
 - [MSG91 web vs mobile widget split](msg91-web-vs-mobile-widget.md) — "Mobile Integration" ON blocks web; mobile needs ON, web needs OFF → two widgets; tokenAuth is account-level/reusable; backend must try each widgetId in verifyAccessToken.
 - [Orval schema naming](orval-schema-naming.md) — a component schema named like an operationId's response collides in generated zod; name response schemas noun-first (e.g. FraudVerdict not FraudCheckResponse).
 - [Fraud engine fusion vs reputation scales](fraud-engine-fusion-vs-reputation.md) — medium weight tuned to 40 so a lone "medium" signal now flags medium; weights (not computeRiskLevel) decide the verdict band.
