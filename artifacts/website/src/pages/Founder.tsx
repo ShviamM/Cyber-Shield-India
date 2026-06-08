@@ -87,6 +87,7 @@ const achievementMeta = [
 ];
 
 const leaderImages = [leaderMahana, leaderKapoor, leaderVishwakarma];
+const leaderImagePositions = ["object-top", "object-top", "object-center"];
 
 const serviceIcons = [Presentation, School, Building2, Flag, Mic, ShieldCheck, Handshake];
 
@@ -454,7 +455,7 @@ export default function Founder() {
                     src={leaderImages[i]}
                     alt={leader.alt}
                     loading="lazy"
-                    className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.04]"
+                    className={`h-full w-full object-cover ${leaderImagePositions[i]} transition-transform duration-500 group-hover:scale-[1.04]`}
                   />
                   <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/55 to-transparent" />
                 </div>
