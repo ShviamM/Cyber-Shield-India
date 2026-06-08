@@ -30,7 +30,6 @@ import {
   Search,
   Camera,
   Landmark,
-  Siren,
   Fingerprint,
   ArrowRight,
   Info,
@@ -59,8 +58,6 @@ const scenarioTones = [
 type Law = { code: string; title: string; desc: string; penalty: string };
 
 const resourceMeta = [
-  { icon: Siren, href: "tel:1930", external: false },
-  { icon: FileText, href: "https://cybercrime.gov.in", external: true },
   { icon: ShieldAlert, href: "https://sancharsaathi.gov.in", external: true },
   { icon: Landmark, href: "https://cybercrime.gov.in", external: true },
 ];

@@ -7,7 +7,7 @@ export default {
   hero: {
     heading: "Protection that fits your life",
     subtitle:
-      "Try Premium free for 7 days — no card needed. After that, keep your protection for just ₹99/year. Your plan unlocks instantly in the Netraksh app on the same mobile number.",
+      "Try Premium free for 7 days — no card needed. Then keep your protection for just ₹99/year, unlocked instantly in the Netraksh app on your mobile number.",
   },
   plans: {
     free: {
@@ -56,7 +56,7 @@ export default {
     included: "Included",
   },
   footnote:
-    "Your 7-day free trial needs no card. After it ends, pay once a year to keep premium — there's no auto-charge. Payments are processed securely by Razorpay in Indian Rupees, and you're never billed without choosing to.",
+    "No card needed for your 7-day trial. After it, pay once a year to keep premium — no auto-charge. Payments are handled securely by Razorpay in Indian Rupees.",
   toast: {
     paymentSuccessTitle: "Payment successful",
     paymentSuccessDesc: "Your {{plan}} plan is now active.",

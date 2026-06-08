@@ -58,24 +58,11 @@ export default {
   ai: {
     badge: "AI Threat Engine",
     title: "A digital bodyguard that never sleeps.",
-    desc: "Behind every alert is an AI engine that learns from scams across India in real time — so the moment a new fraud appears, you're already protected.",
+    desc: "An AI engine that learns from scams across India in real time, so you're protected the moment a new fraud appears.",
     items: [
       { title: "New Scams Detected", desc: "Emerging fraud patterns spotted as they spread." },
-      { title: "Threat Intelligence", desc: "A live map of risks across the country." },
+      { title: "Threat Intelligence", desc: "A live map of risks across India." },
       { title: "Community Reports", desc: "Powered by reports from fellow citizens." },
-      { title: "AI Analysis", desc: "Instant verdicts on calls, links and messages." },
-    ],
-  },
-  family: {
-    title: "The app you install for your parents.",
-    subtitle:
-      "Scammers target the people we love most — our elders, who didn't grow up online. With Netraksh, when a threat reaches them, it reaches you too.",
-    cta: "Explore Family Protection",
-    steps: [
-      { title: "Mother Receives Scam Call", desc: "A fraudster posing as her bank calls during the afternoon." },
-      { title: "Netraksh Detects Threat", desc: "The number is instantly matched against known fraud reports." },
-      { title: "Family Alert Sent", desc: "You get notified the moment a threat is blocked on her phone." },
-      { title: "Protected", desc: "She stays safe — and you have peace of mind from anywhere." },
     ],
   },
   why: {
@@ -97,14 +84,6 @@ export default {
   demo: {
     title: "See Protection In Action",
     subtitle: "Pick a threat and watch how Netraksh responds — step by step, in real time.",
-  },
-  counter: {
-    title: "Protection By The Numbers",
-    subtitle: "Every day, Netraksh works to keep Indian citizens a step ahead of fraud.",
-    threatsDetected: "Threats Detected",
-    fraudReports: "Fraud Reports",
-    familiesProtected: "Families Protected",
-    scamNumbersReported: "Scam Numbers Reported",
   },
   india: {
     badge: "India's Digital Bodyguard",

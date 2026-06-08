@@ -9,7 +9,7 @@ export default {
     titleLine1: "India's Digital",
     titleHighlight: "Bodyguard.",
     subtitle:
-      "Protecting every Indian from scam calls, fraud messages, fake links, QR scams, UPI fraud and digital crime.",
+      "Real-time protection from scam calls, fraud messages, fake links and UPI fraud.",
     downloadCta: "Download Netraksh",
     seeHowCta: "See How It Works",
     trustedBy: "Trusted by Indian families",
@@ -23,39 +23,20 @@ export default {
   stats: {
     heading: "India's Growing Cyber Threat",
     subtitle:
-      "Digital fraud is escalating. Netraksh works tirelessly to keep Indian citizens safe from the rising tide of digital crime.",
+      "Digital fraud is escalating. Netraksh keeps Indian citizens safe.",
     counters: {
       threatsAnalyzed: "Threats Analyzed",
       scamsBlocked: "Scams Blocked",
       familiesProtected: "Families Protected",
       activeScammers: "Active Scammers",
     },
-    cards: [
-      {
-        label: "Cyber Crime Complaints (2024)",
-        value: "22.7 Lakh",
-        desc: "Filed on the National Cyber Crime Reporting Portal (I4C), up ~42% over 2023",
-      },
-      {
-        label: "Financial Losses (2024)",
-        value: "₹22,845 Cr",
-        desc: "Lost to cyber fraud in 2024, a ~206% jump over the previous year (I4C)",
-      },
-      {
-        label: "Digital Arrest Scam Losses (2024)",
-        value: "₹1,935 Cr",
-        desc: "Across ~1.2 lakh cases, a fast-rising threat to seniors & families (I4C)",
-      },
-    ],
-    sources:
-      "Sources: Indian Cyber Crime Coordination Centre (I4C), National Cyber Crime Reporting Portal & CFCFRMS data shared by the Ministry of Home Affairs in the Lok Sabha (July 2025); NCRB Crime in India 2022.",
   },
   radar: {
     badge: "Real-time Threat Intelligence",
     headingLine1: "Always Watching.",
     headingLine2: "Always Defending.",
     description:
-      "Cybercriminals move fast, but our AI moves faster. Netraksh acts as an early warning system, actively scanning the digital horizon for emerging threats before they reach your phone.",
+      "Cybercriminals move fast — our AI moves faster, catching new threats before they reach your phone.",
     bullets: [
       "Active scanning for Digital Arrest scams",
       "Caller reputation & fraud history tracking",
@@ -94,7 +75,7 @@ export default {
   finalCta: {
     heading: "Join the Movement for a Safer Digital India.",
     subtitle:
-      "Download Netraksh today and take the first step towards securing your digital life and protecting your family.",
+      "Download Netraksh today and protect your digital life and your family.",
     android: "Download for Android",
     ios: "Download for iOS",
   },

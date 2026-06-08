@@ -2,18 +2,13 @@ import { Layout } from "@/components/layout/Layout";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { motion, useInView, useReducedMotion, MotionConfig, type Variants } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { motion, MotionConfig, type Variants } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import {
   Eye,
   ShieldCheck,
   Target,
   Heart,
-  Users,
-  AlertTriangle,
-  Smartphone,
-  CreditCard,
   Globe2,
   Brain,
   Lock,
@@ -34,70 +29,13 @@ const staggerContainer: Variants = {
   visible: { opacity: 1, transition: { staggerChildren: 0.12 } },
 };
 
-function Counter({
-  to,
-  prefix = "",
-  suffix = "",
-  decimals = 0,
-}: {
-  to: number;
-  prefix?: string;
-  suffix?: string;
-  decimals?: number;
-}) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-  const reduceMotion = useReducedMotion();
-  const [n, setN] = useState(0);
-  useEffect(() => {
-    if (!inView) return;
-    if (reduceMotion) {
-      setN(to);
-      return;
-    }
-    let raf = 0;
-    const start = performance.now();
-    const dur = 1600;
-    const tick = (t: number) => {
-      const p = Math.min((t - start) / dur, 1);
-      const eased = 1 - Math.pow(1 - p, 3);
-      setN(eased * to);
-      if (p < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [inView, to, reduceMotion]);
-  return (
-    <span ref={ref}>
-      {prefix}
-      {n.toLocaleString("en-IN", {
-        minimumFractionDigits: decimals,
-        maximumFractionDigits: decimals,
-      })}
-      {suffix}
-    </span>
-  );
-}
-
-const scamStatsConfig: Array<{ to: number; prefix?: string; decimals?: number }> = [
-  { to: 22.68, decimals: 2 },
-  { prefix: "₹", to: 5489 },
-  { to: 3.24, decimals: 2 },
-];
-
-const storyIcons = [Smartphone, CreditCard, AlertTriangle, ShieldCheck];
-
 const pillarIcons = [Eye, Heart, Globe2, Languages, Lock, Brain];
 
 export default function About() {
   const { t } = useTranslation("about");
 
-  const scamStatsText = t("crisis.stats", { returnObjects: true }) as Array<{ suffix: string; label: string }>;
-  const storyText = t("why.story", { returnObjects: true }) as Array<{ title: string; desc: string }>;
   const pillarsText = t("standFor.pillars", { returnObjects: true }) as Array<{ title: string; desc: string }>;
 
-  const scamStats = scamStatsConfig.map((c, i) => ({ ...c, ...scamStatsText[i] }));
-  const story = storyText.map((s, i) => ({ ...s, icon: storyIcons[i] }));
   const pillars = pillarsText.map((p, i) => ({ ...p, icon: pillarIcons[i] }));
 
   return (
@@ -142,112 +80,14 @@ export default function About() {
           </div>
         </section>
 
-        {/* CYBER SCAM REALITY */}
-        <section className="py-24 bg-gray-900 text-white relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/25 via-gray-900 to-gray-900 pointer-events-none" />
-          <div className="container mx-auto px-4 md:px-6 relative z-10">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={staggerContainer}
-              className="text-center max-w-2xl mx-auto mb-16"
-            >
-              <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 text-red-400 font-bold text-sm uppercase tracking-wider mb-4">
-                <AlertTriangle className="h-4 w-4" /> {t("crisis.badge")}
-              </motion.div>
-              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-bold mb-6">
-                {t("crisis.titleLead")} <span className="text-accent">{t("crisis.titleHighlight")}</span>{t("crisis.titleTail")}
-              </motion.h2>
-              <motion.p variants={fadeInUp} className="text-xl text-gray-400">
-                {t("crisis.subtitle")}
-              </motion.p>
-            </motion.div>
-
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-80px" }}
-              variants={staggerContainer}
-              className="grid sm:grid-cols-3 gap-6 max-w-5xl mx-auto"
-            >
-              {scamStats.map((s, i) => (
-                <motion.div
-                  key={i}
-                  variants={fadeInUp}
-                  className="rounded-3xl border border-white/10 bg-white/5 backdrop-blur-md p-8 text-center"
-                >
-                  <div className="text-4xl md:text-5xl font-bold text-white mb-3">
-                    <Counter to={s.to} prefix={s.prefix} suffix={s.suffix} decimals={s.decimals} />
-                  </div>
-                  <p className="text-gray-400 leading-relaxed text-sm">{s.label}</p>
-                </motion.div>
-              ))}
-            </motion.div>
-
-            <motion.p
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              className="text-center text-xs text-gray-500 mt-8"
-            >
-              {t("crisis.source")}
-            </motion.p>
-          </div>
-        </section>
-
-        {/* WHY NETRAKSH EXISTS */}
+        {/* NAME MEANING */}
         <section className="py-24 bg-white">
           <div className="container mx-auto px-4 md:px-6">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={staggerContainer}
-              className="text-center max-w-2xl mx-auto mb-16"
-            >
-              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
-                {t("why.title")}
-              </motion.h2>
-              <motion.p variants={fadeInUp} className="text-xl text-gray-600">
-                {t("why.subtitle")}
-              </motion.p>
-            </motion.div>
-
-            <div className="max-w-3xl mx-auto relative">
-              <div className="absolute left-[27px] top-3 bottom-3 w-0.5 bg-gray-200 hidden sm:block" />
-              <motion.div
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-80px" }}
-                variants={staggerContainer}
-                className="space-y-6"
-              >
-                {story.map((step) => {
-                  const Icon = step.icon;
-                  return (
-                    <motion.div key={step.title} variants={fadeInUp} className="flex gap-5 relative">
-                      <div className="shrink-0 relative z-10">
-                        <div className="h-14 w-14 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20">
-                          <Icon className="h-6 w-6" />
-                        </div>
-                      </div>
-                      <div className="flex-1 bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
-                        <h3 className="text-lg font-bold text-gray-900 mb-1.5">{step.title}</h3>
-                        <p className="text-gray-600 leading-relaxed">{step.desc}</p>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </motion.div>
-            </div>
-
-            {/* NAME MEANING */}
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
-              className="max-w-3xl mx-auto mt-16 rounded-3xl bg-gradient-to-br from-primary to-[#0a2f6e] text-white p-8 sm:p-10 text-center relative overflow-hidden"
+              className="max-w-3xl mx-auto rounded-3xl bg-gradient-to-br from-primary to-[#0a2f6e] text-white p-8 sm:p-10 text-center relative overflow-hidden"
             >
               <div className="absolute -top-12 -right-8 h-40 w-40 rounded-full bg-accent/20 blur-3xl pointer-events-none" />
               <div className="relative z-10">

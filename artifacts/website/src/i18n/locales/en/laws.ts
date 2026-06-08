@@ -120,7 +120,7 @@ export default {
     {
       code: "Section 66",
       title: "Hacking & computer-related offences",
-      desc: "Unauthorised access, data theft, virus attacks or system damage done with dishonest or fraudulent intent.",
+      desc: "Unauthorised access, data theft, virus attacks or damage done with dishonest or fraudulent intent.",
       penalty: "Up to 3 years imprisonment and/or fine up to ₹5 lakh",
     },
     {
@@ -132,19 +132,19 @@ export default {
     {
       code: "Section 66D",
       title: "Cheating by personation",
-      desc: "Cheating someone by pretending to be another person using a phone, app or computer — covers fake bank calls and impersonation scams.",
+      desc: "Cheating by impersonating someone via phone, app or computer — covers fake bank calls and OTP scams.",
       penalty: "Up to 3 years imprisonment and fine up to ₹1 lakh",
     },
     {
       code: "Section 66E",
       title: "Violation of privacy",
-      desc: "Capturing, publishing or transmitting private images of a person without their consent.",
+      desc: "Capturing, publishing or sharing private images of someone without their consent.",
       penalty: "Up to 3 years imprisonment and/or fine up to ₹2 lakh",
     },
     {
       code: "Section 67 / 67A / 67B",
       title: "Obscene & exploitative content",
-      desc: "Publishing or transmitting obscene material, sexually explicit content, or child sexual abuse material in electronic form.",
+      desc: "Publishing or transmitting obscene, sexually explicit or child sexual abuse material electronically.",
       penalty: "Up to 5–7 years and heavy fines, higher on repeat offence",
     },
   ],
@@ -152,19 +152,19 @@ export default {
     {
       code: "Section 318",
       title: "Cheating",
-      desc: "Deceiving a person to dishonestly part with property or money. Replaces the old IPC Sections 415, 417, 418 and 420.",
+      desc: "Deceiving someone into parting with money or property. Replaces old IPC Sections 415, 417, 418 and 420.",
       penalty: "Up to 3 years (general) and up to 7 years when property is delivered",
     },
     {
       code: "Section 319",
       title: "Cheating by personation",
-      desc: "Cheating while pretending to be another person — the offline counterpart often charged alongside IT Act Section 66D.",
+      desc: "Cheating by impersonation — often charged alongside IT Act Section 66D.",
       penalty: "Up to 5 years imprisonment and fine",
     },
     {
       code: "Section 336",
       title: "Forgery",
-      desc: "Making a false document or electronic record with intent to cause damage, defraud, or support a claim.",
+      desc: "Making a fake document or electronic record to cause damage, defraud or back a false claim.",
       penalty: "Up to 2 years for forgery; up to 7 years for forging valuable documents or to cheat",
     },
   ],
@@ -182,33 +182,23 @@ export default {
     alwaysDo: "Always Do",
     neverDo: "Never Do",
     dos: [
-      "Verify before you trust — call back on official numbers only",
-      "Keep two-factor authentication on for every important account",
-      "Report scams even when you lost nothing — it protects others",
+      "Verify before you trust — call back only on official numbers",
+      "Turn on two-factor authentication for every important account",
+      "Report scams even if you lost nothing — it protects others",
       "Save evidence: screenshots, IDs, numbers and timestamps",
     ],
     donts: [
       "Never share OTP, CVV, PIN or passwords — no bank ever asks",
       "Don't click links in unexpected SMS, email or WhatsApp",
-      "Don't install screen-sharing or “support” apps on a stranger's request",
+      "Don't install screen-sharing or “support” apps for a stranger",
       "Don't pay blackmailers — report instead",
     ],
   },
   resources: {
     heading: "Official Resources",
     subtitle:
-      "Government helplines and portals — bookmark these now, before you need them.",
+      "More government portals worth bookmarking — before you ever need them.",
     items: [
-      {
-        name: "Helpline 1930",
-        desc: "National Cyber Crime Helpline — 24×7, toll-free, for financial fraud.",
-        action: "Call 1930",
-      },
-      {
-        name: "cybercrime.gov.in",
-        desc: "National Cyber Crime Reporting Portal (NCRP) to file & track complaints.",
-        action: "Open Portal",
-      },
       {
         name: "Sanchar Saathi · Chakshu",
         desc: "Report suspected fraud calls/SMS (no loss yet) and block a lost phone.",

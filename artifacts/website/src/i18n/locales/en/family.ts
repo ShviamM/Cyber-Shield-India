@@ -10,7 +10,7 @@ export default {
     titleAccent: "raised you",
     titleEnd: ".",
     subtitle:
-      "Scammers prey on trust — and they target our parents and grandparents most of all. Netraksh stands guard on their phone and alerts you the moment a threat is stopped.",
+      "Scammers prey on trust, and target our parents and grandparents most of all. Netraksh stands guard on the phones they use every day.",
     protectBtn: "Protect My Family",
     downloadBtn: "Download the App",
   },
@@ -25,7 +25,7 @@ export default {
     badge: "Torn from the headlines",
     title: "Headlines that didn’t have to happen",
     subtitle:
-      "These are the stories that fill our newspapers every week. Hover or tap each clipping to see how Netraksh stops the scam behind it.",
+      "Real scam patterns reported across India every week. Tap any clipping to see how Netraksh stops it.",
   },
   riskSection: {
     badge: "Who needs protecting?",

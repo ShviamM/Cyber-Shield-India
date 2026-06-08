@@ -10,7 +10,7 @@ export default {
     lastName: "Malaviya",
     roles: "Cyber Crime Specialist · Author · Public Speaker · Cyber Awareness Evangelist",
     intro:
-      "Protecting India's digital future through awareness, education, and action, helping citizens, students, businesses, and governments stay safe from cyber fraud.",
+      "Helping citizens, students, businesses, and governments stay safe from cyber fraud through awareness and action.",
     buyBook: "Buy the Book",
     bookWorkshop: "Book a Workshop",
     inviteSpeaker: "Invite as Speaker",
@@ -20,12 +20,10 @@ export default {
   mission: {
     eyebrow: "Personal Mission",
     title: "Protecting India's Digital Future",
-    p1pre: "Netraksh was founded with a simple belief: ",
-    p1bold: "every Indian deserves protection from online fraud, cyber scams, and digital crime.",
-    p2: "As India rapidly embraces digital payments, online services, and connected technologies, cybercriminals are targeting ordinary citizens at an unprecedented scale.",
-    p3: "Netraksh was created to make cyber safety simple, accessible, and understandable for every Indian family.",
+    p1pre: "Netraksh began with one belief: ",
+    p1bold: "every Indian deserves protection from online fraud and cyber crime.",
     p4pre:
-      "Whether it's a scam call, fake WhatsApp message, fraudulent QR code, phishing link, or digital arrest scam, our mission is to help people identify threats ",
+      "As India goes digital, criminals target ordinary citizens at scale. Our mission is to help families spot scam calls, fake messages, fraud QR codes, and phishing links ",
     p4bold: "before they become victims.",
   },
   book: {
@@ -64,21 +62,21 @@ export default {
     eyebrow: "Why Netraksh Exists",
     title: "The story behind the shield",
     items: [
-      { title: "India Goes Digital", desc: "UPI, online services, and connected devices reach every household." },
-      { title: "Cyber Frauds Increase", desc: "Criminals exploit the digital shift at an unprecedented scale." },
-      { title: "Families Become Targets", desc: "Scam calls, fake messages, and digital arrests reach the vulnerable." },
-      { title: "Netraksh Protects Citizens", desc: "A digital bodyguard that spots threats before they become victims." },
+      { title: "India Goes Digital", desc: "UPI and online services reach every household." },
+      { title: "Cyber Frauds Increase", desc: "Criminals exploit the shift at massive scale." },
+      { title: "Families Become Targets", desc: "Scam calls, fake messages, and digital arrests target the vulnerable." },
+      { title: "Netraksh Protects Citizens", desc: "A digital bodyguard that spots threats before they strike." },
     ],
   },
   journey: {
     eyebrow: "The Journey",
     title: "From frontline defender to founder",
     items: [
-      { title: "Cybersecurity Experience", desc: "A proven track record defending citizens and organisations across more than 10 countries." },
-      { title: "Threat Intelligence Leadership", desc: "Tracking emerging fraud patterns and translating them into protection for everyday Indians." },
-      { title: "Security Operations Expertise", desc: "Hands-on experience building and running defensive security at scale." },
-      { title: "National Cyber Safety Vision", desc: "Advising governments and speaking at global forums to raise the bar for digital safety." },
-      { title: "Founder of Netraksh", desc: "Turning years of frontline expertise into a digital bodyguard for every Indian family." },
+      { title: "Cybersecurity Experience", desc: "Defending citizens and organisations across 10+ countries." },
+      { title: "Threat Intelligence Leadership", desc: "Turning emerging fraud patterns into protection for everyday Indians." },
+      { title: "Security Operations Expertise", desc: "Hands-on experience running defensive security at scale." },
+      { title: "National Cyber Safety Vision", desc: "Advising governments and speaking at global forums on digital safety." },
+      { title: "Founder of Netraksh", desc: "Turning frontline expertise into a digital bodyguard for every Indian family." },
     ],
   },
   recognition: {
@@ -216,10 +214,10 @@ export default {
   vision: {
     visionTitle: "Vision for India",
     visionDesc:
-      "A world where cyber awareness is not a privilege but a fundamental right, taught in every school, every institution, across every nation. A digitally literate society where every citizen, from the schoolroom to the boardroom, is equipped to defend themselves in cyberspace.",
+      "A world where cyber awareness is a right, not a privilege — taught in every school and institution, so every citizen can defend themselves online.",
     movementTitle: "Cyber Safety Movement",
     movementDesc:
-      "Beyond an app, Netraksh is a national movement, securing nations, educating communities, and advising governments. Through workshops and awareness drives, the mission is to put practical cyber safety into the hands of every Indian family.",
+      "More than an app, Netraksh is a national movement — educating communities and advising governments to put practical cyber safety in every Indian family's hands.",
     roadmapTitle: "Future Roadmap",
     roadmap: [
       "Smarter AI-powered scam detection across calls, messages & QR codes.",
@@ -262,7 +260,7 @@ export default {
   finalCta: {
     eyebrow: "One Mission. One Vision.",
     title: "Making India the safest digital society in the world.",
-    desc: "Ensuring that every citizen has access to simple, powerful protection against cyber fraud.",
+    desc: "Simple, powerful protection against cyber fraud for every citizen.",
     download: "Download Netraksh",
     protectFamily: "Protect Your Family",
     joinMission: "Join the Mission",

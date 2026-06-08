@@ -28,11 +28,6 @@ export default function Home() {
   const prefersReducedMotion = useReducedMotion();
   const { t } = useTranslation("home");
 
-  const statCards = t("stats.cards", { returnObjects: true }) as Array<{
-    label: string;
-    value: string;
-    desc: string;
-  }>;
   const radarBullets = t("radar.bullets", { returnObjects: true }) as string[];
   const howSteps = t("howItWorks.steps", { returnObjects: true }) as Array<{
     title: string;
@@ -256,32 +251,13 @@ export default function Home() {
           <motion.div 
             initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }}
             variants={staggerContainer}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-16 border-b border-gray-800 pb-16"
+            className="grid grid-cols-2 md:grid-cols-4 gap-8"
           >
             <ScamCounter to={2} suffix="M+" label={t("stats.counters.threatsAnalyzed")} />
             <ScamCounter to={850} suffix="K+" label={t("stats.counters.scamsBlocked")} />
             <ScamCounter to={120} suffix="K+" label={t("stats.counters.familiesProtected")} />
             <ScamCounter to={15} suffix="K+" label={t("stats.counters.activeScammers")} />
           </motion.div>
-
-          {/* Real Stats */}
-          <motion.div 
-            initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-            className="grid md:grid-cols-3 gap-8"
-          >
-            {statCards.map((stat, i) => (
-              <motion.div key={i} variants={fadeInUp} className="bg-gray-800/50 border border-gray-700/50 p-8 rounded-3xl backdrop-blur-sm hover:bg-gray-800 transition-colors">
-                <h3 className="text-gray-400 text-lg font-medium mb-2">{stat.label}</h3>
-                <div className="text-5xl font-bold text-accent mb-4">{stat.value}</div>
-                <p className="text-sm text-gray-500">{stat.desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          <p className="text-center text-xs text-gray-500 mt-10 max-w-3xl mx-auto leading-relaxed">
-            {t("stats.sources")}
-          </p>
         </div>
       </section>
 

@@ -47,11 +47,11 @@ export default {
     items: [
       {
         q: "What is Netraksh?",
-        a: "Netraksh is India's Digital Bodyguard, a comprehensive digital safety platform designed to protect citizens from scam calls, fraudulent SMS, malicious links, and UPI fraud using advanced AI threat detection.",
+        a: "Netraksh is India's Digital Bodyguard — a safety app that protects you from scam calls, fraudulent SMS, malicious links, and UPI fraud using AI threat detection.",
       },
       {
         q: "How is Netraksh different from caller ID apps?",
-        a: "While caller ID apps rely primarily on crowdsourced phone books to show you who is calling, Netraksh is a dedicated security tool. We use threat intelligence and behavioral AI to detect sophisticated scams, including WhatsApp fraud, QR code traps, and malicious URLs, moving beyond just names to provide real-time protection.",
+        a: "Caller ID apps rely on crowdsourced phone books to show who's calling. Netraksh is a security tool: it uses threat intelligence and AI to detect WhatsApp fraud, QR code traps, and malicious URLs in real time — not just names.",
       },
       {
         q: "How does scam detection work?",
@@ -71,7 +71,7 @@ export default {
       },
       {
         q: "Is it free?",
-        a: "Netraksh offers a robust free tier to ensure every Indian has basic digital protection. Premium features, including advanced Family Guardian tools and priority AI scanning, are available via subscription.",
+        a: "Netraksh has a free tier so every Indian gets basic digital protection. Premium features like Family Guardian tools and priority AI scanning come with a subscription.",
       },
     ],
   },

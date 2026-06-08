@@ -324,10 +324,8 @@ export default function Founder() {
                 {t("mission.p1pre")}
                 <span className="font-semibold text-gray-900">{t("mission.p1bold")}</span>
               </p>
-              <p>{t("mission.p2")}</p>
             </div>
             <div className="space-y-5">
-              <p>{t("mission.p3")}</p>
               <p>
                 {t("mission.p4pre")}
                 <span className="font-semibold text-gray-900">{t("mission.p4bold")}</span>

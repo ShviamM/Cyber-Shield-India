@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 import { motion, MotionConfig, type Variants } from "framer-motion";
 import {
   ShieldCheck,
-  ShieldAlert,
   User,
   Users,
   Wallet,
@@ -21,7 +20,6 @@ import {
   ArrowRight,
   Check,
   X,
-  BellRing,
   GraduationCap,
   UserRound,
   Briefcase,
@@ -29,7 +27,6 @@ import {
   Radar,
   Globe2,
 } from "lucide-react";
-import { ScamCounter } from "@/components/ScamCounter";
 import { LiveProtectionDemo } from "@/components/LiveProtectionDemo";
 
 const fadeInUp: Variants = {
@@ -97,21 +94,10 @@ export default function Features() {
     title: string;
     desc: string;
   }>;
-  const familySteps = t("family.steps", { returnObjects: true }) as Array<{
-    title: string;
-    desc: string;
-  }>;
   const whyRows = t("why.rows", { returnObjects: true }) as string[];
   const audiences = t("india.audiences", { returnObjects: true }) as string[];
 
   const aiIcons = [Radar, Globe2, Users, BrainCircuit];
-  const familyTones = [
-    "bg-red-50 text-red-500",
-    "bg-amber-50 text-amber-500",
-    "bg-blue-50 text-blue-600",
-    "bg-green-50 text-green-600",
-  ];
-  const familyIcons = [PhoneIncoming, ShieldAlert, BellRing, ShieldCheck];
   const whyOthers = [true, false, false, false, false, false, false];
   const audienceIcons = [GraduationCap, UserRound, HeartHandshake, Briefcase, Users];
 
@@ -330,74 +316,6 @@ export default function Features() {
           </div>
         </section>
 
-        {/* FAMILY PROTECTION — LARGEST */}
-        <section className="py-28 bg-orange-50/50 relative overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-0 right-0 h-80 w-80 rounded-full bg-accent/10 blur-3xl" />
-          </div>
-          <div className="container mx-auto px-4 md:px-6 relative z-10">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={staggerContainer}
-              className="text-center max-w-3xl mx-auto mb-16"
-            >
-              <motion.div
-                variants={fadeInUp}
-                className="inline-flex items-center justify-center p-4 bg-orange-100 rounded-2xl text-accent mb-6 shadow-sm"
-              >
-                <Users className="h-8 w-8" />
-              </motion.div>
-              <motion.h2 variants={fadeInUp} className="text-3xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-                {t("family.title")}
-              </motion.h2>
-              <motion.p variants={fadeInUp} className="text-xl text-gray-600 leading-relaxed">
-                {t("family.subtitle")}
-              </motion.p>
-            </motion.div>
-
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-80px" }}
-              variants={staggerContainer}
-              className="grid md:grid-cols-4 gap-5 max-w-5xl mx-auto"
-            >
-              {familySteps.map((step, idx) => {
-                const Icon = familyIcons[idx];
-                return (
-                  <motion.div
-                    key={step.title}
-                    variants={fadeInUp}
-                    className="bg-white rounded-2xl border border-gray-100 shadow-xl shadow-gray-200/40 p-6 flex flex-col"
-                  >
-                    <div className={`h-12 w-12 rounded-full flex items-center justify-center mb-4 ${familyTones[idx]}`}>
-                      <Icon className="h-6 w-6" />
-                    </div>
-                    <h4 className="font-bold text-gray-900 mb-2">{step.title}</h4>
-                    <p className="text-sm text-gray-600 leading-relaxed">{step.desc}</p>
-                  </motion.div>
-                );
-              })}
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="mt-14 text-center"
-            >
-              <Link href="/family-protection">
-                <Button size="lg" className="rounded-full bg-gray-900 hover:bg-gray-800 text-white font-medium px-8 shadow-xl shadow-gray-900/10 transition-transform hover:scale-105 active:scale-95">
-                  {t("family.cta")} <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
-            </motion.div>
-          </div>
-        </section>
-
         {/* SECTION 3 — WHY DIFFERENT */}
         <section className="py-24 bg-white">
           <div className="container mx-auto px-4 md:px-6">
@@ -471,40 +389,6 @@ export default function Features() {
             </motion.div>
 
             <LiveProtectionDemo />
-          </div>
-        </section>
-
-        {/* SECTION 5 — COUNTER */}
-        <section className="py-24 bg-gray-900 text-white relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-gray-900 to-gray-900 pointer-events-none" />
-          <div className="container mx-auto px-4 md:px-6 relative z-10">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={staggerContainer}
-              className="text-center max-w-2xl mx-auto mb-16"
-            >
-              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-bold mb-6">
-                {t("counter.title")}
-              </motion.h2>
-              <motion.p variants={fadeInUp} className="text-xl text-gray-400">
-                {t("counter.subtitle")}
-              </motion.p>
-            </motion.div>
-
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-80px" }}
-              variants={staggerContainer}
-              className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto"
-            >
-              <ScamCounter to={2} suffix="M+" label={t("counter.threatsDetected")} />
-              <ScamCounter to={650} suffix="K+" label={t("counter.fraudReports")} />
-              <ScamCounter to={120} suffix="K+" label={t("counter.familiesProtected")} />
-              <ScamCounter to={15} suffix="K+" label={t("counter.scamNumbersReported")} />
-            </motion.div>
           </div>
         </section>
 
