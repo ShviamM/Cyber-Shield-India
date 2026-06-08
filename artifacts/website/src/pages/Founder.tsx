@@ -90,7 +90,6 @@ const whyInviteIcons = [Lightbulb, Users, Languages, MessageCircle, ShieldCheck,
 const workshopIcons = [ShieldCheck, School, GraduationCap, Building2, Users, Heart, Megaphone, Flag];
 
 const galleryCategories = [
-  "All",
   "Workshops",
   "School Programs",
   "College Events",
@@ -176,7 +175,7 @@ function Counter({ to, suffix }: { to: number; suffix: string }) {
 
 export default function Founder() {
   const { t } = useTranslation("founder");
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeCategory, setActiveCategory] = useState(galleryCategories[0]);
   const [lightbox, setLightbox] = useState<number | null>(null);
   const testimonialRef = useRef<HTMLDivElement>(null);
 
@@ -205,10 +204,7 @@ export default function Founder() {
   });
 
   const filteredGallery = useMemo(
-    () =>
-      activeCategory === "All"
-        ? galleryItems
-        : galleryItems.filter((g) => g.category === activeCategory),
+    () => galleryItems.filter((g) => g.category === activeCategory),
     [activeCategory]
   );
 
