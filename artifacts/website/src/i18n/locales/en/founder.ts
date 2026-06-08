@@ -88,6 +88,35 @@ export default {
       { tag: "Government Advisory", title: "FIFA World Cup, Qatar", desc: "Provided Cyber Hygiene Advisory support to the Government of Qatar during the world's most-watched sporting event." },
     ],
   },
+  leaders: {
+    eyebrow: "Conversations on Cyber Safety",
+    title: "In conversation with leaders",
+    subtitle:
+      "From the floor of the Legislative Assembly to police cyber cells, Shivam Malaviya meets policymakers, administrators, and law enforcement to discuss strengthening India's fight against cyber crime — sharing his book Digital Dhokha along the way.",
+    items: [
+      {
+        name: "Satish Mahana",
+        role: "Speaker, U.P. Legislative Assembly",
+        blurb:
+          "A discussion on carrying cyber crime awareness to the grassroots, and the role public policy and institutions can play in protecting ordinary citizens from digital fraud — accompanied by a copy of Digital Dhokha.",
+        alt: "Shivam Malaviya presenting his book Digital Dhokha to Satish Mahana, Speaker of the Uttar Pradesh Legislative Assembly",
+      },
+      {
+        name: "Sanjay Kapoor",
+        role: "Chairman, Kanpur Cricket Association",
+        blurb:
+          "Exploring how sporting bodies and community networks can become powerful channels for cyber safety awareness, helping fans, players, and families recognise and resist online scams.",
+        alt: "Shivam Malaviya presenting his book Digital Dhokha to Sanjay Kapoor, long-serving Chairman of the Kanpur Cricket Association",
+      },
+      {
+        name: "Anjali Vishwakarma, IPS",
+        role: "Additional SP, Cyber Crime",
+        blurb:
+          "A conversation on the rising tide of cyber crime, faster support for victims, and closer police–citizen collaboration to report fraud early and bring offenders to book.",
+        alt: "Shivam Malaviya presenting his book Digital Dhokha to Anjali Vishwakarma, IPS, Additional SP Cyber",
+      },
+    ],
+  },
   gallery: {
     eyebrow: "Photo Gallery",
     title: "Moments from the field",
