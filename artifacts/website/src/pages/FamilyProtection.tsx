@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { motion, MotionConfig } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import {
   ShieldCheck,
   Newspaper,
@@ -15,19 +16,18 @@ import { NewspaperClippings } from "@/components/NewspaperClippings";
 import { FamilyRiskSelector } from "@/components/FamilyRiskSelector";
 import { FamilyStorytelling } from "@/components/FamilyStorytelling";
 
-const STATS = [
-  { value: "₹11,000 Cr+", label: "lost to cyber fraud in India in a single year" },
-  { value: "Every 10 min", label: "a senior citizen is targeted by an online scam" },
-  { value: "1 app", label: "to protect up to 5 of your loved ones" },
-];
-
 export default function FamilyProtection() {
+  const { t } = useTranslation("family");
+  const stats = t("stats.items", { returnObjects: true }) as Array<{
+    value: string;
+    label: string;
+  }>;
   return (
     <Layout>
       <MotionConfig reducedMotion="user">
       <SEOHead
-        title="Family Guardian | Protect Your Loved Ones"
-        description="Netraksh Family Guardian lets you monitor and block cyber threats targeting your parents, seniors, and children — with real-time alerts the moment a scam is stopped."
+        title={t("seo.title")}
+        description={t("seo.description")}
       />
 
       {/* Hero */}
@@ -39,7 +39,7 @@ export default function FamilyProtection() {
             transition={{ duration: 0.5 }}
             className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary"
           >
-            <HeartHandshake className="h-4 w-4" /> Family Guardian
+            <HeartHandshake className="h-4 w-4" /> {t("hero.badge")}
           </motion.span>
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
@@ -47,8 +47,9 @@ export default function FamilyProtection() {
             transition={{ duration: 0.5, delay: 0.05 }}
             className="mx-auto mt-5 max-w-3xl text-4xl font-bold text-gray-900 md:text-6xl"
           >
-            Protect the people who{" "}
-            <span className="text-accent">raised you</span>.
+            {t("hero.titleStart")}
+            <span className="text-accent">{t("hero.titleAccent")}</span>
+            {t("hero.titleEnd")}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 16 }}
@@ -56,9 +57,7 @@ export default function FamilyProtection() {
             transition={{ duration: 0.5, delay: 0.12 }}
             className="mx-auto mt-5 max-w-2xl text-lg text-gray-600 md:text-xl"
           >
-            Scammers prey on trust — and they target our parents and grandparents most of
-            all. Netraksh stands guard on their phone and alerts you the moment a threat is
-            stopped.
+            {t("hero.subtitle")}
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -68,19 +67,19 @@ export default function FamilyProtection() {
           >
             <Link href="/pricing">
               <Button size="lg" className="gap-2">
-                Protect My Family <ArrowRight className="h-4 w-4" />
+                {t("hero.protectBtn")} <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
             <Link href="/download">
               <Button size="lg" variant="outline">
-                Download the App
+                {t("hero.downloadBtn")}
               </Button>
             </Link>
           </motion.div>
 
           {/* Stats strip */}
           <div className="mx-auto mt-12 grid max-w-3xl gap-4 sm:grid-cols-3">
-            {STATS.map((s, i) => (
+            {stats.map((s, i) => (
               <motion.div
                 key={s.label}
                 initial={{ opacity: 0, y: 16 }}
@@ -102,14 +101,13 @@ export default function FamilyProtection() {
         <div className="container mx-auto px-4">
           <div className="mx-auto mb-10 max-w-2xl text-center">
             <span className="inline-flex items-center gap-2 rounded-full bg-black/5 px-4 py-1.5 text-sm font-semibold text-gray-700">
-              <Newspaper className="h-4 w-4" /> Torn from the headlines
+              <Newspaper className="h-4 w-4" /> {t("clippingsSection.badge")}
             </span>
             <h2 className="mt-4 text-3xl font-bold text-gray-900 md:text-4xl">
-              Headlines that didn’t have to happen
+              {t("clippingsSection.title")}
             </h2>
             <p className="mt-3 text-gray-600">
-              These are the stories that fill our newspapers every week. Hover or tap each
-              clipping to see how Netraksh stops the scam behind it.
+              {t("clippingsSection.subtitle")}
             </p>
           </div>
           <NewspaperClippings />
@@ -121,14 +119,13 @@ export default function FamilyProtection() {
         <div className="container mx-auto px-4">
           <div className="mx-auto mb-10 max-w-2xl text-center">
             <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary">
-              <Users className="h-4 w-4" /> Who needs protecting?
+              <Users className="h-4 w-4" /> {t("riskSection.badge")}
             </span>
             <h2 className="mt-4 text-3xl font-bold text-gray-900 md:text-4xl">
-              Every family member faces a different threat
+              {t("riskSection.title")}
             </h2>
             <p className="mt-3 text-gray-600">
-              Tap a person to see the scam they’re most likely to face — and exactly how
-              Netraksh shields them.
+              {t("riskSection.subtitle")}
             </p>
           </div>
           <FamilyRiskSelector />
@@ -140,14 +137,13 @@ export default function FamilyProtection() {
         <div className="container mx-auto px-4">
           <div className="mx-auto mb-10 max-w-2xl text-center">
             <span className="inline-flex items-center gap-2 rounded-full bg-green-100 px-4 py-1.5 text-sm font-semibold text-green-700">
-              <BellRing className="h-4 w-4" /> Real-time peace of mind
+              <BellRing className="h-4 w-4" /> {t("alertSection.badge")}
             </span>
             <h2 className="mt-4 text-3xl font-bold text-gray-900 md:text-4xl">
-              You’ll know the moment a threat is stopped
+              {t("alertSection.title")}
             </h2>
             <p className="mt-3 text-gray-600">
-              When Netraksh blocks a scam on your loved one’s phone, you get notified
-              instantly — no more finding out too late.
+              {t("alertSection.subtitle")}
             </p>
           </div>
           <FamilyStorytelling />
@@ -159,16 +155,15 @@ export default function FamilyProtection() {
         <div className="container mx-auto px-4 text-center">
           <ShieldCheck className="mx-auto h-12 w-12 text-accent" />
           <h2 className="mx-auto mt-4 max-w-2xl text-3xl font-bold md:text-4xl">
-            Give your family the digital bodyguard they deserve
+            {t("cta.title")}
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-blue-100">
-            One subscription protects up to 5 loved ones. Start a 7-day free trial — no card
-            needed.
+            {t("cta.subtitle")}
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link href="/pricing">
               <Button size="lg" variant="secondary" className="gap-2">
-                Start Free Trial <ArrowRight className="h-4 w-4" />
+                {t("cta.startBtn")} <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
             <Link href="/features">
@@ -177,7 +172,7 @@ export default function FamilyProtection() {
                 variant="outline"
                 className="border-white/40 bg-transparent text-white hover:bg-white/10 hover:text-white"
               >
-                See All Features
+                {t("cta.seeAllBtn")}
               </Button>
             </Link>
           </div>

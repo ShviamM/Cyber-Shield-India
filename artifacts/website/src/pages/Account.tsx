@@ -18,21 +18,8 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "wouter";
-
-const PLAN_LABELS: Record<string, string> = {
-  free: "Free",
-  premium: "Premium",
-  family: "Family",
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  active: "Active",
-  canceled: "Cancelled",
-  expired: "Expired",
-  past_due: "Past due",
-  trialing: "Free trial",
-};
 
 function daysLeft(value?: string | null): number | null {
   if (!value) return null;
@@ -68,6 +55,7 @@ function errorMessage(error: unknown, fallback: string): string {
 export default function Account() {
   const { user, isLoading: authLoading, logout } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation("account");
   const [, setLocation] = useLocation();
 
   const [subscription, setSubscription] = useState<SubscriptionStatus | null>(null);
@@ -109,13 +97,13 @@ export default function Account() {
       const status = await cancelSubscription();
       setSubscription(status);
       toast({
-        title: "Subscription cancelled",
-        description: "You'll keep access until the end of your billing period.",
+        title: t("account.toast.cancelledTitle"),
+        description: t("account.toast.cancelledDesc"),
       });
     } catch (error) {
       toast({
-        title: "Could not cancel",
-        description: errorMessage(error, "Please try again in a moment."),
+        title: t("account.toast.couldNotCancelTitle"),
+        description: errorMessage(error, t("account.toast.tryAgainSoon")),
         variant: "destructive",
       });
     } finally {
@@ -142,8 +130,14 @@ export default function Account() {
 
   const isPremium = subscription?.isPremium ?? false;
   const isTrial = subscription?.status === "trialing";
-  const planLabel = PLAN_LABELS[subscription?.plan ?? "free"] ?? "Free";
-  const statusLabel = STATUS_LABELS[subscription?.status ?? "active"] ?? "—";
+  const planKey = subscription?.plan ?? "free";
+  const statusKey = subscription?.status ?? "active";
+  const planLabel = t(`account.plans.${planKey}`, {
+    defaultValue: t("account.plans.free"),
+  });
+  const statusLabel = t(`account.statuses.${statusKey}`, {
+    defaultValue: "—",
+  });
   const canCancel =
     isPremium && subscription?.status === "active" && !subscription?.cancelAtPeriodEnd;
   const trialDaysLeft = isTrial ? daysLeft(subscription?.currentPeriodEnd) : null;
@@ -151,20 +145,22 @@ export default function Account() {
   return (
     <Layout>
       <SEOHead
-        title="My Account | Netraksh"
-        description="Manage your Netraksh subscription, view your payment history and account details."
+        title={t("account.seo.title")}
+        description={t("account.seo.description")}
       />
       <section className="py-16 px-4 bg-gray-50 min-h-[80vh]">
         <div className="container mx-auto max-w-3xl">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">My Account</h1>
+              <h1 className="text-3xl font-bold text-gray-900">
+                {t("account.heading")}
+              </h1>
               <p className="text-gray-600 mt-1">
                 {user.fullName} · +91 {user.phone.replace(/^\+?91/, "")}
               </p>
             </div>
             <Button variant="outline" className="gap-2" onClick={handleLogout}>
-              <LogOut className="w-4 h-4" /> Log out
+              <LogOut className="w-4 h-4" /> {t("account.logOut")}
             </Button>
           </div>
 
@@ -180,7 +176,9 @@ export default function Account() {
                   <ShieldCheck className="w-6 h-6" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Current plan</p>
+                  <p className="text-sm text-gray-500">
+                    {t("account.currentPlan")}
+                  </p>
                   <p className="text-xl font-bold text-gray-900">{planLabel}</p>
                 </div>
               </div>
@@ -199,12 +197,18 @@ export default function Account() {
               <div className="mt-6 rounded-xl bg-accent/10 border border-accent/20 p-4 text-sm">
                 <p className="font-semibold text-gray-900">
                   {trialDaysLeft === 0
-                    ? "Your free trial ends today"
-                    : `${trialDaysLeft} day${trialDaysLeft === 1 ? "" : "s"} left in your free trial`}
+                    ? t("account.trialEndsToday")
+                    : t(
+                        trialDaysLeft === 1
+                          ? "account.trialDaysLeftOne"
+                          : "account.trialDaysLeftOther",
+                        { count: trialDaysLeft ?? 0 },
+                      )}
                 </p>
                 <p className="text-gray-600 mt-1">
-                  Trial ends on {formatDate(subscription?.currentPeriodEnd)}. Subscribe
-                  before then to keep your protection — there's no automatic charge.
+                  {t("account.trialEndsOn", {
+                    date: formatDate(subscription?.currentPeriodEnd),
+                  })}
                 </p>
               </div>
             )}
@@ -212,15 +216,15 @@ export default function Account() {
             {isPremium && !isTrial && (
               <div className="grid sm:grid-cols-2 gap-4 mt-6 text-sm">
                 <div className="bg-gray-50 rounded-xl p-4">
-                  <p className="text-gray-500">Active until</p>
+                  <p className="text-gray-500">{t("account.activeUntil")}</p>
                   <p className="font-semibold text-gray-900 mt-1">
                     {formatDate(subscription?.currentPeriodEnd)}
                   </p>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-4">
-                  <p className="text-gray-500">Renewal</p>
+                  <p className="text-gray-500">{t("account.renewal")}</p>
                   <p className="font-semibold text-gray-900 mt-1">
-                    Pay yearly to renew (no auto-charge)
+                    {t("account.renewalNote")}
                   </p>
                 </div>
               </div>
@@ -230,21 +234,22 @@ export default function Account() {
               {isTrial && (
                 <Link href="/pricing">
                   <Button className="gap-2 rounded-xl">
-                    Subscribe to keep {planLabel} <ArrowRight className="w-4 h-4" />
+                    {t("account.subscribeToKeep", { plan: planLabel })}{" "}
+                    <ArrowRight className="w-4 h-4" />
                   </Button>
                 </Link>
               )}
               {!isPremium && (
                 <Link href="/pricing">
                   <Button className="gap-2 rounded-xl">
-                    Upgrade plan <ArrowRight className="w-4 h-4" />
+                    {t("account.upgradePlan")} <ArrowRight className="w-4 h-4" />
                   </Button>
                 </Link>
               )}
               {isPremium && !isTrial && (
                 <Link href="/pricing">
                   <Button variant="outline" className="rounded-xl">
-                    Change plan
+                    {t("account.changePlan")}
                   </Button>
                 </Link>
               )}
@@ -258,7 +263,7 @@ export default function Account() {
                   {canceling ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
-                    "Cancel subscription"
+                    t("account.cancelSubscription")
                   )}
                 </Button>
               )}
@@ -271,12 +276,13 @@ export default function Account() {
               <Smartphone className="w-5 h-5" />
             </div>
             <div>
-              <p className="font-semibold text-gray-900">Your protection lives in the app</p>
+              <p className="font-semibold text-gray-900">
+                {t("account.appReminderTitle")}
+              </p>
               <p className="text-sm text-gray-600 mt-1">
-                Sign in to the Netraksh app with this same mobile number to use your plan's
-                real-time protection.{" "}
+                {t("account.appReminderDescBefore")}
                 <Link href="/download" className="text-primary font-medium hover:underline">
-                  Get the app
+                  {t("account.getApp")}
                 </Link>
                 .
               </p>
@@ -285,9 +291,11 @@ export default function Account() {
 
           {/* Payment history */}
           <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Payment history</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-4">
+              {t("account.paymentHistory")}
+            </h2>
             {payments.length === 0 ? (
-              <p className="text-sm text-gray-500">No payments yet.</p>
+              <p className="text-sm text-gray-500">{t("account.noPayments")}</p>
             ) : (
               <div className="divide-y divide-gray-100">
                 {payments.map((payment) => (

@@ -1,15 +1,17 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { AlertTriangle, ShieldAlert, Smartphone, MessageSquareWarning } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
-const alerts = [
-  { icon: ShieldAlert, text: "New UPI Fraud Pattern Detected in Maharashtra" },
-  { icon: Smartphone, text: "Warning: Fake Customer Care Calls on the Rise" },
-  { icon: AlertTriangle, text: "Digital Arrest Scam: Never Pay to 'Clear Your Name'" },
-  { icon: MessageSquareWarning, text: "Fraud SMS: Fake Job Offers Circulating" },
-];
+const alertIcons = [ShieldAlert, Smartphone, AlertTriangle, MessageSquareWarning];
 
 export function TrustTicker() {
   const prefersReducedMotion = useReducedMotion();
+  const { t } = useTranslation("common");
+  const texts = t("ticker.items", { returnObjects: true }) as string[];
+  const alerts = texts.map((text, i) => ({
+    icon: alertIcons[i] ?? ShieldAlert,
+    text,
+  }));
 
   return (
     <div className="w-full bg-gray-900 border-y border-gray-800 py-3 overflow-hidden flex">

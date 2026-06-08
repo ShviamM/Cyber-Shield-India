@@ -6,8 +6,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Mail, MessageSquare, Building2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function Contact() {
+  const { t } = useTranslation("misc");
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -18,14 +20,14 @@ export default function Contact() {
   return (
     <Layout>
       <SEOHead 
-        title="Contact Us | Netraksh Support" 
-        description="Get in touch with the Netraksh team for support, business enquiries, partnership requests, or media."
+        title={t("contact.seoTitle")} 
+        description={t("contact.seoDescription")}
       />
       <div className="container mx-auto px-4 pt-10 pb-16 max-w-6xl">
         <div className="grid lg:grid-cols-2 gap-16">
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Get in touch</h1>
-            <p className="text-xl text-gray-600 mb-12">Whether you need support, want to partner with us, or have media enquiries, we're here to help.</p>
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">{t("contact.heading")}</h1>
+            <p className="text-xl text-gray-600 mb-12">{t("contact.subheading")}</p>
             
             <div className="space-y-8">
               <div className="flex items-start gap-4">
@@ -33,8 +35,8 @@ export default function Contact() {
                   <MessageSquare className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold mb-1">User Support</h3>
-                  <p className="text-gray-600 mb-2">Need help with the app? Our support team is available.</p>
+                  <h3 className="text-xl font-bold mb-1">{t("contact.support.title")}</h3>
+                  <p className="text-gray-600 mb-2">{t("contact.support.desc")}</p>
                   <a href="mailto:support@netraksh.com" className="text-primary font-medium hover:underline">support@netraksh.com</a>
                 </div>
               </div>
@@ -43,8 +45,8 @@ export default function Contact() {
                   <Building2 className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold mb-1">Business & Partnerships</h3>
-                  <p className="text-gray-600 mb-2">Interested in API access or institutional partnerships?</p>
+                  <h3 className="text-xl font-bold mb-1">{t("contact.business.title")}</h3>
+                  <p className="text-gray-600 mb-2">{t("contact.business.desc")}</p>
                   <a href="mailto:partners@netraksh.com" className="text-orange-600 font-medium hover:underline">partners@netraksh.com</a>
                 </div>
               </div>
@@ -53,8 +55,8 @@ export default function Contact() {
                   <Mail className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold mb-1">Media Enquiries</h3>
-                  <p className="text-gray-600 mb-2">For press kits and media interviews.</p>
+                  <h3 className="text-xl font-bold mb-1">{t("contact.media.title")}</h3>
+                  <p className="text-gray-600 mb-2">{t("contact.media.desc")}</p>
                   <a href="mailto:press@netraksh.com" className="text-green-600 font-medium hover:underline">press@netraksh.com</a>
                 </div>
               </div>
@@ -69,35 +71,35 @@ export default function Contact() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold mb-2">Message Received</h3>
-                <p className="text-gray-600">Thank you for reaching out. Our team will get back to you shortly.</p>
+                <h3 className="text-2xl font-bold mb-2">{t("contact.success.title")}</h3>
+                <p className="text-gray-600">{t("contact.success.desc")}</p>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Full Name</Label>
-                  <Input id="name" placeholder="John Doe" required className="h-12" />
+                  <Label htmlFor="name">{t("contact.form.nameLabel")}</Label>
+                  <Input id="name" placeholder={t("contact.form.namePlaceholder")} required className="h-12" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input id="email" type="email" placeholder="john@example.com" required className="h-12" />
+                  <Label htmlFor="email">{t("contact.form.emailLabel")}</Label>
+                  <Input id="email" type="email" placeholder={t("contact.form.emailPlaceholder")} required className="h-12" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="subject">Subject</Label>
+                  <Label htmlFor="subject">{t("contact.form.subjectLabel")}</Label>
                   <select id="subject" className="w-full h-12 px-3 border border-input rounded-md bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" required>
-                    <option value="">Select a topic...</option>
-                    <option value="support">App Support</option>
-                    <option value="partnership">Partnership</option>
-                    <option value="media">Media Enquiry</option>
-                    <option value="other">Other</option>
+                    <option value="">{t("contact.form.subjectPlaceholder")}</option>
+                    <option value="support">{t("contact.form.subjectSupport")}</option>
+                    <option value="partnership">{t("contact.form.subjectPartnership")}</option>
+                    <option value="media">{t("contact.form.subjectMedia")}</option>
+                    <option value="other">{t("contact.form.subjectOther")}</option>
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="message">Message</Label>
-                  <Textarea id="message" placeholder="How can we help you?" rows={5} required className="resize-none" />
+                  <Label htmlFor="message">{t("contact.form.messageLabel")}</Label>
+                  <Textarea id="message" placeholder={t("contact.form.messagePlaceholder")} rows={5} required className="resize-none" />
                 </div>
                 <Button type="submit" className="w-full h-12 text-lg rounded-xl bg-primary hover:bg-primary/90 text-white">
-                  Send Message
+                  {t("contact.form.submit")}
                 </Button>
               </form>
             )}

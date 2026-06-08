@@ -1,5 +1,6 @@
 - [Play permissions policy](play-permissions-policy.md) — never re-add READ_SMS/READ_CALL_LOG/READ_PHONE_STATE/RECORD_AUDIO (Play rejection); calls use CallScreeningService role, SMS uses share-to-check; in-app account delete via DELETE /me.
 - [KavachAI i18n](kavach-ai-i18n.md) — locale files aren't type-checked against en; verify key parity with a runtime flatten script, and rely on i18next fallbackLng (no manual deep-merge).
+- [Website i18n](website-i18n.md) — EN/HI; per-page namespace files auto-loaded by Vite glob (parallel-subagent safe); icons merged by index; bilingual data via lang.startsWith("hi"); verify parity at runtime.
 - [Native call screening](kavach-screening-native.md) — CallScreeningService+ROLE_CALL_SCREENING avoids Play Permissions Declaration (no READ_CALL_LOG/SMS); service warns, never blocks; EAS-build only.
 - [OTP login via MSG91 Widget](otp-sms-provider.md) — mobile: widget sends+verifies OTP client-side, backend validates access-token; admin web uses a SHARED PASSWORD (/auth/admin-login), NOT OTP; needs native dev build.
 - [MSG91 web vs mobile widget split](msg91-web-vs-mobile-widget.md) — "Mobile Integration" ON blocks web; mobile needs ON, web needs OFF → two widgets; tokenAuth is account-level/reusable; backend must try each widgetId in verifyAccessToken.

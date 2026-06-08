@@ -2,6 +2,7 @@ import { Layout } from "@/components/layout/Layout";
 import { SEOHead } from "@/components/SEOHead";
 import { Link, useRoute } from "wouter";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   getArticle,
   getRelatedArticles,
@@ -112,15 +113,17 @@ function Block({ block }: { block: ArticleBlock }) {
 }
 
 export default function ScamArticle() {
+  const { t, i18n } = useTranslation("articles");
+  const lang = i18n.language.startsWith("hi") ? "hi" : "en";
   const [, params] = useRoute("/cyber-safety-center/:slug");
   const [copied, setCopied] = useState(false);
-  const article = params?.slug ? getArticle(params.slug) : undefined;
+  const article = params?.slug ? getArticle(params.slug, lang) : undefined;
 
   if (!article) {
     return <NotFound />;
   }
 
-  const related = getRelatedArticles(article.slug);
+  const related = getRelatedArticles(article.slug, lang);
   const articleUrl = `https://netraksh.com/cyber-safety-center/${article.slug}`;
 
   const handleShare = async () => {
@@ -178,11 +181,11 @@ export default function ScamArticle() {
             className="inline-flex items-center gap-2 text-gray-500 hover:text-primary transition-colors mb-8 font-medium"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Cyber Safety Center
+            {t("article.back")}
           </Link>
 
           <span className="px-3 py-1 bg-blue-50 text-primary text-xs font-semibold rounded-full uppercase tracking-wider">
-            {article.category}
+            {t(`categories.${article.category}`)}
           </span>
           <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mt-5 mb-6 leading-tight">
             {article.title}
@@ -195,20 +198,20 @@ export default function ScamArticle() {
             </span>
             <span className="inline-flex items-center gap-1.5">
               <Calendar className="h-4 w-4" />
-              Updated {article.updated}
+              {t("article.updated")} {article.updated}
             </span>
             <button
               onClick={handleShare}
               className="inline-flex items-center gap-1.5 text-primary font-medium hover:underline ml-auto"
-              aria-label="Share this article"
+              aria-label={t("article.shareAriaLabel")}
             >
               {copied ? (
                 <>
-                  <Check className="h-4 w-4" /> Link copied
+                  <Check className="h-4 w-4" /> {t("article.linkCopied")}
                 </>
               ) : (
                 <>
-                  <Share2 className="h-4 w-4" /> Share
+                  <Share2 className="h-4 w-4" /> {t("article.share")}
                 </>
               )}
             </button>
@@ -231,11 +234,10 @@ export default function ScamArticle() {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-gray-900">
-                  Protect yourself automatically
+                  {t("article.protectTitle")}
                 </h3>
                 <p className="text-gray-600">
-                  Netraksh blocks scam calls, fake links and fraud messages like
-                  this in real time — before they reach you.
+                  {t("article.protectDesc")}
                 </p>
               </div>
             </div>
@@ -243,7 +245,7 @@ export default function ScamArticle() {
               href="/download"
               className="inline-flex items-center gap-2 bg-primary text-white font-bold px-6 py-3 rounded-full hover:bg-primary/90 transition-colors whitespace-nowrap shrink-0"
             >
-              Download Netraksh
+              {t("article.download")}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -251,13 +253,12 @@ export default function ScamArticle() {
           <div className="mt-6 p-8 rounded-3xl bg-gray-900 text-white text-center">
             <ShieldCheck className="h-10 w-10 text-accent mx-auto mb-4" />
             <h3 className="text-2xl font-bold mb-3">
-              Report fraud immediately
+              {t("article.reportTitle")}
             </h3>
             <p className="text-gray-300 mb-6 max-w-lg mx-auto">
-              If you or someone you know has been targeted, call the National
-              Cyber Crime Helpline <strong className="text-white">1930</strong>{" "}
-              or report online. Acting fast gives the best chance to recover your
-              money.
+              {t("article.reportDescBefore")}{" "}
+              <strong className="text-white">1930</strong>{" "}
+              {t("article.reportDescAfter")}
             </p>
             <a
               href="https://cybercrime.gov.in"
@@ -265,7 +266,7 @@ export default function ScamArticle() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-accent text-gray-900 font-bold px-6 py-3 rounded-full hover:opacity-90 transition-opacity"
             >
-              Report at cybercrime.gov.in
+              {t("article.reportButton")}
               <ArrowRight className="h-4 w-4" />
             </a>
           </div>
@@ -275,7 +276,7 @@ export default function ScamArticle() {
       <section className="bg-gray-50 py-16">
         <div className="container mx-auto px-4 max-w-5xl">
           <h2 className="text-2xl font-bold text-gray-900 mb-8">
-            Related guides
+            {t("article.relatedGuides")}
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
             {related.map((rel) => (
@@ -285,13 +286,13 @@ export default function ScamArticle() {
                 className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow group"
               >
                 <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full uppercase tracking-wider">
-                  {rel.category}
+                  {t(`categories.${rel.category}`)}
                 </span>
                 <h3 className="text-lg font-bold text-gray-900 mt-4 mb-2 group-hover:text-primary transition-colors">
                   {rel.title}
                 </h3>
                 <span className="text-primary font-medium text-sm inline-flex items-center gap-1">
-                  Read guide <ArrowRight className="h-4 w-4" />
+                  {t("readGuide")} <ArrowRight className="h-4 w-4" />
                 </span>
               </Link>
             ))}

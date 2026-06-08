@@ -2,7 +2,8 @@ import { Layout } from "@/components/layout/Layout";
 import { SEOHead } from "@/components/SEOHead";
 import { Link } from "wouter";
 import { useState } from "react";
-import { scamArticles } from "@/data/scamArticles";
+import { useTranslation } from "react-i18next";
+import { getArticles } from "@/data/scamArticles";
 import {
   AlertTriangle,
   ShieldCheck,
@@ -34,6 +35,9 @@ const iconMap = {
 const categories = ["All", "Alert", "Guide", "Family", "Recovery"] as const;
 
 export default function CyberSafetyCenter() {
+  const { t, i18n } = useTranslation("articles");
+  const lang = i18n.language.startsWith("hi") ? "hi" : "en";
+  const scamArticles = getArticles(lang);
   const [active, setActive] = useState<(typeof categories)[number]>("All");
   const [query, setQuery] = useState("");
 
@@ -50,8 +54,8 @@ export default function CyberSafetyCenter() {
   return (
     <Layout>
       <SEOHead
-        title="Cyber Safety Center | Free Scam Awareness Guides"
-        description="Learn how to spot and avoid India's most common scams: digital arrest, UPI fraud, QR fraud, WhatsApp scams, fake loan apps, OTP theft and more. Free, simple guides for every Indian."
+        title={t("seo.title")}
+        description={t("seo.description")}
         url="https://netraksh.com/cyber-safety-center"
       />
       <div className="bg-gray-50 pt-10 pb-16 md:pt-14 md:pb-20">
@@ -59,14 +63,13 @@ export default function CyberSafetyCenter() {
           <div className="text-center mb-10">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 text-primary text-sm font-semibold mb-6">
               <ShieldCheck className="h-4 w-4" />
-              Free Awareness Hub
+              {t("badge")}
             </div>
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-              Cyber Safety Center
+              {t("heading")}
             </h1>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Knowledge is your first line of defense. Simple, jargon free guides
-              to the scams targeting Indian families today.
+              {t("subtitle")}
             </p>
           </div>
 
@@ -77,8 +80,8 @@ export default function CyberSafetyCenter() {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search scams, e.g. UPI, digital arrest, OTP..."
-                aria-label="Search guides"
+                placeholder={t("searchPlaceholder")}
+                aria-label={t("searchAriaLabel")}
                 className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200 bg-white text-gray-900 placeholder:text-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
               />
             </div>
@@ -95,14 +98,14 @@ export default function CyberSafetyCenter() {
                     : "bg-white text-gray-600 border border-gray-200 hover:border-primary hover:text-primary"
                 }`}
               >
-                {cat}
+                {t(`categories.${cat}`)}
               </button>
             ))}
           </div>
 
           {filtered.length === 0 && (
             <div className="text-center py-16 text-gray-500">
-              No guides found. Try a different search term or category.
+              {t("noResults")}
             </div>
           )}
 
@@ -120,7 +123,7 @@ export default function CyberSafetyCenter() {
                       <Icon className="h-6 w-6" />
                     </div>
                     <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full uppercase tracking-wider">
-                      {article.category}
+                      {t(`categories.${article.category}`)}
                     </span>
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary transition-colors">
@@ -128,7 +131,7 @@ export default function CyberSafetyCenter() {
                   </h3>
                   <p className="text-gray-600 mb-5 flex-1 line-clamp-3">{article.excerpt}</p>
                   <span className="text-primary font-medium inline-flex items-center gap-1.5">
-                    Read guide
+                    {t("readGuide")}
                     <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </span>
                 </Link>
@@ -142,9 +145,9 @@ export default function CyberSafetyCenter() {
                 <Phone className="h-7 w-7" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold">Been scammed? Act now.</h3>
+                <h3 className="text-2xl font-bold">{t("helpCta.title")}</h3>
                 <p className="text-gray-300">
-                  Call the National Cyber Crime Helpline 1930 or report online.
+                  {t("helpCta.desc")}
                 </p>
               </div>
             </div>
@@ -154,7 +157,7 @@ export default function CyberSafetyCenter() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-accent text-gray-900 font-bold px-6 py-3 rounded-full hover:opacity-90 transition-opacity whitespace-nowrap"
             >
-              Report fraud
+              {t("helpCta.button")}
               <ArrowRight className="h-4 w-4" />
             </a>
           </div>

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { motion, useInView, useReducedMotion, MotionConfig, type Variants } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Eye,
   ShieldCheck,
@@ -78,51 +79,33 @@ function Counter({
   );
 }
 
-const scamStats = [
-  { to: 22.68, decimals: 2, suffix: " Lakh", label: "cybercrime cases reported in India in 2024 — more than double 2022." },
-  { prefix: "₹", to: 5489, suffix: " Cr+", label: "siphoned funds frozen by the 1930 helpline system across 17.8 lakh cases." },
-  { to: 3.24, decimals: 2, suffix: " Cr", label: "complaints reported to the national 1930 cyber helpline." },
+const scamStatsConfig: Array<{ to: number; prefix?: string; decimals?: number }> = [
+  { to: 22.68, decimals: 2 },
+  { prefix: "₹", to: 5489 },
+  { to: 3.24, decimals: 2 },
 ];
 
-const story = [
-  {
-    icon: Smartphone,
-    title: "India went digital — overnight",
-    desc: "UPI, cheap data and online everything reached every household. A billion people came online, many for the very first time.",
-  },
-  {
-    icon: CreditCard,
-    title: "The scammers followed the money",
-    desc: "Fraudsters industrialised. Fake bank calls, investment traps, 'digital arrests' and job scams now run like organised businesses.",
-  },
-  {
-    icon: AlertTriangle,
-    title: "Our families became the targets",
-    desc: "Parents, students and seniors — the people who trust most — are hit hardest. A caller ID and good intentions were never going to be enough.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "So we built a digital bodyguard",
-    desc: "Netraksh puts an always-on guardian in every pocket — spotting threats before they turn citizens into victims.",
-  },
-];
+const storyIcons = [Smartphone, CreditCard, AlertTriangle, ShieldCheck];
 
-const pillars = [
-  { icon: Eye, title: "Always Watching", desc: "Proactive, real-time protection that catches scams in the moment — not after the money is gone." },
-  { icon: Heart, title: "Family First", desc: "Built for the people who need it most: seniors, students and parents navigating a digital world." },
-  { icon: Globe2, title: "Made for India", desc: "Tuned to Indian scams, Indian payment rails and Indian languages — not a foreign tool bolted on." },
-  { icon: Languages, title: "For Everyone", desc: "Simple enough for a first-time smartphone user. Safety shouldn't require a tech degree." },
-  { icon: Lock, title: "Privacy by Design", desc: "We protect you without exploiting you. Your data is yours — security is never a trade for surveillance." },
-  { icon: Brain, title: "Always Vigilant", desc: "We study the criminal playbook continuously, so our protection evolves as fast as the threats do." },
-];
+const pillarIcons = [Eye, Heart, Globe2, Languages, Lock, Brain];
 
 export default function About() {
+  const { t } = useTranslation("about");
+
+  const scamStatsText = t("crisis.stats", { returnObjects: true }) as Array<{ suffix: string; label: string }>;
+  const storyText = t("why.story", { returnObjects: true }) as Array<{ title: string; desc: string }>;
+  const pillarsText = t("standFor.pillars", { returnObjects: true }) as Array<{ title: string; desc: string }>;
+
+  const scamStats = scamStatsConfig.map((c, i) => ({ ...c, ...scamStatsText[i] }));
+  const story = storyText.map((s, i) => ({ ...s, icon: storyIcons[i] }));
+  const pillars = pillarsText.map((p, i) => ({ ...p, icon: pillarIcons[i] }));
+
   return (
     <MotionConfig reducedMotion="user">
       <Layout>
         <SEOHead
-          title="About Us | Netraksh Mission"
-          description="Netraksh exists to protect every Indian from cyber fraud. Learn why we built India's digital bodyguard, the scale of the cyber-scam crisis, and what we stand for."
+          title={t("seo.title")}
+          description={t("seo.description")}
         />
 
         {/* HERO */}
@@ -138,7 +121,7 @@ export default function About() {
               transition={{ duration: 0.6 }}
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-primary text-sm font-semibold mb-6"
             >
-              <ShieldCheck className="h-4 w-4" /> Our Mission
+              <ShieldCheck className="h-4 w-4" /> {t("hero.badge")}
             </motion.div>
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
@@ -146,7 +129,7 @@ export default function About() {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 tracking-tight leading-tight"
             >
-              We're building India's <span className="text-primary">digital bodyguard</span>.
+              {t("hero.titleLead")} <span className="text-primary">{t("hero.titleHighlight")}</span>{t("hero.titleTail")}
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -154,8 +137,7 @@ export default function About() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-xl text-gray-600 leading-relaxed"
             >
-              One mission drives everything we do: protect every Indian from cyber fraud — and build the nation's
-              most trusted digital safety platform.
+              {t("hero.subtitle")}
             </motion.p>
           </div>
         </section>
@@ -172,13 +154,13 @@ export default function About() {
               className="text-center max-w-2xl mx-auto mb-16"
             >
               <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 text-red-400 font-bold text-sm uppercase tracking-wider mb-4">
-                <AlertTriangle className="h-4 w-4" /> The cyber-scam crisis
+                <AlertTriangle className="h-4 w-4" /> {t("crisis.badge")}
               </motion.div>
               <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-bold mb-6">
-                A scam every few <span className="text-accent">seconds</span>.
+                {t("crisis.titleLead")} <span className="text-accent">{t("crisis.titleHighlight")}</span>{t("crisis.titleTail")}
               </motion.h2>
               <motion.p variants={fadeInUp} className="text-xl text-gray-400">
-                Cyber fraud in India isn't an edge case anymore — it's an everyday epidemic. The numbers are staggering.
+                {t("crisis.subtitle")}
               </motion.p>
             </motion.div>
 
@@ -209,7 +191,7 @@ export default function About() {
               viewport={{ once: true }}
               className="text-center text-xs text-gray-500 mt-8"
             >
-              Figures as reported by the Indian Cyber Crime Coordination Centre (I4C) &amp; Ministry of Home Affairs (2024–2025).
+              {t("crisis.source")}
             </motion.p>
           </div>
         </section>
@@ -225,10 +207,10 @@ export default function About() {
               className="text-center max-w-2xl mx-auto mb-16"
             >
               <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
-                Why Netraksh Exists
+                {t("why.title")}
               </motion.h2>
               <motion.p variants={fadeInUp} className="text-xl text-gray-600">
-                The story of how a digitising nation, and the criminals chasing it, made a digital bodyguard inevitable.
+                {t("why.subtitle")}
               </motion.p>
             </motion.div>
 
@@ -272,12 +254,11 @@ export default function About() {
                 <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 mb-5">
                   <Eye className="h-7 w-7 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold mb-3">The meaning behind the name</h3>
+                <h3 className="text-2xl font-bold mb-3">{t("why.name.title")}</h3>
                 <p className="text-blue-100 text-lg leading-relaxed">
-                  <span className="font-semibold text-white">Netra</span> (the eye) +{" "}
-                  <span className="font-semibold text-white">Raksha</span> (protection) ={" "}
-                  <span className="font-semibold text-white">Netraksh</span> — the watchful eye that guards you.
-                  It's not just a name; it's the promise we build into every feature.
+                  <span className="font-semibold text-white">{t("why.name.netra")}</span> {t("why.name.netraGloss")} +{" "}
+                  <span className="font-semibold text-white">{t("why.name.raksha")}</span> {t("why.name.rakshaGloss")} ={" "}
+                  <span className="font-semibold text-white">{t("why.name.brand")}</span> {t("why.name.tail")}
                 </p>
               </div>
             </motion.div>
@@ -298,20 +279,18 @@ export default function About() {
                 <div className="h-12 w-12 rounded-2xl bg-accent/10 text-accent flex items-center justify-center mb-5">
                   <Target className="h-6 w-6" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">Our Mission</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">{t("missionVision.missionTitle")}</h3>
                 <p className="text-gray-600 leading-relaxed text-lg">
-                  To put a trusted digital bodyguard in the hands of every Indian — making cyber safety as simple,
-                  accessible and instinctive as locking your front door.
+                  {t("missionVision.missionDesc")}
                 </p>
               </motion.div>
               <motion.div variants={fadeInUp} className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8">
                 <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-5">
                   <TrendingUp className="h-6 w-6" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">Our Vision</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">{t("missionVision.visionTitle")}</h3>
                 <p className="text-gray-600 leading-relaxed text-lg">
-                  A secure digital India where no citizen loses their hard-earned savings to a scam — and where every
-                  family feels safe online, regardless of age or background.
+                  {t("missionVision.visionDesc")}
                 </p>
               </motion.div>
             </motion.div>
@@ -329,10 +308,10 @@ export default function About() {
               className="text-center max-w-2xl mx-auto mb-16"
             >
               <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
-                What We Stand For
+                {t("standFor.title")}
               </motion.h2>
               <motion.p variants={fadeInUp} className="text-xl text-gray-600">
-                The principles that shape every decision, every feature, and every line of code.
+                {t("standFor.subtitle")}
               </motion.p>
             </motion.div>
 
@@ -376,15 +355,13 @@ export default function About() {
                 <Award className="h-7 w-7" />
               </div>
               <div className="flex-1">
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">Built on frontline expertise</h3>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">{t("founder.title")}</h3>
                 <p className="text-gray-600 leading-relaxed text-lg mb-6">
-                  Netraksh is founded by a cyber-crime specialist and author of <em>Digital Dhokha</em> — India's first
-                  cyber crime awareness book — who has advised governments and trained citizens across more than 10
-                  countries. Years of fighting fraud on the front lines are built into everything we make.
+                  {t("founder.descBefore")}<em>{t("founder.descBook")}</em>{t("founder.descAfter")}
                 </p>
                 <Button asChild className="rounded-full font-semibold">
                   <Link href="/founder">
-                    Meet the founder <ArrowRight className="ml-2 h-4 w-4" />
+                    {t("founder.cta")} <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
               </div>
@@ -402,7 +379,7 @@ export default function About() {
               viewport={{ once: true }}
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 text-white text-sm font-semibold mb-6"
             >
-              <Sparkles className="h-4 w-4" /> Join the mission
+              <Sparkles className="h-4 w-4" /> {t("cta.badge")}
             </motion.div>
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
@@ -411,7 +388,7 @@ export default function About() {
               transition={{ delay: 0.05 }}
               className="text-3xl md:text-5xl font-bold mb-6 tracking-tight"
             >
-              A safer digital India starts with you.
+              {t("cta.title")}
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -420,7 +397,7 @@ export default function About() {
               transition={{ delay: 0.1 }}
               className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto leading-relaxed"
             >
-              Put a digital bodyguard in your pocket — and help protect the people you love.
+              {t("cta.subtitle")}
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -430,10 +407,10 @@ export default function About() {
               className="flex flex-col sm:flex-row justify-center gap-4"
             >
               <Button asChild size="lg" className="rounded-full bg-white hover:bg-gray-100 text-primary font-bold px-10 h-14 text-lg shadow-xl shadow-black/10 w-full sm:w-auto">
-                <Link href="/download">Get Netraksh</Link>
+                <Link href="/download">{t("cta.getApp")}</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="rounded-full bg-transparent border-white/30 hover:bg-white/10 text-white font-bold px-10 h-14 text-lg w-full sm:w-auto">
-                <Link href="/features">Explore Features <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                <Link href="/features">{t("cta.exploreFeatures")} <ArrowRight className="ml-2 h-4 w-4" /></Link>
               </Button>
             </motion.div>
           </div>

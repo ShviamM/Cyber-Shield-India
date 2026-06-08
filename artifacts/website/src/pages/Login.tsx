@@ -15,6 +15,7 @@ import {
 } from "@/lib/msg91";
 import { Lock, ArrowRight, Loader2, ShieldCheck } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useLocation } from "wouter";
 
 const CAPTCHA_CONTAINER_ID = "msg91-captcha";
@@ -41,6 +42,7 @@ function nextPath(): string {
 export default function Login() {
   const { setSession } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation("account");
   const [, setLocation] = useLocation();
 
   const [step, setStep] = useState<"phone" | "otp">("phone");
@@ -67,8 +69,8 @@ export default function Login() {
     const local = normalizePhone(phone);
     if (!local) {
       toast({
-        title: "Invalid number",
-        description: "Enter a valid 10-digit Indian mobile number.",
+        title: t("login.toast.invalidNumberTitle"),
+        description: t("login.toast.invalidNumberDesc"),
         variant: "destructive",
       });
       return;
@@ -76,8 +78,8 @@ export default function Login() {
 
     if (!isCaptchaVerified()) {
       toast({
-        title: "Complete the captcha",
-        description: "Please tick the captcha box to confirm you're human.",
+        title: t("login.toast.completeCaptchaTitle"),
+        description: t("login.toast.completeCaptchaDesc"),
         variant: "destructive",
       });
       return;
@@ -90,13 +92,13 @@ export default function Login() {
       setIsNewUser(newUser);
       setStep("otp");
       toast({
-        title: "Code sent",
-        description: `We sent a one-time code to +91 ${local}.`,
+        title: t("login.toast.codeSentTitle"),
+        description: t("login.toast.codeSentDesc", { phone: local }),
       });
     } catch (error) {
       toast({
-        title: "Could not send the code",
-        description: errorMessage(error, "Please try again in a moment."),
+        title: t("login.toast.couldNotSendTitle"),
+        description: errorMessage(error, t("login.toast.tryAgainSoon")),
         variant: "destructive",
       });
     } finally {
@@ -108,16 +110,16 @@ export default function Login() {
     e.preventDefault();
     if (otp.trim().length < 4) {
       toast({
-        title: "Enter the code",
-        description: "Please enter the code we sent to your phone.",
+        title: t("login.toast.enterCodeTitle"),
+        description: t("login.toast.enterCodeDesc"),
         variant: "destructive",
       });
       return;
     }
     if (isNewUser && !fullName.trim()) {
       toast({
-        title: "Name required",
-        description: "Please enter your full name to create your account.",
+        title: t("login.toast.nameRequiredTitle"),
+        description: t("login.toast.nameRequiredDesc"),
         variant: "destructive",
       });
       return;
@@ -132,14 +134,16 @@ export default function Login() {
       });
       setSession(token, user);
       toast({
-        title: "Signed in",
-        description: `Welcome${user.fullName ? `, ${user.fullName}` : ""}!`,
+        title: t("login.toast.signedInTitle"),
+        description: user.fullName
+          ? t("login.toast.welcomeWithName", { name: user.fullName })
+          : t("login.toast.welcome"),
       });
       setLocation(nextPath());
     } catch (error) {
       toast({
-        title: "Verification failed",
-        description: errorMessage(error, "Please check the code and try again."),
+        title: t("login.toast.verificationFailedTitle"),
+        description: errorMessage(error, t("login.toast.checkCode")),
         variant: "destructive",
       });
     } finally {
@@ -150,11 +154,14 @@ export default function Login() {
   const handleResend = async () => {
     try {
       await retryOtp();
-      toast({ title: "Code resent", description: "We sent you a new code." });
+      toast({
+        title: t("login.toast.codeResentTitle"),
+        description: t("login.toast.codeResentDesc"),
+      });
     } catch (error) {
       toast({
-        title: "Could not resend",
-        description: errorMessage(error, "Please try again in a moment."),
+        title: t("login.toast.couldNotResendTitle"),
+        description: errorMessage(error, t("login.toast.tryAgainSoon")),
         variant: "destructive",
       });
     }
@@ -163,26 +170,28 @@ export default function Login() {
   return (
     <Layout>
       <SEOHead
-        title="Sign in | Netraksh"
-        description="Sign in to manage your Netraksh subscription. Your privacy and security are our priority."
+        title={t("login.seo.title")}
+        description={t("login.seo.description")}
       />
       <div className="min-h-[80vh] flex items-center justify-center py-20 px-4 bg-gray-50">
         <div className="max-w-md w-full">
           <div className="text-center mb-10">
             <img
               src="/images/netraksh-logo.png"
-              alt="Netraksh logo"
+              alt={t("login.logoAlt")}
               className="w-16 h-16 rounded-2xl mx-auto mb-4 object-cover shadow-lg shadow-primary/20"
             />
             <span className="block font-bold text-xl tracking-tight text-gray-900 mb-4">
               Netra<span className="text-accent">ksh</span>
             </span>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {step === "phone" ? "Welcome" : "Verify your number"}
+              {step === "phone"
+                ? t("login.headingWelcome")
+                : t("login.headingVerify")}
             </h1>
             <p className="text-gray-600 flex items-center justify-center gap-2">
               <Lock className="w-4 h-4" />
-              Your privacy and security are our priority.
+              {t("login.privacy")}
             </p>
           </div>
 
@@ -190,7 +199,7 @@ export default function Login() {
             <div className={step === "phone" ? "" : "hidden"}>
               <form onSubmit={handlePhoneSubmit} className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Mobile Number</Label>
+                  <Label htmlFor="phone">{t("login.mobileLabel")}</Label>
                   <div className="flex gap-2">
                     <div className="bg-gray-50 border border-input rounded-md px-3 flex items-center justify-center text-gray-500 font-medium">
                       +91
@@ -199,7 +208,7 @@ export default function Login() {
                       id="phone"
                       type="tel"
                       inputMode="numeric"
-                      placeholder="Enter your 10-digit number"
+                      placeholder={t("login.mobilePlaceholder")}
                       required
                       className="h-12 flex-1"
                       value={phone}
@@ -208,8 +217,7 @@ export default function Login() {
                     />
                   </div>
                   <p className="text-sm text-gray-500 mt-2">
-                    We'll text you a one-time code to confirm it's you. Use the same
-                    number as your Netraksh app to unlock your plan there.
+                    {t("login.mobileHelp")}
                   </p>
                 </div>
                 <div
@@ -225,7 +233,7 @@ export default function Login() {
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
                     <>
-                      Send code <ArrowRight className="w-5 h-5" />
+                      {t("login.sendCode")} <ArrowRight className="w-5 h-5" />
                     </>
                   )}
                 </Button>
@@ -235,11 +243,11 @@ export default function Login() {
               <form onSubmit={handleOtpSubmit} className="space-y-6">
                 {isNewUser && (
                   <div className="space-y-2">
-                    <Label htmlFor="fullName">Full Name</Label>
+                    <Label htmlFor="fullName">{t("login.fullNameLabel")}</Label>
                     <Input
                       id="fullName"
                       type="text"
-                      placeholder="Your full name"
+                      placeholder={t("login.fullNamePlaceholder")}
                       required
                       className="h-12"
                       value={fullName}
@@ -249,13 +257,13 @@ export default function Login() {
                   </div>
                 )}
                 <div className="space-y-2">
-                  <Label htmlFor="otp">One-time code</Label>
+                  <Label htmlFor="otp">{t("login.otpLabel")}</Label>
                   <Input
                     id="otp"
                     type="text"
                     inputMode="numeric"
                     autoComplete="one-time-code"
-                    placeholder="Enter the code"
+                    placeholder={t("login.otpPlaceholder")}
                     required
                     className="h-12 tracking-[0.4em] text-center text-lg"
                     value={otp}
@@ -272,7 +280,7 @@ export default function Login() {
                       }}
                       disabled={submitting}
                     >
-                      Change number
+                      {t("login.changeNumber")}
                     </button>
                     <button
                       type="button"
@@ -280,7 +288,7 @@ export default function Login() {
                       onClick={handleResend}
                       disabled={submitting}
                     >
-                      Resend code
+                      {t("login.resendCode")}
                     </button>
                   </div>
                 </div>
@@ -293,7 +301,7 @@ export default function Login() {
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
                     <>
-                      <ShieldCheck className="w-5 h-5" /> Verify & continue
+                      <ShieldCheck className="w-5 h-5" /> {t("login.verifyContinue")}
                     </>
                   )}
                 </Button>

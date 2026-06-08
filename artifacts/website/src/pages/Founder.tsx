@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Link } from "wouter";
 import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import bookTrailer from "@assets/DigitalDhokha_BookTrailer_web_24s.mp4";
 import {
   ShieldCheck,
@@ -63,72 +64,30 @@ const fadeUp = {
   show: { opacity: 1, y: 0 },
 };
 
-const stats = [
-  { value: 10, suffix: "+", label: "Countries Reached" },
-  { value: 20, suffix: "+", label: "Workshops & Sessions" },
-  { value: 1, suffix: "", label: "National Award" },
-  { value: 1, suffix: "", label: "Published Book" },
+const statValues = [
+  { value: 10, suffix: "+" },
+  { value: 20, suffix: "+" },
+  { value: 1, suffix: "" },
+  { value: 1, suffix: "" },
 ];
 
-const insideTheBook = [
-  { icon: FileSearch, title: "Real-World Case Studies", desc: "Actual cyber fraud incidents, decoded step by step." },
-  { icon: Landmark, title: "Banking Fraud Prevention", desc: "Protect your accounts, cards, and life savings." },
-  { icon: Smartphone, title: "UPI Scam Awareness", desc: "Spot and stop fraudulent payment requests." },
-  { icon: UserX, title: "Social Engineering", desc: "How scammers manipulate trust, and how to resist." },
-  { icon: ScanFace, title: "Deepfake & AI Scams", desc: "The new frontier of digital fraud, explained simply." },
-  { icon: Users, title: "Cyber Safety for Families", desc: "Keep parents, children, and seniors protected." },
+const insideTheBookIcons = [FileSearch, Landmark, Smartphone, UserX, ScanFace, Users];
+
+const storyFlowIcons = [Smartphone, CreditCard, AlertTriangle, ShieldCheck];
+
+const timelineIcons = [ShieldCheck, Brain, Briefcase, Flag, Sparkles];
+
+const achievementMeta = [
+  { no: "01", icon: Award },
+  { no: "02", icon: BookOpen },
+  { no: "03", icon: Globe2 },
 ];
 
-const storyFlow = [
-  { icon: Smartphone, title: "India Goes Digital", desc: "UPI, online services, and connected devices reach every household." },
-  { icon: CreditCard, title: "Cyber Frauds Increase", desc: "Criminals exploit the digital shift at an unprecedented scale." },
-  { icon: AlertTriangle, title: "Families Become Targets", desc: "Scam calls, fake messages, and digital arrests reach the vulnerable." },
-  { icon: ShieldCheck, title: "Netraksh Protects Citizens", desc: "A digital bodyguard that spots threats before they become victims." },
-];
+const serviceIcons = [Presentation, School, Building2, Flag, Mic, ShieldCheck, Handshake];
 
-const timeline = [
-  { icon: ShieldCheck, title: "Cybersecurity Experience", desc: "A proven track record defending citizens and organisations across more than 10 countries." },
-  { icon: Brain, title: "Threat Intelligence Leadership", desc: "Tracking emerging fraud patterns and translating them into protection for everyday Indians." },
-  { icon: Briefcase, title: "Security Operations Expertise", desc: "Hands-on experience building and running defensive security at scale." },
-  { icon: Flag, title: "National Cyber Safety Vision", desc: "Advising governments and speaking at global forums to raise the bar for digital safety." },
-  { icon: Sparkles, title: "Founder of Netraksh", desc: "Turning years of frontline expertise into a digital bodyguard for every Indian family." },
-];
+const whyInviteIcons = [Lightbulb, Users, Languages, MessageCircle, ShieldCheck, Heart];
 
-const achievements = [
-  { no: "01", tag: "National Award", title: "Bharat Pratibha Samman", desc: "Awarded at Pradhanmantri Sangrahalaya for outstanding contributions to Cyber Crime Awareness across India.", icon: Award },
-  { no: "02", tag: "Author", title: "Digital Dhokha", desc: "India's first Cyber Crime Awareness book, on a mission to save 100 million Indians from digital fraud.", icon: BookOpen },
-  { no: "03", tag: "Government Advisory", title: "FIFA World Cup, Qatar", desc: "Provided Cyber Hygiene Advisory support to the Government of Qatar during the world's most-watched sporting event.", icon: Globe2 },
-];
-
-const services = [
-  { icon: Presentation, title: "Cyber Awareness Workshops", desc: "Interactive sessions that turn complex threats into simple, everyday safety habits." },
-  { icon: School, title: "School Cyber Safety Programs", desc: "Age-appropriate awareness for students on safe screen time and online behaviour." },
-  { icon: Building2, title: "Corporate Training", desc: "Equip teams to recognise phishing, social engineering, and financial fraud." },
-  { icon: Flag, title: "Government Awareness Campaigns", desc: "Large-scale citizen awareness drives for departments and public bodies." },
-  { icon: Mic, title: "Public Speaking Engagements", desc: "Keynotes and talks that inspire action on digital safety." },
-  { icon: ShieldCheck, title: "Cyber Fraud Prevention Consulting", desc: "Practical guidance to reduce fraud risk for organisations and communities." },
-  { icon: Handshake, title: "Community Outreach Programs", desc: "Grassroots sessions for women, seniors, and vulnerable groups." },
-];
-
-const whyInvite = [
-  { icon: Lightbulb, title: "Practical Real-Life Examples", desc: "Real case studies that make risks impossible to ignore." },
-  { icon: Users, title: "Citizen-Focused Awareness", desc: "Built for ordinary people, not just security experts." },
-  { icon: Languages, title: "Hindi + English Delivery", desc: "Sessions delivered in the language your audience understands." },
-  { icon: MessageCircle, title: "Interactive Sessions", desc: "Live Q&A, demos, and audience participation throughout." },
-  { icon: ShieldCheck, title: "Actionable Prevention", desc: "Clear, repeatable steps people can use the very same day." },
-  { icon: Heart, title: "Youth & Family Engagement", desc: "Content that resonates with students, parents, and seniors." },
-];
-
-const workshopPrograms = [
-  { icon: ShieldCheck, title: "Cyber Safety Workshops", desc: "Foundational awareness for any audience." },
-  { icon: School, title: "School Awareness Sessions", desc: "Safe online habits for young students." },
-  { icon: GraduationCap, title: "College Awareness Programs", desc: "Fraud, privacy, and digital reputation for youth." },
-  { icon: Building2, title: "Corporate Cybersecurity Training", desc: "Phishing and fraud defence for teams." },
-  { icon: Users, title: "Women Safety Awareness", desc: "Online safety, harassment, and privacy." },
-  { icon: Heart, title: "Senior Citizen Protection", desc: "Defending elders from scam calls & UPI fraud." },
-  { icon: Megaphone, title: "Government Awareness Campaigns", desc: "Public, large-scale citizen outreach." },
-  { icon: Flag, title: "Police & Law Enforcement", desc: "Collaboration on cyber crime prevention." },
-];
+const workshopIcons = [ShieldCheck, School, GraduationCap, Building2, Users, Heart, Megaphone, Flag];
 
 const galleryCategories = [
   "All",
@@ -184,39 +143,7 @@ const galleryItems: GalleryItem[] = [
   { category: "Videos", h: "h-56", type: "video", src: "/videos/event-video-3.mp4", poster: "/images/event-video-3.jpg", alt: "Highlights from a Netraksh awareness session" },
 ];
 
-const mediaItems = [
-  { category: "Book Launch Coverage", title: "Digital Dhokha launch draws national attention", blurb: "Coverage of the launch of India's first cyber crime awareness book." },
-  { category: "Cyber Awareness Campaigns", title: "Awareness drives reach citizens across India", blurb: "Featuring nationwide workshops and citizen safety initiatives." },
-  { category: "Expert Interviews", title: "Decoding India's rising cyber fraud", blurb: "Expert commentary on scams, prevention, and digital safety." },
-  { category: "Media Features", title: "Voices on building a cyber-safe India", blurb: "Features on the mission to make every Indian cyber aware." },
-];
-
-const testimonials = [
-  { quote: "The session was eye-opening. Our students now think twice before clicking unknown links.", role: "School Principal" },
-  { quote: "Practical, relatable, and delivered in both Hindi and English. Our staff loved it.", role: "Corporate HR Lead" },
-  { quote: "Senior citizens in our community finally understand how digital arrest scams work.", role: "Community Welfare Organiser" },
-  { quote: "A must-attend session for every college student in India.", role: "College Dean" },
-  { quote: "Real case studies made the risks impossible to ignore.", role: "Bank Branch Manager" },
-  { quote: "Engaging and actionable, exactly what awareness programs should be.", role: "Govt. Training Coordinator" },
-];
-
-const eventTypes = [
-  "School Program",
-  "College Event",
-  "Corporate Workshop",
-  "Government Training",
-  "Public Awareness Campaign",
-  "Podcast Appearance",
-  "Media Interview",
-];
-
-const trustCards = [
-  { icon: Brain, title: "Threat Intelligence", desc: "Reading the criminal playbook before it reaches you." },
-  { icon: ShieldCheck, title: "Cyber Defense", desc: "Defensive expertise built on real-world operations." },
-  { icon: Eye, title: "Digital Safety", desc: "Making safety simple, clear, and human." },
-  { icon: Users, title: "Family Protection", desc: "Designed for seniors, parents, and children alike." },
-  { icon: Sparkles, title: "AI-Powered Scam Detection", desc: "Spotting fraud in calls, messages, links, and QR codes." },
-];
+const trustIcons = [Brain, ShieldCheck, Eye, Users, Sparkles];
 
 function scrollToId(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -248,9 +175,26 @@ function Counter({ to, suffix }: { to: number; suffix: string }) {
 }
 
 export default function Founder() {
+  const { t } = useTranslation("founder");
   const [activeCategory, setActiveCategory] = useState("All");
   const [lightbox, setLightbox] = useState<number | null>(null);
   const testimonialRef = useRef<HTMLDivElement>(null);
+
+  const statLabels = t("impact.stats", { returnObjects: true }) as string[];
+  const insideTheBookItems = t("book.items", { returnObjects: true }) as Array<{ title: string; desc: string }>;
+  const storyItems = t("story.items", { returnObjects: true }) as Array<{ title: string; desc: string }>;
+  const journeyItems = t("journey.items", { returnObjects: true }) as Array<{ title: string; desc: string }>;
+  const recognitionItems = t("recognition.items", { returnObjects: true }) as Array<{ tag: string; title: string; desc: string }>;
+  const serviceItems = t("services.items", { returnObjects: true }) as Array<{ title: string; desc: string }>;
+  const whyInviteItems = t("whyInvite.items", { returnObjects: true }) as Array<{ title: string; desc: string }>;
+  const workshopItems = t("workshops.items", { returnObjects: true }) as Array<{ title: string; desc: string }>;
+  const mediaList = t("media.items", { returnObjects: true }) as Array<{ category: string; title: string; blurb: string }>;
+  const testimonialList = t("testimonials.items", { returnObjects: true }) as Array<{ quote: string; role: string }>;
+  const trustItems = t("trust.items", { returnObjects: true }) as Array<{ title: string; desc: string }>;
+  const roadmapItems = t("vision.roadmap", { returnObjects: true }) as string[];
+  const eventTypes = t("booking.eventTypes", { returnObjects: true }) as string[];
+  const galleryAlts = t("gallery.alts", { returnObjects: true }) as Record<string, string>;
+  const galleryCats = t("gallery.categories", { returnObjects: true }) as Record<string, string>;
   const [form, setForm] = useState({
     name: "",
     organization: "",
@@ -291,8 +235,8 @@ export default function Founder() {
   return (
     <Layout>
       <SEOHead
-        title="Shivam Malaviya: Cyber Crime Specialist, Author & Speaker | Netraksh"
-        description="Shivam Malaviya is a Cyber Crime Specialist, author of Digital Dhokha, public speaker and founder of Netraksh. Book a cyber awareness workshop or invite him to speak."
+        title={t("seo.title")}
+        description={t("seo.description")}
       />
 
       {/* Hero */}
@@ -311,23 +255,22 @@ export default function Founder() {
             <motion.div initial="hidden" animate="show" variants={fadeUp} transition={{ duration: 0.7 }}>
               <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.25em] uppercase text-accent">
                 <span className="h-px w-8 bg-accent" />
-                International Cyber Security Expert
+                {t("hero.eyebrow")}
               </span>
               <h1 className="mt-6 text-5xl md:text-7xl font-bold tracking-tight leading-[1.05]">
-                Shivam <span className="text-accent">Malaviya</span>
+                {t("hero.firstName")} <span className="text-accent">{t("hero.lastName")}</span>
               </h1>
               <p className="mt-5 text-lg md:text-xl text-blue-100/80 font-medium">
-                Cyber Crime Specialist · Author · Public Speaker · Cyber Awareness Evangelist
+                {t("hero.roles")}
               </p>
               <p className="mt-4 max-w-xl text-blue-100/70 leading-relaxed">
-                Protecting India's digital future through awareness, education, and action,
-                helping citizens, students, businesses, and governments stay safe from cyber fraud.
+                {t("hero.intro")}
               </p>
 
               <div className="mt-10 flex flex-wrap gap-4">
                 <Button asChild className="rounded-full bg-accent hover:bg-accent/90 text-white font-semibold px-7 h-12">
                   <a href={BOOK_AMAZON_URL} target="_blank" rel="noopener noreferrer">
-                    Buy the Book <ArrowRight className="ml-2 h-4 w-4" />
+                    {t("hero.buyBook")} <ArrowRight className="ml-2 h-4 w-4" />
                   </a>
                 </Button>
                 <Button
@@ -335,14 +278,14 @@ export default function Founder() {
                   variant="outline"
                   className="rounded-full border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white font-semibold px-7 h-12"
                 >
-                  Book a Workshop
+                  {t("hero.bookWorkshop")}
                 </Button>
                 <Button
                   onClick={() => scrollToId("book-event")}
                   variant="outline"
                   className="rounded-full border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white font-semibold px-7 h-12"
                 >
-                  Invite as Speaker
+                  {t("hero.inviteSpeaker")}
                 </Button>
               </div>
             </motion.div>
@@ -357,14 +300,14 @@ export default function Founder() {
               <div className="relative rounded-[2rem] p-2 bg-gradient-to-tr from-accent/70 to-amber-200/40">
                 <img
                   src="/images/founder-shivam.png"
-                  alt="Shivam Malaviya, Cyber Crime Specialist and Founder of Netraksh"
+                  alt={t("hero.imageAlt")}
                   className="rounded-[1.6rem] w-[300px] md:w-[360px] object-cover shadow-2xl"
                 />
               </div>
               <div className="absolute -bottom-5 -left-5 rounded-2xl border border-white/15 bg-[#08183f]/80 backdrop-blur-md px-5 py-3 shadow-xl">
                 <div className="flex items-center gap-2 text-sm font-semibold">
                   <ShieldCheck className="h-4 w-4 text-accent" />
-                  Securing India's Digital Future
+                  {t("hero.badge")}
                 </div>
               </div>
             </motion.div>
@@ -376,22 +319,22 @@ export default function Founder() {
       <section className="bg-white py-24">
         <div className="container mx-auto px-4 md:px-6 max-w-5xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-14">
-            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">Personal Mission</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">Protecting India's Digital Future</h2>
+            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("mission.eyebrow")}</span>
+            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("mission.title")}</h2>
           </motion.div>
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6, delay: 0.1 }} className="grid md:grid-cols-2 gap-10 text-lg text-gray-600 leading-relaxed">
             <div className="space-y-5">
               <p>
-                Netraksh was founded with a simple belief:{" "}
-                <span className="font-semibold text-gray-900">every Indian deserves protection from online fraud, cyber scams, and digital crime.</span>
+                {t("mission.p1pre")}
+                <span className="font-semibold text-gray-900">{t("mission.p1bold")}</span>
               </p>
-              <p>As India rapidly embraces digital payments, online services, and connected technologies, cybercriminals are targeting ordinary citizens at an unprecedented scale.</p>
+              <p>{t("mission.p2")}</p>
             </div>
             <div className="space-y-5">
-              <p>Netraksh was created to make cyber safety simple, accessible, and understandable for every Indian family.</p>
+              <p>{t("mission.p3")}</p>
               <p>
-                Whether it's a scam call, fake WhatsApp message, fraudulent QR code, phishing link, or digital arrest scam, our mission is to help people identify threats{" "}
-                <span className="font-semibold text-gray-900">before they become victims.</span>
+                {t("mission.p4pre")}
+                <span className="font-semibold text-gray-900">{t("mission.p4bold")}</span>
               </p>
             </div>
           </motion.div>
@@ -402,9 +345,9 @@ export default function Founder() {
       <section className="bg-gray-50 py-24">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-12">
-            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">India's First Cyber Crime Awareness Book</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">Digital Dhokha</h2>
-            <p className="mt-3 text-lg text-gray-600 max-w-2xl mx-auto">Unmasking the Scams, Frauds and Lies Stealing India's Future.</p>
+            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("book.eyebrow")}</span>
+            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("book.title")}</h2>
+            <p className="mt-3 text-lg text-gray-600 max-w-2xl mx-auto">{t("book.subtitle")}</p>
           </motion.div>
 
           <div className="rounded-[2rem] bg-[#08183f] text-white overflow-hidden shadow-2xl">
@@ -421,42 +364,45 @@ export default function Founder() {
                     playsInline
                     controls
                     preload="metadata"
-                    aria-label="Digital Dhokha book trailer by Shivam Malaviya"
+                    aria-label={t("book.trailerAria")}
                   />
                 </motion.div>
               </div>
               <div className="p-8 md:p-12 lg:py-14">
                 <p className="text-blue-100/80 leading-relaxed mb-6">
-                  India's first comprehensive cyber crime awareness book, packed with real-world case studies that show how everyday scams unfold, and exactly how to stop them.
+                  {t("book.intro")}
                 </p>
                 <div className="grid sm:grid-cols-2 gap-4 mb-8">
-                  {insideTheBook.map((item) => (
-                    <div key={item.title} className="flex items-start gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent/15 text-accent shrink-0">
-                        <item.icon className="h-4 w-4" />
+                  {insideTheBookItems.map((item, i) => {
+                    const Icon = insideTheBookIcons[i];
+                    return (
+                      <div key={item.title} className="flex items-start gap-3">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent/15 text-accent shrink-0">
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <div>
+                          <div className="text-sm font-semibold">{item.title}</div>
+                          <div className="text-xs text-blue-100/60 leading-snug">{item.desc}</div>
+                        </div>
                       </div>
-                      <div>
-                        <div className="text-sm font-semibold">{item.title}</div>
-                        <div className="text-xs text-blue-100/60 leading-snug">{item.desc}</div>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 <div className="rounded-xl border border-white/10 bg-white/5 p-4 mb-8">
                   <p className="text-sm italic text-blue-100/80">
-                    "I wrote Digital Dhokha so no Indian family has to learn about cyber fraud the hard way. Awareness is the strongest firewall."
+                    {t("book.quote")}
                   </p>
-                  <p className="mt-2 text-xs font-semibold text-accent">Shivam Malaviya</p>
+                  <p className="mt-2 text-xs font-semibold text-accent">{t("book.quoteAuthor")}</p>
                 </div>
                 <div className="flex flex-wrap gap-4">
                   <Button asChild className="rounded-full bg-accent hover:bg-accent/90 text-white font-semibold px-7 h-12">
                     <a href={BOOK_AMAZON_URL} target="_blank" rel="noopener noreferrer">
-                      Buy on Amazon <ExternalLink className="ml-2 h-4 w-4" />
+                      {t("book.buyAmazon")} <ExternalLink className="ml-2 h-4 w-4" />
                     </a>
                   </Button>
                   <Button asChild variant="outline" className="rounded-full border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white font-semibold px-7 h-12">
                     <a href={BOOK_FLIPKART_URL} target="_blank" rel="noopener noreferrer">
-                      Buy on Flipkart <ExternalLink className="ml-2 h-4 w-4" />
+                      {t("book.buyFlipkart")} <ExternalLink className="ml-2 h-4 w-4" />
                     </a>
                   </Button>
                 </div>
@@ -472,13 +418,13 @@ export default function Founder() {
         <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.7 }} className="container relative mx-auto px-4 md:px-6 max-w-4xl text-center">
           <Quote className="h-12 w-12 text-accent mx-auto mb-8" />
           <p className="text-3xl md:text-4xl font-medium leading-snug tracking-tight">
-            "Cyber safety should not be limited to experts. Every Indian deserves a<span className="text-accent"> digital bodyguard.</span>"
+            {t("quote.pre")}<span className="text-accent">{t("quote.accent")}</span>"
           </p>
           <div className="mt-10 flex items-center justify-center gap-4">
-            <img src="/images/founder-shivam.png" alt="Shivam Malaviya" className="h-14 w-14 rounded-full object-cover border-2 border-accent/60" />
+            <img src="/images/founder-shivam.png" alt={t("quote.name")} className="h-14 w-14 rounded-full object-cover border-2 border-accent/60" />
             <div className="text-left">
-              <div className="font-semibold">Shivam Malaviya</div>
-              <div className="text-sm text-blue-100/70">Founder &amp; CEO, Netraksh</div>
+              <div className="font-semibold">{t("quote.name")}</div>
+              <div className="text-sm text-blue-100/70">{t("quote.role")}</div>
             </div>
           </div>
         </motion.div>
@@ -488,16 +434,16 @@ export default function Founder() {
       <section className="bg-white py-20">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-12">
-            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">Impact Across India &amp; Beyond</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">Awareness in action</h2>
+            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("impact.eyebrow")}</span>
+            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("impact.title")}</h2>
           </motion.div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-            {stats.map((s, i) => (
-              <motion.div key={s.label} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp} transition={{ duration: 0.5, delay: i * 0.08 }} className="rounded-3xl border border-gray-100 bg-gray-50 p-8 text-center">
+            {statValues.map((s, i) => (
+              <motion.div key={statLabels[i]} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp} transition={{ duration: 0.5, delay: i * 0.08 }} className="rounded-3xl border border-gray-100 bg-gray-50 p-8 text-center">
                 <div className="text-5xl font-bold text-accent">
                   <Counter to={s.value} suffix={s.suffix} />
                 </div>
-                <div className="mt-2 text-sm font-medium text-gray-600">{s.label}</div>
+                <div className="mt-2 text-sm font-medium text-gray-600">{statLabels[i]}</div>
               </motion.div>
             ))}
           </div>
@@ -508,31 +454,34 @@ export default function Founder() {
       <section className="bg-gray-50 py-24">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-16">
-            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">Why Netraksh Exists</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">The story behind the shield</h2>
+            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("story.eyebrow")}</span>
+            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("story.title")}</h2>
           </motion.div>
           <div className="grid md:grid-cols-4 gap-6 relative">
-            {storyFlow.map((step, i) => (
+            {storyItems.map((step, i) => {
+              const Icon = storyFlowIcons[i];
+              return (
               <motion.div key={step.title} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp} transition={{ duration: 0.5, delay: i * 0.12 }} className="relative">
-                <div className={`h-full rounded-3xl p-7 border shadow-sm ${i === storyFlow.length - 1 ? "bg-[#08183f] border-[#08183f] text-white" : "bg-white border-gray-100"}`}>
+                <div className={`h-full rounded-3xl p-7 border shadow-sm ${i === storyItems.length - 1 ? "bg-[#08183f] border-[#08183f] text-white" : "bg-white border-gray-100"}`}>
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl mb-5 bg-accent/10 text-accent">
-                    <step.icon className="h-6 w-6" />
+                    <Icon className="h-6 w-6" />
                   </div>
-                  <h3 className={`text-lg font-bold mb-2 ${i === storyFlow.length - 1 ? "text-white" : "text-gray-900"}`}>{step.title}</h3>
-                  <p className={`text-sm leading-relaxed ${i === storyFlow.length - 1 ? "text-blue-100/70" : "text-gray-600"}`}>{step.desc}</p>
+                  <h3 className={`text-lg font-bold mb-2 ${i === storyItems.length - 1 ? "text-white" : "text-gray-900"}`}>{step.title}</h3>
+                  <p className={`text-sm leading-relaxed ${i === storyItems.length - 1 ? "text-blue-100/70" : "text-gray-600"}`}>{step.desc}</p>
                 </div>
-                {i < storyFlow.length - 1 && (
+                {i < storyItems.length - 1 && (
                   <div className="hidden md:flex absolute top-1/2 -right-3 -translate-y-1/2 z-10 h-6 w-6 items-center justify-center rounded-full bg-accent text-white shadow">
                     <ArrowRight className="h-3.5 w-3.5" />
                   </div>
                 )}
-                {i < storyFlow.length - 1 && (
+                {i < storyItems.length - 1 && (
                   <div className="md:hidden flex justify-center my-2 text-accent">
                     <ArrowDown className="h-5 w-5" />
                   </div>
                 )}
               </motion.div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -541,19 +490,21 @@ export default function Founder() {
       <section className="bg-white py-24">
         <div className="container mx-auto px-4 md:px-6 max-w-4xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-16">
-            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">The Journey</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">From frontline defender to founder</h2>
+            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("journey.eyebrow")}</span>
+            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("journey.title")}</h2>
           </motion.div>
           <div className="relative pl-8 md:pl-0">
             <div className="absolute left-2 md:left-1/2 top-2 bottom-2 w-px bg-gradient-to-b from-accent/60 via-gray-200 to-transparent md:-translate-x-1/2" />
             <div className="space-y-10">
-              {timeline.map((item, i) => (
+              {journeyItems.map((item, i) => {
+                const Icon = timelineIcons[i];
+                return (
                 <motion.div key={item.title} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp} transition={{ duration: 0.5, delay: i * 0.08 }} className={`relative md:grid md:grid-cols-2 md:gap-12 md:items-center ${i % 2 === 0 ? "" : "md:[direction:rtl]"}`}>
                   <div className={`md:[direction:ltr] ${i % 2 === 0 ? "md:text-right md:pr-4" : "md:pl-4"}`}>
                     <div className="rounded-2xl border border-gray-100 bg-gray-50 p-6 shadow-sm">
                       <div className={`flex items-center gap-3 mb-2 ${i % 2 === 0 ? "md:flex-row-reverse" : ""}`}>
                         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-accent shrink-0">
-                          <item.icon className="h-5 w-5" />
+                          <Icon className="h-5 w-5" />
                         </div>
                         <h3 className="text-lg font-bold text-gray-900">{item.title}</h3>
                       </div>
@@ -563,7 +514,8 @@ export default function Founder() {
                   <div className="absolute left-2 md:left-1/2 top-6 md:top-1/2 -translate-x-1/2 md:-translate-y-1/2 h-4 w-4 rounded-full bg-accent ring-4 ring-white" />
                   <div className="hidden md:block" />
                 </motion.div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
@@ -574,19 +526,22 @@ export default function Founder() {
         <div className="absolute inset-0 opacity-[0.25] bg-[radial-gradient(circle_at_85%_15%,rgba(255,103,19,0.3),transparent_45%)]" />
         <div className="container relative mx-auto px-4 md:px-6 max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-14">
-            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">Recognition &amp; Impact</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold">Key achievements</h2>
+            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("recognition.eyebrow")}</span>
+            <h2 className="mt-4 text-4xl md:text-5xl font-bold">{t("recognition.title")}</h2>
           </motion.div>
           <div className="grid sm:grid-cols-3 gap-5">
-            {achievements.map((a, i) => (
+            {recognitionItems.map((a, i) => {
+              const Icon = achievementMeta[i].icon;
+              return (
               <motion.div key={a.title} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp} transition={{ duration: 0.5, delay: i * 0.1 }} className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-6 hover:border-accent/40 transition-colors">
-                <div className="text-3xl font-bold text-accent/80 mb-3">{a.no}</div>
-                <a.icon className="h-6 w-6 text-accent mb-3" />
+                <div className="text-3xl font-bold text-accent/80 mb-3">{achievementMeta[i].no}</div>
+                <Icon className="h-6 w-6 text-accent mb-3" />
                 <div className="text-xs font-semibold tracking-[0.15em] uppercase text-blue-100/60 mb-1">{a.tag}</div>
                 <h3 className="text-lg font-bold mb-2">{a.title}</h3>
                 <p className="text-sm text-blue-100/70 leading-relaxed">{a.desc}</p>
               </motion.div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -595,8 +550,8 @@ export default function Founder() {
       <section className="bg-gray-50 py-24">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-10">
-            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">Photo Gallery</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">Moments from the field</h2>
+            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("gallery.eyebrow")}</span>
+            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("gallery.title")}</h2>
           </motion.div>
           <div className="flex flex-wrap justify-center gap-2 mb-10">
             {galleryCategories.map((cat) => (
@@ -611,7 +566,7 @@ export default function Founder() {
                   activeCategory === cat ? "bg-accent text-white" : "bg-white text-gray-600 border border-gray-200 hover:border-accent/40"
                 }`}
               >
-                {cat}
+                {galleryCats[cat] ?? cat}
               </button>
             ))}
           </div>
@@ -624,7 +579,7 @@ export default function Founder() {
               >
                 <img
                   src={g.type === "video" ? g.poster : g.src}
-                  alt={g.alt}
+                  alt={galleryAlts[g.src] ?? g.alt}
                   loading="lazy"
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
@@ -636,7 +591,7 @@ export default function Founder() {
                     </span>
                   </span>
                 )}
-                <span className="absolute bottom-3 left-3 text-xs font-semibold text-white drop-shadow">{g.category}</span>
+                <span className="absolute bottom-3 left-3 text-xs font-semibold text-white drop-shadow">{galleryCats[g.category] ?? g.category}</span>
                 <span className="absolute inset-0 bg-accent/0 group-hover:bg-accent/10 transition-colors" />
               </button>
             ))}
@@ -648,22 +603,25 @@ export default function Founder() {
       <section className="bg-white py-24">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-16">
-            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">Services</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">How Shivam can help your organisation</h2>
+            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("services.eyebrow")}</span>
+            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("services.title")}</h2>
           </motion.div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map((s, i) => (
+            {serviceItems.map((s, i) => {
+              const Icon = serviceIcons[i];
+              return (
               <motion.div key={s.title} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp} transition={{ duration: 0.5, delay: i * 0.06 }} className="group rounded-3xl border border-gray-100 bg-gray-50 p-7 hover:bg-white hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10 text-accent mb-5 group-hover:bg-accent group-hover:text-white transition-colors">
-                  <s.icon className="h-6 w-6" />
+                  <Icon className="h-6 w-6" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">{s.title}</h3>
                 <p className="text-sm text-gray-600 leading-relaxed mb-5 flex-1">{s.desc}</p>
                 <button onClick={() => scrollToId("book-event")} className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent hover:gap-2.5 transition-all">
-                  Enquire now <ArrowRight className="h-4 w-4" />
+                  {t("services.enquire")} <ArrowRight className="h-4 w-4" />
                 </button>
               </motion.div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -672,19 +630,22 @@ export default function Founder() {
       <section className="bg-gray-50 py-24">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-16">
-            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">Why Organizations Invite Shivam</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">Awareness that actually sticks</h2>
+            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("whyInvite.eyebrow")}</span>
+            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("whyInvite.title")}</h2>
           </motion.div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {whyInvite.map((c, i) => (
+            {whyInviteItems.map((c, i) => {
+              const Icon = whyInviteIcons[i];
+              return (
               <motion.div key={c.title} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp} transition={{ duration: 0.5, delay: i * 0.06 }} className="rounded-3xl border border-gray-100 bg-white p-7 shadow-sm">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10 text-accent mb-5">
-                  <c.icon className="h-6 w-6" />
+                  <Icon className="h-6 w-6" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">{c.title}</h3>
                 <p className="text-sm text-gray-600 leading-relaxed">{c.desc}</p>
               </motion.div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -693,22 +654,25 @@ export default function Founder() {
       <section className="bg-white py-24">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-16">
-            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">Workshops &amp; Awareness Programs</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">Reaching every kind of audience</h2>
+            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("workshops.eyebrow")}</span>
+            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("workshops.title")}</h2>
           </motion.div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {workshopPrograms.map((p, i) => (
+            {workshopItems.map((p, i) => {
+              const Icon = workshopIcons[i];
+              return (
               <motion.div key={p.title} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp} transition={{ duration: 0.5, delay: i * 0.05 }} className="rounded-3xl border border-gray-100 bg-gray-50 overflow-hidden hover:shadow-lg transition-shadow">
                 <div className="relative h-32 bg-gradient-to-br from-[#0e2350] to-[#08183f] flex items-center justify-center">
-                  <p.icon className="h-9 w-9 text-accent/90" />
-                  <span className="absolute bottom-2 right-2 text-[10px] uppercase tracking-wider text-white/40">Photo</span>
+                  <Icon className="h-9 w-9 text-accent/90" />
+                  <span className="absolute bottom-2 right-2 text-[10px] uppercase tracking-wider text-white/40">{t("workshops.photo")}</span>
                 </div>
                 <div className="p-5">
                   <h3 className="font-bold text-gray-900 text-sm mb-1">{p.title}</h3>
                   <p className="text-xs text-gray-600 leading-relaxed">{p.desc}</p>
                 </div>
               </motion.div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -717,11 +681,11 @@ export default function Founder() {
       <section className="bg-white py-24">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-16">
-            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">Media &amp; Press Coverage</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">In the spotlight</h2>
+            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("media.eyebrow")}</span>
+            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("media.title")}</h2>
           </motion.div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {mediaItems.map((m, i) => (
+            {mediaList.map((m, i) => (
               <motion.div key={m.title} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp} transition={{ duration: 0.5, delay: i * 0.08 }} className="rounded-3xl border border-gray-100 bg-gray-50 p-6 flex flex-col">
                 <Newspaper className="h-6 w-6 text-accent mb-4" />
                 <span className="text-[11px] font-semibold tracking-wider uppercase text-accent mb-2">{m.category}</span>
@@ -738,19 +702,22 @@ export default function Founder() {
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-16 max-w-3xl mx-auto">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900">
-              Built by Cybersecurity Professionals.<br className="hidden md:block" /> <span className="text-accent">Designed for Every Indian.</span>
+              {t("trust.titleLine1")}<br className="hidden md:block" /> <span className="text-accent">{t("trust.titleLine2")}</span>
             </h2>
           </motion.div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-5">
-            {trustCards.map((card, i) => (
+            {trustItems.map((card, i) => {
+              const Icon = trustIcons[i] ?? ShieldCheck;
+              return (
               <motion.div key={card.title} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp} transition={{ duration: 0.5, delay: i * 0.08 }} className="group rounded-3xl border border-gray-100 bg-white p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10 text-accent mb-5 group-hover:bg-accent group-hover:text-white transition-colors">
-                  <card.icon className="h-6 w-6" />
+                  <Icon className="h-6 w-6" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">{card.title}</h3>
                 <p className="text-sm text-gray-600 leading-relaxed">{card.desc}</p>
               </motion.div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
@@ -760,28 +727,28 @@ export default function Founder() {
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="flex items-end justify-between mb-12 gap-6">
             <div>
-              <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">Testimonials</span>
-              <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">What audiences say</h2>
+              <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("testimonials.eyebrow")}</span>
+              <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("testimonials.title")}</h2>
             </div>
             <div className="hidden md:flex gap-2 shrink-0">
-              <button onClick={() => scrollTestimonials(-1)} className="h-11 w-11 rounded-full border border-gray-200 flex items-center justify-center hover:border-accent hover:text-accent transition-colors" aria-label="Previous">
+              <button onClick={() => scrollTestimonials(-1)} className="h-11 w-11 rounded-full border border-gray-200 flex items-center justify-center hover:border-accent hover:text-accent transition-colors" aria-label={t("testimonials.prev")}>
                 <ChevronLeft className="h-5 w-5" />
               </button>
-              <button onClick={() => scrollTestimonials(1)} className="h-11 w-11 rounded-full border border-gray-200 flex items-center justify-center hover:border-accent hover:text-accent transition-colors" aria-label="Next">
+              <button onClick={() => scrollTestimonials(1)} className="h-11 w-11 rounded-full border border-gray-200 flex items-center justify-center hover:border-accent hover:text-accent transition-colors" aria-label={t("testimonials.next")}>
                 <ChevronRight className="h-5 w-5" />
               </button>
             </div>
           </motion.div>
           <div ref={testimonialRef} className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scroll-smooth [-ms-overflow-style:none] [scrollbar-width:none]">
-            {testimonials.map((t) => (
-              <div key={t.quote} className="snap-start shrink-0 w-[300px] md:w-[340px] rounded-3xl border border-gray-100 bg-gray-50 p-7">
+            {testimonialList.map((item) => (
+              <div key={item.quote} className="snap-start shrink-0 w-[300px] md:w-[340px] rounded-3xl border border-gray-100 bg-gray-50 p-7">
                 <div className="flex gap-1 mb-4 text-accent">
                   {Array.from({ length: 5 }).map((_, s) => (
                     <Star key={s} className="h-4 w-4 fill-current" />
                   ))}
                 </div>
-                <p className="text-gray-700 leading-relaxed mb-6">"{t.quote}"</p>
-                <p className="text-sm font-semibold text-gray-900">{t.role}</p>
+                <p className="text-gray-700 leading-relaxed mb-6">"{item.quote}"</p>
+                <p className="text-sm font-semibold text-gray-900">{item.role}</p>
               </div>
             ))}
           </div>

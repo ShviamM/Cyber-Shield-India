@@ -4,7 +4,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { AuthProvider } from "@/hooks/use-auth";
-import { legalContent } from "@/data/legalContent";
 
 // Main Pages
 import Home from "@/pages/Home";
@@ -50,76 +49,28 @@ function Router() {
 
       {/* Legal & Trust Pages */}
       <Route path="/privacy-policy">
-        {() => (
-          <GenericLegalPage
-            title="Privacy Policy"
-            description="How Netraksh collects, uses and protects your personal data under India's DPDP Act."
-            content={legalContent["privacy-policy"]}
-          />
-        )}
+        {() => <GenericLegalPage slug="privacy-policy" />}
       </Route>
       <Route path="/terms-of-service">
-        {() => (
-          <GenericLegalPage
-            title="Terms of Service"
-            description="The terms that govern your use of the Netraksh website and app."
-            content={legalContent["terms-of-service"]}
-          />
-        )}
+        {() => <GenericLegalPage slug="terms-of-service" />}
       </Route>
       <Route path="/cookie-policy">
-        {() => (
-          <GenericLegalPage
-            title="Cookie Policy"
-            description="How the Netraksh website uses cookies and similar technologies."
-            content={legalContent["cookie-policy"]}
-          />
-        )}
+        {() => <GenericLegalPage slug="cookie-policy" />}
       </Route>
       <Route path="/responsible-disclosure">
-        {() => (
-          <GenericLegalPage
-            title="Responsible Disclosure Policy"
-            description="Report security vulnerabilities to Netraksh responsibly."
-            content={legalContent["responsible-disclosure"]}
-          />
-        )}
+        {() => <GenericLegalPage slug="responsible-disclosure" />}
       </Route>
       <Route path="/data-retention-policy">
-        {() => (
-          <GenericLegalPage
-            title="Data Retention Policy"
-            description="How long Netraksh keeps your data and how to request deletion."
-            content={legalContent["data-retention-policy"]}
-          />
-        )}
+        {() => <GenericLegalPage slug="data-retention-policy" />}
       </Route>
       <Route path="/acceptable-use">
-        {() => (
-          <GenericLegalPage
-            title="Acceptable Use Policy"
-            description="How Netraksh may and may not be used."
-            content={legalContent["acceptable-use"]}
-          />
-        )}
+        {() => <GenericLegalPage slug="acceptable-use" />}
       </Route>
       <Route path="/security">
-        {() => (
-          <GenericLegalPage
-            title="Security at Netraksh"
-            description="How Netraksh protects your data and the platform."
-            content={legalContent["security"]}
-          />
-        )}
+        {() => <GenericLegalPage slug="security" />}
       </Route>
       <Route path="/compliance">
-        {() => (
-          <GenericLegalPage
-            title="Compliance & Trust"
-            description="How Netraksh aligns with the DPDP Act, IT Act and Indian law."
-            content={legalContent["compliance"]}
-          />
-        )}
+        {() => <GenericLegalPage slug="compliance" />}
       </Route>
 
       <Route component={NotFound} />

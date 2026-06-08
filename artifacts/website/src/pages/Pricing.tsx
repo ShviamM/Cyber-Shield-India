@@ -16,47 +16,23 @@ import {
 import { Check, Loader2, Shield, Users, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 
 type PaidPlan = "premium" | "family";
 
 const PLAN_META: Record<
   string,
-  { name: string; tagline: string; icon: typeof Shield; features: string[]; highlight?: boolean }
+  { icon: typeof Shield; highlight?: boolean }
 > = {
   free: {
-    name: "Free",
-    tagline: "Essential protection to get started",
     icon: Shield,
-    features: [
-      "Scam & fraud number lookup",
-      "Daily scam alerts for your city",
-      "Community fraud reports",
-      "Cyber safety knowledge centre",
-    ],
   },
   premium: {
-    name: "Premium",
-    tagline: "Full real-time protection for you",
     icon: Sparkles,
     highlight: true,
-    features: [
-      "Everything in Free",
-      "Real-time call & SMS scam screening",
-      "AI fraud analysis for messages & links",
-      "Priority scam alerts",
-      "Unlimited number checks",
-    ],
   },
   family: {
-    name: "Family",
-    tagline: "Protect your whole family",
     icon: Users,
-    features: [
-      "Everything in Premium",
-      "Cover up to 5 family members",
-      "Shared family safety dashboard",
-      "Alerts for elderly & children",
-    ],
   },
 };
 
@@ -77,6 +53,7 @@ function errorMessage(error: unknown, fallback: string): string {
 export default function Pricing() {
   const { user, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation("pricing");
   const [, setLocation] = useLocation();
 
   const [plans, setPlans] = useState<SubscriptionPlan[] | null>(null);
@@ -133,26 +110,26 @@ export default function Pricing() {
       const order = await createSubscriptionOrder({ plan });
       const payment = await openCheckout({
         order,
-        planLabel: PLAN_META[plan]?.name ?? plan,
+        planLabel: t(`plans.${plan}.name`),
         prefill: { name: user.fullName, contact: user.phone },
       });
       const status = await verifySubscriptionPayment(payment);
       setSubscription(status);
       toast({
-        title: "Payment successful",
-        description: `Your ${PLAN_META[plan]?.name ?? plan} plan is now active.`,
+        title: t("toast.paymentSuccessTitle"),
+        description: t("toast.paymentSuccessDesc", { plan: t(`plans.${plan}.name`) }),
       });
       setLocation("/account");
     } catch (error) {
-      const message = errorMessage(error, "Something went wrong. Please try again.");
+      const message = errorMessage(error, t("toast.genericError"));
       if (message === "Payment cancelled.") {
         toast({
-          title: "Payment cancelled",
-          description: "No charge was made. You can try again anytime.",
+          title: t("toast.paymentCancelledTitle"),
+          description: t("toast.paymentCancelledDesc"),
         });
       } else {
         toast({
-          title: "Payment not completed",
+          title: t("toast.paymentFailedTitle"),
           description: message,
           variant: "destructive",
         });
@@ -174,14 +151,14 @@ export default function Pricing() {
       const status = await startSubscriptionTrial({ plan });
       setSubscription(status);
       toast({
-        title: "Your 7-day free trial is active",
-        description: `Enjoy ${PLAN_META[plan]?.name ?? plan} free for 7 days — no card needed.`,
+        title: t("toast.trialStartedTitle"),
+        description: t("toast.trialStartedDesc", { plan: t(`plans.${plan}.name`) }),
       });
       setLocation("/account");
     } catch (error) {
       toast({
-        title: "Couldn't start trial",
-        description: errorMessage(error, "Please try again in a moment."),
+        title: t("toast.trialFailedTitle"),
+        description: errorMessage(error, t("toast.trialFailedDesc")),
         variant: "destructive",
       });
     } finally {
@@ -199,19 +176,17 @@ export default function Pricing() {
   return (
     <Layout>
       <SEOHead
-        title="Pricing & Plans | Netraksh"
-        description="Start a 7-day free trial of Netraksh — Premium at ₹99/year for full real-time scam protection, or Family at ₹449/year to protect up to 5 loved ones."
+        title={t("seo.title")}
+        description={t("seo.description")}
       />
       <section className="py-20 px-4 bg-gradient-to-b from-white to-gray-50">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Protection that fits your life
+              {t("hero.heading")}
             </h1>
             <p className="text-lg text-gray-600">
-              Try Premium free for 7 days — no card needed. After that, keep your
-              protection for just ₹99/year. Your plan unlocks instantly in the
-              Netraksh app on the same mobile number.
+              {t("hero.subtitle")}
             </p>
           </div>
 
@@ -227,6 +202,11 @@ export default function Pricing() {
                 const Icon = meta.icon;
                 const isCurrent = currentPlan === key;
                 const isPaid = key === "premium" || key === "family";
+                const planName = t(`plans.${key}.name`);
+                const planTagline = t(`plans.${key}.tagline`);
+                const planFeatures = t(`plans.${key}.features`, {
+                  returnObjects: true,
+                }) as string[];
 
                 const featured = !!meta.highlight;
 
@@ -241,7 +221,7 @@ export default function Pricing() {
                   >
                     {featured && (
                       <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 bg-accent text-white text-xs font-bold tracking-wide px-4 py-1.5 rounded-full shadow-lg shadow-accent/40">
-                        <Sparkles className="w-3.5 h-3.5" /> Most popular
+                        <Sparkles className="w-3.5 h-3.5" /> {t("mostPopular")}
                       </span>
                     )}
 
@@ -254,36 +234,36 @@ export default function Pricing() {
                         <Icon className="w-6 h-6" />
                       </div>
                       <h2 className={`text-xl font-bold ${featured ? "text-white" : "text-gray-900"}`}>
-                        {meta.name}
+                        {planName}
                       </h2>
                     </div>
 
                     <p className={`text-sm mb-6 ${featured ? "text-blue-100" : "text-gray-600"}`}>
-                      {meta.tagline}
+                      {planTagline}
                     </p>
 
                     <div className="mb-6">
                       {key === "free" ? (
-                        <span className="text-4xl font-bold text-gray-900">Free</span>
+                        <span className="text-4xl font-bold text-gray-900">{t("freePrice")}</span>
                       ) : (
                         <>
                           <div className="flex items-end gap-1.5">
                             <span className={`text-5xl font-extrabold tracking-tight ${featured ? "text-white" : "text-gray-900"}`}>
                               {plan ? formatPrice(plan.amount) : "—"}
                             </span>
-                            <span className={`mb-1.5 ${featured ? "text-blue-200" : "text-gray-500"}`}>/ year</span>
+                            <span className={`mb-1.5 ${featured ? "text-blue-200" : "text-gray-500"}`}>{t("perYear")}</span>
                           </div>
                           {plan && (
                             <div className="mt-3 flex flex-wrap items-center gap-2">
                               <span className={`text-sm ${featured ? "text-blue-100" : "text-gray-500"}`}>
-                                Just {monthlyEquivalent(plan.amount)}/month, billed yearly
+                                {t("monthlyEquivalent", { price: monthlyEquivalent(plan.amount) })}
                               </span>
                               <span
                                 className={`text-xs font-bold px-2 py-0.5 rounded-full ${
                                   featured ? "bg-accent text-white" : "text-green-700 bg-green-100"
                                 }`}
                               >
-                                Save 2 months
+                                {t("saveTwoMonths")}
                               </span>
                             </div>
                           )}
@@ -298,12 +278,12 @@ export default function Pricing() {
                         }`}
                       >
                         <Sparkles className={`w-4 h-4 shrink-0 ${featured ? "text-accent" : "text-green-600"}`} />
-                        <span>7-day free trial · no card needed</span>
+                        <span>{t("trialBadge")}</span>
                       </div>
                     )}
 
                     <ul className="space-y-3 mb-8 flex-1">
-                      {meta.features.map((feature) => (
+                      {planFeatures.map((feature) => (
                         <li
                           key={feature}
                           className={`flex items-start gap-3 text-sm ${featured ? "text-blue-50" : "text-gray-700"}`}
@@ -321,8 +301,8 @@ export default function Pricing() {
                         variant={featured ? "default" : "secondary"}
                       >
                         {subscription?.status === "trialing"
-                          ? "Trial active"
-                          : "Current plan"}
+                          ? t("buttons.trialActive")
+                          : t("buttons.currentPlan")}
                       </Button>
                     ) : isPaid && trialEligible ? (
                       <Button
@@ -336,7 +316,7 @@ export default function Pricing() {
                         {trialPlan === key ? (
                           <Loader2 className="w-5 h-5 animate-spin" />
                         ) : (
-                          "Start 7-day free trial"
+                          t("buttons.startTrial")
                         )}
                       </Button>
                     ) : isPaid ? (
@@ -351,12 +331,12 @@ export default function Pricing() {
                         {pendingPlan === key ? (
                           <Loader2 className="w-5 h-5 animate-spin" />
                         ) : (
-                          `Get ${meta.name}`
+                          t("buttons.getPlan", { name: planName })
                         )}
                       </Button>
                     ) : (
                       <Button disabled className="w-full h-12 rounded-xl" variant="outline">
-                        Included
+                        {t("buttons.included")}
                       </Button>
                     )}
                   </div>
@@ -366,9 +346,7 @@ export default function Pricing() {
           )}
 
           <p className="text-center text-sm text-gray-500 mt-10">
-            Your 7-day free trial needs no card. After it ends, pay once a year to keep
-            premium — there's no auto-charge. Payments are processed securely by Razorpay
-            in Indian Rupees, and you're never billed without choosing to.
+            {t("footnote")}
           </p>
         </div>
       </section>

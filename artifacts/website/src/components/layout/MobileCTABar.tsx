@@ -1,11 +1,13 @@
 import { Link, useLocation } from "wouter";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { ShieldCheck } from "lucide-react";
 
 export function MobileCTABar() {
   const [location] = useLocation();
   const [visible, setVisible] = useState(false);
+  const { t } = useTranslation("common");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,7 +35,7 @@ export function MobileCTABar() {
         >
           <Link href="/download">
             <ShieldCheck className="h-5 w-5" />
-            Download Netraksh — Free
+            {t("cta.downloadFree")}
           </Link>
         </Button>
       </div>
