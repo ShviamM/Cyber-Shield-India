@@ -1,4 +1,4 @@
-import { and, eq, ne, sql } from "drizzle-orm";
+import { and, eq, ne, lte, or, isNull, sql } from "drizzle-orm";
 import {
   db,
   subscriptionsTable,
@@ -253,16 +253,32 @@ export class TrialActionError extends Error {
  * Guard: a currently-paying subscriber must never be silently downgraded to a
  * trial. Refuse trial grants/resets while a paid plan is still active.
  */
+const ACTIVE_SUBSCRIBER_ERROR = new TrialActionError(
+  "active_subscriber",
+  "This user has an active paid subscription. Manage their plan instead of granting a trial.",
+);
+
 function assertNotActivePaid(row: Subscription | undefined): void {
   if (!row) return;
   const liveEnd =
     row.currentPeriodEnd != null && row.currentPeriodEnd.getTime() > Date.now();
   if (isPaidPlan(row.plan) && row.status === "active" && liveEnd) {
-    throw new TrialActionError(
-      "active_subscriber",
-      "This user has an active paid subscription. Manage their plan instead of granting a trial.",
-    );
+    throw ACTIVE_SUBSCRIBER_ERROR;
   }
+}
+
+/**
+ * SQL guard that matches rows which are NOT a live, active, paid subscription.
+ * Used in admin trial writes so a paid activation landing between our read and
+ * write (e.g. a payment webhook firing concurrently) cannot be clobbered.
+ */
+function notActivePaidCondition(now: Date) {
+  return or(
+    eq(subscriptionsTable.plan, "free"),
+    ne(subscriptionsTable.status, "active"),
+    isNull(subscriptionsTable.currentPeriodEnd),
+    lte(subscriptionsTable.currentPeriodEnd, now),
+  );
 }
 
 /**
@@ -314,7 +330,7 @@ export async function adminGrantTrial(params: {
   newEnd.setDate(newEnd.getDate() + params.days);
 
   if (existing) {
-    await db
+    const [updated] = await db
       .update(subscriptionsTable)
       .set({
         plan: params.plan,
@@ -325,7 +341,15 @@ export async function adminGrantTrial(params: {
         trialStartedAt: existing.trialStartedAt ?? now,
         updatedAt: now,
       })
-      .where(eq(subscriptionsTable.id, existing.id));
+      .where(
+        and(
+          eq(subscriptionsTable.id, existing.id),
+          notActivePaidCondition(now),
+        ),
+      )
+      .returning();
+    // The guard failed: a paid activation landed between our read and write.
+    if (!updated) throw ACTIVE_SUBSCRIBER_ERROR;
   } else {
     await db
       .insert(subscriptionsTable)
@@ -369,7 +393,8 @@ export async function adminResetTrial(userId: string): Promise<{
   const previousEnd = existing?.currentPeriodEnd ?? null;
 
   if (existing) {
-    await db
+    const now = new Date();
+    const [updated] = await db
       .update(subscriptionsTable)
       .set({
         plan: "free",
@@ -378,9 +403,17 @@ export async function adminResetTrial(userId: string): Promise<{
         currentPeriodEnd: null,
         cancelAtPeriodEnd: false,
         trialStartedAt: null,
-        updatedAt: new Date(),
+        updatedAt: now,
       })
-      .where(eq(subscriptionsTable.id, existing.id));
+      .where(
+        and(
+          eq(subscriptionsTable.id, existing.id),
+          notActivePaidCondition(now),
+        ),
+      )
+      .returning();
+    // The guard failed: a paid activation landed between our read and write.
+    if (!updated) throw ACTIVE_SUBSCRIBER_ERROR;
   }
 
   const effective = await getEffectiveSubscription(userId);

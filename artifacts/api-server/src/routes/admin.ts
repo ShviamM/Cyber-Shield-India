@@ -37,13 +37,14 @@ import { toAdminReportDto } from "../lib/dto";
 import { recomputeReputation, setVerifiedScam } from "../lib/reputation";
 import { PLANS, monthlyAmount } from "../lib/plans";
 import { resolveState } from "../lib/states";
-import { requireAdmin } from "../middlewares/auth";
+import { requirePermission } from "../middlewares/auth";
+import { PERMISSIONS } from "../lib/rbac";
 
 const router: IRouter = Router();
 
 const VISIBLE_REPORT_STATUSES = ["pending", "verified"] as const;
 
-router.get("/admin/stats", requireAdmin, async (_req, res) => {
+router.get("/admin/stats", requirePermission(PERMISSIONS.VIEW_DASHBOARD), async (_req, res) => {
   const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
   const [
@@ -92,7 +93,7 @@ router.get("/admin/stats", requireAdmin, async (_req, res) => {
   res.json(response);
 });
 
-router.get("/admin/reports", requireAdmin, async (req, res) => {
+router.get("/admin/reports", requirePermission(PERMISSIONS.MODERATE_REPORTS), async (req, res) => {
   const query = AdminListReportsQueryParams.parse(req.query);
 
   const conditions = [];
@@ -145,7 +146,7 @@ router.get("/admin/reports", requireAdmin, async (req, res) => {
   res.json(response);
 });
 
-router.patch("/admin/reports/:id", requireAdmin, async (req, res) => {
+router.patch("/admin/reports/:id", requirePermission(PERMISSIONS.MODERATE_REPORTS), async (req, res) => {
   const params = AdminUpdateReportParams.parse(req.params);
   const body = AdminUpdateReportBody.parse(req.body);
 
@@ -185,7 +186,7 @@ router.patch("/admin/reports/:id", requireAdmin, async (req, res) => {
   res.json(response);
 });
 
-router.post("/admin/numbers/:phone/verify", requireAdmin, async (req, res) => {
+router.post("/admin/numbers/:phone/verify", requirePermission(PERMISSIONS.MANAGE_NUMBERS), async (req, res) => {
   const params = AdminVerifyNumberParams.parse(req.params);
   const body = AdminVerifyNumberBody.parse(req.body);
 
@@ -208,7 +209,7 @@ router.post("/admin/numbers/:phone/verify", requireAdmin, async (req, res) => {
   res.json(response);
 });
 
-router.get("/admin/business-metrics", requireAdmin, async (_req, res) => {
+router.get("/admin/business-metrics", requirePermission(PERMISSIONS.VIEW_BUSINESS_METRICS), async (_req, res) => {
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const in30Days = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
@@ -322,7 +323,7 @@ router.get("/admin/business-metrics", requireAdmin, async (_req, res) => {
   res.json(response);
 });
 
-router.get("/admin/trials", requireAdmin, async (_req, res) => {
+router.get("/admin/trials", requirePermission(PERMISSIONS.VIEW_BUSINESS_METRICS), async (_req, res) => {
   const now = new Date();
 
   const rows = await db
@@ -361,7 +362,7 @@ router.get("/admin/trials", requireAdmin, async (_req, res) => {
   res.json(response);
 });
 
-router.get("/admin/fraud-map", requireAdmin, async (_req, res) => {
+router.get("/admin/fraud-map", requirePermission(PERMISSIONS.VIEW_FRAUD_MAP), async (_req, res) => {
   // Real user reports only — no seeded baseline.
   const liveRows = await db
     .select({ city: fraudReportsTable.city, value: count() })
@@ -410,7 +411,7 @@ function toBroadcastDto(row: DbBroadcast): Broadcast {
   };
 }
 
-router.get("/admin/broadcasts", requireAdmin, async (_req, res) => {
+router.get("/admin/broadcasts", requirePermission(PERMISSIONS.SEND_BROADCASTS), async (_req, res) => {
   const rows = await db
     .select()
     .from(broadcastsTable)
@@ -420,7 +421,7 @@ router.get("/admin/broadcasts", requireAdmin, async (_req, res) => {
   res.json(response);
 });
 
-router.post("/admin/broadcasts", requireAdmin, async (req, res) => {
+router.post("/admin/broadcasts", requirePermission(PERMISSIONS.SEND_BROADCASTS), async (req, res) => {
   const admin = req.user!;
   const body = AdminSendBroadcastBody.parse(req.body);
   const title = body.title.trim();
