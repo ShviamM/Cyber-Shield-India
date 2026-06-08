@@ -430,6 +430,48 @@ export default function Founder() {
         </motion.div>
       </section>
 
+      {/* In Conversation with Leaders */}
+      <section className="bg-gray-50 py-24">
+        <div className="container mx-auto px-4 md:px-6 max-w-6xl">
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-14">
+            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("leaders.eyebrow")}</span>
+            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("leaders.title")}</h2>
+            <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">{t("leaders.subtitle")}</p>
+          </motion.div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {leaderItems.map((leader, i) => (
+              <motion.div
+                key={leader.name}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, margin: "-60px" }}
+                variants={fadeUp}
+                transition={{ duration: 0.55, delay: i * 0.12 }}
+                className="group flex flex-col overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-accent/30"
+              >
+                <div className="relative aspect-[4/3] overflow-hidden bg-[#08183f]">
+                  <img
+                    src={leaderImages[i]}
+                    alt={leader.alt}
+                    loading="lazy"
+                    className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.04]"
+                  />
+                  <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/55 to-transparent" />
+                </div>
+                <div className="flex flex-1 flex-col p-6">
+                  <div className="inline-flex items-center gap-2 self-start rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold tracking-[0.12em] uppercase text-accent">
+                    <Handshake className="h-3.5 w-3.5" />
+                    {leader.role}
+                  </div>
+                  <h3 className="mt-3 text-xl font-bold text-gray-900">{leader.name}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-gray-600">{leader.blurb}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Impact counters */}
       <section className="bg-white py-20">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
@@ -542,48 +584,6 @@ export default function Founder() {
               </motion.div>
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      {/* In Conversation with Leaders */}
-      <section className="bg-white py-24">
-        <div className="container mx-auto px-4 md:px-6 max-w-6xl">
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-14">
-            <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("leaders.eyebrow")}</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("leaders.title")}</h2>
-            <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">{t("leaders.subtitle")}</p>
-          </motion.div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {leaderItems.map((leader, i) => (
-              <motion.div
-                key={leader.name}
-                initial="hidden"
-                whileInView="show"
-                viewport={{ once: true, margin: "-60px" }}
-                variants={fadeUp}
-                transition={{ duration: 0.55, delay: i * 0.12 }}
-                className="group flex flex-col overflow-hidden rounded-3xl border border-gray-100 bg-gray-50 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-accent/30"
-              >
-                <div className="relative aspect-[4/3] overflow-hidden bg-[#08183f]">
-                  <img
-                    src={leaderImages[i]}
-                    alt={leader.alt}
-                    loading="lazy"
-                    className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.04]"
-                  />
-                  <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/55 to-transparent" />
-                </div>
-                <div className="flex flex-1 flex-col p-6">
-                  <div className="inline-flex items-center gap-2 self-start rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold tracking-[0.12em] uppercase text-accent">
-                    <Handshake className="h-3.5 w-3.5" />
-                    {leader.role}
-                  </div>
-                  <h3 className="mt-3 text-xl font-bold text-gray-900">{leader.name}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-gray-600">{leader.blurb}</p>
-                </div>
-              </motion.div>
-            ))}
           </div>
         </div>
       </section>
