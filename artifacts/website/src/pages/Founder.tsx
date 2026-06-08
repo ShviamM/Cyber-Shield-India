@@ -12,6 +12,7 @@ import bookTrailer from "@assets/DigitalDhokha_BookTrailer_web_24s.mp4";
 import leaderMahana from "@assets/Satish_Mahana_-_Loksabha_Speaker_Uttar_Pradesh_1780923550200.jpeg";
 import leaderKapoor from "@assets/Sanjay_Kapoor_Cricket_Association_Kanpur_1780923623980.jpeg";
 import leaderVishwakarma from "@assets/Add_SP_Anjali_Vishkarma_Cyber_1780923818911.jpeg";
+import leaderJitendra from "@assets/Jitendra_Pratap_DM_Kanpur.jpg";
 import {
   ShieldCheck,
   Brain,
@@ -86,8 +87,8 @@ const achievementMeta = [
   { no: "03", icon: Globe2 },
 ];
 
-const leaderImages = [leaderMahana, leaderKapoor, leaderVishwakarma];
-const leaderImagePositions = ["object-top", "object-top", "object-[center_33%]"];
+const leaderImages = [leaderMahana, leaderKapoor, leaderVishwakarma, leaderJitendra];
+const leaderImagePositions = ["object-top", "object-top", "object-[center_33%]", "object-top"];
 
 const serviceIcons = [Presentation, School, Building2, Flag, Mic, ShieldCheck, Handshake];
 
@@ -439,7 +440,7 @@ export default function Founder() {
             <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("leaders.title")}</h2>
             <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">{t("leaders.subtitle")}</p>
           </motion.div>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {leaderItems.map((leader, i) => (
               <motion.div
                 key={leader.name}

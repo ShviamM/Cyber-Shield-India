@@ -115,6 +115,13 @@ export default {
           "We discussed the sharp rise in cyber crime, getting help to victims faster, and how the police and the public can work together so frauds are reported early and the people behind them are caught.",
         alt: "Shivam Malaviya presenting his book Digital Dhokha to Anjali Vishwakarma, IPS, Additional SP Cyber",
       },
+      {
+        name: "Jitendra Pratap",
+        role: "District Magistrate, Kanpur",
+        blurb:
+          "I called on the District Magistrate of Kanpur to talk about taking cyber safety awareness to every part of the district, and how the administration can help citizens stay alert to online fraud. It was a warm and encouraging meeting.",
+        alt: "Shivam Malaviya meeting Jitendra Pratap, District Magistrate of Kanpur",
+      },
     ],
   },
   gallery: {
