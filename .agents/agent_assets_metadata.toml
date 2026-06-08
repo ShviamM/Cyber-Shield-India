@@ -131,3 +131,9 @@ id = "5wdJD8t2h1t2fRLG3b1dj"
 uri = "file://NETRAKSH_PRELAUNCH_AUDIT.md"
 type = "text"
 title = "Netraksh — Pre-Launch Audit & Play Store Readiness Report"
+
+[[outputs]]
+id = "bUyF3tnkgG58ZjfNEOWrm"
+uri = "file://.local/qr/expo-tunnel.png"
+type = "image"
+title = "Scan this with iPhone Camera to open Netraksh in Expo Go"
