@@ -450,7 +450,8 @@ export const AdminBusinessMetricsResponse = zod.object({
   "familiesProtected": zod.number().describe('Active family-plan subscriptions (one per protected family).'),
   "renewalsDue": zod.number().describe('Active paid subscriptions renewing in the next 30 days.'),
   "newSubscriptions": zod.number().describe('Paid subscriptions started in the last 30 days.'),
-  "activeTrials": zod.number().describe('Members currently on a non-expired free trial.')
+  "activeTrials": zod.number().describe('Members currently on a non-expired free trial.'),
+  "totalUsers": zod.number().describe('All registered users, including those who never started a trial.')
 })
 
 
@@ -466,6 +467,26 @@ export const AdminListTrialsResponse = zod.object({
   "plan": zod.string(),
   "trialStartedAt": zod.coerce.date().nullish(),
   "currentPeriodEnd": zod.coerce.date().nullish(),
+  "createdAt": zod.coerce.date()
+})),
+  "total": zod.number()
+})
+
+
+/**
+ * Every registered user, including older accounts that never started a trial or subscription, with their current plan and subscription status (if any). Newest registrations first.
+ * @summary List all registered users
+ */
+export const AdminListUsersResponse = zod.object({
+  "users": zod.array(zod.object({
+  "id": zod.string(),
+  "fullName": zod.string(),
+  "phone": zod.string(),
+  "location": zod.string().nullish(),
+  "isAdmin": zod.boolean(),
+  "status": zod.string(),
+  "plan": zod.string().nullish().describe('Current subscription plan, or null if the user never subscribed.'),
+  "subscriptionStatus": zod.string().nullish().describe('Current subscription status, or null if the user has no subscription.'),
   "createdAt": zod.coerce.date()
 })),
   "total": zod.number()

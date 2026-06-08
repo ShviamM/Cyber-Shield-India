@@ -29,6 +29,7 @@ import {
   type FraudMapState,
   type NumberReputation,
   type TrialListResponse as TrialList,
+  type UserListResponse as UserList,
 } from "@workspace/api-zod";
 import { sendExpoPush } from "../lib/expo-push";
 import { normalizeIndianPhone } from "../lib/phone";
@@ -246,6 +247,7 @@ router.get("/admin/business-metrics", requireAdmin, async (_req, res) => {
     [renewalsRow],
     [newSubsRow],
     [trialsRow],
+    [totalUsersRow],
   ] = await Promise.all([
     db
       .select({ value: sql<string>`coalesce(sum(${paymentsTable.amount}), 0)` })
@@ -292,6 +294,7 @@ router.get("/admin/business-metrics", requireAdmin, async (_req, res) => {
       .select({ value: count() })
       .from(subscriptionsTable)
       .where(and(eq(subscriptionsTable.status, "trialing"), notExpired)),
+    db.select({ value: count() }).from(usersTable),
   ]);
 
   const planCount = (
@@ -315,6 +318,7 @@ router.get("/admin/business-metrics", requireAdmin, async (_req, res) => {
     renewalsDue: Number(renewalsRow?.value ?? 0),
     newSubscriptions: Number(newSubsRow?.value ?? 0),
     activeTrials: Number(trialsRow?.value ?? 0),
+    totalUsers: Number(totalUsersRow?.value ?? 0),
   };
   res.json(response);
 });
@@ -351,6 +355,40 @@ router.get("/admin/trials", requireAdmin, async (_req, res) => {
       plan: r.plan,
       trialStartedAt: r.trialStartedAt,
       currentPeriodEnd: r.currentPeriodEnd,
+      createdAt: r.createdAt,
+    })),
+    total: rows.length,
+  };
+  res.json(response);
+});
+
+router.get("/admin/users", requireAdmin, async (_req, res) => {
+  const rows = await db
+    .select({
+      id: usersTable.id,
+      fullName: usersTable.fullName,
+      phone: usersTable.phone,
+      location: usersTable.location,
+      isAdmin: usersTable.isAdmin,
+      status: usersTable.status,
+      plan: subscriptionsTable.plan,
+      subscriptionStatus: subscriptionsTable.status,
+      createdAt: usersTable.createdAt,
+    })
+    .from(usersTable)
+    .leftJoin(subscriptionsTable, eq(subscriptionsTable.userId, usersTable.id))
+    .orderBy(desc(usersTable.createdAt));
+
+  const response: UserList = {
+    users: rows.map((r) => ({
+      id: r.id,
+      fullName: r.fullName,
+      phone: r.phone,
+      location: r.location,
+      isAdmin: r.isAdmin,
+      status: r.status,
+      plan: r.plan,
+      subscriptionStatus: r.subscriptionStatus,
       createdAt: r.createdAt,
     })),
     total: rows.length,

@@ -25,4 +25,6 @@ export interface BusinessMetrics {
   newSubscriptions: number;
   /** Members currently on a non-expired free trial. */
   activeTrials: number;
+  /** All registered users, including those who never started a trial. */
+  totalUsers: number;
 }

@@ -549,6 +549,27 @@ paths:
         default:
           $ref: "#/components/responses/Error"
 
+  /admin/users:
+    get:
+      operationId: adminListUsers
+      tags: [admin]
+      summary: List all registered users
+      description: >-
+        Every registered user, including older accounts that never started a
+        trial or subscription, with their current plan and subscription status
+        (if any). Newest registrations first.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Registered users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserListResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
   /admin/fraud-map:
     get:
       operationId: adminFraudMap
@@ -1313,6 +1334,9 @@ components:
         activeTrials:
           type: integer
           description: Members currently on a non-expired free trial.
+        totalUsers:
+          type: integer
+          description: All registered users, including those who never started a trial.
       required:
         - revenuePaise
         - revenueThisMonthPaise
@@ -1324,6 +1348,7 @@ components:
         - renewalsDue
         - newSubscriptions
         - activeTrials
+        - totalUsers
 
     Trial:
       type: object
@@ -1365,6 +1390,54 @@ components:
           type: integer
       required:
         - trials
+        - total
+
+    RegisteredUser:
+      type: object
+      properties:
+        id:
+          type: string
+        fullName:
+          type: string
+        phone:
+          type: string
+        location:
+          type: string
+          nullable: true
+        isAdmin:
+          type: boolean
+        status:
+          type: string
+        plan:
+          type: string
+          nullable: true
+          description: Current subscription plan, or null if the user never subscribed.
+        subscriptionStatus:
+          type: string
+          nullable: true
+          description: Current subscription status, or null if the user has no subscription.
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - fullName
+        - phone
+        - isAdmin
+        - status
+        - createdAt
+
+    UserListResponse:
+      type: object
+      properties:
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/RegisteredUser"
+        total:
+          type: integer
+      required:
+        - users
         - total
 
     SuperAdminOverview:

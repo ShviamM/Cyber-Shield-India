@@ -1,4 +1,4 @@
-import { IndianRupee, TrendingUp, CreditCard, RefreshCw, Users2, Crown, UserPlus, CalendarClock, Gift } from "lucide-react";
+import { IndianRupee, TrendingUp, CreditCard, RefreshCw, Users2, Crown, UserPlus, CalendarClock, Gift, Users } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -8,6 +8,8 @@ import {
   getAdminBusinessMetricsQueryKey,
   useAdminListTrials,
   getAdminListTrialsQueryKey,
+  useAdminListUsers,
+  getAdminListUsersQueryKey,
 } from "@workspace/api-client-react";
 
 function formatRupees(paise: number): string {
@@ -43,6 +45,10 @@ export default function BusinessMetrics() {
     query: { queryKey: getAdminListTrialsQueryKey() },
   });
   const trials = trialsData?.trials ?? [];
+  const { data: usersData, isLoading: usersLoading } = useAdminListUsers({
+    query: { queryKey: getAdminListUsersQueryKey() },
+  });
+  const users = usersData?.users ?? [];
 
   const headlineCards: {
     label: string;
@@ -92,6 +98,7 @@ export default function BusinessMetrics() {
     icon: LucideIcon;
     format: (v: number) => string;
   }[] = [
+    { label: "Registered Users", value: data?.totalUsers, icon: Users, format: formatCount },
     { label: "Active Trials", value: data?.activeTrials, icon: Gift, format: formatCount },
     { label: "Premium Members", value: data?.premiumSubscriptions, icon: Crown, format: formatCount },
     { label: "Families Protected", value: data?.familiesProtected, icon: Users2, format: formatCount },
@@ -215,6 +222,80 @@ export default function BusinessMetrics() {
                             {daysLeft(t.currentPeriodEnd)}
                           </span>
                         </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className="mt-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+            Registered Users
+          </h2>
+          {!usersLoading && (
+            <span className="text-xs text-muted-foreground">
+              {formatCount(users.length)} total
+            </span>
+          )}
+        </div>
+        <Card>
+          <CardContent className="p-0">
+            {usersLoading ? (
+              <div className="p-5 space-y-3">
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-2/3" />
+              </div>
+            ) : users.length === 0 ? (
+              <div className="p-8 text-center">
+                <Users className="w-8 h-8 text-muted-foreground/50 mx-auto mb-3" />
+                <p className="text-sm font-medium">No registered users</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Everyone who signs up on the website or app appears here, whether or not they start a trial.
+                </p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b text-left text-xs uppercase tracking-wider text-muted-foreground">
+                      <th className="px-4 py-3 font-medium">Name</th>
+                      <th className="px-4 py-3 font-medium">Phone</th>
+                      <th className="px-4 py-3 font-medium">Location</th>
+                      <th className="px-4 py-3 font-medium">Plan</th>
+                      <th className="px-4 py-3 font-medium">Subscription</th>
+                      <th className="px-4 py-3 font-medium">Registered</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.map((u) => (
+                      <tr key={u.id} className="border-b last:border-0 hover:bg-muted/40">
+                        <td className="px-4 py-3 font-medium">
+                          {u.fullName || "—"}
+                          {u.isAdmin && (
+                            <span className="ml-2 inline-flex items-center rounded-full bg-[#FF6713]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[#FF6713]">
+                              Admin
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 tabular-nums text-muted-foreground">{u.phone}</td>
+                        <td className="px-4 py-3 text-muted-foreground">{u.location || "—"}</td>
+                        <td className="px-4 py-3 capitalize">{u.plan ?? "—"}</td>
+                        <td className="px-4 py-3">
+                          {u.subscriptionStatus ? (
+                            <span className="inline-flex items-center rounded-full bg-[#0B3D91]/10 px-2.5 py-0.5 text-xs font-medium capitalize text-[#0B3D91]">
+                              {u.subscriptionStatus}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">No subscription</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-muted-foreground">{formatDate(u.createdAt)}</td>
                       </tr>
                     ))}
                   </tbody>

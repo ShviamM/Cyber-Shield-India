@@ -207,6 +207,8 @@ export interface BusinessMetrics {
   newSubscriptions: number;
   /** Members currently on a non-expired free trial. */
   activeTrials: number;
+  /** All registered users, including those who never started a trial. */
+  totalUsers: number;
 }
 
 export interface Trial {
@@ -221,6 +223,25 @@ export interface Trial {
 
 export interface TrialListResponse {
   trials: Trial[];
+  total: number;
+}
+
+export interface RegisteredUser {
+  id: string;
+  fullName: string;
+  phone: string;
+  location?: string | null;
+  isAdmin: boolean;
+  status: string;
+  /** Current subscription plan, or null if the user never subscribed. */
+  plan?: string | null;
+  /** Current subscription status, or null if the user has no subscription. */
+  subscriptionStatus?: string | null;
+  createdAt: string;
+}
+
+export interface UserListResponse {
+  users: RegisteredUser[];
   total: number;
 }
 
