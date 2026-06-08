@@ -22,6 +22,16 @@ Hard constraints (still true):
 - `restart_workflow` SIGKILLs Metro when readiness fails — but with the probe removed, restart now succeeds and leaves Metro running.
 - Manual `expo start` (nohup/setsid/bg) is killed by an env guardrail (bash exit **143**); never run expo directly. Use restart_workflow + read the log/curl localhost:PORT/status.
 
+## "Failed to parse manifest JSON" on a real phone — FIX: tunnel mode
+
+Symptom: scanning the Expo QR (from Metro logs OR Replit's URL-bar menu) on a physical phone fails with **"Failed to parse manifest JSON / data isn't in the correct format."**
+
+**Root cause:** the dev script forced the manifest URL to the public Expo domain (`EXPO_PACKAGER_PROXY_URL=https://$REPLIT_EXPO_DEV_DOMAIN` + `--localhost` + `REACT_NATIVE_PACKAGER_HOSTNAME`). That `*.expo.pike.replit.dev` domain is gated by Replit's `__replshield` → returns `307`/HTML to the unauthenticated phone, so Expo Go parses HTML as JSON and fails. Metro's manifest itself is fine (`localhost:PORT/` → `200 application/expo+json`). The main `*.pike.replit.dev` is public but does NOT proxy to Metro (path `/kavach-ai/` → 404), so there is no usable public Replit URL.
+
+**Fix that worked:** switch the `dev` script to **Expo tunnel mode** (ngrok). In `artifacts/kavach-ai/package.json` set: `EXPO_PUBLIC_DOMAIN=$REPLIT_DEV_DOMAIN EXPO_PUBLIC_REPL_ID=$REPL_ID pnpm exec expo start --tunnel --port $PORT`. **Must remove** `EXPO_PACKAGER_PROXY_URL`, `REACT_NATIVE_PACKAGER_HOSTNAME`, and `--localhost` — otherwise they override the tunnel URL. `@expo/ngrok` is already a devDependency. After restart the log shows `Tunnel ready` + `exp://<sub>.exp.direct`; verified `curl https://<sub>.exp.direct/` → `200 application/expo+json`. That public URL bypasses the shield, so iOS/Android Expo Go connect.
+
+**Trade-off:** tunnel mode changes the manifest host away from the Replit expo domain, so the in-workspace preview pane / canvas iframe for the app may stop rendering (it expects the expo-domain routing). Revert the `dev` script to the `--localhost` + `EXPO_PACKAGER_PROXY_URL` form to restore the in-workspace preview. Tunnel is for physical-device testing; the embedded preview is for in-browser. You can't have both from one Metro instance.
+
 ## Expo SDK patch drift after a task merge
 
 Merges that add Expo native modules can leave `expo`/`expo-font`/`expo-router` (etc.) at patch versions Metro warns about ("The following packages should be updated… your project may not work correctly"). Fix by bumping the pins in `artifacts/kavach-ai/package.json` to the SDK-expected versions and `pnpm --filter @workspace/kavach-ai install`. This clears the warning but does **not** change the "failed" badge (that's the readiness-probe issue above).
