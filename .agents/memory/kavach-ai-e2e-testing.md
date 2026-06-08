@@ -9,16 +9,18 @@ The Playwright testing harness (`runTest`) cannot reach the kavach-ai Expo mobil
 
 **How to apply:** For visual verification of the Expo app, use the `screenshot` tool (type `app_preview`, artifact_dir_name `kavach-ai`) — it reaches the Expo dev domain correctly. It can't get past the phone+OTP login gate non-interactively, so for auth-gated mobile screens rely on: typecheck + a clean Metro bundle (a bad asset `require` path throws a bundling error) rather than runTest. Don't burn cycles retrying runTest against the Expo app.
 
-## Expo workflow shows "failed" but Metro is actually fine
+## Expo workflow shows "failed" — FIX: drop ensurePreviewReachable
 
-The `artifacts/kavach-ai: expo` workflow almost always shows **failed** even when Metro is healthy. The artifact uses `router = "expo-domain"` + `ensurePreviewReachable = "/status"`; that readiness probe goes through the Cloudflare-protected Expo dev domain, which blocks automated requests (the `screenshot`/external-URL tools also get a Cloudflare "you have been blocked" 403). The probe failing is a **false-negative**, not an app crash.
+Symptom: `artifacts/kavach-ai: expo` shows **failed** even though Metro is healthy (clean log, valid QR), and `restart_workflow` then tears Metro down (no process/socket afterward).
 
-**Do NOT chase this as a bug.** Confirm health instead by reading the workflow log: a healthy start reaches the QR + `Metro waiting on exp://…` + `Web is waiting on http://localhost:<PORT>` idle banner with no error after. That means real devices can scan the QR in Expo Go.
+**Root cause (diagnosed by curl):** the artifact had `router = "expo-domain"` + `ensurePreviewReachable = "/status"`. That readiness probe is checked against the **public Expo dev domain** `*.expo.pike.replit.dev`, which `307`-redirects to `https://replit.com/__replshield` (Replit's access shield) instead of `200`. The probe never gets 200 → workflow marked failed → process killed. The *main* dev domain `*.pike.replit.dev` returns 200 (it's public + the other artifacts probe via the internal localhost proxy), so only Expo — which uniquely probes the shielded public domain — fails.
 
-Hard constraints learned the hard way (don't repeat):
-- `restart_workflow` **SIGKILLs Metro when its readiness probe fails**, so right after a failed restart there is no process/socket on the port. You cannot keep Metro alive from the agent side via restart_workflow to poll/curl it.
-- Manual `expo start` (nohup/setsid/background) is killed by an env guardrail (bash exits **143**, often with no output) because it binds the workflow's reserved port. The expo skill's "never run expo directly" rule is enforced. So you cannot manually run Metro to inspect it either.
-- Net: don't try to curl/ss the port to prove it works — rely on the log banner + typecheck.
+**Fix (worked):** remove the `ensurePreviewReachable = "/status"` line from the expo service in `.replit-artifact/artifact.toml` via `verifyAndReplaceArtifactToml` (keep `router`, `paths`, `localPort`). Readiness then = "process started," so the workflow stays **running** and Metro persists. Verified after: state `running`, `curl localhost:25528/status` → `200 packager-status:running`. The QR-based preview routing (driven by `router`/`paths`, not the probe) is unaffected.
+**Why this is correct for Expo:** the mobile preview is a QR/`exp://` connection, not an embedded HTTP iframe, so an HTTP-200 reachability gate on the dev domain is the wrong health signal for this artifact.
+
+Hard constraints (still true):
+- `restart_workflow` SIGKILLs Metro when readiness fails — but with the probe removed, restart now succeeds and leaves Metro running.
+- Manual `expo start` (nohup/setsid/bg) is killed by an env guardrail (bash exit **143**); never run expo directly. Use restart_workflow + read the log/curl localhost:PORT/status.
 
 ## Expo SDK patch drift after a task merge
 
