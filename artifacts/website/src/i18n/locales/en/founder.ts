@@ -92,27 +92,27 @@ export default {
     eyebrow: "Conversations on Cyber Safety",
     title: "In conversation with leaders",
     subtitle:
-      "From the floor of the Legislative Assembly to police cyber cells, Shivam Malaviya meets policymakers, administrators, and law enforcement to discuss strengthening India's fight against cyber crime — sharing his book Digital Dhokha along the way.",
+      "Shivam often sits down with policymakers, administrators, and police officers to talk about keeping ordinary Indians safe from cyber fraud, and to share his book, Digital Dhokha.",
     items: [
       {
         name: "Satish Mahana",
         role: "Speaker, U.P. Legislative Assembly",
         blurb:
-          "A discussion on carrying cyber crime awareness to the grassroots, and the role public policy and institutions can play in protecting ordinary citizens from digital fraud — accompanied by a copy of Digital Dhokha.",
+          "We had a warm conversation about taking cyber safety awareness to every district of the state, and how our public institutions can help shield ordinary citizens from online fraud. I was glad to share my book, Digital Dhokha, with him.",
         alt: "Shivam Malaviya presenting his book Digital Dhokha to Satish Mahana, Speaker of the Uttar Pradesh Legislative Assembly",
       },
       {
-        name: "Sanjay Kapoor",
+        name: "Dr Sanjay Kapoor",
         role: "Chairman, Kanpur Cricket Association",
         blurb:
-          "Exploring how sporting bodies and community networks can become powerful channels for cyber safety awareness, helping fans, players, and families recognise and resist online scams.",
-        alt: "Shivam Malaviya presenting his book Digital Dhokha to Sanjay Kapoor, long-serving Chairman of the Kanpur Cricket Association",
+          "We talked about how cricket associations and community groups can carry the message of cyber safety to fans, young players, and their families. It was wonderful to see such genuine interest in protecting people from online scams.",
+        alt: "Shivam Malaviya presenting his book Digital Dhokha to Dr Sanjay Kapoor, long-serving Chairman of the Kanpur Cricket Association",
       },
       {
         name: "Anjali Vishwakarma, IPS",
         role: "Additional SP, Cyber Crime",
         blurb:
-          "A conversation on the rising tide of cyber crime, faster support for victims, and closer police–citizen collaboration to report fraud early and bring offenders to book.",
+          "We discussed the sharp rise in cyber crime, getting help to victims faster, and how the police and the public can work together so frauds are reported early and the people behind them are caught.",
         alt: "Shivam Malaviya presenting his book Digital Dhokha to Anjali Vishwakarma, IPS, Additional SP Cyber",
       },
     ],
