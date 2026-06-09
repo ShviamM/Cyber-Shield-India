@@ -1,0 +1,24 @@
+# NOTE: When this file exists, EAS Build ignores .gitignore entirely,
+# so these patterns must replicate .gitignore PLUS the extra exclusions.
+
+# --- replicated from .gitignore ---
+node_modules
+dist
+tmp
+out-tsc
+*.tsbuildinfo
+.expo
+.expo-shared
+coverage
+/typings
+.cache/
+.local/
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- large assets not needed to build the mobile app (~260 MB) ---
+exports/
+attached_assets/
+**/public/videos/
