@@ -1,59 +1,55 @@
 ---
-name: KavachAI Truecaller-style call overlay
-description: How the incoming-call "pop" overlay is built; privacy stance is now live server lookup (reversed)
+name: KavachAI incoming-call alert (React screen, not native card)
+description: On a real incoming call the native service launches the React call-alert.tsx screen; reputation is fetched in JS, not Kotlin
 ---
 
-# Incoming-call overlay (Truecaller-style "pop")
+# Incoming-call alert — now a React screen
 
-A WindowManager `TYPE_APPLICATION_OVERLAY` card shown for EVERY incoming call.
-Lives in `KavachCallOverlay.kt`, triggered from
-`KavachCallScreeningService.onScreenCall`.
+On a real incoming call the native `CallScreeningService` no longer draws a Kotlin
+overlay card. It launches the full React screen `app/call-alert.tsx` (the same one
+the home-screen DEMO button opens) over the lock screen via deep link
+`kavach-ai://call-alert?number=<urlencoded>`.
 
-**Privacy stance — REVERSED to live lookup (user opt-in):**
-- The earlier "on-device only, never send the caller number" rule was overturned
-  by an explicit user choice ("Live lookup (Truecaller-style)"). The service now
-  sends the caller's 10-digit number to `GET {apiBase}/api/numbers/{ten}/check`
-  to fetch real `reportCount / riskLevel / verifiedScam / categories`.
-- **Why:** the rich red demo card needs real reputation data; the user accepted
-  that numbers leave the device. Don't silently revert to on-device-only.
-- The card shows on-device info instantly, then `update()` swaps it in place once
-  the network result arrives (guarded by `currentNumber` so a dismissed/stale
-  card isn't repainted).
-- **Auth token matters:** the endpoint is freemium-quota'd for anonymous callers
-  but UNLIMITED with a bearer token. JS syncs base+token into `ScreeningStore`
-  (`syncScreeningApiConfig` → `setApiConfig`) from `_layout.tsx` (on auth change)
-  and `screening.tsx` (focus + enable). The service has no JS bridge, so it makes
-  its own `HttpURLConnection` GET on a daemon thread (4s timeouts).
-- **Privacy copy must stay honest:** the screening screen's `privacy.onDevice`
-  string previously claimed "nothing uploaded" — that's now false for calls.
-  Updated in ALL locales to "SMS screening is on-device; for calls only the
-  number is checked against Netraksh's DB." `noContent` (message *contents*)
-  stays true. If you touch this feature, keep that disclosure accurate.
+**User-chosen behavior:** JUST show the screen automatically — NO auto-answer. The
+user still taps Answer/Block. Do not add ANSWER_PHONE_CALLS / RECORD_AUDIO (keeps
+the Play-safe policy; see play-permissions-policy.md).
 
-**Theme / data rules:**
-- Red "risky" theme is driven by the engine's risk BAND, not raw report count:
-  `verifiedScam || riskLevel in [high, medium]` (or a local blocklist hit). A
-  number with reports but `low` risk shows the calmer navy card. reportCount is
-  still displayed as a stat.
-- Stats are the only REAL per-number fields: reportCount, riskLevel, status
-  (Verified/Reported/Clean), plus top category as a badge. The demo's
-  victims/topCity are fake/hardcoded — there is no per-number source for them.
+**Native launch (KavachCallScreeningService.kt):**
+- `respondToCall` is always an empty builder → never blocks/rejects/silences.
+- Two launch paths: (a) direct `startActivity` of the deep link when `canDraw`
+  (overlay permission grants the background-activity-launch exemption), and
+  (b) ALWAYS post a full-screen-intent notification fallback
+  (`USE_FULL_SCREEN_INTENT`, added in app.json) so it still fires without overlay
+  permission / on stricter OEMs.
+- The service NO LONGER does the HTTP lookup or any card drawing. All the old
+  lookup/overlay/prettyCategory helpers were removed.
 
-**Mechanics / constraints:**
-- Needs `SYSTEM_ALERT_WINDOW`. Call screening still avoids READ_CALL_LOG /
-  READ_PHONE_STATE / READ_SMS (uses the CallScreeningService role).
-- **Still never blocks/answers calls** (empty `CallResponse`). The rich card is
-  full-screen (`FLAG_NOT_FOCUSABLE` only, no NOT_TOUCH_MODAL) to match the user's
-  full-screen design — so it covers the system answer/decline. Buttons handle it:
-  Block (add to on-device blocklist), Report (deep link `kavach-ai://call-alert?number=`),
-  Answer (just dismisses the overlay to reveal the real call UI). This is the
-  inherent tradeoff of a full-screen takeover; the banner-style variant kept
-  system controls tappable but couldn't show the rich card.
-- No call-end signal (needs READ_PHONE_STATE) → 40s auto-timeout + buttons.
-- Overlay is pure Kotlin/WindowManager on a main-thread Handler (no JS context);
-  localized en/hi inline in Kotlin.
-- Graceful fallback: no overlay permission → old heads-up notification (high-risk
-  numbers only).
+**KavachCallOverlay.kt** is trimmed to ONLY `canDraw` (still used by the module +
+service to decide the direct-launch path). All show/update/Risk/view code is gone.
 
-**Can't be e2e tested here** — needs a real EAS build on a device (Expo Go can't
-load the native module; no call simulation). Verify via typecheck + architect.
+**Reputation is fetched in JS now (call-alert.tsx):**
+- `isDemo = no number param`. Demo keeps the canned red showcase content unchanged
+  (2,341 / 892 / Mumbai, FedEx badge, rotating red warnings).
+- Real caller: `useCheckNumber(apiPhone)` (enabled only when `!isDemo && apiPhone`,
+  explicit `getCheckNumberQueryKey`, `staleTime: 60s`). Renders REAL stats:
+  reportCount, risk band, status (Verified/Reported/Clean), top category as badge.
+- Risk band drives the theme (same rule as before): red when
+  `verifiedScam || riskLevel in [high, medium]`, calmer navy otherwise. Caller
+  circle shows a shield icon (not phone-incoming) when safe.
+- **Honesty rule for the non-risky headline:** only show "No scam reports" when
+  `rep && reportCount === 0`. Reported-but-low-risk → cautionHeadline; lookup
+  failed / unknown / query disabled (rep undefined) → unknownHeadline ("couldn't
+  verify — stay cautious"). Never show a reassuring "clean" line on an error or a
+  reported number. (This was a code-review P1 — keep it.)
+
+**Dead config left in place (minor):** `ScreeningStore` apiBaseUrl/authToken and
+JS `syncScreeningApiConfig` are now UNUSED by native (JS does its own fetch via the
+hook). Left to minimize churn; safe to remove later.
+
+**i18n:** new callAlert keys (riskLabel/statusLabel/risk_*/status*/safeHeadline/
+cautionHeadline/unknownHeadline/checking) added to en + hi only; other ~10 locales
+rely on i18next fallbackLng → en (see kavach-ai-i18n.md).
+
+**Can't be e2e tested here** — native auto-launch needs a real EAS device build (no
+call simulation; Expo web preview is behind a proxy security block). Verify via
+typecheck + architect.

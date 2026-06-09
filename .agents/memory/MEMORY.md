@@ -2,6 +2,7 @@
 - [KavachAI i18n](kavach-ai-i18n.md) — locale files aren't type-checked against en; verify key parity with a runtime flatten script, and rely on i18next fallbackLng (no manual deep-merge).
 - [Website i18n](website-i18n.md) — EN/HI; per-page namespace files auto-loaded by Vite glob (parallel-subagent safe); icons merged by index; bilingual data via lang.startsWith("hi"); verify parity at runtime.
 - [Native call screening](kavach-screening-native.md) — CallScreeningService+ROLE_CALL_SCREENING avoids Play Permissions Declaration (no READ_CALL_LOG/SMS); service warns, never blocks; EAS-build only.
+- [Incoming-call alert is a React screen](kavach-call-overlay.md) — service launches call-alert.tsx via deep link (no Kotlin card); JS fetches reputation; no auto-answer; honest non-risky headline.
 - [OTP login via MSG91 Widget](otp-sms-provider.md) — mobile: widget sends+verifies OTP client-side, backend validates access-token; admin web uses a SHARED PASSWORD (/auth/admin-login), NOT OTP; needs native dev build.
 - [RevenueCat vs Razorpay scope](revenuecat-vs-razorpay-scope.md) — RevenueCat=mobile only, website=Razorpay; both reconcile into the same `subscriptions` table. Website trials never show in RevenueCat; that's by design, verify via DB.
 - [MSG91 web vs mobile widget split](msg91-web-vs-mobile-widget.md) — "Mobile Integration" ON blocks web; mobile needs ON, web needs OFF → two widgets; tokenAuth is account-level/reusable; backend must try each widgetId in verifyAccessToken.

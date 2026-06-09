@@ -1,6 +1,11 @@
 import { Feather } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
-import { listCategories, useCreateReport } from "@workspace/api-client-react";
+import {
+  getCheckNumberQueryKey,
+  listCategories,
+  useCheckNumber,
+  useCreateReport,
+} from "@workspace/api-client-react";
 import * as Haptics from "expo-haptics";
 import { router, useLocalSearchParams } from "expo-router";
 import i18n from "i18next";
@@ -24,6 +29,15 @@ import { phoneForApi } from "@/lib/phone";
 
 const DEMO_NUMBER = "+91 87654-32100";
 
+function prettyCategory(key: string): string | null {
+  if (!key.trim()) return null;
+  return key
+    .split(/[_\-\s]+/)
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
 type ReportPhase =
   | "list"
   | "submitting"
@@ -38,6 +52,7 @@ export default function CallAlertScreen() {
   const params = useLocalSearchParams<{ number?: string | string[] }>();
   const rawNumber = Array.isArray(params.number) ? params.number[0] : params.number;
   const callerNumber = rawNumber && rawNumber.trim() ? rawNumber.trim() : DEMO_NUMBER;
+  const isDemo = !(rawNumber && rawNumber.trim());
   const topInset = Platform.OS === "web" ? 67 : insets.top;
   const bottomInset = (Platform.OS === "web" ? 34 : insets.bottom) + 20;
 
@@ -62,6 +77,49 @@ export default function CallAlertScreen() {
   });
   const categories = categoriesQuery.data?.categories ?? [];
   const createReport = useCreateReport();
+
+  // Live reputation for a real incoming caller. The manual demo (no number)
+  // keeps its canned showcase content.
+  const checkEnabled = !isDemo && !!apiPhone;
+  const checkQuery = useCheckNumber(apiPhone ?? "", {
+    query: {
+      queryKey: getCheckNumberQueryKey(apiPhone ?? ""),
+      enabled: checkEnabled,
+      staleTime: 60_000,
+    },
+  });
+  const rep = checkQuery.data;
+  const checking = checkEnabled && checkQuery.isLoading;
+  const isRisky = isDemo
+    ? true
+    : !!rep &&
+      (rep.verifiedScam ||
+        rep.riskLevel === "high" ||
+        rep.riskLevel === "medium");
+  const accent = isRisky ? "#dc2626" : "#16a34a";
+  const rootBg = isRisky ? "#1a0000" : "#04122b";
+  const topCategory =
+    !isDemo && rep && rep.categories.length > 0
+      ? prettyCategory(rep.categories[0].key)
+      : null;
+  const riskText = rep ? t(`callAlert.risk_${rep.riskLevel}`) : "";
+  const statusText = rep
+    ? rep.verifiedScam
+      ? t("callAlert.statusVerified")
+      : rep.reportCount > 0
+        ? t("callAlert.statusReported")
+        : t("callAlert.statusClean")
+    : "";
+  // Honest non-risky headline: only claim "clean" when we actually confirmed
+  // zero reports. Reported-but-not-risky stays cautious; lookup failures are
+  // explicitly neutral rather than reassuring.
+  const safeHeadlineText = checking
+    ? t("callAlert.checking")
+    : rep
+      ? rep.reportCount > 0
+        ? t("callAlert.cautionHeadline")
+        : t("callAlert.safeHeadline")
+      : t("callAlert.unknownHeadline");
 
   useEffect(() => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -167,7 +225,12 @@ export default function CallAlertScreen() {
   const wEn = englishWarnings[warningIndex];
 
   return (
-    <View style={[s.root, { paddingTop: topInset, paddingBottom: bottomInset }]}>
+    <View
+      style={[
+        s.root,
+        { paddingTop: topInset, paddingBottom: bottomInset, backgroundColor: rootBg },
+      ]}
+    >
       {/* Close */}
       <TouchableOpacity
         style={s.closeBtn}
@@ -179,17 +242,24 @@ export default function CallAlertScreen() {
 
       {/* Incoming tag */}
       <View style={s.incomingRow}>
-        <View style={s.incomingDot} />
-        <Text style={s.incomingTxt}>{t("callAlert.incoming")}</Text>
+        <View style={[s.incomingDot, { backgroundColor: accent }]} />
+        <Text style={[s.incomingTxt, { color: accent }]}>{t("callAlert.incoming")}</Text>
       </View>
 
       {/* Caller */}
       <View style={s.callerSection}>
         <Animated.View
-          style={[s.dangerCircleOuter, { transform: [{ scale: pulseAnim }] }]}
+          style={[
+            s.dangerCircleOuter,
+            { backgroundColor: `${accent}2e`, transform: [{ scale: pulseAnim }] },
+          ]}
         >
-          <View style={s.dangerCircleInner}>
-            <Feather name="phone-incoming" size={36} color="#FFFFFF" />
+          <View style={[s.dangerCircleInner, { backgroundColor: accent }]}>
+            <Feather
+              name={isRisky ? "phone-incoming" : "shield"}
+              size={36}
+              color="#FFFFFF"
+            />
           </View>
         </Animated.View>
         <Text style={s.callerNumber}>{callerNumber}</Text>
@@ -197,38 +267,90 @@ export default function CallAlertScreen() {
       </View>
 
       {/* Reports stats */}
-      <View style={s.statsCard}>
-        <View style={s.statItem}>
-          <Feather name="alert-octagon" size={16} color="#f87171" />
-          <Text style={s.statNum}>2,341</Text>
-          <Text style={s.statLbl}>{t("callAlert.scamReports")}</Text>
+      {isDemo ? (
+        <View style={s.statsCard}>
+          <View style={s.statItem}>
+            <Feather name="alert-octagon" size={16} color="#f87171" />
+            <Text style={s.statNum}>2,341</Text>
+            <Text style={s.statLbl}>{t("callAlert.scamReports")}</Text>
+          </View>
+          <View style={s.statDiv} />
+          <View style={s.statItem}>
+            <Feather name="users" size={16} color="#fb923c" />
+            <Text style={s.statNum}>892</Text>
+            <Text style={s.statLbl}>{t("callAlert.victimsReported")}</Text>
+          </View>
+          <View style={s.statDiv} />
+          <View style={s.statItem}>
+            <Feather name="map-pin" size={16} color="#fbbf24" />
+            <Text style={s.statNum}>Mumbai</Text>
+            <Text style={s.statLbl}>{t("callAlert.topCity")}</Text>
+          </View>
         </View>
-        <View style={s.statDiv} />
-        <View style={s.statItem}>
-          <Feather name="users" size={16} color="#fb923c" />
-          <Text style={s.statNum}>892</Text>
-          <Text style={s.statLbl}>{t("callAlert.victimsReported")}</Text>
+      ) : checking ? (
+        <View style={[s.statsCard, s.statsCardLoading, { borderColor: `${accent}40` }]}>
+          <ActivityIndicator color={accent} />
+          <Text style={s.checkingTxt}>{t("callAlert.checking")}</Text>
         </View>
-        <View style={s.statDiv} />
-        <View style={s.statItem}>
-          <Feather name="map-pin" size={16} color="#fbbf24" />
-          <Text style={s.statNum}>Mumbai</Text>
-          <Text style={s.statLbl}>{t("callAlert.topCity")}</Text>
+      ) : rep ? (
+        <View
+          style={[
+            s.statsCard,
+            { borderColor: `${accent}40`, backgroundColor: `${accent}1f` },
+          ]}
+        >
+          <View style={s.statItem}>
+            <Feather name="alert-octagon" size={16} color={accent} />
+            <Text style={s.statNum}>{String(rep.reportCount)}</Text>
+            <Text style={s.statLbl}>{t("callAlert.scamReports")}</Text>
+          </View>
+          <View style={s.statDiv} />
+          <View style={s.statItem}>
+            <Feather name="activity" size={16} color={accent} />
+            <Text style={s.statNum}>{riskText}</Text>
+            <Text style={s.statLbl}>{t("callAlert.riskLabel")}</Text>
+          </View>
+          <View style={s.statDiv} />
+          <View style={s.statItem}>
+            <Feather name="shield" size={16} color={accent} />
+            <Text style={s.statNum}>{statusText}</Text>
+            <Text style={s.statLbl}>{t("callAlert.statusLabel")}</Text>
+          </View>
         </View>
-      </View>
+      ) : null}
 
-      {/* Rotating warning */}
-      <Animated.View style={[s.warningBox, { opacity: warningOpacity }]}>
-        <Text style={s.warningHindi}>{w}</Text>
-        {showEnglish && <Text style={s.warningEnglish}>{wEn}</Text>}
-      </Animated.View>
+      {/* Headline */}
+      {isRisky ? (
+        <Animated.View style={[s.warningBox, { opacity: warningOpacity }]}>
+          <Text style={s.warningHindi}>{w}</Text>
+          {showEnglish && <Text style={s.warningEnglish}>{wEn}</Text>}
+        </Animated.View>
+      ) : (
+        <View style={s.warningBox}>
+          <Text style={[s.warningHindi, { color: accent }]}>{safeHeadlineText}</Text>
+        </View>
+      )}
 
       {/* Scam type tag */}
-      <View style={s.scamTypeRow}>
-        <View style={s.scamTypeBadge}>
-          <Text style={s.scamTypeTxt}>{t("callAlert.scamType")}</Text>
+      {isDemo || topCategory ? (
+        <View style={s.scamTypeRow}>
+          <View
+            style={[
+              s.scamTypeBadge,
+              !isDemo && {
+                backgroundColor: `${accent}33`,
+                borderColor: `${accent}59`,
+              },
+            ]}
+          >
+            <Text style={[s.scamTypeTxt, !isDemo && { color: accent }]}>
+              {isDemo ? t("callAlert.scamType") : topCategory}
+            </Text>
+          </View>
         </View>
-      </View>
+      ) : (
+        <View style={s.scamTypeRow} />
+      )}
 
       {/* Action buttons */}
       <View style={s.actions}>
@@ -257,7 +379,11 @@ export default function CallAlertScreen() {
         >
           <Feather name="phone" size={22} color="rgba(255,255,255,0.5)" />
           <Text style={s.answerTxt}>{t("callAlert.answer")}</Text>
-          <Text style={s.answerRisk}>{t("callAlert.highRisk")}</Text>
+          {isRisky && (
+            <Text style={[s.answerRisk, { color: accent }]}>
+              {t("callAlert.highRisk")}
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
 
@@ -501,6 +627,13 @@ const s = StyleSheet.create({
     marginBottom: 20,
   },
   statItem: { flex: 1, alignItems: "center", gap: 4 },
+  statsCardLoading: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+  },
+  checkingTxt: { fontSize: 13, color: "rgba(255,255,255,0.7)" },
   statNum: { fontSize: 16, fontWeight: "700" as const, color: "#FFFFFF" },
   statLbl: { fontSize: 10, color: "rgba(255,255,255,0.5)" },
   statDiv: {
