@@ -325,6 +325,15 @@ export const FraudCheckResponse = zod.object({
 
 
 /**
+ * Returns the community-sourced list of high-risk phone numbers (verified scams and frequently-reported numbers) so the app can warn about scam calls locally on-device. Available to all signed-in users (basic known-scam screening is a free feature).
+ * @summary Known high-risk numbers for on-device call/SMS screening
+ */
+export const GetScreeningBlocklistResponse = zod.object({
+  "phones": zod.array(zod.string()).describe('Normalized high-risk phone numbers (E.164\/digits).')
+})
+
+
+/**
  * @summary Current user's daily check usage and premium status
  */
 export const GetUsageResponse = zod.object({

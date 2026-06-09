@@ -76,6 +76,7 @@ export * from './roleInfo';
 export * from './rolesListResponse';
 export * from './scamCategory';
 export * from './scamOfDay';
+export * from './screeningBlocklist';
 export * from './sendBroadcastRequest';
 export * from './startTrialRequest';
 export * from './startTrialRequestPlan';

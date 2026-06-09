@@ -66,6 +66,7 @@ import type {
   ResetTrialRequest,
   RolesListResponse,
   ScamOfDay,
+  ScreeningBlocklist,
   SendBroadcastRequest,
   StartTrialRequest,
   SubscriptionOrder,
@@ -1380,6 +1381,84 @@ export const useFraudCheck = <TError = ErrorType<ErrorResponse>,
       > => {
       return useMutation(getFraudCheckMutationOptions(options));
     }
+
+export const getGetScreeningBlocklistUrl = () => {
+
+
+
+
+  return `/api/screening/blocklist`
+}
+
+/**
+ * Returns the community-sourced list of high-risk phone numbers (verified scams and frequently-reported numbers) so the app can warn about scam calls locally on-device. Available to all signed-in users (basic known-scam screening is a free feature).
+ * @summary Known high-risk numbers for on-device call/SMS screening
+ */
+export const getScreeningBlocklist = async ( options?: RequestInit): Promise<ScreeningBlocklist> => {
+
+  return customFetch<ScreeningBlocklist>(getGetScreeningBlocklistUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetScreeningBlocklistQueryKey = () => {
+    return [
+    `/api/screening/blocklist`
+    ] as const;
+    }
+
+
+export const getGetScreeningBlocklistQueryOptions = <TData = Awaited<ReturnType<typeof getScreeningBlocklist>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getScreeningBlocklist>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetScreeningBlocklistQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getScreeningBlocklist>>> = ({ signal }) => getScreeningBlocklist({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getScreeningBlocklist>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetScreeningBlocklistQueryResult = NonNullable<Awaited<ReturnType<typeof getScreeningBlocklist>>>
+export type GetScreeningBlocklistQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Known high-risk numbers for on-device call/SMS screening
+ */
+
+export function useGetScreeningBlocklist<TData = Awaited<ReturnType<typeof getScreeningBlocklist>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getScreeningBlocklist>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetScreeningBlocklistQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export const getGetUsageUrl = () => {
 

@@ -707,6 +707,11 @@ export interface UsageStatus {
   aiChecks: UsageMeter;
 }
 
+export interface ScreeningBlocklist {
+  /** Normalized high-risk phone numbers (E.164/digits). */
+  phones: string[];
+}
+
 export type CreateOrderRequestPlan = typeof CreateOrderRequestPlan[keyof typeof CreateOrderRequestPlan];
 
 

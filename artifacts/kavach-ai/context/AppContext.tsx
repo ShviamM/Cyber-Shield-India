@@ -2,8 +2,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   addFamilyMember as apiAddFamilyMember,
+  getGetScreeningBlocklistQueryKey,
   getListFamilyMembersQueryKey,
   removeFamilyMember as apiRemoveFamilyMember,
+  useGetScreeningBlocklist,
   useListFamilyMembers,
 } from "@workspace/api-client-react";
 import React, {
@@ -86,8 +88,8 @@ type AppContextType = {
   setSmsScreening: (enabled: boolean) => void;
 };
 
-/** High-risk numbers Netraksh should screen are derived from the user's own
- * danger/warning-flagged checks — kept on-device, no bulk fetch. */
+/** High-risk numbers from the user's own danger/warning-flagged checks. These
+ * are merged with the server's community blocklist before syncing on-device. */
 function deriveBlocklist(checks: CheckItem[]): string[] {
   const fromChecks = checks
     .filter((c) => c.type === "number" && (c.result === "danger" || c.result === "warning"))
@@ -122,6 +124,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       enabled: authStatus === "authenticated",
     },
   });
+
+  // Community-sourced known-scam numbers for on-device call/SMS screening. This
+  // is what lets the device warn about scam calls the user never personally
+  // checked — basic known-scam screening is a free feature. Android-only.
+  const { data: blocklistData } = useGetScreeningBlocklist({
+    query: {
+      queryKey: getGetScreeningBlocklistQueryKey(),
+      enabled: Platform.OS === "android" && authStatus === "authenticated",
+      staleTime: 60 * 60 * 1000,
+    },
+  });
+  const serverBlocklist = blocklistData?.phones;
 
   const familyMembers = useMemo<FamilyMember[]>(() => {
     const members = familyData?.members ?? [];
@@ -193,8 +207,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // toggles. No-op on web / non-Android builds.
   useEffect(() => {
     if (!loaded) return;
-    syncEngineData(deriveBlocklist(recentChecks));
-  }, [loaded, recentChecks]);
+    syncEngineData([
+      ...deriveBlocklist(recentChecks),
+      ...(serverBlocklist ?? []),
+    ]);
+  }, [loaded, recentChecks, serverBlocklist]);
 
   // Keep the native engine's enabled flags in lock-step with the resolved
   // toggle states. This is the single source of native sync: it covers the

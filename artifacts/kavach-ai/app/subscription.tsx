@@ -6,6 +6,7 @@ import {
   useGetMySubscription,
   useGetSubscriptionPlans,
   useListMyPayments,
+  useStartSubscriptionTrial,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
@@ -100,14 +101,16 @@ export default function SubscriptionScreen() {
   const [busyPlan, setBusyPlan] = useState<PaidPlanKey | null>(null);
   // The plan + billing period awaiting confirmation in the test-mode modal.
   const [pendingPlan, setPendingPlan] = useState<PaidPlanKey | null>(null);
-  const [pendingPeriod, setPendingPeriod] = useState<BillingPeriod>("monthly");
-  // Monthly vs annual billing for the paid plans.
-  const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>("monthly");
+  const [pendingPeriod, setPendingPeriod] = useState<BillingPeriod>("annual");
+  // Paid plans are sold annually only — best value and a simpler choice.
+  const billingPeriod: BillingPeriod = "annual";
+  const [trialBusy, setTrialBusy] = useState(false);
 
   const statusQuery = useGetMySubscription();
   const plansQuery = useGetSubscriptionPlans();
   const paymentsQuery = useListMyPayments();
   const cancel = useCancelSubscription();
+  const startTrial = useStartSubscriptionTrial();
 
   const bottomPad = (insets.bottom || 0) + 32;
 
@@ -205,6 +208,28 @@ export default function SubscriptionScreen() {
       return;
     }
     void runPurchase(plan, planName, period);
+  }
+
+  // Backend no-card 7-day trial (works without a store, unlike a purchase).
+  async function handleStartTrial(plan: PaidPlanKey) {
+    setTrialBusy(true);
+    try {
+      await startTrial.mutateAsync({ data: { plan } });
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      refreshSubscriptionData();
+      Alert.alert(
+        t("subscription.trialStartedTitle"),
+        t("subscription.trialStartedMsg"),
+      );
+    } catch {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(
+        t("subscription.failedTitle"),
+        t("subscription.trialFailedMsg"),
+      );
+    } finally {
+      setTrialBusy(false);
+    }
   }
 
   async function handleRestore() {
@@ -407,28 +432,6 @@ export default function SubscriptionScreen() {
 
       {/* Plan comparison */}
       <Text style={s.sectionLabel}>{t("subscription.choosePlan")}</Text>
-      <View style={s.periodToggle}>
-        {(["monthly", "annual"] as BillingPeriod[]).map((p) => {
-          const active = billingPeriod === p;
-          return (
-            <TouchableOpacity
-              key={p}
-              style={[s.periodOpt, active && s.periodOptActive]}
-              onPress={() => {
-                Haptics.selectionAsync();
-                setBillingPeriod(p);
-              }}
-              activeOpacity={0.85}
-            >
-              <Text style={[s.periodOptTxt, active && s.periodOptTxtActive]}>
-                {p === "monthly"
-                  ? t("subscription.billingMonthly")
-                  : t("subscription.billingAnnual")}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
       {plans.map((plan) => {
         const key = plan.key as PlanKey;
         const meta = PLAN_META[key];
@@ -612,9 +615,7 @@ export default function SubscriptionScreen() {
                 ) : (
                   <Text style={s.upgradeBtnTxt}>
                     {samePlanDiffPeriod
-                      ? billingPeriod === "annual"
-                        ? t("subscription.switchToAnnual")
-                        : t("subscription.switchToMonthly")
+                      ? t("subscription.switchToAnnual")
                       : premiumActive
                         ? t("subscription.switchTo", {
                             plan: t(`subscription.plans.${key}.name`),
@@ -625,6 +626,36 @@ export default function SubscriptionScreen() {
                   </Text>
                 )}
               </TouchableOpacity>
+            ) : null}
+
+            {/* No-card free trial — only for the eligible (never-trialed,
+                non-premium) user, and only on the Premium plan. */}
+            {key === "premium" &&
+            !premiumActive &&
+            status.trialEligible &&
+            !isCurrent ? (
+              <>
+                <TouchableOpacity
+                  style={s.trialBtn}
+                  onPress={() => handleStartTrial("premium")}
+                  disabled={trialBusy}
+                  activeOpacity={0.85}
+                >
+                  {trialBusy ? (
+                    <ActivityIndicator size="small" color={GREEN} />
+                  ) : (
+                    <>
+                      <Feather name="gift" size={15} color={GREEN} />
+                      <Text style={s.trialBtnTxt}>
+                        {t("subscription.startFreeTrial")}
+                      </Text>
+                    </>
+                  )}
+                </TouchableOpacity>
+                <Text style={s.trialBtnNote}>
+                  {t("subscription.startFreeTrialNote")}
+                </Text>
+              </>
             ) : null}
           </View>
         );
@@ -841,30 +872,25 @@ const s = StyleSheet.create({
   price: { fontSize: 20, fontWeight: "900" as const },
   priceUnit: { fontSize: 10, color: "#94a3b8", marginTop: 1 },
 
-  periodToggle: {
+  trialBtn: {
     flexDirection: "row",
-    backgroundColor: "#f1f5f9",
-    borderRadius: 12,
-    padding: 4,
-    marginBottom: 14,
-  },
-  periodOpt: {
-    flex: 1,
-    height: 38,
-    borderRadius: 9,
     alignItems: "center",
     justifyContent: "center",
+    gap: 8,
+    height: 48,
+    borderRadius: 14,
+    marginTop: 10,
+    backgroundColor: "rgba(19,136,8,0.1)",
+    borderWidth: 1.5,
+    borderColor: GREEN,
   },
-  periodOptActive: {
-    backgroundColor: "#fff",
-    shadowColor: NAVY,
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 1 },
-    elevation: 1,
+  trialBtnTxt: { fontSize: 15, fontWeight: "800" as const, color: GREEN },
+  trialBtnNote: {
+    fontSize: 11,
+    color: "#64748b",
+    textAlign: "center",
+    marginTop: 6,
   },
-  periodOptTxt: { fontSize: 14, fontWeight: "700" as const, color: "#64748b" },
-  periodOptTxtActive: { color: NAVY },
   saveBadge: {
     alignSelf: "flex-start",
     backgroundColor: "rgba(19,136,8,0.1)",

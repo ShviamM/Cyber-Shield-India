@@ -396,6 +396,28 @@ paths:
         default:
           $ref: "#/components/responses/Error"
 
+  /screening/blocklist:
+    get:
+      operationId: getScreeningBlocklist
+      tags: [screening]
+      summary: Known high-risk numbers for on-device call/SMS screening
+      description: >-
+        Returns the community-sourced list of high-risk phone numbers (verified
+        scams and frequently-reported numbers) so the app can warn about scam
+        calls locally on-device. Available to all signed-in users (basic
+        known-scam screening is a free feature).
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Known high-risk numbers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ScreeningBlocklist"
+        default:
+          $ref: "#/components/responses/Error"
+
   /me/usage:
     get:
       operationId: getUsage
@@ -2484,6 +2506,17 @@ components:
         - isPremium
         - numberChecks
         - aiChecks
+
+    ScreeningBlocklist:
+      type: object
+      properties:
+        phones:
+          type: array
+          items:
+            type: string
+          description: Normalized high-risk phone numbers (E.164/digits).
+      required:
+        - phones
 
     CreateOrderRequest:
       type: object
