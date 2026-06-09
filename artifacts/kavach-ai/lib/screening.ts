@@ -72,6 +72,7 @@ const UNAVAILABLE_STATUS: ScreeningStatus = {
   hasCallRole: false,
   hasSmsPermission: false,
   hasNotificationPermission: false,
+  hasOverlayPermission: false,
   blocklistSize: 0,
   keywordCount: 0,
 };
@@ -120,6 +121,31 @@ export async function requestCallScreeningRole(): Promise<boolean> {
     return await KavachScreening.requestCallScreeningRole();
   } catch {
     return false;
+  }
+}
+
+/**
+ * Open the system "Display over other apps" screen so the incoming-call overlay
+ * can draw over the call screen. Resolves true only if already granted — the
+ * grant happens in Settings, so callers should re-read `getScreeningStatus()`
+ * when the screen regains focus.
+ */
+export async function requestOverlayPermission(): Promise<boolean> {
+  if (!isScreeningSupported()) return false;
+  try {
+    return await KavachScreening.requestOverlayPermission();
+  } catch {
+    return false;
+  }
+}
+
+/** Tell the native overlay which language (e.g. "en"/"hi") to render in. */
+export function syncScreeningLanguage(code: string): void {
+  if (!isScreeningSupported()) return;
+  try {
+    KavachScreening.syncLanguage(code);
+  } catch {
+    // ignore
   }
 }
 

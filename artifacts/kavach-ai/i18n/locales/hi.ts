@@ -542,7 +542,12 @@ const hi = {
     statusCallRole: "Netraksh आपका कॉल स्क्रीनिंग ऐप है",
     statusSmsPerm: "SMS एक्सेस दी गई",
     statusNotif: "अलर्ट सूचनाएँ अनुमत",
+    statusOverlay: "कॉलर पॉपअप स्क्रीन के ऊपर दिख सकता है",
     statusBlocklist: "{{n}} उच्च-जोखिम नंबर डिवाइस पर सिंक किए गए",
+    overlayPromptTitle: "इनकमिंग-कॉल पॉपअप चालू करें",
+    overlayPromptMsg:
+      "Netraksh को अन्य ऐप्स के ऊपर दिखने दें ताकि हर इनकमिंग कॉल पर कॉलर कार्ड स्क्रीन के ऊपर पॉप-अप हो सके।",
+    overlayGrant: "अन्य ऐप्स के ऊपर दिखाने दें",
     sectionPrivacy: "आपकी निजता",
     privacy: {
       onDevice: "सारी स्क्रीनिंग आपके फ़ोन पर होती है — कुछ भी अपने-आप अपलोड नहीं होता।",

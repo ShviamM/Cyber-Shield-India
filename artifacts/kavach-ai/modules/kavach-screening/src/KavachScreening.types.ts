@@ -10,6 +10,8 @@ export type ScreeningStatus = {
   hasSmsPermission: boolean;
   /** Whether the POST_NOTIFICATIONS permission is granted (Android 13+). */
   hasNotificationPermission: boolean;
+  /** Whether "Display over other apps" (SYSTEM_ALERT_WINDOW) is granted. */
+  hasOverlayPermission: boolean;
   /** Number of high-risk numbers currently synced on-device. */
   blocklistSize: number;
   /** Number of scam keyword patterns currently synced on-device. */

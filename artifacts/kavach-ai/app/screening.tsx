@@ -1,6 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { router } from "expo-router";
+import { router, useFocusEffect } from "expo-router";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -22,6 +22,8 @@ import {
   getScreeningStatus,
   isScreeningSupported,
   requestCallScreeningRole,
+  requestOverlayPermission,
+  syncScreeningLanguage,
   type ScreeningStatus,
 } from "@/lib/screening";
 
@@ -43,7 +45,7 @@ async function requestNotificationPermission(): Promise<void> {
 export default function ScreeningScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { callScreening, setCallScreening } = useAppContext();
 
   const topInset = Platform.OS === "web" ? 0 : insets.top;
@@ -56,6 +58,22 @@ export default function ScreeningScreen() {
     setStatus(getScreeningStatus());
   }, []);
 
+  // Keep the native overlay language in sync, and re-read status whenever the
+  // screen regains focus (e.g. returning from the "Display over other apps"
+  // settings screen) so the permission state reflects the user's choice.
+  useFocusEffect(
+    React.useCallback(() => {
+      syncScreeningLanguage(i18n.language?.startsWith("hi") ? "hi" : "en");
+      refreshStatus();
+    }, [i18n.language, refreshStatus])
+  );
+
+  async function grantOverlay() {
+    Haptics.selectionAsync();
+    await requestOverlayPermission();
+    refreshStatus();
+  }
+
   async function toggleCall(next: boolean) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     if (!supported) {
@@ -63,6 +81,7 @@ export default function ScreeningScreen() {
       return;
     }
     if (next) {
+      syncScreeningLanguage(i18n.language?.startsWith("hi") ? "hi" : "en");
       const ok = await requestCallScreeningRole();
       await requestNotificationPermission();
       if (!ok) {
@@ -171,12 +190,36 @@ export default function ScreeningScreen() {
               label={t("screening.statusNotif")}
               show
             />
+            <StatusLine
+              ok={status.hasOverlayPermission}
+              label={t("screening.statusOverlay")}
+              show
+            />
             <View style={s.statusMeta}>
               <Feather name="database" size={13} color="#64748b" />
               <Text style={s.statusMetaTxt}>
                 {t("screening.statusBlocklist", { n: status.blocklistSize })}
               </Text>
             </View>
+          </View>
+        )}
+
+        {/* Overlay permission prompt (the Truecaller-style popup needs it) */}
+        {supported && callScreening && !status.hasOverlayPermission && (
+          <View style={s.permCard}>
+            <View style={s.permHead}>
+              <View style={s.permIcon}>
+                <Feather name="layers" size={18} color={SAFFRON} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={s.permTitle}>{t("screening.overlayPromptTitle")}</Text>
+                <Text style={s.permText}>{t("screening.overlayPromptMsg")}</Text>
+              </View>
+            </View>
+            <TouchableOpacity style={s.permBtn} onPress={grantOverlay} activeOpacity={0.85}>
+              <Feather name="external-link" size={16} color="#fff" />
+              <Text style={s.permBtnTxt}>{t("screening.overlayGrant")}</Text>
+            </TouchableOpacity>
           </View>
         )}
 
@@ -311,4 +354,21 @@ const s = StyleSheet.create({
     borderWidth: 1.5, borderColor: "rgba(255,103,19,0.3)",
   },
   demoTxt: { fontSize: 14, fontWeight: "700" as const, color: "#9a3412" },
+
+  permCard: {
+    backgroundColor: "#fff7ed", borderRadius: 16, padding: 14, marginBottom: 20, gap: 12,
+    borderWidth: 1.5, borderColor: "rgba(255,103,19,0.3)",
+  },
+  permHead: { flexDirection: "row", gap: 12, alignItems: "flex-start" },
+  permIcon: {
+    width: 38, height: 38, borderRadius: 10, backgroundColor: "#ffedd5",
+    alignItems: "center", justifyContent: "center",
+  },
+  permTitle: { fontSize: 14, fontWeight: "700" as const, color: "#9a3412", marginBottom: 2 },
+  permText: { fontSize: 12, color: "#7c2d12", lineHeight: 18 },
+  permBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
+    backgroundColor: SAFFRON, borderRadius: 12, paddingVertical: 12,
+  },
+  permBtnTxt: { fontSize: 14, fontWeight: "700" as const, color: "#fff" },
 });

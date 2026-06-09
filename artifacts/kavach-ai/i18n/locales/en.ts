@@ -615,7 +615,12 @@ const en = {
     statusCallRole: "Netraksh is your call screening app",
     statusSmsPerm: "SMS access granted",
     statusNotif: "Alert notifications allowed",
+    statusOverlay: "Caller popup can show over the screen",
     statusBlocklist: "{{n}} high-risk numbers synced on-device",
+    overlayPromptTitle: "Turn on the incoming-call popup",
+    overlayPromptMsg:
+      "Allow Netraksh to display over other apps so the caller card can pop up over the screen on every incoming call.",
+    overlayGrant: "Allow display over apps",
     sectionPrivacy: "YOUR PRIVACY",
     privacy: {
       onDevice: "All screening runs on your phone — nothing is uploaded automatically.",

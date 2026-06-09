@@ -12,7 +12,9 @@ declare class KavachScreeningModule extends NativeModule<KavachScreeningEvents> 
   setSmsScreeningEnabled(enabled: boolean): void;
   syncBlocklist(numbers: string[]): void;
   syncKeywords(keywords: string[]): void;
+  syncLanguage(code: string): void;
   requestCallScreeningRole(): Promise<boolean>;
+  requestOverlayPermission(): Promise<boolean>;
 }
 
 // Loads the native module backing the JS `KavachScreening` API on Android.
