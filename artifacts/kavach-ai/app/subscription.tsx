@@ -459,7 +459,6 @@ export default function SubscriptionScreen() {
         const storePkg = paidKey
           ? packageForPlan(paidKey, billingPeriod)
           : null;
-        const monthlyPkg = paidKey ? packageForPlan(paidKey, "monthly") : null;
         const annualPkg = paidKey ? packageForPlan(paidKey, "annual") : null;
 
         let priceLabel: string;
@@ -475,18 +474,11 @@ export default function SubscriptionScreen() {
           );
         }
 
-        // Annual savings vs 12x monthly (live store prices when available).
-        let savingsPercent = 0;
-        if (paidKey && billingPeriod === "annual") {
-          const monthlyMajor = monthlyPkg?.product.price ?? plan.amount / 100;
-          const annualMajor =
-            annualPkg?.product.price ?? ANNUAL_FALLBACK_PAISE[paidKey] / 100;
-          if (monthlyMajor > 0 && annualMajor > 0) {
-            savingsPercent = Math.round(
-              (1 - annualMajor / (monthlyMajor * 12)) * 100,
-            );
-          }
-        }
+        // Monthly-equivalent of the annual price, mirroring the website's
+        // "Just ₹X/month, billed yearly · Save 2 months" pricing framing.
+        const monthlyEquivalent = plan.premium
+          ? `₹${Math.round(plan.amount / 12 / 100)}`
+          : null;
 
         // On a real store build, annual isn't purchasable until its package is
         // configured — show a "coming soon" state instead of a dead-end alert.
@@ -558,13 +550,18 @@ export default function SubscriptionScreen() {
               </View>
             </View>
 
-            {plan.premium && billingPeriod === "annual" && savingsPercent > 0 ? (
-              <View style={s.saveBadge}>
-                <Text style={s.saveBadgeTxt}>
-                  {t("subscription.annualSavePercent", {
-                    percent: savingsPercent,
+            {plan.premium && monthlyEquivalent ? (
+              <View style={s.priceMetaRow}>
+                <Text style={s.monthlyEquivTxt}>
+                  {t("subscription.monthlyEquivalent", {
+                    price: monthlyEquivalent,
                   })}
                 </Text>
+                <View style={[s.saveBadge, { marginTop: 0 }]}>
+                  <Text style={s.saveBadgeTxt}>
+                    {t("subscription.saveTwoMonths")}
+                  </Text>
+                </View>
               </View>
             ) : null}
             {plan.premium && trialLabel ? (
@@ -900,6 +897,18 @@ const s = StyleSheet.create({
     marginTop: 12,
   },
   saveBadgeTxt: { fontSize: 11, fontWeight: "800" as const, color: GREEN },
+  priceMetaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 12,
+  },
+  monthlyEquivTxt: {
+    fontSize: 12,
+    color: "#64748b",
+    fontWeight: "600" as const,
+  },
   trialBadge: {
     flexDirection: "row",
     alignItems: "center",
