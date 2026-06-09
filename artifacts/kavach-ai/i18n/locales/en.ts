@@ -629,11 +629,16 @@ const en = {
     statusSmsPerm: "SMS access granted",
     statusNotif: "Alert notifications allowed",
     statusOverlay: "Caller popup can show over the screen",
+    statusFullScreen: "Full-screen alerts on lock screen allowed",
     statusBlocklist: "{{n}} high-risk numbers synced on-device",
     overlayPromptTitle: "Turn on the incoming-call popup",
     overlayPromptMsg:
-      "Allow Netraksh to display over other apps so the caller card can pop up over the screen on every incoming call.",
+      "Required: allow Netraksh to display over other apps, or the caller card can't pop up over your phone or call screen. Without this you'll only get a small notification.",
     overlayGrant: "Allow display over apps",
+    fullScreenPromptTitle: "Allow full-screen call alerts",
+    fullScreenPromptMsg:
+      "Android 14 turns off full-screen notifications for new apps. Turn it on so the caller card can appear over your lock screen when a call comes in.",
+    fullScreenGrant: "Allow full-screen alerts",
     sectionPrivacy: "YOUR PRIVACY",
     privacy: {
       onDevice: "SMS screening runs on your phone. For calls, only the number is checked against Netraksh's scam database to warn you.",

@@ -22,6 +22,7 @@ class KavachScreeningModule extends NativeModule<KavachScreeningEvents> {
       hasCallRole: false,
       hasSmsPermission: false,
       hasNotificationPermission: false,
+      hasFullScreenIntentPermission: false,
       hasOverlayPermission: false,
       blocklistSize: 0,
       keywordCount: 0,
@@ -45,6 +46,10 @@ class KavachScreeningModule extends NativeModule<KavachScreeningEvents> {
   }
 
   async requestOverlayPermission(): Promise<boolean> {
+    return false;
+  }
+
+  async requestFullScreenIntentPermission(): Promise<boolean> {
     return false;
   }
 }

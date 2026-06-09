@@ -22,6 +22,7 @@ import {
   getScreeningStatus,
   isScreeningSupported,
   requestCallScreeningRole,
+  requestFullScreenIntentPermission,
   requestOverlayPermission,
   syncScreeningApiConfig,
   syncScreeningLanguage,
@@ -90,6 +91,12 @@ export default function ScreeningScreen() {
   async function grantOverlay() {
     Haptics.selectionAsync();
     await requestOverlayPermission();
+    refreshStatus();
+  }
+
+  async function grantFullScreenIntent() {
+    Haptics.selectionAsync();
+    await requestFullScreenIntentPermission();
     refreshStatus();
   }
 
@@ -215,6 +222,11 @@ export default function ScreeningScreen() {
               label={t("screening.statusOverlay")}
               show
             />
+            <StatusLine
+              ok={status.hasFullScreenIntentPermission}
+              label={t("screening.statusFullScreen")}
+              show
+            />
             <View style={s.statusMeta}>
               <Feather name="database" size={13} color="#64748b" />
               <Text style={s.statusMetaTxt}>
@@ -239,6 +251,26 @@ export default function ScreeningScreen() {
             <TouchableOpacity style={s.permBtn} onPress={grantOverlay} activeOpacity={0.85}>
               <Feather name="external-link" size={16} color="#fff" />
               <Text style={s.permBtnTxt}>{t("screening.overlayGrant")}</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Full-screen notification prompt (Android 14+ revokes this by default;
+            needed so the popup launches over the lock screen) */}
+        {supported && callScreening && !status.hasFullScreenIntentPermission && (
+          <View style={s.permCard}>
+            <View style={s.permHead}>
+              <View style={s.permIcon}>
+                <Feather name="maximize" size={18} color={SAFFRON} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={s.permTitle}>{t("screening.fullScreenPromptTitle")}</Text>
+                <Text style={s.permText}>{t("screening.fullScreenPromptMsg")}</Text>
+              </View>
+            </View>
+            <TouchableOpacity style={s.permBtn} onPress={grantFullScreenIntent} activeOpacity={0.85}>
+              <Feather name="external-link" size={16} color="#fff" />
+              <Text style={s.permBtnTxt}>{t("screening.fullScreenGrant")}</Text>
             </TouchableOpacity>
           </View>
         )}

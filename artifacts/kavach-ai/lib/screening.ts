@@ -72,6 +72,7 @@ const UNAVAILABLE_STATUS: ScreeningStatus = {
   hasCallRole: false,
   hasSmsPermission: false,
   hasNotificationPermission: false,
+  hasFullScreenIntentPermission: false,
   hasOverlayPermission: false,
   blocklistSize: 0,
   keywordCount: 0,
@@ -134,6 +135,22 @@ export async function requestOverlayPermission(): Promise<boolean> {
   if (!isScreeningSupported()) return false;
   try {
     return await KavachScreening.requestOverlayPermission();
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Open the per-app "full-screen notifications" settings screen so the locked-
+ * screen call alert can launch full-screen. Android 14+ revokes this by default
+ * for non-dialer apps. Resolves true only if already granted (or pre-Android 14)
+ * — the grant happens in Settings, so callers should re-read the status when the
+ * screen regains focus.
+ */
+export async function requestFullScreenIntentPermission(): Promise<boolean> {
+  if (!isScreeningSupported()) return false;
+  try {
+    return await KavachScreening.requestFullScreenIntentPermission();
   } catch {
     return false;
   }

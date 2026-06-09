@@ -10,6 +10,11 @@ export type ScreeningStatus = {
   hasSmsPermission: boolean;
   /** Whether the POST_NOTIFICATIONS permission is granted (Android 13+). */
   hasNotificationPermission: boolean;
+  /**
+   * Whether full-screen-intent notifications can launch full-screen. Android 14+
+   * revokes this by default for non-dialer apps; true on older versions.
+   */
+  hasFullScreenIntentPermission: boolean;
   /** Whether "Display over other apps" (SYSTEM_ALERT_WINDOW) is granted. */
   hasOverlayPermission: boolean;
   /** Number of high-risk numbers currently synced on-device. */
