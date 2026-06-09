@@ -13,6 +13,7 @@ declare class KavachScreeningModule extends NativeModule<KavachScreeningEvents> 
   syncBlocklist(numbers: string[]): void;
   syncKeywords(keywords: string[]): void;
   syncLanguage(code: string): void;
+  syncApiConfig(baseUrl: string, token: string | null): void;
   requestCallScreeningRole(): Promise<boolean>;
   requestOverlayPermission(): Promise<boolean>;
 }

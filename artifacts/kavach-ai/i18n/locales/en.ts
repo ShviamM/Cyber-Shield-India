@@ -623,7 +623,7 @@ const en = {
     overlayGrant: "Allow display over apps",
     sectionPrivacy: "YOUR PRIVACY",
     privacy: {
-      onDevice: "All screening runs on your phone — nothing is uploaded automatically.",
+      onDevice: "SMS screening runs on your phone. For calls, only the number is checked against Netraksh's scam database to warn you.",
       noContent: "Message contents are never sent off your device without your tap.",
       userControl: "Turn each protection on or off any time.",
       neverBlocks: "Netraksh warns you — it never silently blocks or answers calls.",

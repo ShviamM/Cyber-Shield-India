@@ -26,6 +26,7 @@ import { AppProvider } from "@/context/AppContext";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { initI18n } from "@/i18n";
 import { initializeRevenueCat, SubscriptionProvider } from "@/lib/revenuecat";
+import { syncScreeningApiConfig } from "@/lib/screening";
 import { getToken } from "@/lib/session";
 
 SplashScreen.preventAutoHideAsync();
@@ -80,6 +81,29 @@ function RootLayoutNav() {
     return () => clearTimeout(id);
   }, []);
   const launchExiting = minElapsed && status !== "loading";
+
+  // Push the API base + session token to the native call-screening service so it
+  // can look up an incoming caller's scam reputation even when no JS is running.
+  // The value persists natively, so syncing once on launch (and re-syncing when
+  // auth changes) covers calls that arrive long after the app is backgrounded.
+  useEffect(() => {
+    if (status === "loading") return;
+    const domain = process.env.EXPO_PUBLIC_DOMAIN;
+    if (!domain) return;
+    let cancelled = false;
+    (async () => {
+      let token: string | null = null;
+      try {
+        token = await getToken();
+      } catch {
+        token = null;
+      }
+      if (!cancelled) syncScreeningApiConfig(`https://${domain}`, token);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [status]);
 
   // First-launch onboarding (language pick + Guardian explainer). Null until the
   // stored flag resolves so we never flash it for a returning user.

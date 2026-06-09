@@ -38,6 +38,8 @@ class KavachScreeningModule extends NativeModule<KavachScreeningEvents> {
 
   syncLanguage(_code: string): void {}
 
+  syncApiConfig(_baseUrl: string, _token: string | null): void {}
+
   async requestCallScreeningRole(): Promise<boolean> {
     return false;
   }

@@ -23,9 +23,11 @@ import {
   isScreeningSupported,
   requestCallScreeningRole,
   requestOverlayPermission,
+  syncScreeningApiConfig,
   syncScreeningLanguage,
   type ScreeningStatus,
 } from "@/lib/screening";
+import { getToken } from "@/lib/session";
 
 const NAVY = "#0B3D91";
 const SAFFRON = "#FF6713";
@@ -58,14 +60,31 @@ export default function ScreeningScreen() {
     setStatus(getScreeningStatus());
   }, []);
 
+  // Give the native call-screening service the API base + session token so it can
+  // look up an incoming caller's scam reputation (the service runs without a JS
+  // bridge and can't reach the JS API client). Premium users get unlimited
+  // checks via the bearer token; signed-out users fall back to anonymous quota.
+  const syncApiConfig = React.useCallback(async () => {
+    const domain = process.env.EXPO_PUBLIC_DOMAIN;
+    if (!domain) return;
+    let token: string | null = null;
+    try {
+      token = await getToken();
+    } catch {
+      token = null;
+    }
+    syncScreeningApiConfig(`https://${domain}`, token);
+  }, []);
+
   // Keep the native overlay language in sync, and re-read status whenever the
   // screen regains focus (e.g. returning from the "Display over other apps"
   // settings screen) so the permission state reflects the user's choice.
   useFocusEffect(
     React.useCallback(() => {
       syncScreeningLanguage(i18n.language?.startsWith("hi") ? "hi" : "en");
+      void syncApiConfig();
       refreshStatus();
-    }, [i18n.language, refreshStatus])
+    }, [i18n.language, refreshStatus, syncApiConfig])
   );
 
   async function grantOverlay() {
@@ -82,6 +101,7 @@ export default function ScreeningScreen() {
     }
     if (next) {
       syncScreeningLanguage(i18n.language?.startsWith("hi") ? "hi" : "en");
+      void syncApiConfig();
       const ok = await requestCallScreeningRole();
       await requestNotificationPermission();
       if (!ok) {

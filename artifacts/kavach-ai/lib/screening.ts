@@ -150,6 +150,21 @@ export function syncScreeningLanguage(code: string): void {
 }
 
 /**
+ * Give the native call-screening service the API base URL and session token so
+ * it can look up an incoming caller's scam reputation (Truecaller-style). The
+ * service runs without a JS bridge, so it can't reach the JS API client — it
+ * makes its own request. Pass `null` for the token when signed out.
+ */
+export function syncScreeningApiConfig(baseUrl: string, token: string | null): void {
+  if (!isScreeningSupported()) return;
+  try {
+    KavachScreening.syncApiConfig(baseUrl, token);
+  } catch {
+    // ignore
+  }
+}
+
+/**
  * Push the latest engine-derived risk data into on-device storage. `numbers`
  * are normalized to E.164 where possible; keywords default to the built-in
  * scam phrase list.
