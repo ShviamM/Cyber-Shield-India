@@ -535,6 +535,23 @@ const hi = {
       "OTP शेयर न करें या पैसे न भेजें!",
       "पहले जाँचें, फिर बात करें",
     ],
+    reportSheetTitle: "इस नंबर की रिपोर्ट करें",
+    reportSheetSubtitle: "ठगी का प्रकार चुनें — हम तुरंत रिपोर्ट कर देते हैं।",
+    reporting: "रिपोर्ट हो रही है…",
+    reportSuccessTitle: "रिपोर्ट हो गई। धन्यवाद!",
+    reportSuccessMsg: "आपने दूसरों को इस नंबर से बचाने में मदद की।",
+    reportDuplicateTitle: "पहले से रिपोर्ट है",
+    reportDuplicateMsg: "आपने हाल ही में इस नंबर की रिपोर्ट कर दी है।",
+    reportErrorTitle: "रिपोर्ट नहीं हो सकी",
+    reportErrorMsg: "कुछ गड़बड़ हो गई। कृपया फिर से कोशिश करें।",
+    reportRateLimitedTitle: "बहुत ज़्यादा रिपोर्ट",
+    reportRateLimitedMsg:
+      "आपने हाल ही में कई रिपोर्ट भेजी हैं। कृपया बाद में कोशिश करें।",
+    reportInvalidNumber: "इस नंबर की रिपोर्ट नहीं की जा सकती।",
+    reportAutoDescription:
+      "Netraksh द्वारा उच्च-जोखिम चिह्नित आती कॉल से रिपोर्ट किया गया।",
+    reportRetry: "फिर से कोशिश करें",
+    reportDone: "हो गया",
   },
 
   screening: {
