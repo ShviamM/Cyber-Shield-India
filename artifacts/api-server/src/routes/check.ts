@@ -21,7 +21,11 @@ router.post("/check", async (req, res) => {
   const limit = caller?.isPremium
     ? config.fraudCheckPremiumMaxPerMinute
     : config.fraudCheckMaxPerMinute;
-  const { allowed } = hitRateLimit(`fraud-check:${clientKey}`, limit, 60_000);
+  const { allowed } = await hitRateLimit(
+    `fraud-check:${clientKey}`,
+    limit,
+    60_000,
+  );
   if (!allowed) {
     throw new HttpError(
       429,

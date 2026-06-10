@@ -46,6 +46,11 @@ export function isDevLoginEnabled(): boolean {
 
 export const config = {
   isProduction,
+  // Redis connection string. When set, the rate limiter uses Redis so limits
+  // are shared across every API instance — required before scaling the API to
+  // more than one instance. Unset = per-process in-memory limiter (dev / single
+  // instance). Use a rediss:// URL for TLS (e.g. DigitalOcean Managed Valkey).
+  redisUrl: (process.env.REDIS_URL ?? "").trim(),
   // MSG91 OTP Widget. The widget (client-side RN SDK) sends and verifies the
   // OTP on MSG91's side and returns an access token; the backend validates that
   // token with MSG91's verifyAccessToken API. `msg91AuthKey` is the account

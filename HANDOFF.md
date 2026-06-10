@@ -140,7 +140,7 @@ On Replit these run as workflows automatically. See `artifacts/api-server/.env.e
 **Other open items (see `NETRAKSH_PRELAUNCH_AUDIT.md` for the ranked list):**
 - Razorpay `payment.refunded` webhook (entitlement isn't revoked on a web refund).
 - Admin console: shared password, no MFA, no per-admin accounts, no "revoke all sessions".
-- In-memory rate limiting won't sync across multiple API instances — move to Redis before scaling out.
+- Rate limiting is now **Redis-backed** (`api-server/src/lib/rate-limit.ts`): set `REDIS_URL` (a `rediss://` Managed Valkey URL) and the per-IP counters are shared across instances, so the API can scale horizontally. Without `REDIS_URL` it falls back to a per-process in-memory limiter (fine for one instance / local dev); a Redis outage degrades to that fallback rather than failing requests. **`.do/app.yaml` now sets `instance_count: 2` + `basic-s` for the API — provision a DO Managed Valkey and set `REDIS_URL` before deploying that, or the per-IP protection weakens by a factor of N.** DB pool is now explicitly sized via `DB_POOL_MAX` (default 10 per instance).
 - Keep INR price parity between `plans.ts` and the store consoles.
 - Note: several audit recommendations (annual plans, 7-day free trial, freemium daily quotas, AI medium-signal tuning) have **already been implemented** since the audit — check git history before re-doing them.
 

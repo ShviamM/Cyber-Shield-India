@@ -40,9 +40,15 @@ services:
       repo_clone_url: https://github.com/ShviamM/Cyber-Shield-India.git
       branch: main
     http_port: 8080
-    instance_count: 1
-    # Smallest paid instance. Bump to apps-s-1vcpu-1gb if you need more memory.
-    instance_size_slug: basic-xxs
+    # Horizontally scaled. The rate limiter is Redis-backed (see REDIS_URL
+    # below), so multiple instances share one set of per-IP counters. IMPORTANT:
+    # if you raise instance_count above 1, REDIS_URL MUST be a real Valkey/Redis
+    # URL — otherwise each instance limits independently and per-IP protection
+    # (incl. OTP/SMS abuse) weakens by a factor of N.
+    instance_count: 2
+    # Bumped from basic-xxs (0.5 GiB) for headroom. Options: basic-xs (1 GiB),
+    # basic-s (2 GiB), professional-xs (1 GiB dedicated CPU), etc.
+    instance_size_slug: basic-s
     routes:
       - path: /api
         # The API defines its routes under /api (e.g. /api/healthz), so keep
@@ -66,6 +72,25 @@ services:
       # to ship the CA cert. To verify the cert instead, remove this and set
       # DATABASE_CA_CERT to the CA PEM from the DO database dashboard.
       - key: DATABASE_SSL_NO_VERIFY
+        scope: RUN_TIME
+        value: "true"
+      # Max Postgres connections per instance. Total = instance_count × this;
+      # keep under your Managed Postgres connection limit.
+      - key: DB_POOL_MAX
+        scope: RUN_TIME
+        value: "10"
+      # Redis/Valkey — REQUIRED because instance_count > 1. Shares the rate-limit
+      # counters across instances. Provision a DigitalOcean Managed Valkey (see
+      # the commented `databases` block at the bottom) and paste its connection
+      # string here (rediss://...). If left as REPLACE_ME the app still runs but
+      # falls back to per-instance in-memory limiting (weaker per-IP protection).
+      - key: REDIS_URL
+        scope: RUN_TIME
+        type: SECRET
+        value: REPLACE_WITH_DO_MANAGED_VALKEY_CONNECTION_STRING
+      # DO Managed Valkey uses a private CA; this skips cert verification (the
+      # connection is still TLS-encrypted via the rediss:// URL).
+      - key: REDIS_TLS_NO_VERIFY
         scope: RUN_TIME
         value: "true"
       # Lock browser CORS to the production domain(s). The admin is same-origin
@@ -146,3 +171,14 @@ domains:
   - domain: www.netraksh.com
     type: ALIAS
     zone: netraksh.com
+
+# Managed Valkey (Redis) for the shared rate limiter. Either create a DO Managed
+# Valkey cluster in the dashboard and paste its rediss:// URL into REDIS_URL
+# above, or uncomment this to let App Platform provision a dev database and wire
+# ${redis.DATABASE_URL} into REDIS_URL. Required when instance_count > 1.
+# databases:
+#   - name: redis
+#     engine: VALKEY
+#     production: false
+#     version: "8"
+

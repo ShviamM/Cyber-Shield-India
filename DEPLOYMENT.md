@@ -60,6 +60,9 @@ See `artifacts/api-server/.env.example` for the full list. The essentials:
 | `NODE_ENV`           | yes      | `production`                                              |
 | `PORT`               | yes      | Port to listen on (many hosts inject this)               |
 | `DATABASE_URL`       | yes      | Postgres connection string                               |
+| `DB_POOL_MAX`        | no       | Max Postgres connections per instance (default 10)        |
+| `REDIS_URL`          | no\*\*   | `rediss://` Valkey/Redis URL — shared rate-limit store    |
+| `REDIS_TLS_NO_VERIFY`| no       | `true` if the Redis provider uses a private CA            |
 | `SMS_PROVIDER`       | yes      | `msg91`                                                   |
 | `MSG91_AUTH_KEY`     | yes\*    | Your MSG91 Auth Key                                       |
 | `MSG91_TEMPLATE_ID`  | yes\*    | DLT-approved MSG91 flow Template ID                       |
@@ -71,6 +74,14 @@ See `artifacts/api-server/.env.example` for the full list. The essentials:
 | `GOOGLE_SAFE_BROWSING_API_KEY` | no | Enables Safe Browsing URL checks                     |
 
 \* Required when `SMS_PROVIDER=msg91` (the default in production).
+
+\*\* `REDIS_URL` is optional for a **single** API instance (it falls back to a
+per-process in-memory rate limiter). It becomes **required** the moment you run
+more than one instance: without a shared store each instance limits independently,
+so a per-IP cap of N effectively becomes N×instances and OTP/SMS-cost abuse
+protection weakens. A Redis outage degrades to the in-memory fallback rather than
+failing requests. Total Postgres connections = `instance_count × DB_POOL_MAX` —
+keep it under your managed-Postgres connection limit.
 
 > **Note:** The app generates and verifies its own OTP codes; MSG91 is used only
 > to deliver the code via its Flow API to a DLT-approved template. The template
@@ -208,10 +219,32 @@ Variables** and fill in the values marked `REPLACE_ME` / `REPLACE_WITH_...`:
 | `RAZORPAY_WEBHOOK_SECRET` | yes      | Razorpay webhook signing secret             |
 | `ADMIN_PASSWORD`          | yes      | Password for the admin web console          |
 | `ADMIN_PHONES`            | yes      | Admin phone(s); first is the admin account  |
+| `REDIS_URL`               | yes\*    | DO Managed Valkey `rediss://` URL (6.4a)    |
+| `DB_POOL_MAX`             | no       | Postgres connections per instance (def. 10) |
 | `OPENAI_API_KEY`          | no       | Enables AI scam classification              |
+
+> \* `.do/app.yaml` ships `instance_count: 2` for the API, so `REDIS_URL` is
+> **required** in production — otherwise the two instances rate-limit
+> independently. See 6.4a to provision it. Set `REDIS_TLS_NO_VERIFY=true` (already
+> in the spec) because DO Valkey uses a private CA.
 
 > Admin login needs **both** `ADMIN_PASSWORD` and `ADMIN_PHONES` — with no admin
 > phone set, `/api/auth/admin-login` returns `503 admin_login_unavailable`.
+
+### 6.4a Provision Managed Valkey for rate limiting (required for >1 instance)
+
+The API runs `instance_count: 2` (see `.do/app.yaml`), so the rate limiter needs a
+shared store. Either:
+
+- **Managed Valkey (recommended):** DO dashboard → **Databases → Create →
+  Valkey**. Copy its connection string (`rediss://...`) into the `REDIS_URL`
+  secret for the `api` component. Leave `REDIS_TLS_NO_VERIFY=true` (DO uses a
+  private CA). Or
+- **App-attached dev DB:** uncomment the `databases:` block at the bottom of
+  `.do/app.yaml` and set `REDIS_URL=${redis.DATABASE_URL}`.
+
+If you intentionally run a **single** instance, you can set `instance_count: 1` and
+leave `REDIS_URL` unset — the in-memory fallback is then correct.
 
 ### 6.5 Create the database schema (one time)
 
@@ -270,6 +303,8 @@ for the `preview` and `production` EAS build profiles, so store builds call
 
 - [ ] Postgres provisioned and `pnpm --filter @workspace/db push` run.
 - [ ] API server env vars set (DB, MSG91, optional OpenAI/Safe Browsing).
+- [ ] `REDIS_URL` set to a Managed Valkey URL (required because `instance_count > 1`).
+- [ ] `instance_count × DB_POOL_MAX` is under the Postgres connection limit.
 - [ ] HTTPS/TLS terminated in front of the API and admin.
 - [ ] Admin served behind a proxy that forwards `/api` to the API server.
 - [ ] `EXPO_PUBLIC_API_DOMAIN` points the mobile build at the live API.

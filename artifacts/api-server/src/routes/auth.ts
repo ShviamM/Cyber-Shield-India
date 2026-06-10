@@ -28,7 +28,7 @@ const router: IRouter = Router();
 // widget. It never sends an OTP itself.
 router.post("/auth/check-phone", async (req, res) => {
   const clientKey = req.ip ?? "unknown";
-  const ipLimit = hitRateLimit(
+  const ipLimit = await hitRateLimit(
     `phone-check:${clientKey}`,
     config.otpRequestMaxPerIpPerHour,
     3_600_000,
@@ -66,7 +66,7 @@ router.post("/auth/check-phone", async (req, res) => {
 // can't authenticate as a number they didn't actually verify.
 router.post("/auth/verify-token", async (req, res) => {
   const clientKey = req.ip ?? "unknown";
-  const ipLimit = hitRateLimit(
+  const ipLimit = await hitRateLimit(
     `token-verify:${clientKey}`,
     config.otpVerifyMaxPerIpPerMinute,
     60_000,
@@ -142,16 +142,18 @@ router.post("/auth/verify-token", async (req, res) => {
 router.post("/auth/admin-login", async (req, res) => {
   const clientKey = req.ip ?? "unknown";
   // Two-tier per-IP throttle to slow brute-force guessing of the shared password.
-  const perMinute = hitRateLimit(
-    `admin-login:m:${clientKey}`,
-    config.adminLoginMaxPerIpPerMinute,
-    60_000,
-  );
-  const perHour = hitRateLimit(
-    `admin-login:h:${clientKey}`,
-    config.adminLoginMaxPerIpPerHour,
-    3_600_000,
-  );
+  const [perMinute, perHour] = await Promise.all([
+    hitRateLimit(
+      `admin-login:m:${clientKey}`,
+      config.adminLoginMaxPerIpPerMinute,
+      60_000,
+    ),
+    hitRateLimit(
+      `admin-login:h:${clientKey}`,
+      config.adminLoginMaxPerIpPerHour,
+      3_600_000,
+    ),
+  ]);
   if (!perMinute.allowed || !perHour.allowed) {
     throw new HttpError(
       429,
@@ -219,7 +221,7 @@ router.post("/auth/dev-login", async (req, res) => {
   }
 
   const clientKey = req.ip ?? "unknown";
-  const ipLimit = hitRateLimit(
+  const ipLimit = await hitRateLimit(
     `dev-login:${clientKey}`,
     config.devLoginMaxPerIpPerMinute,
     60_000,

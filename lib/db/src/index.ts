@@ -45,8 +45,20 @@ function buildConnectionString() {
   }
 }
 
+// Explicit pool sizing. Total Postgres connections = (API instance_count) ×
+// (DB_POOL_MAX), so cap this with your managed-Postgres connection limit in
+// mind when scaling the API horizontally (e.g. 2 instances × 10 = 20). Use a
+// connection pooler (PgBouncer) if you outgrow the raw limit.
+function poolMax() {
+  const raw = Number(process.env.DB_POOL_MAX);
+  return Number.isFinite(raw) && raw > 0 ? raw : 10;
+}
+
 export const pool = new Pool({
   connectionString: buildConnectionString(),
+  max: poolMax(),
+  idleTimeoutMillis: 30_000,
+  connectionTimeoutMillis: 10_000,
   ...(ssl ? { ssl } : {}),
 });
 export const db = drizzle(pool, { schema });
