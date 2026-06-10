@@ -1,0 +1,88 @@
+Enhance the call handling and fraud reporting experience for unknown callers.
+
+### Current Scenario
+
+When an unknown number calls, users are presented with options such as:
+
+* Answer
+* Block
+* Report
+
+This works well before the call is answered.
+
+### New Requirement: Post-Call Fraud Reporting
+
+Many users only realize a caller is fraudulent after speaking with them. To address this, implement a post-call reporting workflow.
+
+### Expected Behavior
+
+#### Scenario 1: Incoming Unknown Call
+
+When an unknown number is ringing, continue showing:
+
+* Answer
+* Block
+* Report Spam/Fraud
+
+#### Scenario 2: User Answers the Call
+
+If the user answers an unknown call and the call ends, the application should intelligently display a lightweight post-call prompt.
+
+### Post-Call Prompt
+
+Display within 2–3 seconds after call termination:
+
+**Title:**
+"How was this call?"
+
+**Message:**
+"Help protect the community by reporting suspicious callers."
+
+**Options:**
+
+* Report Fraud / Spam
+* Block Number
+* Legitimate Caller
+
+### UX Requirements
+
+1. The prompt should only appear for:
+
+   * Unknown numbers
+   * Numbers not already saved in contacts
+   * Numbers not previously reported by the user
+
+2. The prompt should not appear:
+
+   * For contacts saved in the phonebook
+   * For emergency numbers
+   * If the user has disabled post-call prompts
+
+3. If the user selects "Report Fraud / Spam":
+
+   * Open the reporting flow immediately
+   * Allow category selection:
+
+     * Scam
+     * Telemarketing
+     * Loan/Finance Spam
+     * Fake Banking Call
+     * Harassment
+     * Other
+
+4. If the user selects "Block Number":
+
+   * Block the number within the app
+   * Sync the block with the native Android blocked numbers list
+
+5. If the user selects "Legitimate Caller":
+
+   * Suppress future reporting prompts for that number
+
+### Design Inspiration
+
+The experience should feel as seamless and non-intrusive as leading caller identification applications such as Truecaller while maintaining a clean, modern, and trust-focused user experience.
+
+### Goal
+
+Increase fraud reporting rates by capturing user feedback immediately after a suspicious conversation, when the user is most likely to recognize and report a scam attempt.
