@@ -17,6 +17,9 @@ declare class KavachScreeningModule extends NativeModule<KavachScreeningEvents> 
   requestCallScreeningRole(): Promise<boolean>;
   requestOverlayPermission(): Promise<boolean>;
   requestFullScreenIntentPermission(): Promise<boolean>;
+  answerCall(): boolean;
+  endCall(): boolean;
+  blockNumber(number: string): void;
 }
 
 // Loads the native module backing the JS `KavachScreening` API on Android.

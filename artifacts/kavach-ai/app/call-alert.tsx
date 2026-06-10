@@ -26,6 +26,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { categoryIcon } from "@/constants/strings";
 import { phoneForApi } from "@/lib/phone";
+import { answerCall, blockNumber, endCall } from "@/lib/screening";
 
 const DEMO_NUMBER = "+91 87654-32100";
 
@@ -161,9 +162,23 @@ export default function CallAlertScreen() {
     };
   }, []);
 
+  // The screen is launched both as a modal (from the in-app demo, with a back
+  // stack) and via a deep link from the native service (no back stack — where
+  // router.back() is a no-op). Fall back to the tabs so the popup always closes.
+  function dismiss() {
+    if (router.canGoBack()) router.back();
+    else router.replace("/(tabs)");
+  }
+
   function handleBlock() {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    router.back();
+    // For a real incoming call, hang it up and remember the number so future
+    // calls from it are auto-rejected. The demo (no live call) just dismisses.
+    if (!isDemo) {
+      endCall();
+      if (apiPhone) blockNumber(apiPhone);
+    }
+    dismiss();
   }
 
   function handleReport() {
@@ -213,12 +228,14 @@ export default function CallAlertScreen() {
     setReportOpen(false);
     setReportPhase("list");
     // After a successful report, dismiss the call alert too.
-    if (wasDone) router.back();
+    if (wasDone) dismiss();
   }
 
   function handleAnswer() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.back();
+    // Accept the live ringing call; the system in-call UI then comes forward.
+    if (!isDemo) answerCall();
+    dismiss();
   }
 
   const w = warnings[warningIndex];
@@ -234,7 +251,7 @@ export default function CallAlertScreen() {
       {/* Close */}
       <TouchableOpacity
         style={s.closeBtn}
-        onPress={() => router.back()}
+        onPress={dismiss}
         activeOpacity={0.75}
       >
         <Feather name="x" size={20} color="rgba(255,255,255,0.6)" />

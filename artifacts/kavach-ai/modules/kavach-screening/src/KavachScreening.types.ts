@@ -17,6 +17,8 @@ export type ScreeningStatus = {
   hasFullScreenIntentPermission: boolean;
   /** Whether "Display over other apps" (SYSTEM_ALERT_WINDOW) is granted. */
   hasOverlayPermission: boolean;
+  /** Whether ANSWER_PHONE_CALLS is granted (needed to answer/end live calls). */
+  hasAnswerCallsPermission: boolean;
   /** Number of high-risk numbers currently synced on-device. */
   blocklistSize: number;
   /** Number of scam keyword patterns currently synced on-device. */

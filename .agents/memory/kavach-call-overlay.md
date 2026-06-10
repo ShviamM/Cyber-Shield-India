@@ -10,12 +10,34 @@ overlay card. It launches the full React screen `app/call-alert.tsx` (the same o
 the home-screen DEMO button opens) over the lock screen via deep link
 `kavach-ai://call-alert?number=<urlencoded>`.
 
-**User-chosen behavior:** JUST show the screen automatically — NO auto-answer. The
-user still taps Answer/Block. Do not add ANSWER_PHONE_CALLS / RECORD_AUDIO (keeps
-the Play-safe policy; see play-permissions-policy.md).
+**User-chosen behavior:** show the screen automatically — NO auto-answer. The user
+still taps Answer/Block, and those buttons now ACT on the live call:
+- Block → `endCall()` + `blockNumber(apiPhone)` then dismiss; Answer → `answerCall()`
+  then dismiss. Both gated behind `!isDemo` so the home-screen demo is unaffected.
+- These need **ANSWER_PHONE_CALLS** (TelecomManager acceptRingingCall/endCall). This
+  is a deliberate, documented exception to play-permissions-policy.md — it is a
+  call-CONTROL permission, NOT one of Play's restricted Call Log / SMS perms, but it
+  IS call-related so it must be disclosed at Play review. Still never add
+  READ_CALL_LOG / READ_SMS / RECORD_AUDIO.
+- Blocking persists to the on-device blocklist; `KavachCallScreeningService` then
+  **silently auto-rejects** future calls from blocked numbers (setDisallowCall +
+  setRejectCall + setSkipNotification). This is the one place the app acts without a
+  per-call tap — so `screening.privacy.neverBlocks` copy MUST disclose it (don't
+  claim "never silently on its own"). No extra permission needed for the auto-reject.
+- `dismiss()` must be `router.canGoBack() ? back() : replace("/(tabs)")` — the deep-
+  link launch has no back stack, so a bare `router.back()` is a no-op.
+
+**Setup UI (screening.tsx):** scattered status + per-permission prompt cards were
+replaced by ONE guided `SetupGuide` card: ordered steps role → ANSWER_PHONE_CALLS →
+notifications → overlay → full-screen, with a single CTA that runs the next missing
+grant. Enabling the call toggle requests role + notifications + ANSWER_PHONE_CALLS
+back-to-back; the two Settings-screen grants (overlay, full-screen) are driven by
+the guide CTA.
 
 **Native launch (KavachCallScreeningService.kt):**
-- `respondToCall` is always an empty builder → never blocks/rejects/silences.
+- onScreenCall: if the incoming number is on the on-device blocklist → respond with
+  setDisallowCall + setRejectCall + setSkipNotification (silent auto-reject) and stop.
+  Otherwise respond with an empty/allow builder (never blocks) AND launch the screen.
 - Two launch paths: (a) direct `startActivity` of the deep link when `canDraw`
   (overlay permission grants the background-activity-launch exemption), and
   (b) ALWAYS post a full-screen-intent notification fallback

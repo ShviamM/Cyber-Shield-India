@@ -628,9 +628,17 @@ const en = {
     statusCallRole: "Netraksh is your call screening app",
     statusSmsPerm: "SMS access granted",
     statusNotif: "Alert notifications allowed",
+    statusAnswer: "Block & answer buttons can act on calls",
     statusOverlay: "Caller popup can show over the screen",
     statusFullScreen: "Full-screen alerts on lock screen allowed",
     statusBlocklist: "{{n}} high-risk numbers synced on-device",
+    setup: {
+      title: "Finish setup",
+      progress: "{{done}} of {{total}} steps done",
+      cta: "Continue setup",
+      doneTitle: "You're protected",
+      doneSub: "All set — Netraksh is screening your calls.",
+    },
     overlayPromptTitle: "Turn on the incoming-call popup",
     overlayPromptMsg:
       "Required: allow Netraksh to display over other apps, or the caller card can't pop up over your phone or call screen. Without this you'll only get a small notification.",
@@ -644,7 +652,7 @@ const en = {
       onDevice: "SMS screening runs on your phone. For calls, only the number is checked against Netraksh's scam database to warn you.",
       noContent: "Message contents are never sent off your device without your tap.",
       userControl: "Turn each protection on or off any time.",
-      neverBlocks: "Netraksh warns you — it never silently blocks or answers calls.",
+      neverBlocks: "Netraksh acts on a live call only when you tap Block or Answer. Numbers you've blocked are auto-rejected on future calls; it never answers a call on its own.",
     },
     sectionHow: "HOW IT WORKS",
     how: {

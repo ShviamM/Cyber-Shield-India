@@ -1,6 +1,7 @@
 package expo.modules.kavachscreening
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.NotificationManager
 import android.app.role.RoleManager
@@ -10,6 +11,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.telecom.TelecomManager
 import androidx.core.content.ContextCompat
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.exception.Exceptions
@@ -73,6 +75,25 @@ class KavachScreeningModule : Module() {
 
     Function("syncApiConfig") { baseUrl: String, token: String? ->
       ScreeningStore.setApiConfig(context, baseUrl, token ?: "")
+    }
+
+    // Accept the ringing call (the popup's "Answer" button). Requires the
+    // ANSWER_PHONE_CALLS runtime permission; returns false if unavailable so the
+    // JS screen can still dismiss gracefully.
+    Function("answerCall") {
+      answerRingingCall(context)
+    }
+
+    // End the current ringing/active call (the popup's "Block" button). Requires
+    // ANSWER_PHONE_CALLS (API 28+); returns false if unavailable.
+    Function("endCall") {
+      endOngoingCall(context)
+    }
+
+    // Persist a number to the on-device blocklist so future calls from it are
+    // silently rejected by the screening service (no extra permission needed).
+    Function("blockNumber") { number: String ->
+      ScreeningStore.addToBlocklist(context, number)
     }
 
     AsyncFunction("requestCallScreeningRole") { promise: Promise ->
@@ -146,9 +167,46 @@ class KavachScreeningModule : Module() {
       "hasNotificationPermission" to hasNotificationPermission(ctx),
       "hasFullScreenIntentPermission" to hasFullScreenIntentPermission(ctx),
       "hasOverlayPermission" to KavachCallOverlay.canDraw(ctx),
+      "hasAnswerCallsPermission" to hasAnswerCallsPermission(ctx),
       "blocklistSize" to ScreeningStore.getBlocklist(ctx).size,
       "keywordCount" to ScreeningStore.getKeywords(ctx).size
     )
+  }
+
+  /** Whether ANSWER_PHONE_CALLS is granted (needed to answer/end live calls). */
+  private fun hasAnswerCallsPermission(ctx: Context): Boolean {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return false
+    return ContextCompat.checkSelfPermission(
+      ctx,
+      Manifest.permission.ANSWER_PHONE_CALLS
+    ) == PackageManager.PERMISSION_GRANTED
+  }
+
+  /** Accept the currently ringing call. Returns false if not possible. */
+  @SuppressLint("MissingPermission")
+  private fun answerRingingCall(ctx: Context): Boolean {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return false
+    if (!hasAnswerCallsPermission(ctx)) return false
+    val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as? TelecomManager ?: return false
+    return try {
+      tm.acceptRingingCall()
+      true
+    } catch (_: Throwable) {
+      false
+    }
+  }
+
+  /** End the current ringing/active call. Returns false if not possible. */
+  @SuppressLint("MissingPermission")
+  private fun endOngoingCall(ctx: Context): Boolean {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) return false
+    if (!hasAnswerCallsPermission(ctx)) return false
+    val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as? TelecomManager ?: return false
+    return try {
+      tm.endCall()
+    } catch (_: Throwable) {
+      false
+    }
   }
 
   private fun hasCallRole(ctx: Context): Boolean {

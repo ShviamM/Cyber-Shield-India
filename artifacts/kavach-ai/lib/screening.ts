@@ -11,7 +11,7 @@
  * storage. The native services match against these locally — full message
  * contents are never sent off-device without the user's explicit action.
  */
-import { Platform } from "react-native";
+import { PermissionsAndroid, Platform } from "react-native";
 
 import KavachScreening, {
   type CallScreenedEvent,
@@ -74,6 +74,7 @@ const UNAVAILABLE_STATUS: ScreeningStatus = {
   hasNotificationPermission: false,
   hasFullScreenIntentPermission: false,
   hasOverlayPermission: false,
+  hasAnswerCallsPermission: false,
   blocklistSize: 0,
   keywordCount: 0,
 };
@@ -153,6 +154,63 @@ export async function requestFullScreenIntentPermission(): Promise<boolean> {
     return await KavachScreening.requestFullScreenIntentPermission();
   } catch {
     return false;
+  }
+}
+
+/**
+ * Ask for the ANSWER_PHONE_CALLS runtime permission so the incoming-call popup's
+ * Answer/Block buttons can act on the live call. No-op (resolves false) off a
+ * native Android build. Standard caller-management permission — not one of Play's
+ * restricted Call Log / SMS permissions.
+ */
+export async function requestAnswerCallsPermission(): Promise<boolean> {
+  if (Platform.OS !== "android") return false;
+  try {
+    const result = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ANSWER_PHONE_CALLS
+    );
+    return result === PermissionsAndroid.RESULTS.GRANTED;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Accept the currently ringing call (the popup's "Answer" button). Returns true
+ * only when the native layer actually accepted a call; safe no-op elsewhere.
+ */
+export function answerCall(): boolean {
+  if (!isScreeningSupported()) return false;
+  try {
+    return KavachScreening.answerCall();
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * End the current ringing/active call (the popup's "Block" button). Returns true
+ * only when the native layer actually ended a call; safe no-op elsewhere.
+ */
+export function endCall(): boolean {
+  if (!isScreeningSupported()) return false;
+  try {
+    return KavachScreening.endCall();
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Add a number to the on-device blocklist so future calls from it are silently
+ * rejected by the screening service. Safe no-op off a native build.
+ */
+export function blockNumber(number: string): void {
+  if (!isScreeningSupported()) return;
+  try {
+    KavachScreening.blockNumber(number);
+  } catch {
+    // ignore
   }
 }
 

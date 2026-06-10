@@ -21,6 +21,7 @@ import { useColors } from "@/hooks/useColors";
 import {
   getScreeningStatus,
   isScreeningSupported,
+  requestAnswerCallsPermission,
   requestCallScreeningRole,
   requestFullScreenIntentPermission,
   requestOverlayPermission,
@@ -88,6 +89,29 @@ export default function ScreeningScreen() {
     }, [i18n.language, refreshStatus, syncApiConfig])
   );
 
+  async function grantRole() {
+    Haptics.selectionAsync();
+    syncScreeningLanguage(i18n.language?.startsWith("hi") ? "hi" : "en");
+    void syncApiConfig();
+    const ok = await requestCallScreeningRole();
+    if (!ok) {
+      Alert.alert(t("screening.roleDeniedTitle"), t("screening.roleDeniedMsg"));
+    }
+    refreshStatus();
+  }
+
+  async function grantAnswer() {
+    Haptics.selectionAsync();
+    await requestAnswerCallsPermission();
+    refreshStatus();
+  }
+
+  async function grantNotif() {
+    Haptics.selectionAsync();
+    await requestNotificationPermission();
+    refreshStatus();
+  }
+
   async function grantOverlay() {
     Haptics.selectionAsync();
     await requestOverlayPermission();
@@ -109,8 +133,12 @@ export default function ScreeningScreen() {
     if (next) {
       syncScreeningLanguage(i18n.language?.startsWith("hi") ? "hi" : "en");
       void syncApiConfig();
+      // Kick off the guided setup: request the defining role + the two runtime
+      // permissions (notifications, answer/decline calls) back-to-back. The two
+      // Settings-screen grants (overlay, full-screen) are driven by the guide.
       const ok = await requestCallScreeningRole();
       await requestNotificationPermission();
+      await requestAnswerCallsPermission();
       if (!ok) {
         Alert.alert(t("screening.roleDeniedTitle"), t("screening.roleDeniedMsg"));
       }
@@ -120,6 +148,17 @@ export default function ScreeningScreen() {
     }
     refreshStatus();
   }
+
+  type SetupStep = { key: string; done: boolean; label: string; action: () => void };
+  const setupSteps: SetupStep[] = [
+    { key: "role", done: status.hasCallRole, label: t("screening.statusCallRole"), action: grantRole },
+    { key: "answer", done: status.hasAnswerCallsPermission, label: t("screening.statusAnswer"), action: grantAnswer },
+    { key: "notif", done: status.hasNotificationPermission, label: t("screening.statusNotif"), action: grantNotif },
+    { key: "overlay", done: status.hasOverlayPermission, label: t("screening.statusOverlay"), action: grantOverlay },
+    { key: "fullscreen", done: status.hasFullScreenIntentPermission, label: t("screening.statusFullScreen"), action: grantFullScreenIntent },
+  ];
+  const setupDoneCount = setupSteps.filter((x) => x.done).length;
+  const nextSetupStep = setupSteps.find((x) => !x.done);
 
   const PRIVACY_POINTS = [
     { icon: "smartphone" as const, text: t("screening.privacy.onDevice") },
@@ -204,75 +243,17 @@ export default function ScreeningScreen() {
           </View>
         </View>
 
-        {/* Live status (native only) */}
+        {/* Guided, Truecaller-style setup: one card that walks the user through
+            each grant in order with a single "Continue" button, instead of
+            scattered prompts. */}
         {supported && callScreening && (
-          <View style={s.statusCard}>
-            <StatusLine
-              ok={status.hasCallRole}
-              label={t("screening.statusCallRole")}
-              show={callScreening}
-            />
-            <StatusLine
-              ok={status.hasNotificationPermission}
-              label={t("screening.statusNotif")}
-              show
-            />
-            <StatusLine
-              ok={status.hasOverlayPermission}
-              label={t("screening.statusOverlay")}
-              show
-            />
-            <StatusLine
-              ok={status.hasFullScreenIntentPermission}
-              label={t("screening.statusFullScreen")}
-              show
-            />
-            <View style={s.statusMeta}>
-              <Feather name="database" size={13} color="#64748b" />
-              <Text style={s.statusMetaTxt}>
-                {t("screening.statusBlocklist", { n: status.blocklistSize })}
-              </Text>
-            </View>
-          </View>
-        )}
-
-        {/* Overlay permission prompt (the Truecaller-style popup needs it) */}
-        {supported && callScreening && !status.hasOverlayPermission && (
-          <View style={s.permCard}>
-            <View style={s.permHead}>
-              <View style={s.permIcon}>
-                <Feather name="layers" size={18} color={SAFFRON} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={s.permTitle}>{t("screening.overlayPromptTitle")}</Text>
-                <Text style={s.permText}>{t("screening.overlayPromptMsg")}</Text>
-              </View>
-            </View>
-            <TouchableOpacity style={s.permBtn} onPress={grantOverlay} activeOpacity={0.85}>
-              <Feather name="external-link" size={16} color="#fff" />
-              <Text style={s.permBtnTxt}>{t("screening.overlayGrant")}</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {/* Full-screen notification prompt (Android 14+ revokes this by default;
-            needed so the popup launches over the lock screen) */}
-        {supported && callScreening && !status.hasFullScreenIntentPermission && (
-          <View style={s.permCard}>
-            <View style={s.permHead}>
-              <View style={s.permIcon}>
-                <Feather name="maximize" size={18} color={SAFFRON} />
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={s.permTitle}>{t("screening.fullScreenPromptTitle")}</Text>
-                <Text style={s.permText}>{t("screening.fullScreenPromptMsg")}</Text>
-              </View>
-            </View>
-            <TouchableOpacity style={s.permBtn} onPress={grantFullScreenIntent} activeOpacity={0.85}>
-              <Feather name="external-link" size={16} color="#fff" />
-              <Text style={s.permBtnTxt}>{t("screening.fullScreenGrant")}</Text>
-            </TouchableOpacity>
-          </View>
+          <SetupGuide
+            steps={setupSteps}
+            doneCount={setupDoneCount}
+            nextStep={nextSetupStep}
+            blocklistSize={status.blocklistSize}
+            t={t}
+          />
         )}
 
         {/* Privacy */}
@@ -318,16 +299,90 @@ export default function ScreeningScreen() {
   );
 }
 
-function StatusLine({ ok, label, show }: { ok: boolean; label: string; show: boolean }) {
-  if (!show) return null;
+type GuideStep = { key: string; done: boolean; label: string; action: () => void };
+
+function SetupGuide({
+  steps,
+  doneCount,
+  nextStep,
+  blocklistSize,
+  t,
+}: {
+  steps: GuideStep[];
+  doneCount: number;
+  nextStep: GuideStep | undefined;
+  blocklistSize: number;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+}) {
+  const total = steps.length;
+  const allDone = !nextStep;
   return (
-    <View style={s.statusLine}>
-      <Feather
-        name={ok ? "check-circle" : "alert-circle"}
-        size={15}
-        color={ok ? GREEN : "#ea580c"}
-      />
-      <Text style={[s.statusTxt, { color: ok ? "#166534" : "#9a3412" }]}>{label}</Text>
+    <View style={[s.guideCard, allDone && s.guideCardDone]}>
+      <View style={s.guideHead}>
+        <View style={[s.guideBadge, allDone && s.guideBadgeDone]}>
+          <Feather name={allDone ? "check" : "zap"} size={16} color="#fff" />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={s.guideTitle}>
+            {allDone ? t("screening.setup.doneTitle") : t("screening.setup.title")}
+          </Text>
+          <Text style={s.guideSub}>
+            {allDone
+              ? t("screening.setup.doneSub")
+              : t("screening.setup.progress", { done: doneCount, total })}
+          </Text>
+        </View>
+      </View>
+
+      <View style={s.guideSteps}>
+        {steps.map((step) => {
+          const isNext = step.key === nextStep?.key;
+          return (
+            <View key={step.key} style={s.guideStep}>
+              <View
+                style={[
+                  s.guideStepIcon,
+                  step.done && s.guideStepIconDone,
+                  isNext && s.guideStepIconNext,
+                ]}
+              >
+                <Feather
+                  name={step.done ? "check" : "circle"}
+                  size={12}
+                  color={step.done || isNext ? "#fff" : "#cbd5e1"}
+                />
+              </View>
+              <Text
+                style={[
+                  s.guideStepTxt,
+                  step.done && s.guideStepTxtDone,
+                  isNext && s.guideStepTxtNext,
+                ]}
+              >
+                {step.label}
+              </Text>
+            </View>
+          );
+        })}
+      </View>
+
+      {allDone ? (
+        <View style={s.guideDoneMeta}>
+          <Feather name="database" size={13} color="#64748b" />
+          <Text style={s.statusMetaTxt}>
+            {t("screening.statusBlocklist", { n: blocklistSize })}
+          </Text>
+        </View>
+      ) : (
+        <TouchableOpacity
+          style={s.guideBtn}
+          onPress={nextStep?.action}
+          activeOpacity={0.85}
+        >
+          <Text style={s.guideBtnTxt}>{t("screening.setup.cta")}</Text>
+          <Feather name="arrow-right" size={16} color="#fff" />
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -376,14 +431,41 @@ const s = StyleSheet.create({
   rowLabel: { fontSize: 14, fontWeight: "600" as const, color: "#0f172a" },
   rowSub: { fontSize: 12, color: "#64748b", marginTop: 2, lineHeight: 16 },
 
-  statusCard: {
-    backgroundColor: "#f8fafc", borderRadius: 14, padding: 14, marginBottom: 20, gap: 10,
-    borderWidth: 1, borderColor: "#e2e8f0",
-  },
-  statusLine: { flexDirection: "row", alignItems: "center", gap: 8 },
-  statusTxt: { fontSize: 13, fontWeight: "600" as const },
-  statusMeta: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 2 },
   statusMetaTxt: { fontSize: 12, color: "#64748b" },
+
+  guideCard: {
+    backgroundColor: "#fff7ed", borderRadius: 16, padding: 16, marginBottom: 20,
+    borderWidth: 1.5, borderColor: "rgba(255,103,19,0.3)",
+  },
+  guideCardDone: {
+    backgroundColor: "#f0fdf4", borderColor: "rgba(22,163,74,0.3)",
+  },
+  guideHead: { flexDirection: "row", gap: 12, alignItems: "center", marginBottom: 14 },
+  guideBadge: {
+    width: 36, height: 36, borderRadius: 10, backgroundColor: SAFFRON,
+    alignItems: "center", justifyContent: "center",
+  },
+  guideBadgeDone: { backgroundColor: GREEN },
+  guideTitle: { fontSize: 15, fontWeight: "800" as const, color: "#1e293b" },
+  guideSub: { fontSize: 12, color: "#64748b", marginTop: 1 },
+  guideSteps: { gap: 10, marginBottom: 14 },
+  guideStep: { flexDirection: "row", alignItems: "center", gap: 10 },
+  guideStepIcon: {
+    width: 22, height: 22, borderRadius: 11, backgroundColor: "#fff",
+    borderWidth: 1.5, borderColor: "#e2e8f0",
+    alignItems: "center", justifyContent: "center",
+  },
+  guideStepIconDone: { backgroundColor: GREEN, borderColor: GREEN },
+  guideStepIconNext: { backgroundColor: SAFFRON, borderColor: SAFFRON },
+  guideStepTxt: { flex: 1, fontSize: 13, fontWeight: "600" as const, color: "#94a3b8" },
+  guideStepTxtDone: { color: "#166534" },
+  guideStepTxtNext: { color: "#1e293b", fontWeight: "700" as const },
+  guideDoneMeta: { flexDirection: "row", alignItems: "center", gap: 8 },
+  guideBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
+    backgroundColor: SAFFRON, borderRadius: 12, paddingVertical: 13,
+  },
+  guideBtnTxt: { fontSize: 14, fontWeight: "700" as const, color: "#fff" },
 
   privacyRow: { flexDirection: "row", alignItems: "center", gap: 12, padding: 14 },
   privacyIcon: {
@@ -406,21 +488,4 @@ const s = StyleSheet.create({
     borderWidth: 1.5, borderColor: "rgba(255,103,19,0.3)",
   },
   demoTxt: { fontSize: 14, fontWeight: "700" as const, color: "#9a3412" },
-
-  permCard: {
-    backgroundColor: "#fff7ed", borderRadius: 16, padding: 14, marginBottom: 20, gap: 12,
-    borderWidth: 1.5, borderColor: "rgba(255,103,19,0.3)",
-  },
-  permHead: { flexDirection: "row", gap: 12, alignItems: "flex-start" },
-  permIcon: {
-    width: 38, height: 38, borderRadius: 10, backgroundColor: "#ffedd5",
-    alignItems: "center", justifyContent: "center",
-  },
-  permTitle: { fontSize: 14, fontWeight: "700" as const, color: "#9a3412", marginBottom: 2 },
-  permText: { fontSize: 12, color: "#7c2d12", lineHeight: 18 },
-  permBtn: {
-    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
-    backgroundColor: SAFFRON, borderRadius: 12, paddingVertical: 12,
-  },
-  permBtnTxt: { fontSize: 14, fontWeight: "700" as const, color: "#fff" },
 });

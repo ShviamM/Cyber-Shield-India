@@ -22,6 +22,7 @@ class KavachScreeningModule extends NativeModule<KavachScreeningEvents> {
       hasCallRole: false,
       hasSmsPermission: false,
       hasNotificationPermission: false,
+      hasAnswerCallsPermission: false,
       hasFullScreenIntentPermission: false,
       hasOverlayPermission: false,
       blocklistSize: 0,
@@ -32,6 +33,16 @@ class KavachScreeningModule extends NativeModule<KavachScreeningEvents> {
   setCallScreeningEnabled(_enabled: boolean): void {}
 
   setSmsScreeningEnabled(_enabled: boolean): void {}
+
+  answerCall(): boolean {
+    return false;
+  }
+
+  endCall(): boolean {
+    return false;
+  }
+
+  blockNumber(_number: string): void {}
 
   syncBlocklist(_numbers: string[]): void {}
 

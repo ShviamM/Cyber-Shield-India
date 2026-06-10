@@ -30,25 +30,37 @@ import java.net.URLEncoder
  */
 class KavachCallScreeningService : CallScreeningService() {
   override fun onScreenCall(callDetails: Call.Details) {
-    // Allow every call through untouched — an empty response neither blocks the
-    // call, skips the call log, nor silences the ringer.
-    respondToCall(callDetails, CallResponse.Builder().build())
-
     val ctx = applicationContext
-    if (!ScreeningStore.isCallEnabled(ctx)) return
+    val enabled = ScreeningStore.isCallEnabled(ctx)
 
     // Only react to incoming calls (callDirection is API 29+).
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
-      callDetails.callDirection != Call.Details.DIRECTION_INCOMING
-    ) {
+    val isIncoming = Build.VERSION.SDK_INT < Build.VERSION_CODES.Q ||
+      callDetails.callDirection == Call.Details.DIRECTION_INCOMING
+    val number = callDetails.handle?.schemeSpecificPart
+
+    // A number the user explicitly blocked is silently rejected here — the only
+    // case where we touch the call. Everything else is allowed through untouched.
+    if (enabled && isIncoming && number != null && ScreeningStore.isBlocked(ctx, number)) {
+      respondToCall(
+        callDetails,
+        CallResponse.Builder()
+          .setDisallowCall(true)
+          .setRejectCall(true)
+          .setSkipNotification(true)
+          .build()
+      )
+      KavachScreeningModule.notifyCallScreened(number, true)
       return
     }
 
-    val number = callDetails.handle?.schemeSpecificPart ?: return
-    val blocked = ScreeningStore.isBlocked(ctx, number)
+    // Allow the call through untouched — an empty response neither blocks the
+    // call, skips the call log, nor silences the ringer.
+    respondToCall(callDetails, CallResponse.Builder().build())
+
+    if (!enabled || !isIncoming || number == null) return
 
     launchCallScreen(ctx, number)
-    KavachScreeningModule.notifyCallScreened(number, blocked)
+    KavachScreeningModule.notifyCallScreened(number, false)
   }
 
   /**
