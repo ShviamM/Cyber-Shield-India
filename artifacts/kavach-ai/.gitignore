@@ -9,9 +9,11 @@ dist/
 web-build/
 expo-env.d.ts
 
-# Native
-ios/
-android/
+# Native (root prebuild dirs only — keep custom expo-module native source tracked)
+/ios/
+/android/
+modules/**/android/build/
+modules/**/android/.cxx/
 *.orig.*
 *.jks
 *.p8
