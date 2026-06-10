@@ -1,0 +1,157 @@
+# Critical Production Release Review & Fixes Required Before Google Play Store Launch
+
+We are launching the application on the Google Play Store today, and the following issues must be reviewed and fixed immediately. Perform a complete audit of the app's caller identification, blocking functionality, Android integration, user experience, performance, and competitive positioning against Truecaller.
+
+## Issue 1: Incoming Call Screen Behavior
+
+### Current Problem
+
+When an incoming call is received, the app correctly displays the caller identification popup. However, tapping the notification or popup causes the entire application to launch from the beginning, loading the home screen and restarting the app experience.
+
+### Expected Behavior (Truecaller-like Experience)
+
+* The app should NOT fully open when an incoming call is received.
+* Only the incoming caller identification overlay should appear.
+* The user should remain on their current screen or application.
+* The experience should feel lightweight, native, and seamless.
+* The caller information screen should appear as an overlay and disappear automatically after the call ends.
+* No unnecessary navigation to the app dashboard should occur.
+* Cold-start app launches must be eliminated during incoming calls.
+
+### Required Review
+
+* Review Android Call Screening Service implementation.
+* Review Overlay Permissions.
+* Review Activity Launch Logic.
+* Review Notification Intent Handling.
+* Ensure behavior matches or exceeds Truecaller's caller identification experience.
+
+---
+
+## Issue 2: Contact Blocking Synchronization
+
+### Current Problem
+
+When a user blocks a contact inside the application:
+
+* The number gets blocked inside the app.
+* The blocked number is NOT visible in Android's native blocked numbers list.
+* If the user accidentally blocks someone, it becomes difficult to locate and remove the blocked contact.
+
+### Expected Behavior
+
+* Every blocked number should automatically synchronize with Android's native block list.
+* Users should see blocked contacts both:
+
+  * Inside the application.
+  * Inside Android Phone Settings → Blocked Numbers.
+* Unblocking should remove the number from both locations.
+* The app should maintain a single source of truth.
+* No duplicate block entries should be created.
+
+### Required Review
+
+* Android BlockedNumberContract integration.
+* Android Dialer compatibility.
+* Android 13, 14, 15 compliance.
+* Permission handling.
+* Block/Unblock synchronization logic.
+* Edge cases and rollback handling.
+
+---
+
+# Full Competitive Review Against Truecaller
+
+Perform a feature-by-feature comparison with Truecaller and identify gaps.
+
+Review the following:
+
+## Caller Identification
+
+* Speed of caller lookup.
+* Accuracy.
+* Spam confidence scoring.
+* Overlay design.
+* Call answer screen experience.
+
+## Spam Protection
+
+* Spam calls.
+* Scam calls.
+* Robocalls.
+* Fraud detection.
+
+## SMS Protection
+
+* Phishing detection.
+* Malicious links.
+* OTP handling.
+* Scam message detection.
+
+## WhatsApp Protection
+
+* Scam message scanning.
+* Fraud detection.
+* Unknown sender analysis.
+
+## User Experience
+
+* App startup time.
+* Navigation flow.
+* UI responsiveness.
+* One-handed usage.
+* Accessibility.
+
+## AI Features
+
+* Scam detection engine.
+* Behavioral analysis.
+* Risk scoring.
+* Context-aware alerts.
+
+## Battery Optimization
+
+* Background services.
+* RAM consumption.
+* CPU utilization.
+* Startup impact.
+
+## Privacy & Security
+
+* Data collection review.
+* Permission minimization.
+* GDPR compliance.
+* India DPDP Act compliance.
+* Play Store policy compliance.
+
+---
+
+# Launch Readiness Audit
+
+Provide a final launch readiness report including:
+
+### Critical Issues
+
+Items that must be fixed before release.
+
+### High Priority Improvements
+
+Items that can be released within the next sprint.
+
+### Competitive Advantages
+
+Features where we already outperform Truecaller.
+
+### Missing Features
+
+Features that Truecaller currently provides but we do not.
+
+### Play Store Risks
+
+Potential causes of rejection or policy violations.
+
+### Recommendations
+
+Actions required to position the application as the best anti-scam and caller protection application in India.
+
+Goal: Deliver a smoother, faster, smarter, and more privacy-focused experience than Truecaller while maintaining full Android compatibility and Google Play Store compliance.

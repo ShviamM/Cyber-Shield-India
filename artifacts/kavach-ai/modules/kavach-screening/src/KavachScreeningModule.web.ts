@@ -44,6 +44,12 @@ class KavachScreeningModule extends NativeModule<KavachScreeningEvents> {
 
   blockNumber(_number: string): void {}
 
+  getBlockedNumbers(): string[] {
+    return [];
+  }
+
+  unblockNumber(_number: string): void {}
+
   syncBlocklist(_numbers: string[]): void {}
 
   syncKeywords(_keywords: string[]): void {}

@@ -282,6 +282,22 @@ export default function ScreeningScreen() {
           ))}
         </View>
 
+        {/* Manage the numbers the user has blocked (view + unblock). */}
+        {supported && (
+          <TouchableOpacity
+            style={s.manageBtn}
+            onPress={() => {
+              Haptics.selectionAsync();
+              router.push("/blocked-numbers");
+            }}
+            activeOpacity={0.85}
+          >
+            <Feather name="slash" size={18} color={NAVY} />
+            <Text style={s.manageTxt}>{t("screening.manageBlocked")}</Text>
+            <Feather name="chevron-right" size={18} color="#94a3b8" />
+          </TouchableOpacity>
+        )}
+
         {/* Demo (so users can preview the warning UI) */}
         <TouchableOpacity
           style={s.demoBtn}
@@ -488,4 +504,11 @@ const s = StyleSheet.create({
     borderWidth: 1.5, borderColor: "rgba(255,103,19,0.3)",
   },
   demoTxt: { fontSize: 14, fontWeight: "700" as const, color: "#9a3412" },
+
+  manageBtn: {
+    flexDirection: "row", alignItems: "center", gap: 10,
+    backgroundColor: "#fff", borderRadius: 14, paddingVertical: 14, paddingHorizontal: 16,
+    borderWidth: 1, borderColor: "#e2e8f0",
+  },
+  manageTxt: { flex: 1, fontSize: 14, fontWeight: "700" as const, color: "#0B3D91" },
 });

@@ -214,6 +214,30 @@ export function blockNumber(number: string): void {
   }
 }
 
+/**
+ * The numbers the user has manually blocked (call popup's Block button or the
+ * Blocked-numbers screen). Distinct from the engine-derived high-risk list, so
+ * an engine re-sync never wipes a user's own blocks. Empty off a native build.
+ */
+export function getBlockedNumbers(): string[] {
+  if (!isScreeningSupported()) return [];
+  try {
+    return KavachScreening.getBlockedNumbers();
+  } catch {
+    return [];
+  }
+}
+
+/** Remove a number the user previously blocked (the in-app Unblock action). */
+export function unblockNumber(number: string): void {
+  if (!isScreeningSupported()) return;
+  try {
+    KavachScreening.unblockNumber(number);
+  } catch {
+    // ignore
+  }
+}
+
 /** Tell the native overlay which language (e.g. "en"/"hi") to render in. */
 export function syncScreeningLanguage(code: string): void {
   if (!isScreeningSupported()) return;

@@ -96,6 +96,18 @@ class KavachScreeningModule : Module() {
       ScreeningStore.addToBlocklist(context, number)
     }
 
+    // The numbers the user blocked manually, for the in-app "Blocked numbers"
+    // screen. Engine-derived high-risk numbers are managed automatically and are
+    // excluded so the user only sees (and can undo) their own blocks.
+    Function("getBlockedNumbers") {
+      ScreeningStore.getUserBlocklist(context).sorted()
+    }
+
+    // Remove a user-blocked number — the in-app Unblock action.
+    Function("unblockNumber") { number: String ->
+      ScreeningStore.removeFromUserBlock(context, number)
+    }
+
     AsyncFunction("requestCallScreeningRole") { promise: Promise ->
       requestCallScreeningRole(promise)
     }

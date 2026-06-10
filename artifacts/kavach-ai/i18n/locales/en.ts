@@ -661,12 +661,25 @@ const en = {
       step3: "If something looks risky, you get a clear warning — tap to verify it safely.",
     },
     previewWarning: "Preview a scam-call warning",
+    manageBlocked: "Blocked numbers",
     roleDeniedTitle: "Call screening not enabled",
     roleDeniedMsg:
       "To screen calls, allow Netraksh to be your call screening app in the system dialog.",
     smsDeniedTitle: "SMS permission needed",
     smsDeniedMsg:
       "Netraksh needs SMS access to screen messages on your device. You can grant it in Settings.",
+  },
+
+  blockedNumbers: {
+    title: "Blocked numbers",
+    intro:
+      "Numbers you've blocked are rejected automatically before your phone rings. Tap Unblock to allow calls again.",
+    unsupported: "Blocking is only available on the Android app.",
+    emptyTitle: "No blocked numbers",
+    emptySub: "When you block a caller from the call alert, it will appear here.",
+    unblock: "Unblock",
+    unblockTitle: "Unblock this number?",
+    unblockConfirm: "Calls from {{number}} will no longer be blocked.",
   },
 
   language: {

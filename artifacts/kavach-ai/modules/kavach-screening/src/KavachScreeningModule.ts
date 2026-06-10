@@ -20,6 +20,8 @@ declare class KavachScreeningModule extends NativeModule<KavachScreeningEvents> 
   answerCall(): boolean;
   endCall(): boolean;
   blockNumber(number: string): void;
+  getBlockedNumbers(): string[];
+  unblockNumber(number: string): void;
 }
 
 // Loads the native module backing the JS `KavachScreening` API on Android.

@@ -80,7 +80,13 @@ function RootLayoutNav() {
     const id = setTimeout(() => setMinElapsed(true), 5000);
     return () => clearTimeout(id);
   }, []);
-  const launchExiting = minElapsed && status !== "loading";
+  // An incoming-call deep link (kavach-ai://call-alert) must feel like a
+  // lightweight Truecaller-style popup, NOT a full app launch. When the app is
+  // resolving onto the call-alert route we skip the branded LaunchScreen, the
+  // onboarding gate, and the unauthenticated→login redirect so the caller card
+  // appears immediately instead of cold-starting into the home screen.
+  const isCallAlert = segments[0] === "call-alert";
+  const launchExiting = isCallAlert || (minElapsed && status !== "loading");
 
   // Push the API base + session token to the native call-screening service so it
   // can look up an incoming caller's scam reputation even when no JS is running.
@@ -135,8 +141,15 @@ function RootLayoutNav() {
   // settles, otherwise it would clobber the Verify route.
   useEffect(() => {
     if (status === "loading") return;
+    // Wait for the router to resolve a concrete route before gating. During the
+    // brief unresolved phase `segments` is `[]`, and acting then can fire the
+    // login redirect before a `call-alert` deep link resolves — recreating the
+    // "wrong first screen" race for an incoming call on a signed-out device.
+    if ((segments as string[]).length === 0) return;
     const inAuthGroup = segments[0] === "(auth)";
-    if (status === "unauthenticated" && !inAuthGroup) {
+    // The incoming-call popup must show even when signed out (the reputation
+    // lookup works anonymously), so never bounce the call-alert route to login.
+    if (status === "unauthenticated" && !inAuthGroup && !isCallAlert) {
       router.replace("/(auth)/login");
     } else if (status === "authenticated" && inAuthGroup) {
       if (hasShareIntent && !shareHandledRef.current) {
@@ -181,6 +194,10 @@ function RootLayoutNav() {
           options={{ title: t("notifications.title") }}
         />
         <Stack.Screen name="screening" options={{ title: t("screening.title") }} />
+        <Stack.Screen
+          name="blocked-numbers"
+          options={{ title: t("blockedNumbers.title") }}
+        />
         <Stack.Screen name="report" options={{ title: t("report.title") }} />
         <Stack.Screen
           name="subscription"
@@ -196,7 +213,7 @@ function RootLayoutNav() {
       {launchHidden ? null : (
         <LaunchScreen exiting={launchExiting} onHidden={() => setLaunchHidden(true)} />
       )}
-      {launchHidden && onboarded === false ? (
+      {launchHidden && onboarded === false && !isCallAlert ? (
         <Onboarding onDone={() => setOnboarded(true)} />
       ) : null}
     </View>

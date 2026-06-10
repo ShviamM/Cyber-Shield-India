@@ -14,6 +14,7 @@ object ScreeningStore {
   private const val KEY_CALL_ENABLED = "call_enabled"
   private const val KEY_SMS_ENABLED = "sms_enabled"
   private const val KEY_BLOCKLIST = "blocklist"
+  private const val KEY_USER_BLOCKLIST = "user_blocklist"
   private const val KEY_KEYWORDS = "keywords"
   private const val KEY_LANGUAGE = "language"
   private const val KEY_API_BASE = "api_base"
@@ -78,12 +79,30 @@ object ScreeningStore {
   fun getBlocklist(ctx: Context): Set<String> =
     prefs(ctx).getStringSet(KEY_BLOCKLIST, emptySet()) ?: emptySet()
 
-  /** Add a single number to the on-device blocklist (used by the overlay's Block button). */
+  /**
+   * Numbers the user blocked manually (e.g. the call popup's Block button). Kept
+   * in a SEPARATE store from the engine-derived [getBlocklist] so a re-sync of
+   * the engine list ([setBlocklist], which replaces the whole set) can never wipe
+   * a user's own block. This is the list shown/edited by the in-app
+   * "Blocked numbers" screen.
+   */
+  fun getUserBlocklist(ctx: Context): Set<String> =
+    prefs(ctx).getStringSet(KEY_USER_BLOCKLIST, emptySet()) ?: emptySet()
+
+  /** Add a single number to the user's manual blocklist (the overlay's Block button). */
   fun addToBlocklist(ctx: Context, rawNumber: String) {
     val n = normalize(rawNumber)
     if (n.length < 6) return
-    val updated = getBlocklist(ctx).toMutableSet().apply { add(n) }
-    prefs(ctx).edit().putStringSet(KEY_BLOCKLIST, updated).apply()
+    val updated = getUserBlocklist(ctx).toMutableSet().apply { add(n) }
+    prefs(ctx).edit().putStringSet(KEY_USER_BLOCKLIST, updated).apply()
+  }
+
+  /** Remove a number from the user's manual blocklist (last-10 match) — the in-app Unblock action. */
+  fun removeFromUserBlock(ctx: Context, rawNumber: String) {
+    val tail = normalize(rawNumber).takeLast(10)
+    if (tail.length < 6) return
+    val updated = getUserBlocklist(ctx).filterNot { it.takeLast(10) == tail }.toSet()
+    prefs(ctx).edit().putStringSet(KEY_USER_BLOCKLIST, updated).apply()
   }
 
   fun setKeywords(ctx: Context, keywords: List<String>) {
@@ -101,7 +120,8 @@ object ScreeningStore {
     val n = normalize(rawNumber)
     if (n.length < 6) return false
     val tail = n.takeLast(10)
-    return getBlocklist(ctx).any { it.takeLast(10) == tail }
+    return getBlocklist(ctx).any { it.takeLast(10) == tail } ||
+      getUserBlocklist(ctx).any { it.takeLast(10) == tail }
   }
 
   private fun normalize(number: String): String = number.filter { it.isDigit() }
