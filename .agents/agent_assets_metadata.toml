@@ -143,3 +143,9 @@ id = "aBfOn-TGyTAwRRs-PSvpy"
 uri = "file://HANDOFF.md"
 type = "text"
 title = "Netraksh — Developer Handoff (status, deploy, build, open items)"
+
+[[outputs]]
+id = "hyCeZmiTHNwoi6irx9jz2"
+uri = "file://netraksh-source-handoff.tar.gz"
+type = "unspecified"
+title = "Netraksh — Full Source + Docs (mobile app, admin, backend)"
