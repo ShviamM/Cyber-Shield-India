@@ -85,6 +85,7 @@ const CITY_TO_STATE: Record<string, string> = {
   Gurugram: "Haryana",
   Noida: "Uttar Pradesh",
   Lucknow: "Uttar Pradesh",
+  Kanpur: "Uttar Pradesh",
   Kolkata: "West Bengal",
   Ahmedabad: "Gujarat",
   Jaipur: "Rajasthan",
