@@ -14,7 +14,7 @@ import { ShareIntentProvider, useShareIntentContext } from "expo-share-intent";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { LogBox, View } from "react-native";
+import { AppState, type AppStateStatus, LogBox, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -25,6 +25,11 @@ import { Onboarding } from "@/components/Onboarding";
 import { AppProvider } from "@/context/AppContext";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { initI18n } from "@/i18n";
+import {
+  clearPendingPostCall,
+  evaluatePending,
+  getPendingPostCall,
+} from "@/lib/postcall";
 import { initializeRevenueCat, SubscriptionProvider } from "@/lib/revenuecat";
 import { syncScreeningApiConfig } from "@/lib/screening";
 import { getToken } from "@/lib/session";
@@ -160,6 +165,38 @@ function RootLayoutNav() {
     }
   }, [status, segments, router, hasShareIntent, routeShareToVerify]);
 
+  // Play-safe post-call prompt. We can't detect a call ending without restricted
+  // phone permissions, so when the user answers a flagged call through Netraksh's
+  // alert we record it (see lib/postcall); here, the FIRST time the app returns
+  // to the foreground afterwards, we surface "How was this call?" for that
+  // number. We only act on a background→active transition so the prompt can't
+  // appear over the live call the user just answered.
+  const appStateRef = useRef<AppStateStatus>(AppState.currentState);
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (next) => {
+      const prev = appStateRef.current;
+      appStateRef.current = next;
+      const cameToForeground = prev.match(/inactive|background/) && next === "active";
+      if (!cameToForeground) return;
+      if (status !== "authenticated") return;
+      // Don't interrupt an active incoming-call screen or a prompt already up.
+      if (segments[0] === "call-alert" || segments[0] === "post-call") return;
+      (async () => {
+        const pending = await getPendingPostCall();
+        if (!pending) return;
+        const decision = await evaluatePending(pending);
+        // Keep the record on "defer" (too soon / feature off) so a later
+        // foreground can re-evaluate it within the time window.
+        if (decision === "defer") return;
+        await clearPendingPostCall();
+        if (decision === "show") {
+          router.push({ pathname: "/post-call", params: { number: pending.number } });
+        }
+      })();
+    });
+    return () => sub.remove();
+  }, [status, segments, router]);
+
   // A share received while already signed in and inside the app (app foregrounded
   // from another app's Share sheet). The auth effect above owns the post-login
   // case; here we only act once we're outside the auth group. The dedupe ref is
@@ -183,6 +220,14 @@ function RootLayoutNav() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
           name="call-alert"
+          options={{
+            presentation: "modal",
+            headerShown: false,
+            animation: "slide_from_bottom",
+          }}
+        />
+        <Stack.Screen
+          name="post-call"
           options={{
             presentation: "modal",
             headerShown: false,

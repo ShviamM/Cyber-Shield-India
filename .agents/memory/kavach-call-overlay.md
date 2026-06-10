@@ -75,3 +75,34 @@ rely on i18next fallbackLng → en (see kavach-ai-i18n.md).
 **Can't be e2e tested here** — native auto-launch needs a real EAS device build (no
 call simulation; Expo web preview is behind a proxy security block). Verify via
 typecheck + architect.
+
+## Post-call "How was this call?" prompt (Play-safe)
+
+True call-END detection is impossible without READ_PHONE_STATE / READ_CALL_LOG /
+default-dialer (all Play-banned), so the post-call prompt is NOT triggered by call
+state. Instead: when the user taps Answer in call-alert.tsx for a real flagged call
+we persist the answered number; the next time the app goes background→active we
+surface a new `app/post-call.tsx` screen ("How was this call?") to report / block /
+mark legitimate.
+
+**Why the foreground heuristic needs guards (these were code-review fixes — keep):**
+- Record ONLY when `answerCall()` returns true, else we'd prompt for a call that
+  never connected.
+- A foreground transition ≠ call ended. The user can switch to the app mid-call, so
+  the prompt could appear OVER a live call. Guard with a SETTLE_MS (10s) minimum
+  since `answeredAt`; if too soon, DEFER (don't clear) and re-check next foreground.
+- Clear timing is tri-state (`evaluatePending` → "show" | "clear" | "defer"), not a
+  boolean. "defer" (too-soon OR feature toggled off) must KEEP the pending record so
+  it can still fire within the 6h window; only permanent disqualifiers (expired /
+  emergency / already reported-or-legit) clear it. Clearing on every evaluation drops
+  legit pending calls.
+
+**Trigger lives in `_layout.tsx` RootLayoutNav** via an `AppState` "change" listener:
+acts only on inactive|background→active, `status === "authenticated"`, and NOT when
+`segments[0]` is `call-alert`/`post-call` (don't stack over those).
+
+State is device-local AsyncStorage (`lib/postcall.ts`): pending record + reported/
+legit suppression sets (capped) + enabled flag (default true). Emergency/short codes
+are skipped. Settings toggle + a preview button added to screening.tsx. i18n: new
+`postCall.*` block + `screening.postCall*`/`previewPostCall` in en + hi only (rest
+fall back via fallbackLng=en).

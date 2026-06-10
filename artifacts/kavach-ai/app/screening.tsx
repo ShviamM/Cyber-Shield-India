@@ -18,6 +18,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useAppContext } from "@/context/AppContext";
 import { useColors } from "@/hooks/useColors";
+import { isPostCallEnabled, setPostCallEnabled } from "@/lib/postcall";
 import {
   getScreeningStatus,
   isScreeningSupported,
@@ -57,10 +58,21 @@ export default function ScreeningScreen() {
 
   const supported = isScreeningSupported();
   const [status, setStatus] = React.useState<ScreeningStatus>(() => getScreeningStatus());
+  const [postCallOn, setPostCallOn] = React.useState(true);
 
   const refreshStatus = React.useCallback(() => {
     setStatus(getScreeningStatus());
   }, []);
+
+  React.useEffect(() => {
+    void isPostCallEnabled().then(setPostCallOn);
+  }, []);
+
+  function togglePostCall(next: boolean) {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setPostCallOn(next);
+    void setPostCallEnabled(next);
+  }
 
   // Give the native call-screening service the API base + session token so it can
   // look up an incoming caller's scam reputation (the service runs without a JS
@@ -232,7 +244,7 @@ export default function ScreeningScreen() {
               thumbColor="#FFFFFF"
             />
           </View>
-          <View style={s.row}>
+          <View style={[s.row, s.rowBorder]}>
             <View style={[s.rowIcon, { backgroundColor: "#ecfeff" }]}>
               <Feather name="message-square" size={18} color="#0891b2" />
             </View>
@@ -240,6 +252,21 @@ export default function ScreeningScreen() {
               <Text style={s.rowLabel}>{t("screening.smsShareTitle")}</Text>
               <Text style={s.rowSub}>{t("screening.smsShareSub")}</Text>
             </View>
+          </View>
+          <View style={s.row}>
+            <View style={[s.rowIcon, { backgroundColor: "#fff7ed" }]}>
+              <Feather name="phone-call" size={18} color={SAFFRON} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={s.rowLabel}>{t("screening.postCallTitle")}</Text>
+              <Text style={s.rowSub}>{t("screening.postCallSub")}</Text>
+            </View>
+            <Switch
+              value={postCallOn}
+              onValueChange={togglePostCall}
+              trackColor={{ false: "#e2e8f0", true: NAVY }}
+              thumbColor="#FFFFFF"
+            />
           </View>
         </View>
 
@@ -309,6 +336,19 @@ export default function ScreeningScreen() {
         >
           <Feather name="play-circle" size={18} color={SAFFRON} />
           <Text style={s.demoTxt}>{t("screening.previewWarning")}</Text>
+        </TouchableOpacity>
+
+        {/* Preview the post-call "How was this call?" prompt. */}
+        <TouchableOpacity
+          style={[s.demoBtn, { marginTop: 12 }]}
+          onPress={() => {
+            Haptics.selectionAsync();
+            router.push("/post-call");
+          }}
+          activeOpacity={0.85}
+        >
+          <Feather name="phone-call" size={18} color={SAFFRON} />
+          <Text style={s.demoTxt}>{t("screening.previewPostCall")}</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>

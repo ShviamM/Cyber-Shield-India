@@ -607,6 +607,34 @@ const en = {
     reportDone: "Done",
   },
 
+  postCall: {
+    title: "How was this call?",
+    subtitle:
+      "Help protect others — tell us if this caller was a scam, or mark them safe.",
+    reportTitle: "Report fraud or spam",
+    reportSub: "Add this caller to the community scam database",
+    blockTitle: "Block this number",
+    blockSub: "Auto-reject future calls from this number",
+    legitTitle: "Legitimate caller",
+    legitSub: "It was genuine — don't ask about this number again",
+    dismiss: "Not now",
+    reportSheetTitle: "Report this number",
+    reportSheetSubtitle: "Pick the scam type — we report it instantly.",
+    reportSuccessTitle: "Reported. Thank you!",
+    reportSuccessMsg: "You've helped protect others from this number.",
+    reportDuplicateTitle: "Already reported",
+    reportDuplicateMsg: "You've already reported this number recently.",
+    reportErrorTitle: "Couldn't report",
+    reportErrorMsg: "Something went wrong. Please try again.",
+    reportRateLimitedTitle: "Too many reports",
+    reportRateLimitedMsg:
+      "You've submitted several reports recently. Please try again later.",
+    reportInvalidNumber: "This number can't be reported.",
+    reportAutoDescription: "Reported after a call, via Netraksh's post-call prompt.",
+    reportRetry: "Try again",
+    reportDone: "Done",
+  },
+
   screening: {
     title: "On-Device Screening",
     subtitle: "Real-time scam call & SMS protection",
@@ -620,6 +648,9 @@ const en = {
     sectionProtections: "PROTECTIONS",
     callTitle: "Scam Call Screening",
     callSub: "Warns you when a high-risk number calls",
+    postCallTitle: "Post-call prompts",
+    postCallSub:
+      "After you answer a flagged call through Netraksh, ask how it went next time you open the app",
     smsTitle: "Scam SMS Screening",
     smsSub: "Flags likely scam texts as they arrive",
     smsShareTitle: "Check any SMS instantly",
@@ -661,6 +692,7 @@ const en = {
       step3: "If something looks risky, you get a clear warning — tap to verify it safely.",
     },
     previewWarning: "Preview a scam-call warning",
+    previewPostCall: "Preview the post-call prompt",
     manageBlocked: "Blocked numbers",
     roleDeniedTitle: "Call screening not enabled",
     roleDeniedMsg:
