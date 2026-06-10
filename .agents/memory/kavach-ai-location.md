@@ -1,28 +1,32 @@
 ---
-name: KavachAI nearby-city detection
-description: Why Home "scams in your city" matches coordinates to a fixed city list instead of reverse-geocoding.
+name: KavachAI nearby-city/state detection
+description: How Home and Report resolve the user's city + state from device coordinates (nationwide).
 ---
 
-The Home tab "Active Scams in {City}" feature derives the city from device
-coordinates by picking the nearest of a small hardcoded list of metros
-(haversine), NOT from `Location.reverseGeocodeAsync`.
+The Home tab "Active Scams in {City}" / cyber-cell card and the Report screen's
+prefilled location derive city + state from device coordinates via
+`Location.reverseGeocodeAsync` in `hooks/useNearbyCity.ts`, which works anywhere
+in India. The hook returns `{ city, state, status, ... }`.
 
-**Why:**
-- Scam data (LIVE_THREATS, CITY_HOTSPOTS) is hardcoded client-side with no
-  backend; only a fixed set of cities have data. Nearest-coords matching
-  guarantees the detected city always has data to show.
-- `reverseGeocodeAsync` is unsupported on Expo web; coord-only matching works
-  on both web and native (getCurrentPositionAsync uses navigator.geolocation
-  on web).
+**Why reverse geocoding (changed from the old fixed-metro list):**
+- For an India-wide launch, snapping coordinates to the nearest of ~13 hardcoded
+  metros mis-tags every unlisted town (e.g. Kanpur → Lucknow). Reverse geocoding
+  resolves the actual city/state for any location.
+- The platform geocoder needs network/Play services and is unsupported on Expo
+  web, so the call is wrapped in try/catch with a fallback: a small
+  `FALLBACK_CITIES` haversine nearest-match (offline / web only). Never delete
+  that fallback — it keeps the screen from going blank.
 
-**How to apply:** If you add/remove cities, keep the city list in
-hooks/useNearbyCity.ts in sync with the city strings in constants/data.ts
-(LIVE_THREATS.city / CITY_HOTSPOTS.city) or the match will render an empty
-section. Hyderabad intentionally has a hotspot but no LIVE_THREATS entry —
-the empty-city fallback text covers that case.
+**Cyber-cell contacts are STATE-level and verified-only** (`lib/cyberContacts.ts`).
+`getCyberCellContact(city, state?)` prefers the geocoded `state`, normalises it
+via `STATE_ALIASES` (all 28 states + 8 UTs, incl. Delhi/NCT variants), then falls
+back to `CITY_TO_STATE` for known metros. Only states with an officially verified
+number/email are in `STATE_CONTACTS` (7 as of Jun 2026); others return null so the
+card hides. **Do NOT fabricate state cyber-cell numbers** — wrong emergency
+numbers are harmful; the national 1930 helpline (shown elsewhere) covers everyone.
+Adding a state contact requires an official .gov.in/.nic.in source + verified date.
 
-**Snapping pitfall:** any location not in KNOWN_CITIES snaps to the nearest
-metro, which can be far/wrong (e.g. Kanpur snapped to Delhi NCR ~440km until
-Kanpur was added). When a user reports a wrong city, add their city (coords +
-data entries) rather than reworking the matcher. The Home "Hotspots This Week"
-list pins the detected city's hotspot even when it's outside the national top 4.
+**Soft-match caveat:** `cityHotspot`/`cityTrending` match the geocoded city string
+against backend report data; spelling variants (Bengaluru vs Bangalore) just yield
+no city hotspot/scams (graceful empty), not an error. If a Hindi-locale device
+returns a Devanagari state name, the contact card simply hides.

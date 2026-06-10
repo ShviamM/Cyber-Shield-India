@@ -4,11 +4,12 @@ import * as Location from "expo-location";
 export type NearbyCityStatus = "loading" | "granted" | "denied" | "unavailable";
 
 /**
- * Known metro areas we have scam data for, with approximate centroids. The
- * device location is matched to the nearest of these so the home screen always
- * has data to show for the detected city.
+ * Offline fallback only. When reverse geocoding is unavailable (no network or
+ * no platform geocoder), the device location is snapped to the nearest of these
+ * metros so the home screen still has a plausible city to show. Accurate
+ * nationwide detection comes from `Location.reverseGeocodeAsync` below.
  */
-const KNOWN_CITIES: { city: string; lat: number; lng: number }[] = [
+const FALLBACK_CITIES: { city: string; lat: number; lng: number }[] = [
   { city: "Mumbai", lat: 19.076, lng: 72.8777 },
   { city: "Delhi", lat: 28.6139, lng: 77.209 },
   { city: "Gurugram", lat: 28.4595, lng: 77.0266 },
@@ -37,9 +38,9 @@ function haversineKm(aLat: number, aLng: number, bLat: number, bLng: number): nu
 }
 
 function nearestCity(lat: number, lng: number): string {
-  let best = KNOWN_CITIES[0];
+  let best = FALLBACK_CITIES[0];
   let bestDist = Infinity;
-  for (const c of KNOWN_CITIES) {
+  for (const c of FALLBACK_CITIES) {
     const d = haversineKm(lat, lng, c.lat, c.lng);
     if (d < bestDist) {
       bestDist = d;
@@ -50,12 +51,14 @@ function nearestCity(lat: number, lng: number): string {
 }
 
 /**
- * Detects the user's nearest supported city from the device location. Runs
- * automatically on mount; returns the detected city plus a permission/loading
- * status and a `retry` to ask again after a denial or failure.
+ * Detects the user's actual city and state from the device location, working
+ * anywhere in India via reverse geocoding (not a fixed list of metros). Runs
+ * automatically on mount; returns the detected city + state plus a
+ * permission/loading status and a `retry` to ask again after a denial/failure.
  */
 export function useNearbyCity() {
   const [city, setCity] = useState<string | null>(null);
+  const [state, setState] = useState<string | null>(null);
   const [status, setStatus] = useState<NearbyCityStatus>("loading");
   const [canAskAgain, setCanAskAgain] = useState(true);
 
@@ -71,7 +74,26 @@ export function useNearbyCity() {
       const pos = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Low,
       });
-      setCity(nearestCity(pos.coords.latitude, pos.coords.longitude));
+      const { latitude, longitude } = pos.coords;
+
+      // Resolve the real city + state for any location in India. The platform
+      // geocoder needs network/Play services, so this can throw or come back
+      // empty — in that case we fall back to the nearest known metro below.
+      let resolvedCity: string | null = null;
+      let resolvedState: string | null = null;
+      try {
+        const places = await Location.reverseGeocodeAsync({ latitude, longitude });
+        const place = places[0];
+        if (place) {
+          resolvedCity = place.city || place.subregion || place.district || null;
+          resolvedState = place.region || null;
+        }
+      } catch {
+        // Geocoder unavailable — fall through to the offline nearest-metro match.
+      }
+
+      setCity(resolvedCity ?? nearestCity(latitude, longitude));
+      setState(resolvedState);
       setStatus("granted");
     } catch {
       setStatus("unavailable");
@@ -82,5 +104,5 @@ export function useNearbyCity() {
     detect();
   }, [detect]);
 
-  return { city, status, canAskAgain, retry: detect };
+  return { city, state, status, canAskAgain, retry: detect };
 }

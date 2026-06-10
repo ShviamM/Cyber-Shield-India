@@ -52,6 +52,7 @@ export default function HomeScreen() {
   const { hasUnread: hasUnreadNotifications } = useNotifications();
   const {
     city: nearbyCity,
+    state: nearbyState,
     status: nearbyStatus,
     canAskAgain: nearbyCanAskAgain,
     retry: retryNearby,
@@ -85,7 +86,7 @@ export default function HomeScreen() {
   const trendingTotal = trending.data?.total ?? 0;
   const cityScams = cityTrending.data?.scams ?? [];
   const hotspots = hotspotsQuery.data?.hotspots ?? [];
-  const cyberContact = getCyberCellContact(nearbyCity);
+  const cyberContact = getCyberCellContact(nearbyCity, nearbyState);
   const cityHotspot = nearbyCity
     ? hotspots.find((h) => h.city === nearbyCity)
     : undefined;
