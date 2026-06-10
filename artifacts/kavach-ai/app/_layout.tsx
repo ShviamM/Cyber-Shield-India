@@ -29,6 +29,7 @@ import {
   clearPendingPostCall,
   evaluatePending,
   getPendingPostCall,
+  ingestNativePending,
 } from "@/lib/postcall";
 import { initializeRevenueCat, SubscriptionProvider } from "@/lib/revenuecat";
 import { syncScreeningApiConfig } from "@/lib/screening";
@@ -182,6 +183,10 @@ function RootLayoutNav() {
       // Don't interrupt an active incoming-call screen or a prompt already up.
       if (segments[0] === "call-alert" || segments[0] === "post-call") return;
       (async () => {
+        // Pull any call the native overlay screened while the app was away into
+        // the JS pending record first, so the prompt covers calls the user
+        // didn't answer through the in-app alert.
+        await ingestNativePending();
         const pending = await getPendingPostCall();
         if (!pending) return;
         const decision = await evaluatePending(pending);

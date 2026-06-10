@@ -1,7 +1,6 @@
 package expo.modules.kavachscreening
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.NotificationManager
 import android.app.role.RoleManager
@@ -10,8 +9,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import android.os.PowerManager
 import android.provider.Settings
-import android.telecom.TelecomManager
 import androidx.core.content.ContextCompat
 import expo.modules.kotlin.Promise
 import expo.modules.kotlin.exception.Exceptions
@@ -81,13 +80,24 @@ class KavachScreeningModule : Module() {
     // ANSWER_PHONE_CALLS runtime permission; returns false if unavailable so the
     // JS screen can still dismiss gracefully.
     Function("answerCall") {
-      answerRingingCall(context)
+      KavachTelecom.answer(context)
     }
 
     // End the current ringing/active call (the popup's "Block" button). Requires
     // ANSWER_PHONE_CALLS (API 28+); returns false if unavailable.
     Function("endCall") {
-      endOngoingCall(context)
+      KavachTelecom.end(context)
+    }
+
+    // The latest screened incoming call recorded natively (by the overlay), so
+    // JS can surface the Play-safe post-call prompt for ANY screened call — not
+    // only ones answered through the in-app alert. Null when there's nothing pending.
+    Function("getPendingScreenedCall") {
+      ScreeningStore.getPendingCall(context)
+    }
+
+    Function("clearPendingScreenedCall") {
+      ScreeningStore.clearPendingCall(context)
     }
 
     // Persist a number to the on-device blocklist so future calls from it are
@@ -160,6 +170,26 @@ class KavachScreeningModule : Module() {
       promise.resolve(false)
     }
 
+    AsyncFunction("requestBatteryOptimizationExemption") { promise: Promise ->
+      val ctx = context
+      if (isIgnoringBatteryOptimizations(ctx)) {
+        promise.resolve(true)
+        return@AsyncFunction
+      }
+      // Open the system battery-optimization list (NOT the per-app prompt) so we
+      // don't need the Play-restricted REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+      // permission. The grant happens out-of-process; we resolve the current
+      // (still-false) state and JS re-reads getStatus() on focus.
+      try {
+        val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+          .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        (appContext.currentActivity ?: ctx).startActivity(intent)
+      } catch (_: Throwable) {
+        // No settings activity to handle the intent — nothing more to do.
+      }
+      promise.resolve(false)
+    }
+
     OnActivityResult { _, payload ->
       if (payload.requestCode == ROLE_REQUEST_CODE) {
         val granted = payload.resultCode == Activity.RESULT_OK
@@ -179,43 +209,24 @@ class KavachScreeningModule : Module() {
       "hasNotificationPermission" to hasNotificationPermission(ctx),
       "hasFullScreenIntentPermission" to hasFullScreenIntentPermission(ctx),
       "hasOverlayPermission" to KavachCallOverlay.canDraw(ctx),
-      "hasAnswerCallsPermission" to hasAnswerCallsPermission(ctx),
+      "hasAnswerCallsPermission" to KavachTelecom.hasPermission(ctx),
+      "isIgnoringBatteryOptimizations" to isIgnoringBatteryOptimizations(ctx),
       "blocklistSize" to ScreeningStore.getBlocklist(ctx).size,
       "keywordCount" to ScreeningStore.getKeywords(ctx).size
     )
   }
 
-  /** Whether ANSWER_PHONE_CALLS is granted (needed to answer/end live calls). */
-  private fun hasAnswerCallsPermission(ctx: Context): Boolean {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return false
-    return ContextCompat.checkSelfPermission(
-      ctx,
-      Manifest.permission.ANSWER_PHONE_CALLS
-    ) == PackageManager.PERMISSION_GRANTED
-  }
-
-  /** Accept the currently ringing call. Returns false if not possible. */
-  @SuppressLint("MissingPermission")
-  private fun answerRingingCall(ctx: Context): Boolean {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return false
-    if (!hasAnswerCallsPermission(ctx)) return false
-    val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as? TelecomManager ?: return false
+  /**
+   * Whether the OS has exempted Netraksh from battery optimization. When it
+   * hasn't, aggressive OEM Doze can kill the call-screening service so incoming
+   * calls aren't flagged — hence the in-app "keep running" prompt. Reading this
+   * needs no special permission.
+   */
+  private fun isIgnoringBatteryOptimizations(ctx: Context): Boolean {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return true
+    val pm = ctx.getSystemService(Context.POWER_SERVICE) as? PowerManager ?: return false
     return try {
-      tm.acceptRingingCall()
-      true
-    } catch (_: Throwable) {
-      false
-    }
-  }
-
-  /** End the current ringing/active call. Returns false if not possible. */
-  @SuppressLint("MissingPermission")
-  private fun endOngoingCall(ctx: Context): Boolean {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) return false
-    if (!hasAnswerCallsPermission(ctx)) return false
-    val tm = ctx.getSystemService(Context.TELECOM_SERVICE) as? TelecomManager ?: return false
-    return try {
-      tm.endCall()
+      pm.isIgnoringBatteryOptimizations(ctx.packageName)
     } catch (_: Throwable) {
       false
     }

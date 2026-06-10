@@ -11,6 +11,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { tenDigits } from "@/lib/phone";
+import {
+  clearPendingScreenedCall,
+  getPendingScreenedCall,
+} from "@/lib/screening";
 
 const PENDING_KEY = "kv_postcall_pending";
 const REPORTED_KEY = "kv_postcall_reported";
@@ -102,6 +106,34 @@ export async function recordAnsweredCall(number: string): Promise<void> {
     await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(record));
   } catch {
     // ignore
+  }
+}
+
+/**
+ * Pull the latest screened call recorded by the NATIVE call overlay into the JS
+ * pending record, so the post-call prompt fires for any screened call — not only
+ * ones answered through the in-app alert. Idempotent: the native record is
+ * cleared once read, and we only overwrite the JS pending record when the native
+ * call is newer. Call this on a foreground transition before reading the pending.
+ */
+export async function ingestNativePending(): Promise<void> {
+  const native = getPendingScreenedCall();
+  if (!native) return;
+  // Consume the native record regardless of what we do with it, so it can't be
+  // re-ingested on every subsequent foreground.
+  clearPendingScreenedCall();
+  if (!native.number || isEmergency(native.number)) return;
+  if (typeof native.ts !== "number" || native.ts <= 0) return;
+  const existing = await getPendingPostCall();
+  if (existing && existing.answeredAt >= native.ts) return;
+  const record: PendingPostCall = {
+    number: native.number,
+    answeredAt: native.ts,
+  };
+  try {
+    await AsyncStorage.setItem(PENDING_KEY, JSON.stringify(record));
+  } catch {
+    // ignore — worst case the prompt just doesn't surface this time
   }
 }
 

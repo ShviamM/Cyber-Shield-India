@@ -23,6 +23,7 @@ import {
   getScreeningStatus,
   isScreeningSupported,
   requestAnswerCallsPermission,
+  requestBatteryOptimizationExemption,
   requestCallScreeningRole,
   requestFullScreenIntentPermission,
   requestOverlayPermission,
@@ -133,6 +134,13 @@ export default function ScreeningScreen() {
   async function grantFullScreenIntent() {
     Haptics.selectionAsync();
     await requestFullScreenIntentPermission();
+    refreshStatus();
+  }
+
+  async function grantBatteryExemption() {
+    Haptics.selectionAsync();
+    await requestBatteryOptimizationExemption();
+    // The grant happens in a Settings screen; status refreshes on focus return.
     refreshStatus();
   }
 
@@ -281,6 +289,28 @@ export default function ScreeningScreen() {
             blocklistSize={status.blocklistSize}
             t={t}
           />
+        )}
+
+        {/* Battery optimization: aggressive OEM Doze can kill the screening
+            service in the background, so recommend (not require) exempting the
+            app once setup is otherwise complete. */}
+        {supported && callScreening && !status.isIgnoringBatteryOptimizations && (
+          <View style={s.batteryCard}>
+            <View style={s.batteryIcon}>
+              <Feather name="battery-charging" size={18} color={SAFFRON} />
+            </View>
+            <View style={s.batteryBody}>
+              <Text style={s.batteryTitle}>{t("screening.battery.title")}</Text>
+              <Text style={s.batterySub}>{t("screening.battery.sub")}</Text>
+              <TouchableOpacity
+                style={s.batteryBtn}
+                onPress={grantBatteryExemption}
+                activeOpacity={0.85}
+              >
+                <Text style={s.batteryBtnTxt}>{t("screening.battery.cta")}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         )}
 
         {/* Privacy */}
@@ -522,6 +552,24 @@ const s = StyleSheet.create({
     backgroundColor: SAFFRON, borderRadius: 12, paddingVertical: 13,
   },
   guideBtnTxt: { fontSize: 14, fontWeight: "700" as const, color: "#fff" },
+
+  batteryCard: {
+    flexDirection: "row", gap: 12, padding: 14, marginBottom: 18,
+    backgroundColor: "#fff7ed", borderRadius: 14,
+    borderWidth: 1, borderColor: "#fed7aa",
+  },
+  batteryIcon: {
+    width: 34, height: 34, borderRadius: 9, backgroundColor: "#ffedd5",
+    alignItems: "center", justifyContent: "center",
+  },
+  batteryBody: { flex: 1 },
+  batteryTitle: { fontSize: 14, fontWeight: "700" as const, color: NAVY, marginBottom: 3 },
+  batterySub: { fontSize: 12.5, color: "#7c5e3b", lineHeight: 18, marginBottom: 10 },
+  batteryBtn: {
+    alignSelf: "flex-start", backgroundColor: SAFFRON,
+    borderRadius: 10, paddingVertical: 9, paddingHorizontal: 16,
+  },
+  batteryBtnTxt: { fontSize: 13, fontWeight: "700" as const, color: "#fff" },
 
   privacyRow: { flexDirection: "row", alignItems: "center", gap: 12, padding: 14 },
   privacyIcon: {

@@ -19,6 +19,10 @@ object ScreeningStore {
   private const val KEY_LANGUAGE = "language"
   private const val KEY_API_BASE = "api_base"
   private const val KEY_AUTH_TOKEN = "auth_token"
+  private const val KEY_PENDING_NUMBER = "pending_call_number"
+  private const val KEY_PENDING_TS = "pending_call_ts"
+  private const val KEY_PENDING_RISK = "pending_call_risk"
+  private const val KEY_PENDING_ANSWERED = "pending_call_answered"
 
   private fun prefs(ctx: Context) =
     ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -122,6 +126,49 @@ object ScreeningStore {
     val tail = n.takeLast(10)
     return getBlocklist(ctx).any { it.takeLast(10) == tail } ||
       getUserBlocklist(ctx).any { it.takeLast(10) == tail }
+  }
+
+  /**
+   * Record the most recent screened incoming call so the JS layer can surface a
+   * Play-safe "How was this call?" prompt the next time the app is foregrounded.
+   * Written by the native overlay for a risky caller (answered = false) or when
+   * the user answered through us (answered = true). Only the latest call is kept.
+   */
+  fun recordPendingCall(ctx: Context, rawNumber: String, risk: String, answered: Boolean) {
+    val n = rawNumber.trim()
+    if (n.isEmpty()) return
+    prefs(ctx).edit()
+      .putString(KEY_PENDING_NUMBER, n)
+      .putLong(KEY_PENDING_TS, System.currentTimeMillis())
+      .putString(KEY_PENDING_RISK, risk)
+      .putBoolean(KEY_PENDING_ANSWERED, answered)
+      .apply()
+  }
+
+  /**
+   * The latest pending screened call as a JS-friendly map, or null if none.
+   * Keys: number (String), ts (Long, epoch ms), risk (String), answered (Boolean).
+   */
+  fun getPendingCall(ctx: Context): Map<String, Any>? {
+    val p = prefs(ctx)
+    val number = p.getString(KEY_PENDING_NUMBER, null) ?: return null
+    val ts = p.getLong(KEY_PENDING_TS, 0L)
+    if (ts <= 0L) return null
+    return mapOf(
+      "number" to number,
+      "ts" to ts,
+      "risk" to (p.getString(KEY_PENDING_RISK, "unknown") ?: "unknown"),
+      "answered" to p.getBoolean(KEY_PENDING_ANSWERED, false),
+    )
+  }
+
+  fun clearPendingCall(ctx: Context) {
+    prefs(ctx).edit()
+      .remove(KEY_PENDING_NUMBER)
+      .remove(KEY_PENDING_TS)
+      .remove(KEY_PENDING_RISK)
+      .remove(KEY_PENDING_ANSWERED)
+      .apply()
   }
 
   private fun normalize(number: String): String = number.filter { it.isDigit() }

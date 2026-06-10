@@ -670,6 +670,11 @@ const en = {
       doneTitle: "You're protected",
       doneSub: "All set — Netraksh is screening your calls.",
     },
+    battery: {
+      title: "Keep screening running",
+      sub: "Allow Netraksh to ignore battery optimization so it can keep screening calls when the app is closed or your screen is off.",
+      cta: "Allow background activity",
+    },
     overlayPromptTitle: "Turn on the incoming-call popup",
     overlayPromptMsg:
       "Required: allow Netraksh to display over other apps, or the caller card can't pop up over your phone or call screen. Without this you'll only get a small notification.",
