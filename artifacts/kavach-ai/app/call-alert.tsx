@@ -25,7 +25,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { categoryIcon } from "@/constants/strings";
-import { phoneForApi } from "@/lib/phone";
+import { formatIndianPhone, phoneForApi } from "@/lib/phone";
 import { answerCall, blockNumber, endCall } from "@/lib/screening";
 
 const DEMO_NUMBER = "+91 87654-32100";
@@ -71,6 +71,10 @@ export default function CallAlertScreen() {
   const [submittingKey, setSubmittingKey] = useState<string | null>(null);
 
   const apiPhone = phoneForApi(callerNumber);
+  // Always present the caller as "+91 96828 24432" for Indian numbers (the
+  // native layer may hand us "919682824432", "+919682824432" or bare digits).
+  // Non-Indian / short codes fall back to whatever came in.
+  const displayNumber = formatIndianPhone(callerNumber);
   const categoriesQuery = useQuery({
     queryKey: ["categories"],
     queryFn: () => listCategories(),
@@ -279,7 +283,7 @@ export default function CallAlertScreen() {
             />
           </View>
         </Animated.View>
-        <Text style={s.callerNumber}>{callerNumber}</Text>
+        <Text style={s.callerNumber}>{displayNumber}</Text>
         <Text style={s.callerUnknown}>{t("callAlert.unknownCaller")}</Text>
       </View>
 
@@ -498,7 +502,7 @@ export default function CallAlertScreen() {
                     <Text style={s.sheetSubtitle}>
                       {t("callAlert.reportSheetSubtitle")}
                     </Text>
-                    <Text style={s.sheetNumber}>{callerNumber}</Text>
+                    <Text style={s.sheetNumber}>{displayNumber}</Text>
                   </View>
                   <TouchableOpacity
                     onPress={closeReport}
