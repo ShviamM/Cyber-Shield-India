@@ -1,15 +1,18 @@
 /**
  * State cyber-cell contacts shown on the home screen for the user's detected
- * city. Each entry is sourced from an official government page (.gov.in /
- * .nic.in) or the RBI-published list of cyber-crime nodal agencies, and carries
- * the `source` URL plus the month it was last verified so it can be audited and
- * refreshed. The national 1930 helpline is already shown elsewhere on the home
- * screen, so these are the *state* cyber-cell numbers/emails only.
+ * state. Every state and UT has an entry so the card is useful anywhere in
+ * India:
+ *   - States with an officially confirmed *state* cyber-cell line (against a
+ *     .gov.in / .nic.in source) carry that number + email.
+ *   - All other states/UTs fall back to the national cyber-crime helpline
+ *     **1930**, operated 24x7 by I4C / Ministry of Home Affairs. 1930 is the
+ *     official reporting number in *every* state — it replaced the old
+ *     per-state 155260 lines — so it is the correct, verified contact, not a
+ *     placeholder.
  *
- * We only ship entries we could confirm against an official source. Cities whose
- * state contact could not be verified (e.g. Bengaluru, Hyderabad, Chennai)
- * intentionally have no entry, so the home card simply hides for them rather
- * than showing an unverified — and potentially wrong — number.
+ * Each entry carries its `source` URL and the month it was last verified.
+ * NEVER invent a state landline: an unverified — and potentially wrong —
+ * emergency number is worse than the national 1930 fallback.
  */
 export type CyberCellContact = {
   /** Display name of the state / UT (English proper noun, kept untranslated). */
@@ -25,6 +28,18 @@ export type CyberCellContact = {
 };
 
 const VERIFIED = "Jun 2026";
+
+/** National cyber-crime helpline portal — the official source for 1930. */
+const NATIONAL_PORTAL = "https://cybercrime.gov.in";
+
+/**
+ * Builds the national 1930 fallback entry for a state/UT without a separately
+ * verified state-cell line. 1930 is the official MHA/I4C cyber-crime reporting
+ * number valid in every state, so this is a verified contact, not a placeholder.
+ */
+function national(state: string): CyberCellContact {
+  return { state, phone: "1930", source: NATIONAL_PORTAL, verified: VERIFIED };
+}
 
 const STATE_CONTACTS: Record<string, CyberCellContact> = {
   Maharashtra: {
@@ -75,6 +90,42 @@ const STATE_CONTACTS: Record<string, CyberCellContact> = {
     source: "https://police.rajasthan.gov.in",
     verified: VERIFIED,
   },
+
+  // All remaining states/UTs: the official national 1930 helpline, which is the
+  // cyber-crime reporting number in every state (replaced the old 155260 lines).
+  // Upgrade any of these to a state-specific line only with a .gov.in source.
+  "Andhra Pradesh": national("Andhra Pradesh"),
+  "Arunachal Pradesh": national("Arunachal Pradesh"),
+  Assam: national("Assam"),
+  Bihar: national("Bihar"),
+  Chhattisgarh: national("Chhattisgarh"),
+  Goa: national("Goa"),
+  "Himachal Pradesh": national("Himachal Pradesh"),
+  Jharkhand: national("Jharkhand"),
+  Karnataka: national("Karnataka"),
+  Kerala: national("Kerala"),
+  "Madhya Pradesh": national("Madhya Pradesh"),
+  Manipur: national("Manipur"),
+  Meghalaya: national("Meghalaya"),
+  Mizoram: national("Mizoram"),
+  Nagaland: national("Nagaland"),
+  Odisha: national("Odisha"),
+  Punjab: national("Punjab"),
+  Sikkim: national("Sikkim"),
+  "Tamil Nadu": national("Tamil Nadu"),
+  Telangana: national("Telangana"),
+  Tripura: national("Tripura"),
+  Uttarakhand: national("Uttarakhand"),
+  // Union Territories
+  "Andaman and Nicobar Islands": national("Andaman and Nicobar Islands"),
+  Chandigarh: national("Chandigarh"),
+  "Dadra and Nagar Haveli and Daman and Diu": national(
+    "Dadra and Nagar Haveli and Daman and Diu",
+  ),
+  "Jammu and Kashmir": national("Jammu and Kashmir"),
+  Ladakh: national("Ladakh"),
+  Lakshadweep: national("Lakshadweep"),
+  Puducherry: national("Puducherry"),
 };
 
 /**

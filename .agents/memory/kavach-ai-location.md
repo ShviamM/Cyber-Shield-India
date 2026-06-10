@@ -17,14 +17,17 @@ in India. The hook returns `{ city, state, status, ... }`.
   `FALLBACK_CITIES` haversine nearest-match (offline / web only). Never delete
   that fallback — it keeps the screen from going blank.
 
-**Cyber-cell contacts are STATE-level and verified-only** (`lib/cyberContacts.ts`).
+**Cyber-cell contacts are STATE-level** (`lib/cyberContacts.ts`).
 `getCyberCellContact(city, state?)` prefers the geocoded `state`, normalises it
 via `STATE_ALIASES` (all 28 states + 8 UTs, incl. Delhi/NCT variants), then falls
-back to `CITY_TO_STATE` for known metros. Only states with an officially verified
-number/email are in `STATE_CONTACTS` (7 as of Jun 2026); others return null so the
-card hides. **Do NOT fabricate state cyber-cell numbers** — wrong emergency
-numbers are harmful; the national 1930 helpline (shown elsewhere) covers everyone.
-Adding a state contact requires an official .gov.in/.nic.in source + verified date.
+back to `CITY_TO_STATE` for known metros. ALL 36 states/UTs now have an entry in
+`STATE_CONTACTS`: 7 carry an officially confirmed state-cell landline/email; the
+rest use the `national(state)` helper = the **1930** national helpline (official
+MHA/I4C number valid in every state — it replaced the old per-state 155260 lines,
+so it is verified, not a placeholder). **Do NOT fabricate a state landline** — a
+wrong emergency number is worse than the 1930 fallback. Upgrade a state to a
+specific line only with a live .gov.in/.nic.in source (most state-police sites sit
+behind Cloudflare and won't fetch, so confirm carefully before changing one).
 
 **Soft-match caveat:** `cityHotspot`/`cityTrending` match the geocoded city string
 against backend report data; spelling variants (Bengaluru vs Bangalore) just yield
