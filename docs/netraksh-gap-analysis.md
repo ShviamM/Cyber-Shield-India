@@ -118,3 +118,86 @@ These were **deliberately excluded** to keep the app publishable (the project ha
 3. Notification categories (backend + admin + app)
 4. Trial home-screen hook + subscription-management routing (app-only, quick)
 5. Location fallback polish (app-only, quick)
+
+---
+
+## 8. Competitive Benchmark vs Truecaller (2025)
+
+Truecaller (450M+ users) is the reference caller-protection app. Below is its current
+feature set mapped to Netraksh, with a compliant recommendation for each. The goal is
+**parity on protection, differentiation on India-specific scam intelligence** — not
+copying Truecaller's social/privacy features, which are off-mission.
+
+### Where Netraksh already matches Truecaller
+| Truecaller feature | Netraksh equivalent |
+| --- | --- |
+| Real-time caller ID over the call | Full-screen overlay with live reputation lookup |
+| Community spam/scam flagging | Report engine + community reputation bands |
+| Reverse number lookup | Verify tab number check |
+| Spam reporting from app | Manual + share-to-check + in-call report |
+| Family plan | Family Shield + dual-path subscription |
+| SOS / personal safety | SOS (1930) on home |
+
+### Where Truecaller is ahead — and what Netraksh should do (compliant)
+
+1. **Announce Caller (voice).** Truecaller speaks the caller's name/status aloud.
+   **→ Netraksh: voice scam-warning.** Use `expo-speech` to announce the verdict on
+   an incoming call ("चेतावनी — संभावित स्कैम कॉल" / "Warning: suspected scam call")
+   in the user's language. Hands-free, great for driving/low-vision users, no new
+   permissions. **High impact, low effort.**
+
+2. **AI caller intelligence — "why they're calling" (Truecaller's flagship 2025 AI).**
+   Truecaller now uses AI to show call *context*, not just a name.
+   **→ Netraksh: AI risk explanation line** on the alert — reuse the existing scam-
+   analysis engine to generate a one-line plain-language reason per category
+   ("This number is widely reported for fake-KYC bank fraud"). Differentiates on
+   India-specific scam patterns. **High impact, medium effort.**
+
+3. **Call history.** Truecaller keeps a full call log (it uses `READ_CALL_LOG` /
+   default-dialer status — which Netraksh deliberately avoids for Play compliance).
+   **→ Netraksh: compliant "recent screened calls" list** built from numbers the
+   screening service already sees, with one-tap report. (Same as §5.2.)
+
+4. **Verified Business / Green & Purple badges.** Truecaller shows verified
+   businesses green and priority calls purple — countering bank/govt number spoofing.
+   **→ Netraksh: verified-safe allowlist + green badge.** Admin-curated list of
+   genuine bank/government/UPI helpline numbers shown green ("Verified — RBI helpline"),
+   so users aren't falsely alarmed and spoofed numbers stand out. Strong India fit.
+   **Medium effort (admin + reputation + app).**
+
+5. **Guardians (live location + SOS to family).** Truecaller's safety app does live
+   location sharing and SOS alerts to chosen contacts.
+   **→ Netraksh: extend Family Shield** with opt-in live location sharing and an SOS
+   that alerts family members (builds on existing SOS + Family). Foreground/while-in-use
+   location only to stay Play-compliant. **Higher effort.**
+
+6. **SMS spam blocking.** Truecaller auto-screens SMS (it can be set as default SMS
+   handler, the one Play-compliant way to read SMS).
+   **→ Netraksh: keep share-to-check** as the default (zero-permission) path and
+   promote it more prominently; optionally offer an advanced "set Netraksh as your SMS
+   app" flow to unlock automatic SMS scam scanning the *compliant* way. **Optional /
+   heavier — flag for product decision.**
+
+### What Netraksh should deliberately NOT copy
+- **Call recording / AI Assistant that auto-answers** — needs `RECORD_AUDIO` /
+  default-dialer; restricted and high-risk for Play. Skip.
+- **Automatic SMS reading without default-handler status** — `READ_SMS` is restricted.
+  Share-to-check is the compliant substitute.
+- **Social/privacy premium features** (who-viewed-my-profile, ghost mode, contact
+  requests) — off-mission for a scam-protection product.
+
+### Differentiation opportunities (beat Truecaller in India)
+- **Hyper-local scam intelligence** (already started via city hotspots) — lean into
+  state/city-level fraud campaign advisories; Truecaller is global and generic.
+- **Native-language, plain-words warnings** (Hindi + regional) — Netraksh's bilingual
+  alerts are already an edge; extend to more Indian languages.
+- **Government/RBI/CERT-In tie-ins** — verified-safe allowlist + cybercrime (1930 /
+  cybercrime.gov.in) reporting hooks give credibility Truecaller can't match locally.
+
+### Recommended priority (Truecaller-parity track)
+1. Voice scam-warning / Announce Caller (`expo-speech`) — quick, high impact
+2. AI "why this is risky" explanation line on the alert
+3. Recent-screened-calls list with one-tap report (also §5.2)
+4. Verified-safe / green-badge allowlist (anti-spoofing)
+5. Family Shield live location + SOS-to-family
+6. (Optional) advanced default-SMS-app scanning
