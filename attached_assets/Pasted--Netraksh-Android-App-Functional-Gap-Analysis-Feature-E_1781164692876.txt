@@ -1,0 +1,185 @@
+# Netraksh Android App – Functional Gap Analysis & Feature Enhancement
+
+You are a Senior Android Engineer, React Native Architect, UX Specialist, and Google Play Policy Expert.
+
+I have completed end-to-end testing of the Netraksh application and identified the following functional gaps. Review the existing implementation, compare it with leading caller protection applications such as Truecaller, and implement the required improvements.
+
+Before implementing any feature, validate whether it is technically possible under Android and Google Play policies. If a requested feature is restricted, propose the closest compliant alternative and implement it.
+
+---
+
+# 1. Incoming Call Experience Must Match Demo
+
+Current Issue:
+
+The incoming call experience does not consistently match the expected demo experience.
+
+Tasks:
+
+* Review the entire incoming call workflow.
+* Compare the actual implementation with the demo design and user flow.
+* Ensure caller identification appears:
+
+  * On lock screen
+  * When screen is off
+  * When app is closed
+  * When app is in background
+* Verify call screening works across:
+
+  * Samsung
+  * Xiaomi
+  * Vivo
+  * Oppo
+  * Realme
+  * OnePlus
+  * Pixel
+
+Expected Result:
+
+Incoming caller identification should feel premium, instant, and reliable similar to industry-leading caller ID applications.
+
+---
+
+# 2. Broadcast & Security Notifications
+
+Current Issue:
+
+Important alerts, broadcasts, fraud advisories, and community security notifications are not clearly reaching users.
+
+Tasks:
+
+Design and implement a Broadcast Notification System.
+
+Requirements:
+
+* Push notifications should appear even when app is not open.
+* Notifications should support:
+
+  * Security Alerts
+  * Fraud Warnings
+  * Scam Campaign Advisories
+  * Emergency Broadcasts
+  * Product Announcements
+  * Community Awareness Messages
+
+Features:
+
+* Notification categories
+* High-priority notifications
+* Silent notifications where appropriate
+* Notification history screen
+* Read/unread status
+* Deep linking into app
+
+Expected Result:
+
+Users should never miss important fraud intelligence or security advisories.
+
+---
+
+# 3. Automatic Location Awareness
+
+Current Issue:
+
+The application should automatically identify the user's current location and use it to improve fraud intelligence.
+
+Tasks:
+
+Review current location implementation.
+
+Requirements:
+
+* Detect user's current city/state automatically.
+* Update location intelligently.
+* Use battery-efficient location collection.
+* Respect Android privacy requirements.
+* Ask for location permission only when needed.
+* Handle permission denial gracefully.
+
+Potential Use Cases:
+
+* Localized fraud alerts
+* Scam hotspot detection
+* Regional fraud campaigns
+* Community protection insights
+
+Expected Result:
+
+Users automatically receive relevant alerts based on their current geographic location.
+
+Important:
+
+Review Google Play policy compliance before implementation.
+
+---
+
+# 4. Post-Call Scam Reporting Experience
+
+Current Requirement:
+
+After a user interacts with a suspicious caller, they should be able to report it quickly to help protect the broader community.
+
+Tasks:
+
+Review Android restrictions and existing implementation.
+
+Determine:
+
+* Whether a true post-call popup can be implemented without restricted permissions.
+* Whether Android call-screening APIs provide any compliant mechanism.
+* Whether notifications, recent call screens, or other workflows can provide an alternative.
+
+If direct implementation is not possible:
+
+Design the best Google Play-compliant alternative that allows users to quickly report:
+
+* Scam Calls
+* Fraud Calls
+* Spam Calls
+* Telemarketing Calls
+
+Expected Result:
+
+Reporting a scam caller should require minimal effort and contribute to community intelligence.
+
+Do not implement restricted functionality that would risk Play Store rejection.
+
+---
+
+# 5. End-to-End User Journey Review
+
+Review the complete application journey:
+
+* Installation
+* Onboarding
+* Permissions
+* Incoming Calls
+* Scam Reporting
+* Blocking
+* Alerts
+* Broadcasts
+* Subscription Experience
+* Trial Experience
+* Settings
+
+Identify:
+
+* Missing workflows
+* UX issues
+* Performance bottlenecks
+* Permission friction
+* Android compatibility issues
+
+Generate a detailed report containing:
+
+1. Features implemented
+2. Features partially implemented
+3. Features blocked by Android restrictions
+4. Features blocked by Google Play policy
+5. Recommended alternatives
+6. Code changes performed
+7. Remaining risks before production release
+
+Goal:
+
+Make Netraksh feel like a premium, production-ready cyber safety platform that can compete with the best caller protection and scam prevention applications while remaining fully compliant with Android and Google Play policies.

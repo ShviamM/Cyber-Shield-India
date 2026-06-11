@@ -149,3 +149,9 @@ id = "hyCeZmiTHNwoi6irx9jz2"
 uri = "file://netraksh-source-handoff.tar.gz"
 type = "unspecified"
 title = "Netraksh — Full Source + Docs (mobile app, admin, backend)"
+
+[[outputs]]
+id = "EgCu0FcE4F2nL2eCcg6ZR"
+uri = "file://docs/netraksh-gap-analysis.md"
+type = "text"
+title = "Netraksh — Functional Gap Analysis & Enhancement Report"
