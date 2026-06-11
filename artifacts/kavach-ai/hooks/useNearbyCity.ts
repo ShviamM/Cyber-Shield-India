@@ -1,5 +1,13 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { AppState, type AppStateStatus } from "react-native";
 import * as Location from "expo-location";
+
+/**
+ * Minimum gap between automatic re-detections. A user who travels and reopens
+ * the app gets a fresh city, but we never re-hit the geocoder more than once
+ * every few minutes (battery + rate-limit friendly).
+ */
+const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
 
 export type NearbyCityStatus = "loading" | "granted" | "denied" | "unavailable";
 
@@ -55,54 +63,90 @@ function nearestCity(lat: number, lng: number): string {
  * anywhere in India via reverse geocoding (not a fixed list of metros). Runs
  * automatically on mount; returns the detected city + state plus a
  * permission/loading status and a `retry` to ask again after a denial/failure.
+ *
+ * Pass `{ prompt: false }` for passive screens (e.g. the quick post-call
+ * report) that want the city only as optional metadata: it then reads the
+ * already-granted permission without ever showing the OS location prompt.
+ * Calling `retry()` still prompts explicitly, since that is a user action.
  */
-export function useNearbyCity() {
+export function useNearbyCity(options?: { prompt?: boolean }) {
+  const prompt = options?.prompt ?? true;
   const [city, setCity] = useState<string | null>(null);
   const [state, setState] = useState<string | null>(null);
   const [status, setStatus] = useState<NearbyCityStatus>("loading");
   const [canAskAgain, setCanAskAgain] = useState(true);
+  const lastDetectAt = useRef(0);
+  const grantedRef = useRef(false);
 
-  const detect = useCallback(async () => {
-    setStatus("loading");
-    try {
-      const perm = await Location.requestForegroundPermissionsAsync();
-      if (!perm.granted) {
-        setCanAskAgain(perm.canAskAgain);
-        setStatus("denied");
-        return;
-      }
-      const pos = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Low,
-      });
-      const { latitude, longitude } = pos.coords;
-
-      // Resolve the real city + state for any location in India. The platform
-      // geocoder needs network/Play services, so this can throw or come back
-      // empty — in that case we fall back to the nearest known metro below.
-      let resolvedCity: string | null = null;
-      let resolvedState: string | null = null;
+  const run = useCallback(
+    async (allowPrompt: boolean) => {
+      lastDetectAt.current = Date.now();
+      setStatus("loading");
       try {
-        const places = await Location.reverseGeocodeAsync({ latitude, longitude });
-        const place = places[0];
-        if (place) {
-          resolvedCity = place.city || place.subregion || place.district || null;
-          resolvedState = place.region || null;
+        const perm = allowPrompt
+          ? await Location.requestForegroundPermissionsAsync()
+          : await Location.getForegroundPermissionsAsync();
+        if (!perm.granted) {
+          grantedRef.current = false;
+          setCanAskAgain(perm.canAskAgain);
+          setStatus("denied");
+          return;
         }
-      } catch {
-        // Geocoder unavailable — fall through to the offline nearest-metro match.
-      }
+        grantedRef.current = true;
+        const pos = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.Low,
+        });
+        const { latitude, longitude } = pos.coords;
 
-      setCity(resolvedCity ?? nearestCity(latitude, longitude));
-      setState(resolvedState);
-      setStatus("granted");
-    } catch {
-      setStatus("unavailable");
-    }
-  }, []);
+        // Resolve the real city + state for any location in India. The platform
+        // geocoder needs network/Play services, so this can throw or come back
+        // empty — in that case we fall back to the nearest known metro below.
+        let resolvedCity: string | null = null;
+        let resolvedState: string | null = null;
+        try {
+          const places = await Location.reverseGeocodeAsync({ latitude, longitude });
+          const place = places[0];
+          if (place) {
+            resolvedCity = place.city || place.subregion || place.district || null;
+            resolvedState = place.region || null;
+          }
+        } catch {
+          // Geocoder unavailable — fall through to the offline nearest-metro match.
+        }
+
+        setCity(resolvedCity ?? nearestCity(latitude, longitude));
+        setState(resolvedState);
+        setStatus("granted");
+      } catch {
+        setStatus("unavailable");
+      }
+    },
+    [],
+  );
+
+  // Explicit user action (initial mount in active mode, or a retry tap) is
+  // allowed to show the OS permission prompt.
+  const detect = useCallback(() => run(true), [run]);
 
   useEffect(() => {
-    detect();
-  }, [detect]);
+    run(prompt);
+  }, [run, prompt]);
+
+  // Update the location intelligently: when the app returns to the foreground
+  // (the user may have travelled since they last opened it), re-detect — but
+  // only if permission was already granted and our throttle window has elapsed,
+  // so we never re-prompt a denied user or hammer the geocoder/battery. The
+  // refresh never prompts (passes false) — it relies on the already-granted
+  // permission captured in grantedRef.
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (next: AppStateStatus) => {
+      if (next !== "active") return;
+      if (!grantedRef.current) return;
+      if (Date.now() - lastDetectAt.current < REFRESH_INTERVAL_MS) return;
+      run(false);
+    });
+    return () => sub.remove();
+  }, [run]);
 
   return { city, state, status, canAskAgain, retry: detect };
 }

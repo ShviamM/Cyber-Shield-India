@@ -24,7 +24,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { categoryIcon } from "@/constants/strings";
+import { categoryIcon, isCallReportCategory } from "@/constants/strings";
 import { formatIndianPhone, phoneForApi } from "@/lib/phone";
 import { answerCall, blockNumber, endCall } from "@/lib/screening";
 
@@ -80,7 +80,11 @@ export default function CallAlertScreen() {
     queryFn: () => listCategories(),
     enabled: reportOpen,
   });
-  const categories = categoriesQuery.data?.categories ?? [];
+  // Keep the rich scam-type taxonomy here; the simple call-type keys belong to
+  // the one-tap post-call report only.
+  const categories = (categoriesQuery.data?.categories ?? []).filter(
+    (c) => !isCallReportCategory(c.key),
+  );
   const createReport = useCreateReport();
 
   // Live reputation for a real incoming caller. The manual demo (no number)

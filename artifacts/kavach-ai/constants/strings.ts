@@ -26,11 +26,37 @@ export const CATEGORY_ICONS: Record<string, FeatherName> = {
   tech_support: "tool",
   impersonation: "user-x",
   sextortion: "lock",
+  scam_call: "alert-octagon",
+  fraud_call: "alert-triangle",
+  spam_call: "slash",
+  telemarketing: "volume-2",
   other: "alert-circle",
 };
 
 export function categoryIcon(key: string): FeatherName {
   return CATEGORY_ICONS[key] ?? "alert-circle";
+}
+
+/**
+ * Simple call-type categories used by the one-tap post-call report
+ * (`app/report-call.tsx`). They are filtered OUT of the detailed fraud-incident
+ * pickers (manual report form and in-call report sheet), which keep the richer
+ * scam-type taxonomy. Order here drives the order of the quick-report buttons.
+ */
+export const CALL_REPORT_CATEGORY_KEYS = [
+  "scam_call",
+  "fraud_call",
+  "spam_call",
+  "telemarketing",
+] as const;
+
+export type CallReportCategoryKey = (typeof CALL_REPORT_CATEGORY_KEYS)[number];
+
+const CALL_REPORT_KEY_SET = new Set<string>(CALL_REPORT_CATEGORY_KEYS);
+
+/** True for the simple call-type keys that belong only to the quick report. */
+export function isCallReportCategory(key: string): boolean {
+  return CALL_REPORT_KEY_SET.has(key);
 }
 
 /**

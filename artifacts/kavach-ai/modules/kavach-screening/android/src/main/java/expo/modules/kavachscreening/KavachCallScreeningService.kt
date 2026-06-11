@@ -60,11 +60,17 @@ class KavachCallScreeningService : CallScreeningService() {
     if (!enabled || !isIncoming || number == null) return
 
     launchCallScreen(ctx, number)
+    // A quiet, persistent "report this call" notification posted now survives
+    // the call, giving a Play-compliant post-call reporting moment. (Android
+    // exposes no compliant call-ended hook without restricted call-state
+    // permissions, so we post at screen-time and let it linger in the shade.)
+    postCallReportPrompt(ctx, number)
     KavachScreeningModule.notifyCallScreened(number, false)
   }
 
   companion object {
     const val CHANNEL_ID = "kavach_screening_alerts"
+    const val REPORT_CHANNEL_ID = "kavach_call_report"
 
     /**
      * Launch Netraksh's full-screen caller screen for [number]. Tries a direct
@@ -131,19 +137,79 @@ class KavachCallScreeningService : CallScreeningService() {
       }
     }
 
-    private fun ensureChannel(ctx: Context) {
+    /**
+     * Post a quiet, dismissible "report this call" notification. It is posted at
+     * screen-time but is deliberately low-importance (no sound/heads-up) so it
+     * doesn't intrude during the call — it simply waits in the shade so the user
+     * can report the caller right after hanging up. Tapping it opens the one-tap
+     * post-call report (`app/report-call.tsx`) with the number prefilled.
+     *
+     * This is the Play-compliant substitute for a true post-call popup: Android
+     * has no call-ended callback we can use without restricted call-state
+     * permissions (READ_PHONE_STATE etc.), which Netraksh deliberately avoids.
+     */
+    private fun postCallReportPrompt(ctx: Context, number: String) {
+      ensureChannels(ctx)
+
+      val encoded = URLEncoder.encode(number, "UTF-8")
+      val deepLink = Intent(
+        Intent.ACTION_VIEW,
+        Uri.parse("kavach-ai://report-call?number=$encoded"),
+      ).apply {
+        setPackage(ctx.packageName)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+      }
+
+      val flags = PendingIntent.FLAG_UPDATE_CURRENT or
+        (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0)
+      // A distinct request code from the full-screen alert so the two
+      // notifications for the same number don't overwrite each other's intents.
+      val pending = PendingIntent.getActivity(ctx, number.hashCode() xor 0x5247, deepLink, flags)
+
+      val notification = NotificationCompat.Builder(ctx, REPORT_CHANNEL_ID)
+        .setSmallIcon(android.R.drawable.ic_menu_report_image)
+        .setContentTitle("Was this call a scam?")
+        .setContentText("Tap to report $number and help protect others.")
+        .setPriority(NotificationCompat.PRIORITY_LOW)
+        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        .setAutoCancel(true)
+        .setContentIntent(pending)
+        .build()
+      try {
+        // A separate notification id namespace from the full-screen alert.
+        NotificationManagerCompat.from(ctx).notify(number.hashCode() xor 0x5247, notification)
+      } catch (_: SecurityException) {
+        // POST_NOTIFICATIONS not granted yet — nothing more we can do here.
+      }
+    }
+
+    private fun ensureChannel(ctx: Context) = ensureChannels(ctx)
+
+    private fun ensureChannels(ctx: Context) {
       if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
       val mgr = ctx.getSystemService(NotificationManager::class.java) ?: return
-      if (mgr.getNotificationChannel(CHANNEL_ID) != null) return
-      val channel = NotificationChannel(
-        CHANNEL_ID,
-        "Scam call alerts",
-        NotificationManager.IMPORTANCE_HIGH
-      ).apply {
-        description = "Shows Netraksh's caller screen when someone calls you."
-        lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
+      if (mgr.getNotificationChannel(CHANNEL_ID) == null) {
+        val channel = NotificationChannel(
+          CHANNEL_ID,
+          "Scam call alerts",
+          NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+          description = "Shows Netraksh's caller screen when someone calls you."
+          lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
+        }
+        mgr.createNotificationChannel(channel)
       }
-      mgr.createNotificationChannel(channel)
+      if (mgr.getNotificationChannel(REPORT_CHANNEL_ID) == null) {
+        val reportChannel = NotificationChannel(
+          REPORT_CHANNEL_ID,
+          "Report a call",
+          NotificationManager.IMPORTANCE_LOW
+        ).apply {
+          description = "Lets you report a caller as scam/spam after the call ends."
+          lockscreenVisibility = android.app.Notification.VISIBILITY_PUBLIC
+        }
+        mgr.createNotificationChannel(reportChannel)
+      }
     }
   }
 

@@ -400,6 +400,37 @@ const en = {
       "Reports are reviewed by moderators. False reports may be removed. For financial loss, also call 1930.",
   },
 
+  reportCall: {
+    title: "Report this call",
+    subtitle: "Tap one type — your report helps protect others.",
+    notNow: "Not now",
+    done: "Done",
+    retry: "Try again",
+    disclaimer:
+      "Reports are reviewed by moderators. False reports may be removed. For financial loss, also call 1930.",
+    types: {
+      scam_call: { title: "Scam Call", desc: "Tried to trick or cheat me" },
+      fraud_call: { title: "Fraud Call", desc: "Pretended to be a bank/official" },
+      spam_call: { title: "Spam Call", desc: "Unwanted or repeated nuisance" },
+      telemarketing: { title: "Telemarketing", desc: "Unsolicited sales or promotion" },
+    },
+    descriptions: {
+      scam_call: "Reported as a scam call via Netraksh.",
+      fraud_call: "Reported as a fraud call via Netraksh.",
+      spam_call: "Reported as a spam call via Netraksh.",
+      telemarketing: "Reported as a telemarketing call via Netraksh.",
+    },
+    successTitle: "Report submitted",
+    successMsg: "Thank you for helping protect the community.",
+    duplicateTitle: "Already reported",
+    duplicateMsg: "You've already reported this number recently.",
+    rateLimitedTitle: "Too many reports",
+    rateLimitedMsg: "You've reported a lot recently. Please try again later.",
+    errorTitle: "Couldn't submit",
+    errorMsg: "Something went wrong. Please try again.",
+    invalidNumber: "This caller's number couldn't be read, so it can't be reported.",
+  },
+
   categories: {
     title: "Scam Categories",
     intro: "Learn how the most common scams in India work so you can spot them early.",

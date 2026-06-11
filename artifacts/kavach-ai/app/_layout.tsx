@@ -200,6 +200,10 @@ function RootLayoutNav() {
         />
         <Stack.Screen name="report" options={{ title: t("report.title") }} />
         <Stack.Screen
+          name="report-call"
+          options={{ title: t("reportCall.title"), presentation: "modal" }}
+        />
+        <Stack.Screen
           name="subscription"
           options={{ title: t("subscription.title") }}
         />

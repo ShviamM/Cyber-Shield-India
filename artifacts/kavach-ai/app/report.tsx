@@ -19,7 +19,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ErrorState, LoadingState } from "@/components/StateViews";
-import { categoryIcon } from "@/constants/strings";
+import { categoryIcon, isCallReportCategory } from "@/constants/strings";
 import { useColors } from "@/hooks/useColors";
 import { useNearbyCity } from "@/hooks/useNearbyCity";
 import { isValidIndianPhone, phoneForApi } from "@/lib/phone";
@@ -59,7 +59,12 @@ export default function ReportScreen() {
 
   const createReport = useCreateReport();
 
-  const categories = categoriesQuery.data?.categories ?? [];
+  // The detailed form keeps the rich scam-type taxonomy; the simple call-type
+  // keys (Scam/Fraud/Spam/Telemarketing) belong only to the quick post-call
+  // report, so filter them out here.
+  const categories = (categoriesQuery.data?.categories ?? []).filter(
+    (c) => !isCallReportCategory(c.key),
+  );
   const bottomPad = (insets.bottom || 0) + 24;
 
   async function handleSubmit() {
