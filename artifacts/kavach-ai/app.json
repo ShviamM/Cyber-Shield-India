@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Netraksh — India's Digital Bodyguard",
+    "name": "Netraksh \u2014 India's Digital Bodyguard",
     "slug": "kavach-ai",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -95,9 +95,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "93d7ef97-d9e3-4800-ba22-0f81cdd6eef2"
+        "projectId": "e5d1313b-c177-4200-96df-82bfce6d97ee"
       }
     },
-    "owner": "netraksh"
+    "owner": "shviam"
   }
 }

@@ -110,7 +110,7 @@ object KavachCallOverlay {
 
     scheduleAutoDismiss()
 
-    KavachReputation.fetch(ctx) { rep -> applyRep(ctx, number, rep, lang) }
+    KavachReputation.fetch(ctx, number) { rep -> applyRep(ctx, number, rep, lang) }
     return true
   }
 
