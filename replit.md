@@ -9,6 +9,7 @@ _Replace the heading above with the project's name, and this line with one sente
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
+- `pnpm --filter @workspace/kavach-ai run build:android` — build a fresh Android APK of the mobile app via EAS (preview profile). Requires `EXPO_TOKEN`. Prints a build URL when queued; the finished APK is downloadable from that URL (or from `eas build:list --platform android` / the Expo dashboard) after ~20 min.
 - Required env: `DATABASE_URL` — Postgres connection string
 
 ## Stack

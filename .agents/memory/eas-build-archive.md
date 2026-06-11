@@ -58,3 +58,10 @@ full-monorepo archive (root pnpm-lock present → pnpm detected), `.easignore`
 honored, zero git ops → guard never fires. Auth via `EXPO_TOKEN`. `preview`
 profile = APK; `--no-wait` returns the build URL (~20 min build).
 Note: `npx eas-cli` can hang — call the `eas` binary on PATH (v14.7.1).
+
+**Now encoded as a one-click script:** `pnpm --filter @workspace/kavach-ai run
+build:android` runs exactly this invocation (`EAS_NO_VCS=1
+EAS_PROJECT_ROOT=$(git rev-parse --show-toplevel) eas build --platform android
+--profile preview --non-interactive`). It blocks until the build finishes; add
+`--no-wait` manually if you only want to verify the upload size / get the URL.
+Requires `EXPO_TOKEN`. Verified upload = 66.2 MB.
