@@ -65,3 +65,12 @@ EAS_PROJECT_ROOT=$(git rev-parse --show-toplevel) eas build --platform android
 --profile preview --non-interactive`). It blocks until the build finishes; add
 `--no-wait` manually if you only want to verify the upload size / get the URL.
 Requires `EXPO_TOKEN`. Verified upload = 66.2 MB.
+
+**Play Store needs the PRODUCTION profile (AAB), not preview (APK):** the
+`preview` profile sets `android.buildType=apk` (internal sideload/testing only —
+the Play Console rejects APKs for new apps). The `production` profile has NO
+buildType, so EAS defaults to **app-bundle (AAB)**, which is what Play requires.
+Use `pnpm --filter @workspace/kavach-ai run build:android:prod` (same EAS_NO_VCS
+invocation but `--profile production`). Production also has `autoIncrement:true`
++ `appVersionSource:remote`, so versionCode is bumped on EAS servers per build.
+Don't tell a user to upload the preview APK to the Play Store.
