@@ -75,6 +75,8 @@ const UNAVAILABLE_STATUS: ScreeningStatus = {
   hasFullScreenIntentPermission: false,
   hasOverlayPermission: false,
   hasAnswerCallsPermission: false,
+  isIgnoringBatteryOptimizations: false,
+  manufacturer: "",
   blocklistSize: 0,
   keywordCount: 0,
 };
@@ -155,6 +157,74 @@ export async function requestFullScreenIntentPermission(): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+/**
+ * Open the system battery-optimization settings so the user can mark Netraksh as
+ * "unrestricted". On aggressive OEMs an optimized app gets its screening service
+ * frozen/killed, so the caller popup never appears. Resolves true only if already
+ * exempt — re-read getScreeningStatus() when the screen regains focus.
+ */
+export async function requestDisableBatteryOptimization(): Promise<boolean> {
+  if (!isScreeningSupported()) return false;
+  try {
+    return await KavachScreening.requestDisableBatteryOptimization();
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Open the OEM-specific "autostart" / "background launch" manager (MIUI, ColorOS,
+ * Funtouch, OxygenOS, etc.) so the screening service is allowed to start in the
+ * background. Falls back to the app's system settings page. Resolves true only if
+ * a vendor autostart screen was actually opened.
+ */
+export async function openAutoStartSettings(): Promise<boolean> {
+  if (!isScreeningSupported()) return false;
+  try {
+    return await KavachScreening.openAutoStartSettings();
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Fire the exact caller-alert experience a real incoming call produces (with a
+ * demo number) so the user can lock their phone and confirm the popup fronts on
+ * their own device/OEM. Returns true only when the native alert was dispatched.
+ */
+export function sendTestAlert(): boolean {
+  if (!isScreeningSupported()) return false;
+  try {
+    return KavachScreening.sendTestAlert();
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Manufacturers known to aggressively kill background services and require an
+ * extra autostart / background-launch grant beyond the standard permissions.
+ */
+const AGGRESSIVE_OEMS = [
+  "xiaomi",
+  "redmi",
+  "poco",
+  "oppo",
+  "realme",
+  "vivo",
+  "iqoo",
+  "oneplus",
+  "huawei",
+  "honor",
+];
+
+/** True if the device's manufacturer needs the extra autostart guidance step. */
+export function needsAutoStartGuidance(manufacturer: string): boolean {
+  const m = manufacturer.trim().toLowerCase();
+  if (!m) return false;
+  return AGGRESSIVE_OEMS.some((oem) => m.includes(oem));
 }
 
 /**

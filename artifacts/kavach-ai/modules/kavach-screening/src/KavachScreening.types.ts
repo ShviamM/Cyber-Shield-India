@@ -19,6 +19,14 @@ export type ScreeningStatus = {
   hasOverlayPermission: boolean;
   /** Whether ANSWER_PHONE_CALLS is granted (needed to answer/end live calls). */
   hasAnswerCallsPermission: boolean;
+  /**
+   * Whether Netraksh is exempt from battery optimization. When false, aggressive
+   * OEM power managers can freeze/kill the screening service so the caller popup
+   * never appears — the main cause of cross-device unreliability.
+   */
+  isIgnoringBatteryOptimizations: boolean;
+  /** Device manufacturer (Build.MANUFACTURER), used to tailor OEM setup hints. */
+  manufacturer: string;
   /** Number of high-risk numbers currently synced on-device. */
   blocklistSize: number;
   /** Number of scam keyword patterns currently synced on-device. */

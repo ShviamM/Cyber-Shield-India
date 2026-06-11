@@ -17,6 +17,9 @@ declare class KavachScreeningModule extends NativeModule<KavachScreeningEvents> 
   requestCallScreeningRole(): Promise<boolean>;
   requestOverlayPermission(): Promise<boolean>;
   requestFullScreenIntentPermission(): Promise<boolean>;
+  requestDisableBatteryOptimization(): Promise<boolean>;
+  openAutoStartSettings(): Promise<boolean>;
+  sendTestAlert(): boolean;
   answerCall(): boolean;
   endCall(): boolean;
   blockNumber(number: string): void;

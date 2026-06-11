@@ -22,10 +22,14 @@ import { useColors } from "@/hooks/useColors";
 import {
   getScreeningStatus,
   isScreeningSupported,
+  needsAutoStartGuidance,
+  openAutoStartSettings,
   requestAnswerCallsPermission,
   requestCallScreeningRole,
+  requestDisableBatteryOptimization,
   requestFullScreenIntentPermission,
   requestOverlayPermission,
+  sendTestAlert,
   syncScreeningApiConfig,
   syncScreeningLanguage,
   type ScreeningStatus,
@@ -137,6 +141,28 @@ export default function ScreeningScreen() {
     refreshStatus();
   }
 
+  async function fixBatteryOptimization() {
+    Haptics.selectionAsync();
+    await requestDisableBatteryOptimization();
+    refreshStatus();
+  }
+
+  async function openAutoStart() {
+    Haptics.selectionAsync();
+    await openAutoStartSettings();
+    refreshStatus();
+  }
+
+  function fireTestAlert() {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    const ok = sendTestAlert();
+    if (ok) {
+      Alert.alert(t("screening.testAlert.sentTitle"), t("screening.testAlert.sentMsg"));
+    } else {
+      Alert.alert(t("screening.testAlert.failTitle"), t("screening.testAlert.failMsg"));
+    }
+  }
+
   async function toggleCall(next: boolean) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     if (!supported) {
@@ -175,6 +201,13 @@ export default function ScreeningScreen() {
   ];
   const setupDoneCount = setupSteps.filter((x) => x.done).length;
   const nextSetupStep = setupSteps.find((x) => !x.done);
+
+  const batteryOk = status.isIgnoringBatteryOptimizations;
+  const needsAutoStart = needsAutoStartGuidance(status.manufacturer);
+  // Title-case the manufacturer for display ("xiaomi" -> "Xiaomi").
+  const oemBrand = status.manufacturer
+    ? status.manufacturer.charAt(0).toUpperCase() + status.manufacturer.slice(1)
+    : "";
 
   const PRIVACY_POINTS = [
     { icon: "smartphone" as const, text: t("screening.privacy.onDevice") },
@@ -300,6 +333,89 @@ export default function ScreeningScreen() {
             blocklistSize={status.blocklistSize}
             t={t}
           />
+        )}
+
+        {/* Reliability: on aggressive OEMs the screening service is killed unless
+            the app is battery-unrestricted and (on Xiaomi/Oppo/Vivo/etc.) has
+            autostart enabled. Surface these as one-tap fixes so the caller popup
+            fires consistently — the real cross-device reliability gap. */}
+        {supported && callScreening && (
+          <>
+            <Text style={s.sectionLabel}>{t("screening.sectionReliability")}</Text>
+            <View style={s.card}>
+              {/* Battery optimization (all OEMs) */}
+              <View style={[s.relRow, needsAutoStart && s.rowBorder]}>
+                <View
+                  style={[
+                    s.relIcon,
+                    { backgroundColor: batteryOk ? "#f0fdf4" : "#fff7ed" },
+                  ]}
+                >
+                  <Feather
+                    name="battery-charging"
+                    size={18}
+                    color={batteryOk ? GREEN : SAFFRON}
+                  />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={s.rowLabel}>{t("screening.reliability.batteryTitle")}</Text>
+                  <Text style={s.rowSub}>
+                    {batteryOk
+                      ? t("screening.reliability.batteryDone")
+                      : t("screening.reliability.batterySub")}
+                  </Text>
+                </View>
+                {batteryOk ? (
+                  <Feather name="check-circle" size={20} color={GREEN} />
+                ) : (
+                  <TouchableOpacity
+                    style={s.relFixBtn}
+                    onPress={fixBatteryOptimization}
+                    activeOpacity={0.85}
+                  >
+                    <Text style={s.relFixTxt}>{t("screening.reliability.fix")}</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              {/* OEM autostart (Xiaomi / Oppo / Vivo / Realme / OnePlus / etc.) */}
+              {needsAutoStart && (
+                <View style={s.relRow}>
+                  <View style={[s.relIcon, { backgroundColor: "#fff7ed" }]}>
+                    <Feather name="power" size={18} color={SAFFRON} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={s.rowLabel}>{t("screening.reliability.autostartTitle")}</Text>
+                    <Text style={s.rowSub}>
+                      {t("screening.reliability.autostartSub", { brand: oemBrand })}
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    style={s.relFixBtn}
+                    onPress={openAutoStart}
+                    activeOpacity={0.85}
+                  >
+                    <Text style={s.relFixTxt}>{t("screening.reliability.open")}</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </View>
+
+            {/* Self-test: fire the real lock-screen alert so the user can verify
+                it fronts on their own device. */}
+            <TouchableOpacity
+              style={s.testBtn}
+              onPress={fireTestAlert}
+              activeOpacity={0.85}
+            >
+              <Feather name="bell" size={18} color="#fff" />
+              <View style={{ flex: 1 }}>
+                <Text style={s.testTitle}>{t("screening.testAlert.cta")}</Text>
+                <Text style={s.testSub}>{t("screening.testAlert.hint")}</Text>
+              </View>
+              <Feather name="arrow-right" size={18} color="rgba(255,255,255,0.8)" />
+            </TouchableOpacity>
+          </>
         )}
 
         {/* Privacy */}
@@ -570,4 +686,20 @@ const s = StyleSheet.create({
     borderWidth: 1, borderColor: "#e2e8f0",
   },
   manageTxt: { flex: 1, fontSize: 14, fontWeight: "700" as const, color: "#0B3D91" },
+
+  relRow: { flexDirection: "row", alignItems: "center", padding: 14, gap: 12 },
+  relIcon: { width: 38, height: 38, borderRadius: 10, alignItems: "center", justifyContent: "center" },
+  relFixBtn: {
+    backgroundColor: SAFFRON, borderRadius: 10,
+    paddingVertical: 8, paddingHorizontal: 14,
+  },
+  relFixTxt: { fontSize: 13, fontWeight: "700" as const, color: "#fff" },
+
+  testBtn: {
+    flexDirection: "row", alignItems: "center", gap: 12,
+    backgroundColor: NAVY, borderRadius: 14, paddingVertical: 14, paddingHorizontal: 16,
+    marginBottom: 20,
+  },
+  testTitle: { fontSize: 14, fontWeight: "700" as const, color: "#fff" },
+  testSub: { fontSize: 12, color: "rgba(255,255,255,0.7)", marginTop: 2, lineHeight: 16 },
 });

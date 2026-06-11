@@ -25,9 +25,15 @@ class KavachScreeningModule extends NativeModule<KavachScreeningEvents> {
       hasAnswerCallsPermission: false,
       hasFullScreenIntentPermission: false,
       hasOverlayPermission: false,
+      isIgnoringBatteryOptimizations: false,
+      manufacturer: "",
       blocklistSize: 0,
       keywordCount: 0,
     };
+  }
+
+  sendTestAlert(): boolean {
+    return false;
   }
 
   setCallScreeningEnabled(_enabled: boolean): void {}
@@ -67,6 +73,14 @@ class KavachScreeningModule extends NativeModule<KavachScreeningEvents> {
   }
 
   async requestFullScreenIntentPermission(): Promise<boolean> {
+    return false;
+  }
+
+  async requestDisableBatteryOptimization(): Promise<boolean> {
+    return false;
+  }
+
+  async openAutoStartSettings(): Promise<boolean> {
     return false;
   }
 }
