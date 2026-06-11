@@ -352,6 +352,15 @@ export default function CallAlertScreen() {
         </View>
       )}
 
+      {/* Always-on safety reminder — shown for EVERY caller in both languages,
+          so even an unverified/unknown number still warns about OTP & money. */}
+      <View style={s.safetyReminderBox}>
+        <Text style={s.safetyReminder}>{t("callAlert.safetyReminder")}</Text>
+        {showEnglish && (
+          <Text style={s.safetyReminderEn}>{tEn("callAlert.safetyReminder")}</Text>
+        )}
+      </View>
+
       {/* Scam type tag */}
       {isDemo || topCategory ? (
         <View style={s.scamTypeRow}>
@@ -678,6 +687,24 @@ const s = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600" as const,
     color: "rgba(255,255,255,0.8)",
+    textAlign: "center",
+  },
+  safetyReminderBox: {
+    alignItems: "center",
+    gap: 4,
+    marginBottom: 16,
+    paddingHorizontal: 8,
+  },
+  safetyReminder: {
+    fontSize: 18,
+    fontWeight: "800" as const,
+    color: "#FF6713",
+    textAlign: "center",
+  },
+  safetyReminderEn: {
+    fontSize: 14,
+    fontWeight: "700" as const,
+    color: "rgba(255,255,255,0.85)",
     textAlign: "center",
   },
   scamTypeRow: { marginBottom: 28 },

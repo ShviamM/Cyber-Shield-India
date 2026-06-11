@@ -586,9 +586,9 @@ const en = {
     checking: "Checking this number…",
     warnings: [
       "STOP! This could be a scammer",
-      "Do NOT share OTP or send money!",
       "Verify first, then talk",
     ],
+    safetyReminder: "Do NOT share OTP or send money!",
     reportSheetTitle: "Report this number",
     reportSheetSubtitle: "Pick the scam type — we report it instantly.",
     reporting: "Reporting…",
