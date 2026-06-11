@@ -5,6 +5,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import {
   Alert,
+  AppState,
   PermissionsAndroid,
   Platform,
   ScrollView,
@@ -89,6 +90,18 @@ export default function ScreeningScreen() {
     }, [i18n.language, refreshStatus, syncApiConfig])
   );
 
+  // Re-read permission status when the app returns to the foreground. Granting
+  // overlay / full-screen-intent happens on a system Settings activity that
+  // backgrounds the whole app — which does NOT trigger useFocusEffect (the
+  // navigator screen never lost focus) — so without this the setup steps would
+  // keep showing "missing" until the user re-navigated to the screen.
+  React.useEffect(() => {
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state === "active") refreshStatus();
+    });
+    return () => sub.remove();
+  }, [refreshStatus]);
+
   async function grantRole() {
     Haptics.selectionAsync();
     syncScreeningLanguage(i18n.language?.startsWith("hi") ? "hi" : "en");
@@ -142,7 +155,10 @@ export default function ScreeningScreen() {
       if (!ok) {
         Alert.alert(t("screening.roleDeniedTitle"), t("screening.roleDeniedMsg"));
       }
-      setCallScreening(true);
+      // Only mark screening enabled if the defining Call Screening role was
+      // actually granted. Without the role the OS never routes incoming calls to
+      // us, so a "true" toggle would be a false-positive "protected" state.
+      setCallScreening(ok);
     } else {
       setCallScreening(false);
     }

@@ -1,0 +1,239 @@
+Critical Issues Found
+1. Incoming Call Popup May Not Appear on Lock Screen
+
+Your app depends on:
+
+Call Screening Role
+Overlay Permission
+Full Screen Intent Permission
+Notification Permission
+Answer Calls Permission
+
+I found the permission flow in app/screening.tsx.
+
+Problem:
+When call screening is enabled, the app automatically requests:
+
+Call Screening Role ✅
+Notification Permission ✅
+Answer Calls Permission ✅
+
+But it does NOT automatically request:
+
+Overlay Permission ❌
+Full Screen Intent Permission ❌
+
+These are only exposed through separate setup actions.
+
+Impact
+
+This directly explains:
+
+"Popup only comes after opening the app"
+
+and
+
+"Incoming call screen doesn't always come to front like Truecaller"
+
+because Android requires Full-Screen Intent + Overlay permissions for reliable lock-screen presentation.
+
+2. Call Screening State Can Become Out of Sync
+
+In toggleCall():
+
+setCallScreening(true);
+
+is executed even if setup is incomplete.
+
+If:
+
+user denies role
+user denies overlay
+user denies full-screen
+
+the UI can still show screening enabled.
+
+Impact
+
+False positive configuration state.
+
+User thinks protection is enabled while Android blocks the feature.
+
+3. Netraksh vs Kavach Package Naming Conflict
+
+Found references such as:
+
+market://details?id=com.kavachai.app
+
+and
+
+Netraksh
+
+in multiple locations.
+
+Impact
+
+Possible issues:
+
+Store review links
+Play Store redirects
+Subscription restoration
+Deep links
+Referral flows
+
+Need a full audit to ensure one package identity is used everywhere.
+
+4. Post-Call Reporting Workflow Appears Missing
+
+I found reporting functionality inside:
+
+call-alert.tsx
+
+using:
+
+useCreateReport()
+
+and report modal logic.
+
+However, I did not find evidence that:
+
+Call Ends
+     ↓
+Show Fraud Report Popup
+     ↓
+Report / Ignore
+
+is automatically triggered after every completed call.
+
+Impact
+
+This matches your observation:
+
+"Post call prompt not coming"
+
+Likely the report UI exists but is not connected to Android call-state events.
+
+5. Background Reliability Risk
+
+The native screening module runs independently from React Native, which is good.
+
+However I found comments indicating:
+
+The service runs without a JS bridge
+
+and API configuration sync occurs from:
+
+syncScreeningApiConfig()
+
+inside UI lifecycle events.
+
+Risk
+
+If:
+
+token changes
+app gets killed
+app updated
+
+the native service may retain stale configuration until app opens again.
+
+Impact
+
+Can cause inconsistent caller identification while app is closed.
+
+6. Android 13+ Notification Permission Risk
+
+The code requests:
+
+POST_NOTIFICATIONS
+
+but I did not see strong validation ensuring it remains granted before displaying caller alerts.
+
+Impact
+
+Some devices may silently suppress alerts.
+
+7. Potential Permission Refresh Issue
+
+After requesting permissions:
+
+requestOverlayPermission()
+requestFullScreenIntentPermission()
+
+the code immediately calls:
+
+refreshStatus()
+
+Android settings screens often return asynchronously.
+
+Impact
+
+Status may still show:
+
+Permission Missing
+
+until user revisits the screen.
+
+Functional Gaps Compared to Truecaller
+
+Based on the code review, the following features are either incomplete or not fully wired:
+
+Missing Auto Post-Call Fraud Feedback
+
+Desired:
+
+Call Ends
+↓
+Was this call Spam?
+[Report]
+[Ignore]
+
+Not fully implemented.
+
+Missing Blocked Number Synchronization
+
+You reported:
+
+"Blocked contact should sync with Android block list"
+
+I found:
+
+blockNumber()
+
+references but did not yet find evidence that Android's native blocked-number provider is being updated.
+
+Needs verification.
+
+Very likely not synced currently.
+
+Missing Guaranteed Full-Screen Caller UI
+
+Current implementation depends on:
+
+Overlay
+Full-screen intent
+Notification
+
+but setup is not enforced.
+
+Truecaller forces all prerequisites.
+
+Priority Fix Order
+P1 (Must Fix Before Store Launch)
+Enforce Overlay Permission
+Enforce Full Screen Intent Permission
+Fix lock-screen popup reliability
+Add post-call report popup
+Validate Android blocked-number synchronization
+P2
+Sync native screening configuration automatically
+Improve permission validation
+Handle Android OEM restrictions (Samsung, Xiaomi, Vivo, Oppo)
+P3
+Package name consistency audit
+Subscription and store-link validation
+Overall Assessment
+
+The project architecture is good and the native screening module is significantly more advanced than a typical React Native caller-ID app. However, the main launch blocker is that the permission flow is not strict enough, which is almost certainly causing the incoming-call and lock-screen issues you've already identified.
+
+Based on the source review alone, I would not recommend publishing until the lock-screen popup, background caller detection, blocked-number sync, and post-call reporting workflow are validated on at least Samsung, Pixel, Xiaomi, Vivo, and Oppo devices.
