@@ -41,3 +41,12 @@ If the bundle hash is unchanged after a deploy, the build got stale code (GitHub
 encrypted `EV[...]` secret values ("secret env value must not be encrypted before app is created").
 Use `doctl apps update <id> --spec <file>` directly — it preserves existing encrypted secrets and
 encrypts new plaintext values.
+
+**Detect stale prod (don't trust commit dates):** a Replit checkpoint "Restored to …"
+rewrites commit timestamps, so `git log` dates lie about what's deployed. Instead compare
+the DO active deployment's `services[].source_commit_hash` (from
+`/v2/apps/{id}/deployments`) against GitHub `main` HEAD
+(`api.github.com/repos/ShviamM/Cyber-Shield-India/commits/main`). If main is ahead with
+backend diffs (`git diff --stat <deployed>..<mainHEAD> -- artifacts/api-server artifacts/admin artifacts/website packages lib`),
+prod is stale. Backend commits already on GitHub deploy via `doctl apps create-deployment <id>`
+with NO user push needed — pushing is only required for commits that are local-only.
