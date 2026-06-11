@@ -27,3 +27,19 @@ consumed as source / rebuilt on EAS servers, not from committed `dist`.
 
 **How to apply:** keep `.easignore` a superset of `.gitignore` plus the heavy
 non-mobile assets; never let it drop `node_modules`/`dist`/`.expo`/`.local`.
+
+## Triggering builds from the Replit main agent — use EAS_NO_VCS=1
+
+`eas build` defaults to archiving from the git tree, which writes
+`.git/index.lock`. The main-agent sandbox blocks that as a "destructive git
+operation" and the build aborts with exit 254 before uploading.
+
+**Fix:** run `EAS_NO_VCS=1 eas build --platform android --profile preview
+--non-interactive --no-wait` from `artifacts/kavach-ai`. With VCS off, EAS tars
+the filesystem and honors `.easignore` directly — safe here precisely because
+`.easignore` is a correct superset of `.gitignore` and the native module source
+is present on disk. Auth is via the `EXPO_TOKEN` secret (no interactive login).
+Use the `preview` profile for an APK (buildType apk); `production` is an app
+bundle. `--no-wait` returns the build URL immediately instead of blocking ~20min.
+Note: `npx eas-cli ...` can hang fetching the package — call the `eas` binary
+already on PATH instead.
