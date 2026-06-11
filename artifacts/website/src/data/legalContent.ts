@@ -19,6 +19,7 @@ export const legalContent: Record<"en" | "hi", Record<string, string>> = {
       <li><strong>Account information:</strong> your phone number and basic profile details when you sign up.</li>
       <li><strong>Protection data:</strong> when you ask Netraksh to check a call, message, link or UPI ID, we process that content only to return a safety verdict.</li>
       <li><strong>Device and usage data:</strong> app version, device type and diagnostic logs used to keep the service reliable and secure.</li>
+      <li><strong>Location:</strong> with your permission, your approximate device location is used to show cyber-cell contacts and scam alerts relevant to your area. Location is accessed only while the app is open (in the foreground), never in the background, and you can decline it or turn it off in your device settings at any time.</li>
     </ul>
     <h2>How we use your information</h2>
     <ul>
@@ -197,6 +198,7 @@ export const legalContent: Record<"en" | "hi", Record<string, string>> = {
       <li><strong>खाता जानकारी:</strong> साइन अप करते समय आपका फ़ोन नंबर और बुनियादी प्रोफ़ाइल विवरण।</li>
       <li><strong>सुरक्षा डेटा:</strong> जब आप Netraksh से किसी कॉल, मैसेज, लिंक या UPI ID को जाँचने के लिए कहते हैं, तो हम उस सामग्री को केवल सुरक्षा परिणाम देने के लिए प्रोसेस करते हैं।</li>
       <li><strong>डिवाइस और उपयोग डेटा:</strong> ऐप वर्शन, डिवाइस का प्रकार और डायग्नोस्टिक लॉग, जो सेवा को भरोसेमंद और सुरक्षित बनाए रखने में मदद करते हैं।</li>
+      <li><strong>स्थान (लोकेशन):</strong> आपकी अनुमति से, आपके क्षेत्र से जुड़े साइबर सेल संपर्क और स्कैम अलर्ट दिखाने के लिए आपके डिवाइस का अनुमानित स्थान उपयोग किया जाता है। स्थान केवल तभी एक्सेस किया जाता है जब ऐप खुला हो (फ़ोरग्राउंड), पृष्ठभूमि में कभी नहीं, और आप इसे कभी भी अस्वीकार कर सकते हैं या अपनी डिवाइस सेटिंग्स में बंद कर सकते हैं।</li>
     </ul>
     <h2>हम आपकी जानकारी का उपयोग कैसे करते हैं</h2>
     <ul>
