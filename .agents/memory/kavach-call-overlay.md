@@ -55,14 +55,19 @@ service to decide the direct-launch path). All show/update/Risk/view code is gon
 - Real caller: `useCheckNumber(apiPhone)` (enabled only when `!isDemo && apiPhone`,
   explicit `getCheckNumberQueryKey`, `staleTime: 60s`). Renders REAL stats:
   reportCount, risk band, status (Verified/Reported/Clean), top category as badge.
-- Risk band drives the theme (same rule as before): red when
-  `verifiedScam || riskLevel in [high, medium]`, calmer navy otherwise. Caller
-  circle shows a shield icon (not phone-incoming) when safe.
-- **Honesty rule for the non-risky headline:** only show "No scam reports" when
-  `rep && reportCount === 0`. Reported-but-low-risk → cautionHeadline; lookup
-  failed / unknown / query disabled (rep undefined) → unknownHeadline ("couldn't
-  verify — stay cautious"). Never show a reassuring "clean" line on an error or a
-  reported number. (This was a code-review P1 — keep it.)
+- **Three-state VISUAL verdict (not just headline text):** the whole overlay theme
+  (accent, root bg, caller-circle icon) derives from a single `verdict`:
+  `risky`=red (`verifiedScam || riskLevel in [high,medium]`, or demo),
+  `clean`=green, `caution`=amber. **GREEN is reserved EXCLUSIVELY for a number we
+  actually looked up with `reportCount === 0`.** A failed/slow/disabled lookup
+  (rep undefined) OR reported-but-low-risk (`reportCount > 0`) → AMBER, never green.
+  **Why:** previously both "unknown lookup" and "community-reported" collapsed into
+  the same green/safe treatment (green shield, green accent), so a glance mid-call
+  could misread an unverified caller as safe — for a scam app that's the most
+  dangerous bug. Headline text mirrors this (safeHeadline only when clean;
+  cautionHeadline when reported; unknownHeadline when no rep). Keep the icon as
+  shield only for `clean`; `alert-triangle` for reported-caution, `help-circle`
+  for unknown-caution. (Originally a code-review P1 on text; hardened to visual.)
 
 **Dead config left in place (minor):** `ScreeningStore` apiBaseUrl/authToken and
 JS `syncScreeningApiConfig` are now UNUSED by native (JS does its own fetch via the

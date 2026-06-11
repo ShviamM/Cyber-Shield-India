@@ -165,6 +165,7 @@ const en = {
     nearbyCases: "{{n}} cases reported this month",
     nearbyDenied: "Turn on location to see scams reported near you.",
     nearbyEnable: "Enable location",
+    nearbySettings: "Open Settings",
     nearbyUnavailable: "Couldn't detect your location.",
     nearbyRetry: "Try again",
     nearbyEmpty: "No city-specific reports right now. Stay alert and verify every unknown caller.",
@@ -734,6 +735,11 @@ const en = {
     unblock: "Unblock",
     unblockTitle: "Unblock this number?",
     unblockConfirm: "Calls from {{number}} will no longer be blocked.",
+    addTitle: "Block a number manually",
+    addPlaceholder: "10-digit mobile number",
+    addButton: "Block",
+    addInvalid: "Enter a valid 10-digit Indian mobile number.",
+    addDuplicate: "This number is already blocked.",
   },
 
   language: {

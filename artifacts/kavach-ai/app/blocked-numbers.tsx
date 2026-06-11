@@ -8,6 +8,7 @@ import {
   FlatList,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -15,11 +16,12 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useColors } from "@/hooks/useColors";
 import {
+  blockNumber,
   getBlockedNumbers,
   isScreeningSupported,
   unblockNumber,
 } from "@/lib/screening";
-import { formatIndianPhone } from "@/lib/phone";
+import { formatIndianPhone, isValidIndianPhone, phoneForApi } from "@/lib/phone";
 
 const SAFFRON = "#FF6713";
 const GREEN = "#138808";
@@ -31,10 +33,36 @@ export default function BlockedNumbersScreen() {
 
   const supported = isScreeningSupported();
   const [numbers, setNumbers] = React.useState<string[]>([]);
+  const [input, setInput] = React.useState("");
+  const [error, setError] = React.useState<string | null>(null);
 
   const refresh = React.useCallback(() => {
     setNumbers(getBlockedNumbers());
   }, []);
+
+  const handleAdd = React.useCallback(() => {
+    if (!isValidIndianPhone(input)) {
+      setError(t("blockedNumbers.addInvalid"));
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      return;
+    }
+    const api = phoneForApi(input);
+    if (!api) {
+      setError(t("blockedNumbers.addInvalid"));
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      return;
+    }
+    if (getBlockedNumbers().includes(api)) {
+      setError(t("blockedNumbers.addDuplicate"));
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      return;
+    }
+    blockNumber(api);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    setInput("");
+    setError(null);
+    refresh();
+  }, [input, refresh, t]);
 
   // Re-read the on-device list every time the screen regains focus so a number
   // just blocked from the call popup shows up immediately.
@@ -75,9 +103,57 @@ export default function BlockedNumbersScreen() {
         }}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={
-          <Text style={[s.intro, { color: colors.mutedForeground }]}>
-            {supported ? t("blockedNumbers.intro") : t("blockedNumbers.unsupported")}
-          </Text>
+          <View>
+            <Text style={[s.intro, { color: colors.mutedForeground }]}>
+              {supported ? t("blockedNumbers.intro") : t("blockedNumbers.unsupported")}
+            </Text>
+            {supported && (
+              <View style={s.addBox}>
+                <Text style={[s.addLabel, { color: colors.text }]}>
+                  {t("blockedNumbers.addTitle")}
+                </Text>
+                <View style={s.addRow}>
+                  <View
+                    style={[
+                      s.inputWrap,
+                      { backgroundColor: colors.card, borderColor: colors.border },
+                    ]}
+                  >
+                    <Text style={[s.prefix, { color: colors.mutedForeground }]}>
+                      +91
+                    </Text>
+                    <TextInput
+                      style={[s.input, { color: colors.text }]}
+                      value={input}
+                      onChangeText={(v) => {
+                        setInput(v);
+                        if (error) setError(null);
+                      }}
+                      placeholder={t("blockedNumbers.addPlaceholder")}
+                      placeholderTextColor={colors.mutedForeground}
+                      keyboardType="phone-pad"
+                      maxLength={10}
+                      returnKeyType="done"
+                      onSubmitEditing={handleAdd}
+                    />
+                  </View>
+                  <TouchableOpacity
+                    style={[
+                      s.addBtn,
+                      { backgroundColor: input.length ? colors.danger : colors.border },
+                    ]}
+                    onPress={handleAdd}
+                    disabled={!input.length}
+                    activeOpacity={0.85}
+                  >
+                    <Feather name="slash" size={15} color="#fff" />
+                    <Text style={s.addBtnTxt}>{t("blockedNumbers.addButton")}</Text>
+                  </TouchableOpacity>
+                </View>
+                {error && <Text style={s.addError}>{error}</Text>}
+              </View>
+            )}
+          </View>
         }
         ListEmptyComponent={
           <View style={s.center}>
@@ -124,6 +200,31 @@ export default function BlockedNumbersScreen() {
 const s = StyleSheet.create({
   screen: { flex: 1 },
   intro: { fontSize: 13.5, lineHeight: 19, marginBottom: 6 },
+  addBox: { marginTop: 10, marginBottom: 10 },
+  addLabel: { fontSize: 14, fontWeight: "700", marginBottom: 8 },
+  addRow: { flexDirection: "row", gap: 8, alignItems: "center" },
+  inputWrap: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    height: 46,
+    gap: 6,
+  },
+  prefix: { fontSize: 15, fontWeight: "600" },
+  input: { flex: 1, fontSize: 15, fontWeight: "600", padding: 0 },
+  addBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 14,
+    height: 46,
+    borderRadius: 12,
+  },
+  addBtnTxt: { color: "#fff", fontSize: 14, fontWeight: "700" },
+  addError: { color: "#dc2626", fontSize: 12.5, marginTop: 6, fontWeight: "600" },
   center: {
     flex: 1,
     alignItems: "center",

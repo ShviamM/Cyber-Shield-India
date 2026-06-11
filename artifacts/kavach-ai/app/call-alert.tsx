@@ -99,14 +99,48 @@ export default function CallAlertScreen() {
   });
   const rep = checkQuery.data;
   const checking = checkEnabled && checkQuery.isLoading;
-  const isRisky = isDemo
-    ? true
-    : !!rep &&
-      (rep.verifiedScam ||
-        rep.riskLevel === "high" ||
-        rep.riskLevel === "medium");
-  const accent = isRisky ? "#dc2626" : "#16a34a";
-  const rootBg = isRisky ? "#1a0000" : "#04122b";
+  // Three honest verdicts. GREEN is reserved exclusively for a number we
+  // actually looked up and confirmed has zero reports. A failed/slow lookup or
+  // a community-reported-but-not-high-risk number is AMBER ("couldn't verify /
+  // stay cautious") — never green — so a glance during a live call can never
+  // misread an unverified caller as safe.
+  type Verdict = "risky" | "caution" | "clean";
+  const verdict: Verdict = isDemo
+    ? "risky"
+    : checking
+      ? "caution"
+      : rep
+        ? rep.verifiedScam ||
+          rep.riskLevel === "high" ||
+          rep.riskLevel === "medium"
+          ? "risky"
+          : rep.reportCount > 0
+            ? "caution"
+            : "clean"
+        : "caution";
+  const isRisky = verdict === "risky";
+  const VERDICT_ACCENT: Record<Verdict, string> = {
+    risky: "#dc2626",
+    caution: "#d97706",
+    clean: "#16a34a",
+  };
+  const VERDICT_BG: Record<Verdict, string> = {
+    risky: "#1a0000",
+    caution: "#1c1400",
+    clean: "#04122b",
+  };
+  const accent = VERDICT_ACCENT[verdict];
+  const rootBg = VERDICT_BG[verdict];
+  // Icon mirrors the verdict: incoming-danger (red), warning/unknown (amber),
+  // verified-shield (green).
+  const verdictIcon: keyof typeof Feather.glyphMap =
+    verdict === "risky"
+      ? "phone-incoming"
+      : verdict === "clean"
+        ? "shield"
+        : rep
+          ? "alert-triangle"
+          : "help-circle";
   const topCategory =
     !isDemo && rep && rep.categories.length > 0
       ? prettyCategory(rep.categories[0].key)
@@ -280,11 +314,7 @@ export default function CallAlertScreen() {
           ]}
         >
           <View style={[s.dangerCircleInner, { backgroundColor: accent }]}>
-            <Feather
-              name={isRisky ? "phone-incoming" : "shield"}
-              size={36}
-              color="#FFFFFF"
-            />
+            <Feather name={verdictIcon} size={36} color="#FFFFFF" />
           </View>
         </Animated.View>
         <Text style={s.callerNumber}>{displayNumber}</Text>

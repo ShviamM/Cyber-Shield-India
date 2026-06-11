@@ -50,13 +50,19 @@ export default function HomeScreen() {
   const isHindi = i18n.language?.startsWith("hi");
   const { guardianActive, familyMembers, recentChecks, toggleGuardian } = useAppContext();
   const { hasUnread: hasUnreadNotifications } = useNotifications();
+  // Don't auto-fire the OS location dialog the instant Home mounts. We read the
+  // already-granted permission silently ({ prompt: false }) — returning users
+  // who granted it still get their city with no prompt — and a fresh user sees
+  // the in-app "see scams near you" rationale card first, then taps Enable
+  // (which prompts). This is the Play-recommended in-context request pattern and
+  // removes the surprise prompt on first open.
   const {
     city: nearbyCity,
     state: nearbyState,
     status: nearbyStatus,
     canAskAgain: nearbyCanAskAgain,
     retry: retryNearby,
-  } = useNearbyCity();
+  } = useNearbyCity({ prompt: false });
 
   // Global trending feed (no city filter) for the "Active Scams Today" section.
   const trending = useGetTrendingScams(undefined, {
@@ -360,8 +366,16 @@ export default function HomeScreen() {
                   nearbyCanAskAgain ? retryNearby() : Linking.openSettings()
                 }
               >
-                <Feather name="navigation" size={13} color="#fff" />
-                <Text style={s.nearbyBtnTxt}>{t("home.nearbyEnable")}</Text>
+                <Feather
+                  name={nearbyCanAskAgain ? "navigation" : "settings"}
+                  size={13}
+                  color="#fff"
+                />
+                <Text style={s.nearbyBtnTxt}>
+                  {nearbyCanAskAgain
+                    ? t("home.nearbyEnable")
+                    : t("home.nearbySettings")}
+                </Text>
               </TouchableOpacity>
             </View>
           )}
