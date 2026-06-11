@@ -639,6 +639,11 @@ const en = {
       doneTitle: "You're protected",
       doneSub: "All set — Netraksh is screening your calls.",
     },
+    popupWarn: {
+      title: "Popup may not appear on your lock screen",
+      body: "Allow “Display over other apps” and full-screen alerts so the caller card pops up instantly over your lock or call screen — like Truecaller. Without them you may only get a small notification, or the popup may appear only after you open the app.",
+      cta: "Fix popup reliability",
+    },
     overlayPromptTitle: "Turn on the incoming-call popup",
     overlayPromptMsg:
       "Required: allow Netraksh to display over other apps, or the caller card can't pop up over your phone or call screen. Without this you'll only get a small notification.",

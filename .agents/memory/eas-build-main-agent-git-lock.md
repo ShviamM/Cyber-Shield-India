@@ -45,3 +45,11 @@ the share-intent plugin re-adds its appExtension itself at build time.
 with `GIT_OPTIONAL_LOCKS=0`. A stale `.git/index.lock` may remain from a prior
 failed attempt; the platform's end-of-turn checkpoint clears it. The remote
 versionCode still increments on each failed attempt, so don't be surprised by gaps.
+
+**Long uploads vs. the bash timeout:** an `eas build --no-wait` that archives the
+full workspace (tens of MB) takes longer than the 120s bash-tool limit, so a
+synchronous call gets killed. Backgrounding it with `nohup ... &` also dies when
+the tool call returns (sandbox kills the process group) and may leave an empty log,
+BUT the build is usually already queued server-side before the process dies. Don't
+re-trigger blindly — confirm with `eas build:list --platform android --json` and
+look for a fresh IN_PROGRESS entry before assuming it failed.

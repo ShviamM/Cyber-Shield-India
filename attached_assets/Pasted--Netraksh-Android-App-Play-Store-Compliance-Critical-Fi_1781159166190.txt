@@ -1,0 +1,261 @@
+# Netraksh Android App – Play Store Compliance & Critical Fixes
+
+You are a Senior Android Engineer, React Native Expert, and Google Play Policy Specialist.
+
+Review the entire Netraksh codebase and implement the following changes while ensuring the application remains fully compliant with Google Play policies.
+
+## Important Constraints
+
+Do NOT introduce any permission that could cause Google Play rejection, including:
+
+* READ_PHONE_STATE
+* READ_CALL_LOG
+* PROCESS_OUTGOING_CALLS
+* Accessibility Service misuse
+* Any permission requiring the app to become the default Phone app
+
+The application must remain a Call Screening application and not a Dialer replacement.
+
+---
+
+# Critical Fixes Required
+
+## 1. Lock Screen Incoming Call Detection
+
+Current issue:
+
+* Incoming caller popup works inconsistently.
+* Popup sometimes appears only after opening the application.
+* Lock-screen experience is unreliable.
+
+Tasks:
+
+* Audit the Call Screening Service implementation.
+* Ensure incoming call detection works when:
+
+  * App is killed
+  * App is in background
+  * Device is locked
+  * Device screen is off
+
+Implement:
+
+* Foreground service where appropriate
+* Full Screen Intent notifications
+* Proper notification channels
+* Wake lock handling (only where necessary)
+* Android 12, 13, 14, 15 compatibility
+
+Expected Result:
+
+Incoming caller identification should appear consistently similar to Truecaller without violating Play Store policies.
+
+---
+
+## 2. Permission Validation Flow
+
+Current issue:
+
+Users can enable protection even when required permissions are missing.
+
+Tasks:
+
+Create a Protection Readiness Check.
+
+Verify all required permissions before enabling protection:
+
+* Call Screening Role
+* Overlay Permission
+* Notification Permission
+* Full Screen Intent Permission
+
+If any permission is missing:
+
+* Show status as Incomplete Setup
+* Prevent enabling protection
+* Provide one-click navigation to the missing permission
+
+Expected Result:
+
+Protection cannot be enabled unless setup is 100% complete.
+
+---
+
+## 3. Full Screen Intent Reliability
+
+Tasks:
+
+Review all notification implementations.
+
+Ensure:
+
+* Full-screen caller UI appears on locked devices.
+* Android 13+ notification behavior is handled correctly.
+* Notification channel importance is configured properly.
+* OEM devices (Samsung, Xiaomi, Vivo, Oppo, OnePlus) are supported.
+
+Expected Result:
+
+Caller identification reliably appears during incoming calls.
+
+---
+
+## 4. Background Service Stability
+
+Tasks:
+
+Review all native Android services.
+
+Ensure:
+
+* Services restart correctly after reboot.
+* Services survive app updates.
+* Configuration sync remains active.
+* API tokens are refreshed properly.
+* No dependency on opening the app manually.
+
+Expected Result:
+
+Caller protection continues functioning even if the user has not opened the app for weeks.
+
+---
+
+## 5. Improve Blocked Numbers Management
+
+Important:
+
+Do NOT attempt to sync blocked numbers with Android's native blocked-number provider.
+
+Reason:
+
+Android restricts this capability to default Phone/SMS applications.
+
+Instead implement:
+
+### In-App Block Management
+
+Features:
+
+* View blocked numbers
+* Search blocked numbers
+* Unblock numbers
+* Block reasons
+* Fraud history
+* Bulk unblock
+
+Display clear messaging:
+
+"Numbers blocked in Netraksh are automatically rejected by Netraksh Call Protection."
+
+Expected Result:
+
+Users can manage blocked numbers easily without relying on Android's system blocklist.
+
+---
+
+## 6. Package & Branding Audit
+
+Review entire codebase for:
+
+* Old package names
+* Kavach references
+* Legacy store links
+* Legacy app names
+* Legacy subscription identifiers
+
+Replace everything with:
+
+Netraksh
+
+Ensure consistency across:
+
+* Android package configuration
+* Deep links
+* Notifications
+* Subscription handling
+* Play Store URLs
+* Analytics
+* Crash reporting
+
+---
+
+## 7. OEM Battery Optimization Guidance
+
+Add a dedicated onboarding screen.
+
+Detect and guide users for:
+
+* Samsung
+* Xiaomi
+* Oppo
+* Vivo
+* OnePlus
+* Realme
+
+Provide instructions for:
+
+* Auto-start
+* Battery optimization exclusion
+* Background activity permissions
+
+Expected Result:
+
+Higher reliability on aggressive OEM Android devices.
+
+---
+
+## 8. Protection Health Dashboard
+
+Create a real-time status screen showing:
+
+✓ Call Screening Active
+✓ Overlay Permission Granted
+✓ Notifications Enabled
+✓ Full Screen Intent Enabled
+✓ Background Protection Active
+✓ Cloud Connection Active
+
+Display warnings when anything is broken.
+
+Expected Result:
+
+Users immediately know if protection is working correctly.
+
+---
+
+## 9. Code Quality Review
+
+Perform a full audit for:
+
+* Crashes
+* Memory leaks
+* Notification issues
+* Android 15 compatibility
+* React Native performance issues
+* Native module issues
+* Security vulnerabilities
+
+Generate a report containing:
+
+* Files modified
+* Bugs fixed
+* Risks identified
+* Remaining limitations caused by Android platform restrictions
+
+---
+
+# Features NOT To Implement
+
+Do NOT implement:
+
+1. Post-call "Was this spam?" popup triggered after call ends.
+2. READ_PHONE_STATE based call tracking.
+3. READ_CALL_LOG access.
+4. Android native blocked-number synchronization.
+5. Any feature requiring Netraksh to become the default Phone app.
+
+These features are either restricted by Android or likely to create Google Play policy issues.
+
+Focus only on compliant alternatives.
+
+Provide production-ready code with detailed comments and explanations for every change.

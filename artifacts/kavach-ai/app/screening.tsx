@@ -259,6 +259,36 @@ export default function ScreeningScreen() {
           </View>
         </View>
 
+        {/* Reliability warning: the lock-screen popup depends on the overlay +
+            full-screen-intent grants. Until both are on, nag the user (with a
+            one-tap fix) so the caller card actually fronts like Truecaller. */}
+        {supported &&
+          callScreening &&
+          (!status.hasOverlayPermission || !status.hasFullScreenIntentPermission) && (
+            <View style={s.warnCard}>
+              <View style={s.warnHead}>
+                <Feather name="alert-triangle" size={18} color="#b45309" />
+                <Text style={s.warnTitle}>{t("screening.popupWarn.title")}</Text>
+              </View>
+              <Text style={s.warnText}>{t("screening.popupWarn.body")}</Text>
+              <TouchableOpacity
+                style={s.warnBtn}
+                onPress={() => {
+                  // grantOverlay / grantFullScreenIntent already trigger haptics.
+                  if (!status.hasOverlayPermission) {
+                    void grantOverlay();
+                  } else {
+                    void grantFullScreenIntent();
+                  }
+                }}
+                activeOpacity={0.85}
+              >
+                <Feather name="zap" size={15} color="#fff" />
+                <Text style={s.warnBtnTxt}>{t("screening.popupWarn.cta")}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
         {/* Guided, Truecaller-style setup: one card that walks the user through
             each grant in order with a single "Continue" button, instead of
             scattered prompts. */}
@@ -464,6 +494,19 @@ const s = StyleSheet.create({
   rowSub: { fontSize: 12, color: "#64748b", marginTop: 2, lineHeight: 16 },
 
   statusMetaTxt: { fontSize: 12, color: "#64748b" },
+
+  warnCard: {
+    backgroundColor: "#fffbeb", borderRadius: 16, padding: 16, marginBottom: 16,
+    borderWidth: 1.5, borderColor: "#fcd34d",
+  },
+  warnHead: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 8 },
+  warnTitle: { flex: 1, fontSize: 14, fontWeight: "800" as const, color: "#92400e" },
+  warnText: { fontSize: 12.5, color: "#78350f", lineHeight: 19, marginBottom: 12 },
+  warnBtn: {
+    flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8,
+    backgroundColor: "#d97706", borderRadius: 12, paddingVertical: 12,
+  },
+  warnBtnTxt: { fontSize: 14, fontWeight: "700" as const, color: "#fff" },
 
   guideCard: {
     backgroundColor: "#fff7ed", borderRadius: 16, padding: 16, marginBottom: 20,
