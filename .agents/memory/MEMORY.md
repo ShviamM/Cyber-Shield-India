@@ -46,3 +46,4 @@
 - [Expo owner account for kavach-ai](expo-account-owner.md) — Play keystore lives under owner `netraksh` (projectId 93d7ef97…); builds under `shviam` (e5d1313b…) get a NEW keystore and can't update the live Play listing.
 - [Call cold-start + block limits](kavach-block-and-coldstart.md) — call-alert deep link cold-starts RN (mitigate per-route in _layout); user blocks need a SEPARATE store from engine blocklist; system BlockedNumberContract sync needs default-dialer (impossible here).
 - [API horizontal scaling](api-horizontal-scaling.md) — async Redis-backed rate limiter (REDIS_URL, else in-memory fallback); set REDIS_URL + DB_POOL_MAX before instance_count>1 or per-IP limits weaken N×.
+- [EAS build MSG91/OTP vars](eas-build-env-msg91.md) — EAS builds can't see Replit Secrets; inline EXPO_PUBLIC_MSG91_* (+RevenueCat) in eas.json, not just EAS server env (which is empty after an Expo account/owner change → OTP silently breaks).
