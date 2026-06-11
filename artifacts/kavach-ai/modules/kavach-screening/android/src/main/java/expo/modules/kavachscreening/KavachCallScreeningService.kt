@@ -14,18 +14,19 @@ import androidx.core.app.NotificationManagerCompat
 import java.net.URLEncoder
 
 /**
- * Warns about incoming calls. Netraksh NEVER auto-blocks a call based on its own
- * scam reputation — it only surfaces the full-screen caller screen and leaves the
- * Answer/Block decision to the user. The single exception is a number the user
- * has EXPLICITLY added to their personal blocklist: that is a deliberate user
- * action, so we honor it by rejecting the call. Reputation alone never rejects.
+ * Warns about incoming calls. By design this NEVER blocks, rejects, or silences
+ * a call — it surfaces Netraksh's full-screen caller screen, keeping the user in
+ * control (they still tap Answer/Block themselves).
  *
- * On every incoming call, when "Display over other apps" is granted we draw the
- * native [KavachCallOverlay] directly — it appears instantly over the dialer /
- * lock screen without cold-starting React Native, and does its own reputation
- * lookup. When the overlay permission is missing we fall back to a
- * full-screen-intent notification that opens the in-app React caller screen
- * (`app/call-alert.tsx`) via the `kavach-ai://call-alert?number=<n>` deep link.
+ * On every incoming call it launches the in-app React screen
+ * (`app/call-alert.tsx`, the same screen shown by the home-screen DEMO) via the
+ * `kavach-ai://call-alert?number=<n>` deep link. When "Display over other apps"
+ * is granted we start the activity directly so it appears immediately; we also
+ * post a full-screen-intent notification so the screen still launches on a
+ * locked device and as a tap fallback when the activity start is throttled.
+ *
+ * The React screen does the live reputation lookup itself (report count, risk
+ * level, top scam category) for the real caller number.
  */
 class KavachCallScreeningService : CallScreeningService() {
   override fun onScreenCall(callDetails: Call.Details) {
@@ -63,20 +64,23 @@ class KavachCallScreeningService : CallScreeningService() {
   }
 
   /**
-   * Surface the incoming-call alert. When we can draw over other apps, the
-   * native overlay is the primary path — it renders instantly without launching
-   * React Native. When that permission is missing we fall back to a
-   * full-screen-intent notification that opens the in-app caller screen.
+   * Launch Netraksh's full-screen caller screen for an incoming call. Tries a
+   * direct activity start (allowed from the background while we hold the overlay
+   * permission) and always posts a full-screen-intent notification as a robust
+   * fallback (locked screen / throttled background starts).
    */
   private fun launchCallScreen(ctx: Context, number: String) {
-    // The native overlay is the primary path, but if it can't draw (permission
-    // missing) or fails to attach at runtime (OEM restrictions, bad window
-    // state), fall back to the full-screen-intent notification so the user is
-    // never left with a silently-screened call and no visible alert.
-    if (KavachCallOverlay.canDraw(ctx) && KavachCallOverlay.show(ctx, number)) {
-      return
+    val intent = buildDeepLinkIntent(ctx, number)
+
+    if (KavachCallOverlay.canDraw(ctx)) {
+      try {
+        ctx.startActivity(intent)
+      } catch (_: Throwable) {
+        // Background start refused — the full-screen-intent notification covers us.
+      }
     }
-    postFullScreenAlert(ctx, number, buildDeepLinkIntent(ctx, number))
+
+    postFullScreenAlert(ctx, number, intent)
   }
 
   private fun buildDeepLinkIntent(ctx: Context, number: String): Intent {

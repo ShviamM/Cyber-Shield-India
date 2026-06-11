@@ -4,9 +4,7 @@
       System-bound call screening service. Holding ROLE_CALL_SCREENING lets the
       OS hand each incoming call to onScreenCall() without any sensitive
       permission (no READ_CALL_LOG / READ_PHONE_STATE), so no Play "Permissions
-      Declaration" is required. The service never auto-blocks based on scam
-      reputation — it only warns; it rejects a call solely when the user has
-      explicitly added that number to their own blocklist.
+      Declaration" is required. The service only warns; it never blocks calls.
     -->
     <service
       android:name="expo.modules.kavachscreening.KavachCallScreeningService"

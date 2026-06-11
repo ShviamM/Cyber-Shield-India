@@ -2,7 +2,6 @@ import { registerWebModule, NativeModule } from "expo";
 
 import type {
   KavachScreeningEvents,
-  PendingScreenedCall,
   ScreeningStatus,
 } from "./KavachScreening.types";
 
@@ -26,7 +25,6 @@ class KavachScreeningModule extends NativeModule<KavachScreeningEvents> {
       hasAnswerCallsPermission: false,
       hasFullScreenIntentPermission: false,
       hasOverlayPermission: false,
-      isIgnoringBatteryOptimizations: false,
       blocklistSize: 0,
       keywordCount: 0,
     };
@@ -43,12 +41,6 @@ class KavachScreeningModule extends NativeModule<KavachScreeningEvents> {
   endCall(): boolean {
     return false;
   }
-
-  getPendingScreenedCall(): PendingScreenedCall | null {
-    return null;
-  }
-
-  clearPendingScreenedCall(): void {}
 
   blockNumber(_number: string): void {}
 
@@ -75,10 +67,6 @@ class KavachScreeningModule extends NativeModule<KavachScreeningEvents> {
   }
 
   async requestFullScreenIntentPermission(): Promise<boolean> {
-    return false;
-  }
-
-  async requestBatteryOptimizationExemption(): Promise<boolean> {
     return false;
   }
 }

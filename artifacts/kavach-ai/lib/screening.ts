@@ -15,7 +15,6 @@ import { PermissionsAndroid, Platform } from "react-native";
 
 import KavachScreening, {
   type CallScreenedEvent,
-  type PendingScreenedCall,
   type ScreeningStatus,
   type SmsScreenedEvent,
 } from "@/modules/kavach-screening";
@@ -65,12 +64,7 @@ export const DEFAULT_SCAM_KEYWORDS: string[] = [
   "fedex",
 ];
 
-export type {
-  ScreeningStatus,
-  CallScreenedEvent,
-  SmsScreenedEvent,
-  PendingScreenedCall,
-};
+export type { ScreeningStatus, CallScreenedEvent, SmsScreenedEvent };
 
 const UNAVAILABLE_STATUS: ScreeningStatus = {
   callScreening: false,
@@ -81,7 +75,6 @@ const UNAVAILABLE_STATUS: ScreeningStatus = {
   hasFullScreenIntentPermission: false,
   hasOverlayPermission: false,
   hasAnswerCallsPermission: false,
-  isIgnoringBatteryOptimizations: false,
   blocklistSize: 0,
   keywordCount: 0,
 };
@@ -161,45 +154,6 @@ export async function requestFullScreenIntentPermission(): Promise<boolean> {
     return await KavachScreening.requestFullScreenIntentPermission();
   } catch {
     return false;
-  }
-}
-
-/**
- * Open the system battery-optimization list so the user can exempt Netraksh,
- * keeping the call-screening service alive under aggressive OEM Doze. Resolves
- * true only if already exempted — the grant happens in Settings, so callers
- * should re-read `getScreeningStatus()` when the screen regains focus.
- */
-export async function requestBatteryOptimizationExemption(): Promise<boolean> {
-  if (!isScreeningSupported()) return false;
-  try {
-    return await KavachScreening.requestBatteryOptimizationExemption();
-  } catch {
-    return false;
-  }
-}
-
-/**
- * The latest screened incoming call recorded natively by the call overlay, or
- * null. Used to surface the post-call prompt for ANY screened call (not just
- * ones answered through the in-app alert). Safe no-op off a native build.
- */
-export function getPendingScreenedCall(): PendingScreenedCall | null {
-  if (!isScreeningSupported()) return null;
-  try {
-    return KavachScreening.getPendingScreenedCall();
-  } catch {
-    return null;
-  }
-}
-
-/** Clear the native pending screened-call record once JS has consumed it. */
-export function clearPendingScreenedCall(): void {
-  if (!isScreeningSupported()) return;
-  try {
-    KavachScreening.clearPendingScreenedCall();
-  } catch {
-    // ignore
   }
 }
 

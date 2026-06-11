@@ -18,12 +18,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useAppContext } from "@/context/AppContext";
 import { useColors } from "@/hooks/useColors";
-import { isPostCallEnabled, setPostCallEnabled } from "@/lib/postcall";
 import {
   getScreeningStatus,
   isScreeningSupported,
   requestAnswerCallsPermission,
-  requestBatteryOptimizationExemption,
   requestCallScreeningRole,
   requestFullScreenIntentPermission,
   requestOverlayPermission,
@@ -59,21 +57,10 @@ export default function ScreeningScreen() {
 
   const supported = isScreeningSupported();
   const [status, setStatus] = React.useState<ScreeningStatus>(() => getScreeningStatus());
-  const [postCallOn, setPostCallOn] = React.useState(true);
 
   const refreshStatus = React.useCallback(() => {
     setStatus(getScreeningStatus());
   }, []);
-
-  React.useEffect(() => {
-    void isPostCallEnabled().then(setPostCallOn);
-  }, []);
-
-  function togglePostCall(next: boolean) {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    setPostCallOn(next);
-    void setPostCallEnabled(next);
-  }
 
   // Give the native call-screening service the API base + session token so it can
   // look up an incoming caller's scam reputation (the service runs without a JS
@@ -134,13 +121,6 @@ export default function ScreeningScreen() {
   async function grantFullScreenIntent() {
     Haptics.selectionAsync();
     await requestFullScreenIntentPermission();
-    refreshStatus();
-  }
-
-  async function grantBatteryExemption() {
-    Haptics.selectionAsync();
-    await requestBatteryOptimizationExemption();
-    // The grant happens in a Settings screen; status refreshes on focus return.
     refreshStatus();
   }
 
@@ -252,7 +232,7 @@ export default function ScreeningScreen() {
               thumbColor="#FFFFFF"
             />
           </View>
-          <View style={[s.row, s.rowBorder]}>
+          <View style={s.row}>
             <View style={[s.rowIcon, { backgroundColor: "#ecfeff" }]}>
               <Feather name="message-square" size={18} color="#0891b2" />
             </View>
@@ -260,21 +240,6 @@ export default function ScreeningScreen() {
               <Text style={s.rowLabel}>{t("screening.smsShareTitle")}</Text>
               <Text style={s.rowSub}>{t("screening.smsShareSub")}</Text>
             </View>
-          </View>
-          <View style={s.row}>
-            <View style={[s.rowIcon, { backgroundColor: "#fff7ed" }]}>
-              <Feather name="phone-call" size={18} color={SAFFRON} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={s.rowLabel}>{t("screening.postCallTitle")}</Text>
-              <Text style={s.rowSub}>{t("screening.postCallSub")}</Text>
-            </View>
-            <Switch
-              value={postCallOn}
-              onValueChange={togglePostCall}
-              trackColor={{ false: "#e2e8f0", true: NAVY }}
-              thumbColor="#FFFFFF"
-            />
           </View>
         </View>
 
@@ -289,28 +254,6 @@ export default function ScreeningScreen() {
             blocklistSize={status.blocklistSize}
             t={t}
           />
-        )}
-
-        {/* Battery optimization: aggressive OEM Doze can kill the screening
-            service in the background, so recommend (not require) exempting the
-            app once setup is otherwise complete. */}
-        {supported && callScreening && !status.isIgnoringBatteryOptimizations && (
-          <View style={s.batteryCard}>
-            <View style={s.batteryIcon}>
-              <Feather name="battery-charging" size={18} color={SAFFRON} />
-            </View>
-            <View style={s.batteryBody}>
-              <Text style={s.batteryTitle}>{t("screening.battery.title")}</Text>
-              <Text style={s.batterySub}>{t("screening.battery.sub")}</Text>
-              <TouchableOpacity
-                style={s.batteryBtn}
-                onPress={grantBatteryExemption}
-                activeOpacity={0.85}
-              >
-                <Text style={s.batteryBtnTxt}>{t("screening.battery.cta")}</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
         )}
 
         {/* Privacy */}
@@ -366,19 +309,6 @@ export default function ScreeningScreen() {
         >
           <Feather name="play-circle" size={18} color={SAFFRON} />
           <Text style={s.demoTxt}>{t("screening.previewWarning")}</Text>
-        </TouchableOpacity>
-
-        {/* Preview the post-call "How was this call?" prompt. */}
-        <TouchableOpacity
-          style={[s.demoBtn, { marginTop: 12 }]}
-          onPress={() => {
-            Haptics.selectionAsync();
-            router.push("/post-call");
-          }}
-          activeOpacity={0.85}
-        >
-          <Feather name="phone-call" size={18} color={SAFFRON} />
-          <Text style={s.demoTxt}>{t("screening.previewPostCall")}</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -552,24 +482,6 @@ const s = StyleSheet.create({
     backgroundColor: SAFFRON, borderRadius: 12, paddingVertical: 13,
   },
   guideBtnTxt: { fontSize: 14, fontWeight: "700" as const, color: "#fff" },
-
-  batteryCard: {
-    flexDirection: "row", gap: 12, padding: 14, marginBottom: 18,
-    backgroundColor: "#fff7ed", borderRadius: 14,
-    borderWidth: 1, borderColor: "#fed7aa",
-  },
-  batteryIcon: {
-    width: 34, height: 34, borderRadius: 9, backgroundColor: "#ffedd5",
-    alignItems: "center", justifyContent: "center",
-  },
-  batteryBody: { flex: 1 },
-  batteryTitle: { fontSize: 14, fontWeight: "700" as const, color: NAVY, marginBottom: 3 },
-  batterySub: { fontSize: 12.5, color: "#7c5e3b", lineHeight: 18, marginBottom: 10 },
-  batteryBtn: {
-    alignSelf: "flex-start", backgroundColor: SAFFRON,
-    borderRadius: 10, paddingVertical: 9, paddingHorizontal: 16,
-  },
-  batteryBtnTxt: { fontSize: 13, fontWeight: "700" as const, color: "#fff" },
 
   privacyRow: { flexDirection: "row", alignItems: "center", gap: 12, padding: 14 },
   privacyIcon: {

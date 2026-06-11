@@ -18,9 +18,7 @@
         "EXPO_PUBLIC_DOMAIN": "netraksh.com",
         "EXPO_PUBLIC_REVENUECAT_TEST_API_KEY": "test_hWcPqXTWJCKomPGsXslYRSKHeUM",
         "EXPO_PUBLIC_REVENUECAT_IOS_API_KEY": "appl_modadiBiHTBlFtybCgbvnpDjAUC",
-        "EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY": "goog_AVtbLuCDxhhoelnehAHUZtNaHBj",
-        "EXPO_PUBLIC_MSG91_WIDGET_ID": "3666646f3256373630343935",
-        "EXPO_PUBLIC_MSG91_TOKEN_AUTH": "522821TUVhOaxkdQMU6a21a06aP1"
+        "EXPO_PUBLIC_REVENUECAT_ANDROID_API_KEY": "goog_AVtbLuCDxhhoelnehAHUZtNaHBj"
       }
     },
     "production": {

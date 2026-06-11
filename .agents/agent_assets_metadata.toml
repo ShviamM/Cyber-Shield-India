@@ -149,15 +149,3 @@ id = "hyCeZmiTHNwoi6irx9jz2"
 uri = "file://netraksh-source-handoff.tar.gz"
 type = "unspecified"
 title = "Netraksh — Full Source + Docs (mobile app, admin, backend)"
-
-[[outputs]]
-id = "WMkfsdYhJpUp_HO7NBuyL"
-uri = "file://.local/handoff/netraksh-mobile-source.zip"
-type = "unspecified"
-title = "Netraksh — Mobile App Source (buildable bundle)"
-
-[[outputs]]
-id = "rjd47JpiJJlHWsubIrjW7"
-uri = "file://.local/handoff/DEVELOPER_HANDOFF.md"
-type = "text"
-title = "Developer Handoff Document"

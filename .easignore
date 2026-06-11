@@ -18,10 +18,6 @@ Thumbs.db
 .vscode/
 .idea/
 
-# --- not needed for a no-VCS working-dir archive (EAS copies the tree) ---
-.git/
-.pythonlibs/
-
 # --- large assets not needed to build the mobile app (~260 MB) ---
 exports/
 attached_assets/

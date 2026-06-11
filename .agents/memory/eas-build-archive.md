@@ -27,7 +27,3 @@ consumed as source / rebuilt on EAS servers, not from committed `dist`.
 
 **How to apply:** keep `.easignore` a superset of `.gitignore` plus the heavy
 non-mobile assets; never let it drop `node_modules`/`dist`/`.expo`/`.local`.
-
-> To actually RUN `eas build` from the main agent (the `.git/index.lock` sandbox
-> block + `GIT_OPTIONAL_LOCKS=0` fix, why NOT to move `.easignore` out or use
-> `EAS_NO_VCS=1`), see `eas-build-main-agent-git-lock.md`.

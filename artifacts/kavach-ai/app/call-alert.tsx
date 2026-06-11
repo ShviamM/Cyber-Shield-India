@@ -26,7 +26,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { categoryIcon } from "@/constants/strings";
 import { formatIndianPhone, phoneForApi } from "@/lib/phone";
-import { recordAnsweredCall } from "@/lib/postcall";
 import { answerCall, blockNumber, endCall } from "@/lib/screening";
 
 const DEMO_NUMBER = "+91 87654-32100";
@@ -239,15 +238,7 @@ export default function CallAlertScreen() {
   function handleAnswer() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     // Accept the live ringing call; the system in-call UI then comes forward.
-    // Remember the answered number so that — when the user returns to Netraksh
-    // after the call — we can ask how it went (Play-safe post-call prompt; we
-    // can't detect call-end without restricted phone permissions).
-    if (!isDemo) {
-      const answered = answerCall();
-      // Only remember the call if the system actually accepted it; otherwise we'd
-      // ask "How was this call?" about a call that never connected.
-      if (answered && apiPhone) void recordAnsweredCall(apiPhone);
-    }
+    if (!isDemo) answerCall();
     dismiss();
   }
 

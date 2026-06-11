@@ -2,7 +2,6 @@ import { NativeModule, requireOptionalNativeModule } from "expo";
 
 import type {
   KavachScreeningEvents,
-  PendingScreenedCall,
   ScreeningStatus,
 } from "./KavachScreening.types";
 
@@ -18,11 +17,8 @@ declare class KavachScreeningModule extends NativeModule<KavachScreeningEvents> 
   requestCallScreeningRole(): Promise<boolean>;
   requestOverlayPermission(): Promise<boolean>;
   requestFullScreenIntentPermission(): Promise<boolean>;
-  requestBatteryOptimizationExemption(): Promise<boolean>;
   answerCall(): boolean;
   endCall(): boolean;
-  getPendingScreenedCall(): PendingScreenedCall | null;
-  clearPendingScreenedCall(): void;
   blockNumber(number: string): void;
   getBlockedNumbers(): string[];
   unblockNumber(number: string): void;
