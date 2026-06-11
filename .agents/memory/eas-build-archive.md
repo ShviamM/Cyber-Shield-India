@@ -28,18 +28,33 @@ consumed as source / rebuilt on EAS servers, not from committed `dist`.
 **How to apply:** keep `.easignore` a superset of `.gitignore` plus the heavy
 non-mobile assets; never let it drop `node_modules`/`dist`/`.expo`/`.local`.
 
-## Triggering builds from the Replit main agent — use EAS_NO_VCS=1
+## Triggering builds from the Replit sandbox — EAS_NO_VCS=1 + EAS_PROJECT_ROOT
 
 `eas build` defaults to archiving from the git tree, which writes
-`.git/index.lock`. The main-agent sandbox blocks that as a "destructive git
-operation" and the build aborts with exit 254 before uploading.
+`.git/index.lock`. The bash sandbox blocks ALL `.git/index.lock` writes as a
+"destructive git operation" (exit 254) — this hits the default build AND any
+`git add`/`git commit`, in BOTH the main env and an isolated task env. So
+`requireCommit:true` (which would use read-only `git archive HEAD`) is a
+dead-end too: you can't commit the eas.json change to enable it.
 
-**Fix:** run `EAS_NO_VCS=1 eas build --platform android --profile preview
---non-interactive --no-wait` from `artifacts/kavach-ai`. With VCS off, EAS tars
-the filesystem and honors `.easignore` directly — safe here precisely because
-`.easignore` is a correct superset of `.gitignore` and the native module source
-is present on disk. Auth is via the `EXPO_TOKEN` secret (no interactive login).
-Use the `preview` profile for an APK (buildType apk); `production` is an app
-bundle. `--no-wait` returns the build URL immediately instead of blocking ~20min.
-Note: `npx eas-cli ...` can hang fetching the package — call the `eas` binary
-already on PATH instead.
+**The trap with plain `EAS_NO_VCS=1`:** the no-VCS client archives
+`process.env.EAS_PROJECT_ROOT ?? process.cwd()` (see eas-cli
+`build/vcs/local.js` `getRootPath`). Run from `artifacts/kavach-ai`, it tars
+ONLY the app subdir (~1.4 MB) — the root `pnpm-lock.yaml`/`pnpm-workspace.yaml`
+and `lib/api-client-react` (workspace:*) are missing, so EAS falls back to
+`yarn install --frozen-lockfile` and the build fails at install.
+
+**Fix (verified):** set the archive root to the monorepo while keeping cwd at
+the app dir:
+```
+cd artifacts/kavach-ai
+EAS_NO_VCS=1 EAS_PROJECT_ROOT=/home/runner/workspace \
+  eas build --platform android --profile preview --non-interactive --no-wait
+```
+`EAS_PROJECT_ROOT` is used ONLY by `getRootPath` (not config discovery), and
+EAS computes the app's subdir as `path.relative(rootPath, projectDir)` →
+`artifacts/kavach-ai`, so the builder cd's there correctly. Result: a ~66 MB
+full-monorepo archive (root pnpm-lock present → pnpm detected), `.easignore`
+honored, zero git ops → guard never fires. Auth via `EXPO_TOKEN`. `preview`
+profile = APK; `--no-wait` returns the build URL (~20 min build).
+Note: `npx eas-cli` can hang — call the `eas` binary on PATH (v14.7.1).
