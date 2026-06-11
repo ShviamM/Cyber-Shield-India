@@ -1,0 +1,105 @@
+Critical Android Call Experience Issues – Immediate Investigation & Fix Required
+
+I have completed live testing of the Netraksh Android application and found two major issues that must be investigated and resolved.
+
+Before making any code changes, perform a root cause analysis and identify whether the issue is caused by:
+
+Android platform restrictions
+Missing permissions
+Incorrect notification configuration
+Background execution limitations
+OEM battery optimization restrictions
+Call Screening API limitations
+Application bugs
+
+Provide findings and implement fixes where technically possible.
+
+Issue #1 – Incoming Call Popup Not Appearing on Lock Screen
+Current Behavior
+
+When an incoming call is received:
+
+Caller identification does not consistently appear on the lock screen.
+Screen may remain locked without displaying Netraksh caller information.
+User must unlock the device or open the app to see caller details.
+Expected Behavior
+
+When an incoming call arrives:
+
+Caller information should appear immediately.
+Caller identification should work when:
+Screen is locked
+Screen is off
+App is closed
+App is running in background
+Investigation Tasks
+
+Review:
+
+Full Screen Intent implementation
+Notification channels
+Notification importance levels
+Overlay permissions
+Call Screening Service lifecycle
+Wake lock usage
+Foreground services
+Android 13/14/15 compatibility
+Samsung/Xiaomi/Oppo/Vivo battery restrictions
+Deliverables
+Root cause analysis
+Code changes performed
+Devices/Android versions affected
+Verification steps
+Recommended improvements
+Issue #2 – No Post-Call Reporting Experience
+Current Behavior
+
+After a user receives a suspicious or fraudulent call:
+
+No reporting prompt appears.
+No quick reporting workflow is available.
+User cannot easily contribute to community fraud intelligence.
+Required Investigation
+
+Determine whether Android and Google Play policies allow:
+
+Detecting when a call has ended
+Triggering a post-call reporting screen
+Triggering a notification after a call
+Showing a report workflow after caller interaction
+Important
+
+Do NOT introduce restricted permissions that could result in Play Store rejection, including:
+
+READ_PHONE_STATE
+READ_CALL_LOG
+Any permission requiring Netraksh to become the default dialer
+If Direct Implementation Is Not Possible
+
+Design and implement the best compliant alternative.
+
+Possible alternatives:
+
+Post-call notification
+Quick report action from incoming caller screen
+Recent calls reporting screen
+One-tap fraud reporting workflow
+Community reporting shortcuts
+Goal
+
+The user should be able to report a scam caller with minimal effort while keeping the application fully compliant with Google Play policies.
+
+Additional Requirement
+
+Generate a detailed report containing:
+
+Root cause of lock-screen issue
+Root cause of post-call reporting issue
+Android restrictions identified
+Google Play restrictions identified
+Fixes implemented
+Alternative solutions implemented
+Remaining risks
+Production readiness assessment
+
+Do not provide assumptions. Review the actual codebase, identify the real cause, implement fixes where possible, and clearly document any Android or Google Play limitations preventing the requested functionality.

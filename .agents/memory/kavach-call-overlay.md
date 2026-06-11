@@ -77,6 +77,24 @@ hook). Left to minimize churn; safe to remove later.
 cautionHeadline/unknownHeadline/checking) added to en + hi only; other ~10 locales
 rely on i18next fallbackLng → en (see kavach-ai-i18n.md).
 
+**Lock-screen display fix (showWhenLocked/turnScreenOn):** the deep link launches
+Expo `MainActivity`, which by default renders BEHIND the keyguard and won't wake
+the screen — so on a locked/off device the caller card never appears (the real
+root cause of "popup doesn't show on lock screen"). Fixed with a local Expo
+config plugin (`plugins/withLockScreenCallAlert.js`, registered in `app.json`)
+that injects `android:showWhenLocked="true"` + `android:turnScreenOn="true"` onto
+`MainActivity` via `withAndroidManifest` + `AndroidConfig.Manifest.getMainActivityOrThrow`.
+Standard activity attributes → NO restricted permission, NO Play declaration.
+Verify by running `expo prebuild` and grepping the generated
+`android/app/src/main/AndroidManifest.xml` (then delete the generated `android/`
+and revert prebuild's incidental `package.json` edits — the app stays managed).
+**Caveat (privacy):** flags are on the shared MainActivity, so any locked launch
+of it can show over the keyguard, not just call-alert. Practical exposure is low
+(normal launches go through the keyguard), but the scoped hardening is a dedicated
+call-alert Activity (or runtime setShowWhenLocked toggling around the call-alert
+lifecycle). Other OS gates still apply: USE_FULL_SCREEN_INTENT (revoked by default
+on Android 14+), SYSTEM_ALERT_WINDOW, POST_NOTIFICATIONS, OEM battery exemption.
+
 **Can't be e2e tested here** — native auto-launch needs a real EAS device build (no
 call simulation; Expo web preview is behind a proxy security block). Verify via
 typecheck + architect.
