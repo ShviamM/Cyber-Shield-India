@@ -155,3 +155,15 @@ id = "EgCu0FcE4F2nL2eCcg6ZR"
 uri = "file://docs/netraksh-gap-analysis.md"
 type = "text"
 title = "Netraksh — Functional Gap Analysis & Enhancement Report"
+
+[[outputs]]
+id = "DU7PCEex1ZoGpM9CozuS2"
+uri = "file://artifacts/kavach-ai/store-listing/play-icon-512.png"
+type = "image"
+title = "App icon (512×512) — Play Store"
+
+[[outputs]]
+id = "MniXy1KTGuzCToJh-CsML"
+uri = "file://artifacts/kavach-ai/store-listing/feature-graphic-1024x500.png"
+type = "image"
+title = "Feature graphic (1024×500) — Play Store"
