@@ -20,7 +20,28 @@ headless environment cannot do interactive keystore generation: stdin isn't a TT
 ("Input is required, but stdin is not readable"), and piping `yes`/`y` does NOT
 work — EAS refuses non-TTY stdin for that prompt.
 
-## How a keystore was created without keytool (no JDK installed)
+## CRITICAL: don't generate a new keystore — the Play upload key already exists
+This app's Play listing has a **registered upload key** (sha1 `bae16e17…`). A
+freshly generated keystore (the openssl PKCS12 one below, sha1 `2fe5b5…`) gets
+**rejected by Play** ("signed with the wrong key"). The correct key is the shviam
+EAS project's existing keystore — PULL it instead of generating one.
+
+Expo GraphQL (`POST https://api.expo.dev/graphql`, header `Authorization: Bearer
+$EXPO_TOKEN`) — no keytool / no interactive `eas credentials` needed (both are
+unavailable in this headless, no-TTY env):
+
+```
+app { byId(appId:"e5d1313b-c177-4200-96df-82bfce6d97ee"){ androidAppCredentials {
+  applicationIdentifier
+  androidAppBuildCredentialsList { androidKeystore {
+    type keyAlias keystore keystorePassword keyPassword sha1CertificateFingerprint } } } } }
+```
+
+`keystore` is base64 → decode to `credentials/keystore.jks` (JKS magic `feedfeed`);
+copy the password/alias fields into `credentials.json`; verify sha1 == `bae16e17…`;
+build with `credentialsSource:"local"` (package-agnostic). See expo-account-owner.md.
+
+## (superseded) How the WRONG openssl keystore was created — kept for reference
 keytool/java are not installed here; installing a Java toolchain just for keytool
 is heavy. `openssl` IS available, so generate a PKCS12 keystore instead:
 1. `openssl req -x509 -newkey rsa:2048 -nodes -days 10950` (~30yr cert).
