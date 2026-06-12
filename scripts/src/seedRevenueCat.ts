@@ -33,7 +33,7 @@ const PROJECT_NAME = "Netraksh";
 const APP_STORE_APP_NAME = "Netraksh (iOS)";
 const APP_STORE_BUNDLE_ID = "com.kavachai.app";
 const PLAY_STORE_APP_NAME = "Netraksh (Android)";
-const PLAY_STORE_PACKAGE_NAME = "com.kavachai.app";
+const PLAY_STORE_PACKAGE_NAME = "com.kavachai.com";
 
 const ENTITLEMENT_IDENTIFIER = "premium";
 const ENTITLEMENT_DISPLAY_NAME = "Premium Access";

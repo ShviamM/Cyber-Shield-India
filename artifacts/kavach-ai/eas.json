@@ -25,6 +25,7 @@
     },
     "production": {
       "autoIncrement": true,
+      "credentialsSource": "local",
       "environment": "production",
       "env": {
         "EXPO_PUBLIC_DOMAIN": "netraksh.com",
