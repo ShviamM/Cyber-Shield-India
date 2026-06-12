@@ -36,6 +36,7 @@ export * from './cityHotspotListResponse';
 export * from './createOrderRequest';
 export * from './createOrderRequestPlan';
 export * from './createReportRequest';
+export * from './demoLoginRequest';
 export * from './devLoginRequest';
 export * from './errorResponse';
 export * from './extendTrialRequest';

@@ -49,6 +49,13 @@ export interface DevLoginRequest {
   location?: string | null;
 }
 
+export interface DemoLoginRequest {
+  /** Must equal the configured demo phone number */
+  phone: string;
+  /** The fixed demo passcode for the app-store-review account */
+  otp: string;
+}
+
 export interface User {
   id: string;
   fullName: string;

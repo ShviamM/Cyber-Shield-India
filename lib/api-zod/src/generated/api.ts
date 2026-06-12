@@ -104,6 +104,30 @@ export const DevLoginResponse = zod.object({
 
 
 /**
+ * Signs in a single fixed demo account used by app store reviewers who cannot receive an OTP on the demo number. Accepts only the configured demo phone number together with the configured demo passcode; every other number is rejected. The demo account is a normal (non-admin) user. Works in production, unlike dev-login. Disabled (404) when the server has no demo credentials configured.
+ * @summary Demo login for app store review (no real OTP)
+ */
+export const DemoLoginBody = zod.object({
+  "phone": zod.string().describe('Must equal the configured demo phone number'),
+  "otp": zod.string().describe('The fixed demo passcode for the app-store-review account')
+})
+
+export const DemoLoginResponse = zod.object({
+  "token": zod.string(),
+  "user": zod.object({
+  "id": zod.string(),
+  "fullName": zod.string(),
+  "phone": zod.string(),
+  "location": zod.string().nullish(),
+  "isAdmin": zod.boolean(),
+  "isSuperAdmin": zod.boolean().describe('True for platform owners who may access the Super Admin dashboard.'),
+  "status": zod.string(),
+  "createdAt": zod.coerce.date()
+})
+})
+
+
+/**
  * @summary Get the current authenticated user
  */
 export const GetMeResponse = zod.object({

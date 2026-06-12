@@ -14,6 +14,7 @@ import Purchases, {
 } from "react-native-purchases";
 
 import { useAuth } from "@/context/AuthContext";
+import { isDemoPhone } from "@/lib/demo";
 
 const REVENUECAT_TEST_API_KEY = process.env.EXPO_PUBLIC_REVENUECAT_TEST_API_KEY;
 const REVENUECAT_IOS_API_KEY = process.env.EXPO_PUBLIC_REVENUECAT_IOS_API_KEY;
@@ -132,7 +133,14 @@ function useSubscriptionContext() {
     onSuccess: () => customerInfoQuery.refetch(),
   });
 
+  // App store reviewers sign in to a demo account that has no real store
+  // entitlement; unlock Premium for it on the client so every paid feature is
+  // visible during review. Purely cosmetic (it grants no server-side paid
+  // capability) and only ever matches the one configured demo number.
+  const isDemoAccount = isDemoPhone(user?.phone);
+
   const isSubscribed =
+    isDemoAccount ||
     customerInfoQuery.data?.entitlements.active?.[
       REVENUECAT_ENTITLEMENT_IDENTIFIER
     ] !== undefined;

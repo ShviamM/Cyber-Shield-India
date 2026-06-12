@@ -77,6 +77,15 @@ export const config = {
   adminLoginMaxPerIpPerHour: intEnv("ADMIN_LOGIN_MAX_PER_IP_PER_HOUR", 30),
   // Per-IP throttle for the development-only test login (see isDevLoginEnabled).
   devLoginMaxPerIpPerMinute: intEnv("DEV_LOGIN_MAX_PER_IP_PER_MINUTE", 10),
+  // Demo login for app store (Google Play) review. Reviewers can't receive an
+  // OTP on the demo SIM, so a single fixed, NON-admin account signs in with a
+  // phone + fixed passcode pair. Unlike dev-login this works in production, but
+  // it's tightly scoped to this one number. Disable by setting DEMO_LOGIN_OTP="".
+  demoLoginPhone: normalizeIndianPhone(
+    process.env.DEMO_LOGIN_PHONE ?? "9682824432",
+  ),
+  demoLoginOtp: (process.env.DEMO_LOGIN_OTP ?? "7019").trim(),
+  demoLoginMaxPerIpPerMinute: intEnv("DEMO_LOGIN_MAX_PER_IP_PER_MINUTE", 10),
   sessionTtlDays: intEnv("SESSION_TTL_DAYS", 60),
   reportDuplicateWindowHours: intEnv("REPORT_DUPLICATE_WINDOW_HOURS", 24),
   reportMaxPerHour: intEnv("REPORT_MAX_PER_HOUR", 20),

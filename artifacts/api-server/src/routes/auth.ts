@@ -4,6 +4,7 @@ import { db, sessionsTable, usersTable } from "@workspace/db";
 import {
   AdminLoginBody,
   CheckPhoneBody,
+  DemoLoginBody,
   DevLoginBody,
   UpdateMyLocationBody,
   VerifyTokenBody,
@@ -284,6 +285,79 @@ router.post("/auth/dev-login", async (req, res) => {
         .where(eq(usersTable.id, user.id))
         .returning();
     }
+  }
+
+  const token = generateToken();
+  const expiresAt = new Date(
+    Date.now() + config.sessionTtlDays * 24 * 60 * 60 * 1000,
+  );
+  await db
+    .insert(sessionsTable)
+    .values({ userId: user.id, tokenHash: hashToken(token), expiresAt });
+
+  const response: AuthResponse = { token, user: toUserDto(user) };
+  res.json(response);
+});
+
+// Demo login for app store (Google Play) review. Reviewers cannot receive an
+// OTP on the demo number, so this signs in a single fixed, NON-admin demo
+// account when given the configured demo phone *and* demo passcode. Unlike
+// dev-login it intentionally works in production, but it is tightly scoped:
+// only the one configured number is accepted, the passcode is compared in
+// constant time, and the account is never granted admin rights. Disabled (404)
+// when no demo credentials are configured (e.g. DEMO_LOGIN_OTP="").
+router.post("/auth/demo-login", async (req, res) => {
+  const demoPhone = config.demoLoginPhone;
+  const demoOtp = config.demoLoginOtp;
+  if (!demoPhone || !demoOtp) {
+    throw new HttpError(404, "not_found", "Not found.");
+  }
+
+  const clientKey = req.ip ?? "unknown";
+  const ipLimit = await hitRateLimit(
+    `demo-login:${clientKey}`,
+    config.demoLoginMaxPerIpPerMinute,
+    60_000,
+  );
+  if (!ipLimit.allowed) {
+    throw new HttpError(
+      429,
+      "too_many_attempts",
+      "Too many attempts from this device. Please try again later.",
+    );
+  }
+
+  const body = DemoLoginBody.parse(req.body);
+  const phone = normalizeIndianPhone(body.phone);
+  // One generic error for a wrong number or wrong passcode so the endpoint never
+  // reveals which half was correct. Only the configured demo account can ever
+  // authenticate here.
+  const credentialsOk =
+    Boolean(phone) && phone === demoPhone && safeCompare(body.otp, demoOtp);
+  if (!credentialsOk) {
+    throw new HttpError(
+      401,
+      "invalid_credentials",
+      "Incorrect demo credentials.",
+    );
+  }
+
+  let [user] = await db
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.phone, demoPhone))
+    .limit(1);
+
+  if (!user) {
+    [user] = await db
+      .insert(usersTable)
+      .values({
+        fullName: "Play Reviewer",
+        phone: demoPhone,
+        // Never grant admin: these credentials live in the store review notes.
+        isAdmin: false,
+      })
+      .returning();
   }
 
   const token = generateToken();

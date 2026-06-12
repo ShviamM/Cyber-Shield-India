@@ -135,6 +135,34 @@ paths:
         default:
           $ref: "#/components/responses/Error"
 
+  /auth/demo-login:
+    post:
+      operationId: demoLogin
+      tags: [auth]
+      summary: Demo login for app store review (no real OTP)
+      description: >-
+        Signs in a single fixed demo account used by app store reviewers who
+        cannot receive an OTP on the demo number. Accepts only the configured
+        demo phone number together with the configured demo passcode; every
+        other number is rejected. The demo account is a normal (non-admin)
+        user. Works in production, unlike dev-login. Disabled (404) when the
+        server has no demo credentials configured.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DemoLoginRequest"
+      responses:
+        "200":
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
   /auth/me:
     get:
       operationId: getMe
@@ -1303,6 +1331,19 @@ components:
           nullable: true
       required:
         - phone
+
+    DemoLoginRequest:
+      type: object
+      properties:
+        phone:
+          type: string
+          description: Must equal the configured demo phone number
+        otp:
+          type: string
+          description: The fixed demo passcode for the app-store-review account
+      required:
+        - phone
+        - otp
 
     User:
       type: object

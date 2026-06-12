@@ -1,5 +1,6 @@
 import {
   useCheckPhone,
+  useDemoLogin,
   useDevLogin,
   useVerifyToken,
 } from "@workspace/api-client-react";
@@ -23,6 +24,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
 import { isValidIndianPhone, formatIndianPhone } from "@/lib/phone";
 import { isOtpAvailable, sendWidgetOtp, verifyWidgetOtp } from "@/lib/msg91";
+import { isDemoPhone } from "@/lib/demo";
 
 const NAVY = "#0B3D91";
 const SAFFRON = "#FF6713";
@@ -44,6 +46,7 @@ export default function LoginScreen() {
   const checkPhone = useCheckPhone();
   const verifyToken = useVerifyToken();
   const devLogin = useDevLogin();
+  const demoLogin = useDemoLogin();
 
   const [step, setStep] = useState<Step>("phone");
   const [phone, setPhone] = useState("");
@@ -52,6 +55,8 @@ export default function LoginScreen() {
   const [code, setCode] = useState("");
   const [isNewUser, setIsNewUser] = useState(false);
   const [devFlow, setDevFlow] = useState(false);
+  // App store review: the demo number signs in via /auth/demo-login (no MSG91).
+  const [demoFlow, setDemoFlow] = useState(false);
   const [reqId, setReqId] = useState<string | null>(null);
   const [otpSending, setOtpSending] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -81,6 +86,12 @@ export default function LoginScreen() {
 
   // Launch the MSG91 widget to send the code, then move to the OTP entry step.
   async function startOtp() {
+    // The demo (app-store-review) number never sends a real OTP.
+    if (demoFlow) {
+      startResendTimer();
+      setStep("otp");
+      return;
+    }
     if (!isOtpAvailable()) {
       setError(t("auth.otpUnavailable"));
       return;
@@ -108,6 +119,15 @@ export default function LoginScreen() {
       return;
     }
     setError(null);
+    // App store review: the demo number skips MSG91 and signs in via
+    // /auth/demo-login after the reviewer enters the documented passcode.
+    if (isDemoPhone(toE164(phone))) {
+      setDemoFlow(true);
+      setIsNewUser(false);
+      startResendTimer();
+      setStep("otp");
+      return;
+    }
     try {
       const res = await checkPhone.mutateAsync({ data: { phone } });
       setIsNewUser(res.isNewUser);
@@ -184,21 +204,23 @@ export default function LoginScreen() {
       setError(t("auth.invalidOtp"));
       return;
     }
-    if (!reqId) {
+    if (!demoFlow && !reqId) {
       setError(t("auth.requestFailed"));
       return;
     }
     setVerifying(true);
     setError(null);
     try {
-      const accessToken = await verifyWidgetOtp(reqId, code.trim());
-      const auth = await verifyToken.mutateAsync({
-        data: {
-          accessToken,
-          fullName: isNewUser ? fullName.trim() : undefined,
-          location: isNewUser && location.trim() ? location.trim() : undefined,
-        },
-      });
+      const auth = demoFlow
+        ? await demoLogin.mutateAsync({ data: { phone, otp: code.trim() } })
+        : await verifyToken.mutateAsync({
+            data: {
+              accessToken: await verifyWidgetOtp(reqId!, code.trim()),
+              fullName: isNewUser ? fullName.trim() : undefined,
+              location:
+                isNewUser && location.trim() ? location.trim() : undefined,
+            },
+          });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       await signIn(auth);
       // root layout's auth gate redirects into the app
@@ -215,6 +237,7 @@ export default function LoginScreen() {
     setReqId(null);
     setError(null);
     setDevFlow(false);
+    setDemoFlow(false);
   }
 
   const checking = checkPhone.isPending;

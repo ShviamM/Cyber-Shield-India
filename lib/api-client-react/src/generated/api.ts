@@ -44,6 +44,7 @@ import type {
   CityHotspotListResponse,
   CreateOrderRequest,
   CreateReportRequest,
+  DemoLoginRequest,
   DevLoginRequest,
   ErrorResponse,
   ExtendTrialRequest,
@@ -463,6 +464,78 @@ export const useDevLogin = <TError = ErrorType<ErrorResponse>,
         TContext
       > => {
       return useMutation(getDevLoginMutationOptions(options));
+    }
+
+export const getDemoLoginUrl = () => {
+
+
+
+
+  return `/api/auth/demo-login`
+}
+
+/**
+ * Signs in a single fixed demo account used by app store reviewers who cannot receive an OTP on the demo number. Accepts only the configured demo phone number together with the configured demo passcode; every other number is rejected. The demo account is a normal (non-admin) user. Works in production, unlike dev-login. Disabled (404) when the server has no demo credentials configured.
+ * @summary Demo login for app store review (no real OTP)
+ */
+export const demoLogin = async (demoLoginRequest: DemoLoginRequest, options?: RequestInit): Promise<AuthResponse> => {
+
+  return customFetch<AuthResponse>(getDemoLoginUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      demoLoginRequest,)
+  }
+);}
+
+
+
+
+export const getDemoLoginMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof demoLogin>>, TError,{data: BodyType<DemoLoginRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof demoLogin>>, TError,{data: BodyType<DemoLoginRequest>}, TContext> => {
+
+const mutationKey = ['demoLogin'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof demoLogin>>, {data: BodyType<DemoLoginRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  demoLogin(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DemoLoginMutationResult = NonNullable<Awaited<ReturnType<typeof demoLogin>>>
+    export type DemoLoginMutationBody = BodyType<DemoLoginRequest>
+    export type DemoLoginMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Demo login for app store review (no real OTP)
+ */
+export const useDemoLogin = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof demoLogin>>, TError,{data: BodyType<DemoLoginRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof demoLogin>>,
+        TError,
+        {data: BodyType<DemoLoginRequest>},
+        TContext
+      > => {
+      return useMutation(getDemoLoginMutationOptions(options));
     }
 
 export const getGetMeUrl = () => {

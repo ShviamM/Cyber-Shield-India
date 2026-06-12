@@ -15,6 +15,7 @@ vi.mock("../lib/msg91-widget", () => ({
 const { default: app } = await import("../app");
 const { db, usersTable, sessionsTable } = await import("@workspace/db");
 const { HttpError } = await import("../lib/http-error");
+const { config } = await import("../config");
 
 function randomPhone(): string {
   const first = 6 + Math.floor(Math.random() * 4);
@@ -169,5 +170,41 @@ describe("POST /auth/dev-login", () => {
       .send({ phone });
     expect(again.status).toBe(200);
     expect(again.body.user.id).toBe(res.body.user.id);
+  });
+});
+
+describe("POST /auth/demo-login", () => {
+  const demoPhone = config.demoLoginPhone!;
+  const demoOtp = config.demoLoginOtp;
+
+  it("rejects an incorrect passcode", async () => {
+    const res = await request(app)
+      .post("/api/auth/demo-login")
+      .send({ phone: demoPhone, otp: "000000" });
+    expect(res.status).toBe(401);
+    expect(res.body.error).toBe("invalid_credentials");
+  });
+
+  it("rejects any number other than the demo account", async () => {
+    const res = await request(app)
+      .post("/api/auth/demo-login")
+      .send({ phone: randomPhone(), otp: demoOtp });
+    expect(res.status).toBe(401);
+    expect(res.body.error).toBe("invalid_credentials");
+  });
+
+  it("signs in the demo account as a non-admin with valid credentials", async () => {
+    usedPhones.push(demoPhone);
+    const res = await request(app)
+      .post("/api/auth/demo-login")
+      .send({ phone: demoPhone, otp: demoOtp });
+
+    expect(res.status).toBe(200);
+    expect(typeof res.body.token).toBe("string");
+    expect(res.body.token.length).toBeGreaterThan(0);
+    expect(res.body.user.phone).toBe(demoPhone);
+    // Demo credentials live in store review notes, so the account must never
+    // have admin rights.
+    expect(res.body.user.isAdmin).toBe(false);
   });
 });
