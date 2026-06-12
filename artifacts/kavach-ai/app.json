@@ -22,7 +22,7 @@
       }
     },
     "android": {
-      "package": "com.kavachai.app",
+      "package": "com.kavachai.com",
       "backgroundColor": "#0B3D91",
       "permissions": [
         "android.permission.POST_NOTIFICATIONS",
