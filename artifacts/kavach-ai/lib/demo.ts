@@ -3,7 +3,7 @@
 // config). The account is a normal, non-admin user; we unlock Premium for it
 // on the client so reviewers can see every feature (premium is gated via the
 // RevenueCat entitlement, which the demo device won't have).
-export const DEMO_LOGIN_PHONE = "+919682824432";
+export const DEMO_LOGIN_PHONE = "+919000000000";
 
 function last10(phone: string | null | undefined): string {
   return (phone ?? "").replace(/\D/g, "").slice(-10);

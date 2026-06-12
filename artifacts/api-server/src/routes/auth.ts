@@ -13,6 +13,7 @@ import {
   type SuccessResponse,
 } from "@workspace/api-zod";
 import { config, isDevLoginEnabled } from "../config";
+import { isSuperAdmin } from "../lib/super-admin";
 import { normalizeIndianPhone } from "../lib/phone";
 import { generateToken, hashToken, safeCompare } from "../lib/token";
 import { verifyAccessToken } from "../lib/msg91-widget";
@@ -358,6 +359,17 @@ router.post("/auth/demo-login", async (req, res) => {
         isAdmin: false,
       })
       .returning();
+  }
+
+  // Defense-in-depth: even though config disables the demo login for any
+  // admin/owner phone, refuse here too if the resolved account is privileged.
+  // The store-review passcode must never hand out an admin/super-admin session.
+  if (
+    user.isAdmin ||
+    config.adminPhones.includes(user.phone) ||
+    isSuperAdmin(user)
+  ) {
+    throw new HttpError(404, "not_found", "Not found.");
   }
 
   const token = generateToken();

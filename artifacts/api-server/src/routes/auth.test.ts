@@ -207,4 +207,20 @@ describe("POST /auth/demo-login", () => {
     // have admin rights.
     expect(res.body.user.isAdmin).toBe(false);
   });
+
+  it("404s when the demo login is disabled (no passcode configured)", async () => {
+    // The kill-switch: clearing DEMO_LOGIN_OTP (here, the resolved config value)
+    // must make the route disappear entirely, even with otherwise-valid input.
+    const mutable = config as { demoLoginOtp: string };
+    const original = mutable.demoLoginOtp;
+    mutable.demoLoginOtp = "";
+    try {
+      const res = await request(app)
+        .post("/api/auth/demo-login")
+        .send({ phone: demoPhone, otp: original });
+      expect(res.status).toBe(404);
+    } finally {
+      mutable.demoLoginOtp = original;
+    }
+  });
 });

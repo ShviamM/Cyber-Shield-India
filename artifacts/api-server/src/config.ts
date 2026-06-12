@@ -22,6 +22,23 @@ const superAdminPhonesEnv = (process.env.SUPER_ADMIN_PHONES ?? "")
   .map((p) => normalizeIndianPhone(p.trim()))
   .filter((p): p is string => Boolean(p));
 
+// Demo login for app store (Google Play) review. Reviewers can't receive an OTP
+// on the demo SIM, so a single fixed, NON-admin account signs in with a phone +
+// fixed passcode pair. Defaults to a clearly-fake number so it works out of the
+// box; override with DEMO_LOGIN_PHONE. Defense-in-depth: if the demo number is
+// ever an admin/owner phone the demo login is disabled (null), because the
+// passcode lives in the store review notes and must never unlock a privileged
+// account. Disable entirely by setting DEMO_LOGIN_OTP="".
+const demoLoginPhoneRaw = normalizeIndianPhone(
+  process.env.DEMO_LOGIN_PHONE ?? "9000000000",
+);
+const demoLoginPhone =
+  demoLoginPhoneRaw &&
+  !adminPhones.includes(demoLoginPhoneRaw) &&
+  !superAdminPhonesEnv.includes(demoLoginPhoneRaw)
+    ? demoLoginPhoneRaw
+    : null;
+
 function numEnv(name: string, fallback: number): number {
   const raw = process.env[name];
   if (!raw) return fallback;
@@ -77,13 +94,9 @@ export const config = {
   adminLoginMaxPerIpPerHour: intEnv("ADMIN_LOGIN_MAX_PER_IP_PER_HOUR", 30),
   // Per-IP throttle for the development-only test login (see isDevLoginEnabled).
   devLoginMaxPerIpPerMinute: intEnv("DEV_LOGIN_MAX_PER_IP_PER_MINUTE", 10),
-  // Demo login for app store (Google Play) review. Reviewers can't receive an
-  // OTP on the demo SIM, so a single fixed, NON-admin account signs in with a
-  // phone + fixed passcode pair. Unlike dev-login this works in production, but
-  // it's tightly scoped to this one number. Disable by setting DEMO_LOGIN_OTP="".
-  demoLoginPhone: normalizeIndianPhone(
-    process.env.DEMO_LOGIN_PHONE ?? "9682824432",
-  ),
+  // Demo login for app store (Google Play) review. See demoLoginPhone above:
+  // resolved/guarded earlier so a privileged number can never be used here.
+  demoLoginPhone,
   demoLoginOtp: (process.env.DEMO_LOGIN_OTP ?? "7019").trim(),
   demoLoginMaxPerIpPerMinute: intEnv("DEMO_LOGIN_MAX_PER_IP_PER_MINUTE", 10),
   sessionTtlDays: intEnv("SESSION_TTL_DAYS", 60),
