@@ -28,6 +28,15 @@ consumed as source / rebuilt on EAS servers, not from committed `dist`.
 **How to apply:** keep `.easignore` a superset of `.gitignore` plus the heavy
 non-mobile assets; never let it drop `node_modules`/`dist`/`.expo`/`.local`.
 
+**Gotcha — a checkpoint rollback can silently delete `.easignore`.** A Replit
+"Restored to <hash>" checkpoint reverted the working tree to a state before
+`.easignore` existed, so it vanished with no diff in the current task. The heavy
+assets (`attached_assets/` ~112 MB, `artifacts/website/public/videos/` ~21 MB)
+are git-TRACKED, so without `.easignore` the archive balloons to ~234 MB. ALWAYS
+verify `.easignore` exists at the git root before an EAS build; if missing,
+restore the proven version with `git show <commit>:.easignore` (don't hand-roll
+the superset — it's easy to forget a line and pull in `node_modules`/`.local`).
+
 ## Triggering builds from the Replit sandbox — EAS_NO_VCS=1 + EAS_PROJECT_ROOT
 
 `eas build` defaults to archiving from the git tree, which writes
