@@ -75,6 +75,22 @@ EAS_PROJECT_ROOT=$(git rev-parse --show-toplevel) eas build --platform android
 `--no-wait` manually if you only want to verify the upload size / get the URL.
 Requires `EXPO_TOKEN`. Verified upload = 66.2 MB.
 
+**Preview profile needs `credentialsSource: "local"` too:** unlike `production`,
+the `preview` profile defaulted to REMOTE credentials (Expo server). With no remote
+keystore, `--non-interactive` can't generate one → "Generating a new Keystore is not
+supported in --non-interactive mode". Fix: add `"credentialsSource": "local"` to the
+preview profile so it reuses `credentials/keystore.jks` (same as production). Signing
+an internal preview APK with the production keystore is fine. eas.json is read from
+disk by the CLI, so the edit applies even if uncommitted.
+
+**EAS Free plan caps Android builds per month — a hard build blocker.** After the
+quota is used (one prod AAB can exhaust it), even a fully-configured build fails at the
+end with "This account has used its Android builds from the Free plan this month, which
+will reset in N days" → "Error: build command failed." This is account/billing state,
+NOT a code/config bug — don't keep retrying. Resolve by waiting for the monthly reset
+or upgrading the Expo plan (expo.dev/accounts/<acct>/settings/billing). The upload +
+fingerprint succeed first, so a clean upload log does not mean the build was accepted.
+
 **Play Store needs the PRODUCTION profile (AAB), not preview (APK):** the
 `preview` profile sets `android.buildType=apk` (internal sideload/testing only —
 the Play Console rejects APKs for new apps). The `production` profile has NO
