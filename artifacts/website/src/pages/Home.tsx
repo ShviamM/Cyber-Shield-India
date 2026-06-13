@@ -231,46 +231,51 @@ export default function Home() {
             {/* Hero Visual */}
             <div className="relative flex justify-center lg:justify-end lg:pr-8">
 
-              {/* Proof Stat — floating */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9, x: 20 }}
-                animate={{ opacity: 1, scale: 1, x: 0 }}
-                transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
-                className="absolute -top-8 left-0 lg:-left-8 bg-[#0c1424]/90 backdrop-blur-md p-5 sm:p-6 rounded-3xl border border-white/10 shadow-2xl z-20"
-              >
-                <p className="text-4xl sm:text-5xl font-extrabold text-white tracking-tighter">8.5L+</p>
-                <p className="text-xs sm:text-sm font-medium text-accent mt-1 uppercase tracking-widest flex items-center gap-2">
-                  <ShieldAlert className="w-4 h-4" /> {t("hero.scamsBlocked")}
-                </p>
-              </motion.div>
+              {/* Phone + chips anchored to the phone's bounding box */}
+              <div className="relative">
 
-              {/* Status Chip — floating */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 0.8, ease: "easeOut" }}
-                className="absolute bottom-16 -right-2 lg:-right-6 bg-[#0c1424]/90 backdrop-blur-md px-5 py-3 rounded-full border border-[#16a34a]/40 shadow-2xl z-20 flex items-center gap-3"
-              >
-                <span className="relative flex h-2 w-2">
-                  {!prefersReducedMotion && (
-                    <span className="absolute inline-flex h-full w-full rounded-full bg-[#16a34a] opacity-75 animate-ping" />
-                  )}
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#16a34a]" />
-                </span>
-                <span className="text-sm font-medium text-white">{t("hero.activeProtection")}</span>
-              </motion.div>
+                {/* Saffron glow behind phone */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[600px] bg-accent/10 blur-[100px] rounded-full pointer-events-none" />
 
-              {/* Saffron glow behind phone */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[600px] bg-accent/10 blur-[100px] rounded-full pointer-events-none" />
+                <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
+                  className="relative z-10 drop-shadow-[0_30px_50px_rgba(0,0,0,0.5)]"
+                >
+                  <CinematicPhone />
+                </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
-                className="relative z-10 drop-shadow-[0_30px_50px_rgba(0,0,0,0.5)]"
-              >
-                <CinematicPhone />
-              </motion.div>
+                {/* Proof Stat — anchored over the phone's top-left corner */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, x: 20 }}
+                  animate={{ opacity: 1, scale: 1, x: 0 }}
+                  transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
+                  className="absolute -top-5 -left-5 sm:-left-10 bg-[#0c1424]/95 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-white/10 shadow-2xl z-20"
+                >
+                  <p className="text-3xl sm:text-4xl font-extrabold text-white tracking-tighter">8.5L+</p>
+                  <p className="text-[11px] sm:text-xs font-medium text-accent mt-1 uppercase tracking-widest flex items-center gap-2">
+                    <ShieldAlert className="w-4 h-4 shrink-0" /> {t("hero.scamsBlocked")}
+                  </p>
+                </motion.div>
+
+                {/* Status Chip — anchored to the phone's bottom-right */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 1, delay: 0.8, ease: "easeOut" }}
+                  className="absolute bottom-20 -right-4 sm:-right-6 bg-[#0c1424]/95 backdrop-blur-md px-4 py-2.5 rounded-full border border-[#16a34a]/40 shadow-2xl z-20 flex items-center gap-2.5"
+                >
+                  <span className="relative flex h-2 w-2">
+                    {!prefersReducedMotion && (
+                      <span className="absolute inline-flex h-full w-full rounded-full bg-[#16a34a] opacity-75 animate-ping" />
+                    )}
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#16a34a]" />
+                  </span>
+                  <span className="text-sm font-medium text-white whitespace-nowrap">{t("hero.activeProtection")}</span>
+                </motion.div>
+
+              </div>
             </div>
 
           </div>
