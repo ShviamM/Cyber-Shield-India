@@ -19,6 +19,7 @@ import FAQ from "@/pages/FAQ";
 import Download from "@/pages/Download";
 import Login from "@/pages/Login";
 import Pricing from "@/pages/Pricing";
+import CheckScam from "@/pages/CheckScam";
 import Account from "@/pages/Account";
 import NotFound from "@/pages/not-found";
 
@@ -32,6 +33,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/check" component={CheckScam} />
       <Route path="/features" component={Features} />
       <Route path="/family-protection" component={FamilyProtection} />
       <Route path="/cyber-safety-center" component={CyberSafetyCenter} />

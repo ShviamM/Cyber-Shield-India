@@ -22,3 +22,12 @@ log reading `Origin not allowed by CORS`; the password/DB/token path is fine.
 **How to apply:** set `ADMIN_ORIGINS` to all admin-facing origins (custom +
 platform default). It's an env-only fix — update the spec and redeploy, no code
 change.
+
+**Note:** the public website is now also a browser API consumer (the `/check`
+scam-lookup page calls `/api/check`). It shares the root origin with the admin
+console (admin lives at `/admin` subpath, website at `/`), so it's covered by
+the same allowlist — no extra origin needed. Caveat: the screenshot tool hits
+the app via `http://localhost:80`, which is NOT allowlisted, so API calls 500
+under the screenshot tool even though the real Replit-dev-domain preview works
+(200). Verify website→API calls with an explicit `Origin: https://<dev-domain>`
+curl, not the screenshot tool.

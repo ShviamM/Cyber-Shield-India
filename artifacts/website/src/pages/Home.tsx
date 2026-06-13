@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
-import { motion, MotionConfig, AnimatePresence, useReducedMotion, type Variants } from "framer-motion";
-import { ShieldCheck, ArrowRight, ShieldAlert, Users, ChevronRight, Search, Activity, AlertOctagon, Lock } from "lucide-react";
+import { Link, useLocation } from "wouter";
+import { motion, MotionConfig, useReducedMotion, type Variants } from "framer-motion";
+import { ShieldCheck, ArrowRight, ShieldAlert, Users, ChevronRight, Search, AlertOctagon, Lock } from "lucide-react";
 import { ScamCounter } from "@/components/ScamCounter";
 import { TrustTicker } from "@/components/TrustTicker";
 import { CyberRadar } from "@/components/CyberRadar";
@@ -93,30 +93,13 @@ function CinematicPhone() {
 
 function HeroTeaser() {
   const { t } = useTranslation("home");
-  const prefersReducedMotion = useReducedMotion();
   const [value, setValue] = useState("");
-  const [status, setStatus] = useState<"idle" | "scanning" | "result">("idle");
-  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, []);
+  const [, setLocation] = useLocation();
 
   const handleCheck = () => {
-    if (!value) return;
-    setStatus("scanning");
-    if (prefersReducedMotion) {
-      setStatus("result");
-    } else {
-      timerRef.current = setTimeout(() => setStatus("result"), 2000);
-    }
-  };
-
-  const handleReset = () => {
-    setStatus("idle");
-    setValue("");
+    const trimmed = value.trim();
+    if (!trimmed) return;
+    setLocation(`/check?q=${encodeURIComponent(trimmed)}`);
   };
 
   return (
@@ -128,80 +111,23 @@ function HeroTeaser() {
         {t("hero.teaser.title")}
       </h4>
 
-      <AnimatePresence mode="wait">
-        {status === "idle" && (
-          <motion.div
-            key="idle"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="flex flex-col gap-3"
-          >
-            <input
-              type="text"
-              placeholder={t("hero.teaser.placeholder")}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleCheck()}
-              className="w-full bg-[#152033] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:border-accent transition-colors font-mono"
-            />
-            <button
-              onClick={handleCheck}
-              disabled={!value}
-              className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {t("hero.teaser.analyzeCta")}
-            </button>
-          </motion.div>
-        )}
-
-        {status === "scanning" && (
-          <motion.div
-            key="scanning"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="py-6 flex flex-col items-center justify-center gap-4"
-          >
-            <div className="relative">
-              <Activity className="w-8 h-8 text-accent animate-pulse" />
-              {!prefersReducedMotion && (
-                <motion.div
-                  className="absolute inset-0 border-2 border-accent rounded-full"
-                  animate={{ scale: [1, 1.5], opacity: [1, 0] }}
-                  transition={{ duration: 1, repeat: Infinity }}
-                />
-              )}
-            </div>
-            <p className="text-gray-400 font-mono text-sm animate-pulse">{t("hero.teaser.scanning")}</p>
-          </motion.div>
-        )}
-
-        {status === "result" && (
-          <motion.div
-            key="result"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="flex flex-col items-center text-center gap-4 py-2"
-          >
-            <div className="w-12 h-12 rounded-full bg-destructive/20 flex items-center justify-center text-destructive">
-              <ShieldAlert className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-white font-medium">{t("hero.teaser.resultTitle")}</p>
-              <p className="text-sm text-gray-400 mt-1">{t("hero.teaser.resultDesc")}</p>
-            </div>
-            <Link href="/download" className="w-full">
-              <button className="w-full mt-2 bg-primary hover:bg-primary/90 text-white py-3 rounded-xl font-medium shadow-[0_0_20px_rgba(11,61,145,0.4)] flex items-center justify-center gap-2 transition-colors">
-                {t("hero.teaser.downloadToBlock")} <ArrowRight className="w-4 h-4" />
-              </button>
-            </Link>
-            <button onClick={handleReset} className="text-xs text-gray-500 hover:text-gray-300">
-              {t("hero.teaser.checkAnother")}
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <div className="flex flex-col gap-3">
+        <input
+          type="text"
+          placeholder={t("hero.teaser.placeholder")}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleCheck()}
+          className="w-full bg-[#152033] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:border-accent transition-colors font-mono"
+        />
+        <button
+          onClick={handleCheck}
+          disabled={!value.trim()}
+          className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          {t("hero.teaser.analyzeCta")} <ArrowRight className="w-4 h-4" />
+        </button>
+      </div>
     </div>
   );
 }
