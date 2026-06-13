@@ -605,6 +605,7 @@ export const FraudSignalSource = {
   message_ai: 'message_ai',
   url_heuristic: 'url_heuristic',
   url_threat_feed: 'url_threat_feed',
+  url_ai: 'url_ai',
   phone_reputation: 'phone_reputation',
   upi_heuristic: 'upi_heuristic',
 } as const;

@@ -265,6 +265,169 @@ async function classifyWithGemini(
   return parseClassification(response.text?.trim(), validKeys);
 }
 
+// ---- URL reputation ------------------------------------------------------
+
+export type UrlClassification = {
+  /**
+   * "malicious"  — phishing/scam/malware site;
+   * "suspicious" — risky structure or weak signals, treat with caution;
+   * "likely_safe" — a domain the model recognizes as established/legitimate;
+   * "unknown"    — no basis to judge.
+   */
+  verdict: "malicious" | "suspicious" | "likely_safe" | "unknown";
+  /** Model confidence, 0-1. */
+  confidence: number;
+  /** Short English explanation (no PII echoed back). */
+  rationale: string;
+};
+
+const URL_SYSTEM_PROMPT = `You are a URL reputation analyst for Netraksh, an Indian cyber-safety app.
+Given a single URL, judge whether it is likely a phishing, scam, or malware site targeting Indian consumers, or a well-known legitimate site.
+You CANNOT fetch the page — judge only from the URL itself and your own knowledge of the registrable domain's reputation.
+Consider: is the registrable domain a recognized, established, legitimate organization? Does it impersonate an Indian bank, wallet/UPI app (Paytm, PhonePe, GPay), government service (Aadhaar/UIDAI, income tax, India Post, NPCI), courier, or telecom via a look-alike/typosquat domain? Does the structure match common Indian phishing (fake KYC/refund/reward/login pages, raw IP hosts, abused cheap TLDs, deep subdomains, credentials embedded before the host)?
+Respond ONLY with a JSON object: {"verdict": "malicious"|"suspicious"|"likely_safe"|"unknown", "confidence": number, "rationale": string}.
+- "verdict": use "likely_safe" ONLY for registrable domains you actually recognize as established and legitimate; use "unknown" when you have no basis to judge an unfamiliar domain.
+- "confidence": a number from 0 to 1.
+- "rationale": one short English sentence, no PII.`;
+
+type RawUrlClassification = {
+  verdict?: unknown;
+  confidence?: unknown;
+  rationale?: unknown;
+};
+
+const URL_VERDICTS = new Set([
+  "malicious",
+  "suspicious",
+  "likely_safe",
+  "unknown",
+]);
+
+/** Parse a model's JSON output into a normalized URL classification, or null if unusable. */
+function parseUrlClassification(
+  content: string | undefined,
+): UrlClassification | null {
+  if (!content) return null;
+  let parsed: RawUrlClassification;
+  try {
+    parsed = JSON.parse(content) as RawUrlClassification;
+  } catch {
+    return null;
+  }
+
+  const rawVerdict =
+    typeof parsed.verdict === "string" ? parsed.verdict.toLowerCase() : "";
+  const verdict = (
+    URL_VERDICTS.has(rawVerdict) ? rawVerdict : "unknown"
+  ) as UrlClassification["verdict"];
+
+  const confidenceNum =
+    typeof parsed.confidence === "number" ? parsed.confidence : 0;
+  const confidence = Math.min(1, Math.max(0, confidenceNum));
+
+  return {
+    verdict,
+    confidence,
+    rationale:
+      typeof parsed.rationale === "string" && parsed.rationale.trim()
+        ? parsed.rationale.trim().slice(0, 280)
+        : "AI assessed this link's reputation.",
+  };
+}
+
+/**
+ * Assess a URL's reputation with AI. Tries OpenAI first; on the Azure content
+ * filter or any failure, falls back to Gemini (BLOCK_NONE), mirroring
+ * classifyMessage. Returns null only when every provider is unavailable, so the
+ * URL analyzer degrades to structural heuristics + threat feed alone.
+ */
+export async function classifyUrl(
+  url: string,
+): Promise<UrlClassification | null> {
+  if (!isAiConfigured()) return null;
+
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+
+  const userPrompt = `URL:\n"""\n${trimmed.slice(0, 2000)}\n"""`;
+
+  // --- Primary: OpenAI (gpt-5-mini) ---
+  if (isOpenAiConfigured()) {
+    try {
+      const { openai } = await import("@workspace/integrations-openai-ai-server");
+      const completion = await openai.chat.completions.create({
+        model: "gpt-5-mini",
+        max_completion_tokens: 8192,
+        response_format: { type: "json_object" },
+        messages: [
+          { role: "system", content: URL_SYSTEM_PROMPT },
+          { role: "user", content: userPrompt },
+        ],
+      });
+      void recordAiUsage("gpt-5-mini", "classify_url", completion.usage);
+      const result = parseUrlClassification(
+        completion.choices[0]?.message?.content?.trim(),
+      );
+      if (result) return result;
+    } catch (err) {
+      if (isContentFilterError(err)) {
+        logger.warn(
+          { requestId: extractRequestId(err) },
+          "OpenAI URL classification rejected by content filter; trying Gemini fallback",
+        );
+      } else {
+        logger.error({ err }, "OpenAI URL classification failed; trying Gemini fallback");
+      }
+    }
+  }
+
+  // --- Fallback: Gemini (gemini-2.5-flash) ---
+  if (isGeminiConfigured()) {
+    try {
+      return await classifyUrlWithGemini(userPrompt);
+    } catch (err) {
+      logger.error({ err }, "Gemini URL classification failed");
+    }
+  }
+
+  return null;
+}
+
+/** Gemini fallback for URL reputation. Safety thresholds relaxed (see classifyWithGemini). */
+async function classifyUrlWithGemini(
+  userPrompt: string,
+): Promise<UrlClassification | null> {
+  const { ai, HarmCategory, HarmBlockThreshold } = await import(
+    "@workspace/integrations-gemini-ai"
+  );
+
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+    config: {
+      systemInstruction: URL_SYSTEM_PROMPT,
+      responseMimeType: "application/json",
+      maxOutputTokens: 8192,
+      temperature: 0,
+      safetySettings: [
+        { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+        { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_NONE },
+        { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_NONE },
+        { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_NONE },
+      ],
+    },
+  });
+
+  const usage = response.usageMetadata;
+  void recordAiUsage("gemini-2.5-flash", "classify_url", {
+    prompt_tokens: usage?.promptTokenCount,
+    completion_tokens: usage?.candidatesTokenCount,
+    total_tokens: usage?.totalTokenCount,
+  });
+
+  return parseUrlClassification(response.text?.trim());
+}
+
 /** True when the error is the provider's content-safety rejection. */
 function isContentFilterError(err: unknown): boolean {
   const e = err as { code?: string; error?: { code?: string } };

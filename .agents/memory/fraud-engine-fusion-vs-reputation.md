@@ -32,3 +32,22 @@ can't reach `medium`; you need a `medium`/`high` signal or stacking. Don't chang
 **How to apply:** re-run the eval harness
 (`pnpm --filter @workspace/api-server run eval`) after any weight/threshold
 change and confirm per-type F1 and overall precision don't regress.
+
+## A lone "high" signal lands in MEDIUM by design (corroboration required)
+
+`high` weight is **55**, but the high verdict band is **>= 70**, so a single
+`high` signal alone fuses to `medium`; it reaches `high` only when a second
+signal (any `medium`+, or stacked) corroborates it. This is intentional, not a
+bug — reviewers (and the architect) will read "high severity → high verdict" and
+flag it as broken. It is the same deliberate threshold tuning as the medium=40
+choice: the engine wants corroboration before the top band. Consequence to keep
+in mind: a moderator-`verifiedScam` phone, a lone brand-impersonation URL
+heuristic, and a lone AI `url_ai`/`message_ai` "high" each surface as `medium`
+on their own. **Do NOT "fix" this by bumping `high` to 70 or adding a
+lone-high→high override** unless the product explicitly wants single-source top
+warnings — it changes phone/URL/message/UPI verdicts globally. If you ever do,
+re-run the eval harness.
+
+**Why:** correctness-over-coverage — single-source signals (one model, one
+heuristic) are kept advisory; the top "high" band is reserved for corroborated
+risk to limit false alarms.

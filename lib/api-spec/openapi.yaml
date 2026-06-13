@@ -2395,6 +2395,7 @@ components:
             - message_ai
             - url_heuristic
             - url_threat_feed
+            - url_ai
             - phone_reputation
             - upi_heuristic
           description: Which analyzer produced this signal

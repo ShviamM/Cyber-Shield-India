@@ -3,7 +3,7 @@ import { asc, eq } from "drizzle-orm";
 import type { FraudSignal, FraudVerdict } from "@workspace/api-zod";
 import { normalizeIndianPhone } from "./phone";
 import { computeRiskLevel, getCategoriesForNumber } from "./reputation";
-import { classifyMessage } from "./ai-classifier";
+import { classifyMessage, classifyUrl, type UrlClassification } from "./ai-classifier";
 import { analyzeUrlHeuristics, checkSafeBrowsing } from "./url-analysis";
 import { analyzeUpi } from "./upi";
 
@@ -110,12 +110,48 @@ async function analyzePhoneTarget(phone: string): Promise<Analysis> {
   return { signals, couldAnalyze: hasData };
 }
 
+/**
+ * Map an AI URL-reputation verdict to a fraud signal, or null when the model
+ * had no usable opinion (so it adds no weight). A high-confidence "malicious"
+ * verdict emits a "high" signal: on its own that lands in the medium band, and
+ * reaches the high band once any heuristic / threat-feed signal corroborates it
+ * — the engine deliberately requires corroboration for the top band (see
+ * SEVERITY_WEIGHT, where a lone high = 55 < the high threshold of 70).
+ * "suspicious" stays advisory (low/medium); "likely_safe"/"unknown" never warn.
+ */
+export function urlAiSignal(result: UrlClassification): FraudSignal | null {
+  const { verdict, confidence, rationale } = result;
+  let severity: FraudSignal["severity"];
+  switch (verdict) {
+    case "malicious":
+      severity = confidence >= 0.75 ? "high" : "medium";
+      break;
+    case "suspicious":
+      severity = confidence >= 0.75 ? "medium" : "low";
+      break;
+    case "likely_safe":
+      severity = "info";
+      break;
+    default:
+      return null;
+  }
+  return { source: "url_ai", severity, label: rationale };
+}
+
 async function analyzeUrlTarget(raw: string): Promise<Analysis> {
   const { url, signals } = analyzeUrlHeuristics(raw);
   if (!url) {
     return { signals, couldAnalyze: false };
   }
-  signals.push(await checkSafeBrowsing(url));
+  const [safeBrowsing, aiResult] = await Promise.all([
+    checkSafeBrowsing(url),
+    classifyUrl(url.toString()),
+  ]);
+  signals.push(safeBrowsing);
+  if (aiResult) {
+    const signal = urlAiSignal(aiResult);
+    if (signal) signals.push(signal);
+  }
   return { signals, couldAnalyze: true };
 }
 

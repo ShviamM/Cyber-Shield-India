@@ -341,7 +341,7 @@ export const FraudCheckResponse = zod.object({
   "confidence": zod.number().nullish().describe('AI classification confidence (0-1) when applicable'),
   "reasons": zod.array(zod.string()).describe('Human-readable contributing reasons'),
   "signals": zod.array(zod.object({
-  "source": zod.enum(['message_ai', 'url_heuristic', 'url_threat_feed', 'phone_reputation', 'upi_heuristic']).describe('Which analyzer produced this signal'),
+  "source": zod.enum(['message_ai', 'url_heuristic', 'url_threat_feed', 'url_ai', 'phone_reputation', 'upi_heuristic']).describe('Which analyzer produced this signal'),
   "severity": zod.enum(['info', 'low', 'medium', 'high']),
   "label": zod.string().describe('Human-readable explanation of the signal')
 }).describe('A single contributing factor in the overall verdict')).describe('Structured breakdown of every contributing signal')

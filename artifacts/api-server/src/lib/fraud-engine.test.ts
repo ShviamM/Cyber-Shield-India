@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { analyzeUrlHeuristics, parseUrl } from "./url-analysis";
 import { analyzeUpi } from "./upi";
+import { fuse, urlAiSignal } from "./fraud-engine";
+import type { UrlClassification } from "./ai-classifier";
 
 describe("analyzeUrlHeuristics", () => {
   it("flags brand impersonation on a non-official domain", () => {
@@ -62,5 +64,56 @@ describe("analyzeUpi", () => {
   it("does not flag a known handle", () => {
     const { signals } = analyzeUpi("merchant@oksbi");
     expect(signals.some((s) => /not a widely recognized/i.test(s.label))).toBe(false);
+  });
+});
+
+describe("urlAiSignal", () => {
+  const make = (
+    verdict: UrlClassification["verdict"],
+    confidence: number,
+  ): UrlClassification => ({ verdict, confidence, rationale: "r" });
+
+  it("maps high-confidence malicious to a high signal", () => {
+    expect(urlAiSignal(make("malicious", 0.9))).toMatchObject({
+      source: "url_ai",
+      severity: "high",
+    });
+  });
+
+  it("maps low-confidence malicious to a medium signal", () => {
+    expect(urlAiSignal(make("malicious", 0.5))?.severity).toBe("medium");
+  });
+
+  it("maps suspicious to medium/low by confidence", () => {
+    expect(urlAiSignal(make("suspicious", 0.8))?.severity).toBe("medium");
+    expect(urlAiSignal(make("suspicious", 0.4))?.severity).toBe("low");
+  });
+
+  it("treats likely_safe as an info signal", () => {
+    expect(urlAiSignal(make("likely_safe", 0.9))?.severity).toBe("info");
+  });
+
+  it("returns null for unknown so it adds no weight", () => {
+    expect(urlAiSignal(make("unknown", 0.9))).toBeNull();
+  });
+});
+
+describe("fuse", () => {
+  const sig = (severity: "info" | "low" | "medium" | "high") => ({
+    source: "url_ai" as const,
+    severity,
+    label: "x",
+  });
+
+  it("keeps a lone high signal in the medium band (corroboration required)", () => {
+    expect(fuse([sig("high")], true).riskLevel).toBe("medium");
+  });
+
+  it("promotes to high once a second signal corroborates a high one", () => {
+    expect(fuse([sig("high"), sig("medium")], true).riskLevel).toBe("high");
+  });
+
+  it("returns unknown when nothing could be analyzed and no weight accrued", () => {
+    expect(fuse([sig("info")], false).riskLevel).toBe("unknown");
   });
 });
