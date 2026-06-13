@@ -107,6 +107,30 @@ call-alert Activity (or runtime setShowWhenLocked toggling around the call-alert
 lifecycle). Other OS gates still apply: USE_FULL_SCREEN_INTENT (revoked by default
 on Android 14+), SYSTEM_ALERT_WINDOW, POST_NOTIFICATIONS, OEM battery exemption.
 
+**Screen dismiss + post-call report ("screen goes off; post-call screen on call-end"):**
+- Answer/Block already dismiss the caller screen. The in-popup Report sub-sheet now
+  AUTO-dismisses the whole screen ~1.6s after `reportPhase` hits `success`/`duplicate`
+  (the Done button stays for an instant manual close) — "screen goes off once the
+  action is performed". Don't make the user tap to leave a successful report.
+- A true call-ended popup is **impossible** without restricted call-state perms
+  (READ_PHONE_STATE / default dialer) — banned. Two compliant post-call mechanisms,
+  both keyed off the user having ANSWERED via our screen:
+  1. native persistent IMPORTANCE_LOW "report this call" notification posted at
+     screen-time (survives the call) — the authoritative fallback;
+  2. in-app trigger: on Answer (`!isDemo`) queue the caller number
+     (`lib/postCallReport.ts`, AsyncStorage, 1h expiry) then an `AppState`
+     background→active listener in `_layout.tsx` `router.push`es `/report-call` when
+     the user returns to Netraksh after the call.
+- **Persist the pending report BEFORE `answerCall()`** (await the AsyncStorage write):
+  `answerCall()` foregrounds the system in-call UI and can suspend JS, dropping an
+  un-flushed write. **Why:** that lost write = no auto-prompt.
+- **Don't add a cold-launch consume of the pending report.** At cold start the app
+  resolves onto `call-alert`; right after Answer→dismiss it lands on `(tabs)` and a
+  cold-launch consumer would fire `/report-call` immediately (mid-call, before the
+  call ends). The native notification covers the process-killed case instead.
+- Accepted limitation: if the user foregrounds Netraksh MID-call it can prompt early;
+  unavoidable without call state, mitigated by the "Not now" dismiss + notification.
+
 **Can't be e2e tested here** — native auto-launch needs a real EAS device build (no
 call simulation; Expo web preview is behind a proxy security block). Verify via
 typecheck + architect.

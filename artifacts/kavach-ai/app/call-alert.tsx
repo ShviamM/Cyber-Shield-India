@@ -25,6 +25,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { categoryIcon, isCallReportCategory } from "@/constants/strings";
 import { formatIndianPhone, phoneForApi } from "@/lib/phone";
+import { setPendingPostCallReport } from "@/lib/postCallReport";
 import { answerCall, blockNumber, endCall } from "@/lib/screening";
 
 const DEMO_NUMBER = "+91 87654-32100";
@@ -200,6 +201,19 @@ export default function CallAlertScreen() {
     };
   }, []);
 
+  // After a successful (or already-reported) in-popup report, auto-close the
+  // whole caller screen so it "goes off" once the action is done — no extra tap
+  // needed (the Done button stays for an instant manual close).
+  useEffect(() => {
+    if (reportPhase !== "success" && reportPhase !== "duplicate") return;
+    const id = setTimeout(() => {
+      setReportOpen(false);
+      setReportPhase("list");
+      dismiss();
+    }, 1600);
+    return () => clearTimeout(id);
+  }, [reportPhase]);
+
   // The screen is launched both as a modal (from the in-app demo, with a back
   // stack) and via a deep link from the native service (no back stack — where
   // router.back() is a no-op). Fall back to the tabs so the popup always closes.
@@ -269,10 +283,19 @@ export default function CallAlertScreen() {
     if (wasDone) dismiss();
   }
 
-  function handleAnswer() {
+  async function handleAnswer() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    // Accept the live ringing call; the system in-call UI then comes forward.
-    if (!isDemo) answerCall();
+    if (!isDemo) {
+      // Queue a post-call report BEFORE answering: answerCall() foregrounds the
+      // system in-call UI and can suspend our JS, dropping an un-flushed write.
+      // Persisting first guarantees the prompt survives the call. When the user
+      // returns to Netraksh afterwards the one-tap report screen surfaces — the
+      // Play-compliant stand-in for a real call-ended hook (we never read call
+      // state); the native notification is the fallback if they don't reopen.
+      await setPendingPostCallReport(callerNumber);
+      // Accept the live ringing call; the system in-call UI then comes forward.
+      answerCall();
+    }
     dismiss();
   }
 

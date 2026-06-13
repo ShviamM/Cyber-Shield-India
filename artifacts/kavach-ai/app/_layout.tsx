@@ -14,7 +14,7 @@ import { ShareIntentProvider, useShareIntentContext } from "expo-share-intent";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { LogBox, View } from "react-native";
+import { AppState, LogBox, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -25,6 +25,7 @@ import { Onboarding } from "@/components/Onboarding";
 import { AppProvider } from "@/context/AppContext";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { initI18n } from "@/i18n";
+import { consumePendingPostCallReport } from "@/lib/postCallReport";
 import { initializeRevenueCat, SubscriptionProvider } from "@/lib/revenuecat";
 import { syncScreeningApiConfig } from "@/lib/screening";
 import { getToken } from "@/lib/session";
@@ -110,6 +111,35 @@ function RootLayoutNav() {
       cancelled = true;
     };
   }, [status]);
+
+  // When the user answered a screened call from the caller popup, surface the
+  // one-tap post-call report the next time Netraksh returns to the foreground
+  // (e.g. right after they hang up). Play-compliant: the trigger is app
+  // foreground, never a restricted call-state permission. The persistent native
+  // "report this call" notification remains the fallback if they don't reopen.
+  const appStateRef = useRef(AppState.currentState);
+  const statusRef = useRef(status);
+  statusRef.current = status;
+  const segmentsRef = useRef(segments);
+  segmentsRef.current = segments;
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (next) => {
+      const prev = appStateRef.current;
+      appStateRef.current = next;
+      if (prev === "active" || next !== "active") return;
+      if (statusRef.current !== "authenticated") return;
+      // Don't interrupt the caller popup itself.
+      if (segmentsRef.current[0] === "call-alert") return;
+      consumePendingPostCallReport()
+        .then((number) => {
+          if (number) {
+            router.push({ pathname: "/report-call", params: { number } });
+          }
+        })
+        .catch(() => {});
+    });
+    return () => sub.remove();
+  }, [router]);
 
   // First-launch onboarding (language pick + Guardian explainer). Null until the
   // stored flag resolves so we never flash it for a returning user.
