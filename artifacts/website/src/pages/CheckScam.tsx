@@ -26,10 +26,17 @@ import {
 type CheckType =
   (typeof FraudCheckRequestType)[keyof typeof FraudCheckRequestType];
 
-function detectType(raw: string): CheckType {
+export function detectType(raw: string): CheckType {
   const v = raw.trim();
   if (!v) return "message";
-  if (v.includes(" ") || v.length > 80) return "message";
+  if (v.length > 80) return "message";
+  // Phone: composed only of digits and common separators (spaces, dashes,
+  // parentheses, plus) — e.g. "+91 98765 43210" — with 7–15 digits once the
+  // separators are stripped. Checked before the space guard so spaced numbers
+  // are still recognized as phone numbers.
+  const digits = v.replace(/[\s\-()+]/g, "");
+  if (/^[\d\s\-()+]+$/.test(v) && /^\d{7,15}$/.test(digits)) return "phone";
+  if (v.includes(" ")) return "message";
   // UPI handle: user@bank — the part after @ has no dot (distinguishes from email)
   if (/^[\w.\-]{2,}@[a-zA-Z]{2,}$/.test(v)) return "upi";
   // URL: explicit scheme, www, or host.tld without spaces and without @
@@ -40,9 +47,6 @@ function detectType(raw: string): CheckType {
   ) {
     return "url";
   }
-  // Phone: only digits and common separators, 7–15 digits
-  const digits = v.replace(/[\s\-()+]/g, "");
-  if (/^\d{7,15}$/.test(digits) && !v.includes(".")) return "phone";
   return "message";
 }
 
