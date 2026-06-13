@@ -8,7 +8,6 @@ import {
 } from "@workspace/api-client-react";
 import * as Haptics from "expo-haptics";
 import { router, useLocalSearchParams } from "expo-router";
-import i18n from "i18next";
 import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -49,7 +48,7 @@ type ReportPhase =
 
 export default function CallAlertScreen() {
   const insets = useSafeAreaInsets();
-  const { t, i18n: i18nInstance } = useTranslation();
+  const { t } = useTranslation();
   const params = useLocalSearchParams<{ number?: string | string[] }>();
   const rawNumber = Array.isArray(params.number) ? params.number[0] : params.number;
   const callerNumber = rawNumber && rawNumber.trim() ? rawNumber.trim() : DEMO_NUMBER;
@@ -58,9 +57,6 @@ export default function CallAlertScreen() {
   const bottomInset = (Platform.OS === "web" ? 34 : insets.bottom) + 20;
 
   const warnings = t("callAlert.warnings", { returnObjects: true }) as string[];
-  const tEn = i18n.getFixedT("en");
-  const englishWarnings = tEn("callAlert.warnings", { returnObjects: true }) as string[];
-  const showEnglish = i18nInstance.language !== "en";
 
   const [warningIndex, setWarningIndex] = useState(0);
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -281,7 +277,6 @@ export default function CallAlertScreen() {
   }
 
   const w = warnings[warningIndex];
-  const wEn = englishWarnings[warningIndex];
 
   return (
     <View
@@ -374,11 +369,10 @@ export default function CallAlertScreen() {
         </View>
       ) : null}
 
-      {/* Headline */}
+      {/* Headline — shown only in the user's chosen language. */}
       {isRisky ? (
         <Animated.View style={[s.warningBox, { opacity: warningOpacity }]}>
           <Text style={s.warningHindi}>{w}</Text>
-          {showEnglish && <Text style={s.warningEnglish}>{wEn}</Text>}
         </Animated.View>
       ) : (
         <View style={s.warningBox}>
@@ -386,13 +380,12 @@ export default function CallAlertScreen() {
         </View>
       )}
 
-      {/* Always-on safety reminder — shown for EVERY caller in both languages,
-          so even an unverified/unknown number still warns about OTP & money. */}
+      {/* Always-on safety reminder — shown for EVERY caller in the user's
+          chosen language, so even an unverified/unknown number still warns
+          about OTP & money. */}
       <View style={s.safetyReminderBox}>
+        <Feather name="alert-triangle" size={16} color="#FF6713" />
         <Text style={s.safetyReminder}>{t("callAlert.safetyReminder")}</Text>
-        {showEnglish && (
-          <Text style={s.safetyReminderEn}>{tEn("callAlert.safetyReminder")}</Text>
-        )}
       </View>
 
       {/* Scam type tag */}
@@ -712,34 +705,32 @@ const s = StyleSheet.create({
     paddingHorizontal: 8,
   },
   warningHindi: {
-    fontSize: 22,
+    fontSize: 23,
     fontWeight: "800" as const,
     color: "#FF6713",
     textAlign: "center",
-  },
-  warningEnglish: {
-    fontSize: 16,
-    fontWeight: "600" as const,
-    color: "rgba(255,255,255,0.8)",
-    textAlign: "center",
+    lineHeight: 32,
   },
   safetyReminderBox: {
+    flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    justifyContent: "center",
+    gap: 8,
     marginBottom: 16,
-    paddingHorizontal: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "rgba(255,103,19,0.35)",
+    backgroundColor: "rgba(255,103,19,0.10)",
   },
   safetyReminder: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "800" as const,
     color: "#FF6713",
     textAlign: "center",
-  },
-  safetyReminderEn: {
-    fontSize: 14,
-    fontWeight: "700" as const,
-    color: "rgba(255,255,255,0.85)",
-    textAlign: "center",
+    lineHeight: 23,
+    flexShrink: 1,
   },
   scamTypeRow: { marginBottom: 28 },
   scamTypeBadge: {

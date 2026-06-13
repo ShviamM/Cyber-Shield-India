@@ -77,6 +77,18 @@ hook). Left to minimize churn; safe to remove later.
 cautionHeadline/unknownHeadline/checking) added to en + hi only; other ~10 locales
 rely on i18next fallbackLng → en (see kavach-ai-i18n.md).
 
+**Single-language only (no bilingual duplicate):** the popup must render in the
+user's CHOSEN language only — never the selected language + an always-on English
+copy underneath. An earlier design dual-rendered (a `showEnglish = language!=="en"`
+flag added an English `<Text>` under the warning headline and the safety reminder);
+the user explicitly rejected this ("I chose Hindi, show only Hindi"). **Why:** for a
+Hindi user it looked like a bug (every line doubled). **How to apply:** rely on
+`t()` + i18next fallbackLng (per-key English fallback for incomplete locales) — do
+NOT reintroduce a getFixedT("en")/showEnglish dual-render for "clarity".
+**Still English (separate gap, not the bilingual bug):** report-sheet category names
+(`c.nameEn`) and the real-caller top-category badge (`prettyCategory(key)`) — true
+localization needs `nameHi` added to the /categories API + orval regen (app-wide).
+
 **Lock-screen display fix (showWhenLocked/turnScreenOn):** the deep link launches
 Expo `MainActivity`, which by default renders BEHIND the keyguard and won't wake
 the screen — so on a locked/off device the caller card never appears (the real
