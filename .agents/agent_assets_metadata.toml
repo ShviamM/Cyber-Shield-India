@@ -179,3 +179,15 @@ id = "J7PR9wa8LqXU1T8w9r0Dh"
 uri = "file://.local/review/demo-login-changes.txt"
 type = "text"
 title = "Demo Login — Exact Code Diff"
+
+[[outputs]]
+id = "gGfe0T9Z9D2Uku0o5D7PM"
+uri = "file://.local/review/netraksh-mobile-app.zip"
+type = "unspecified"
+title = "Netraksh Mobile App — Full Source Code"
+
+[[outputs]]
+id = "IIfbpLaXcuYdOW4qjxPkb"
+uri = "file://.local/review/netraksh-mobile-app-overview.md"
+type = "text"
+title = "Netraksh Mobile App — Developer Overview"
