@@ -1,4 +1,5 @@
 - [Play permissions policy](play-permissions-policy.md) — never re-add READ_SMS/READ_CALL_LOG/READ_PHONE_STATE/RECORD_AUDIO (Play rejection); calls use CallScreeningService role, SMS uses share-to-check; in-app account delete via DELETE /me.
+- [Android Play compat warnings](android-play-compat-warnings.md) — A15 edge-to-edge & A16 large-screen orientation are non-blocking; edge-to-edge non-actionable (SDK54); keep portrait + a large-screen opt-out plugin; need a new AAB.
 - [KavachAI i18n](kavach-ai-i18n.md) — locale files aren't type-checked against en; verify key parity with a runtime flatten script, and rely on i18next fallbackLng (no manual deep-merge).
 - [Website i18n](website-i18n.md) — EN/HI; per-page namespace files auto-loaded by Vite glob (parallel-subagent safe); icons merged by index; bilingual data via lang.startsWith("hi"); verify parity at runtime.
 - [Native call screening](kavach-screening-native.md) — CallScreeningService+ROLE_CALL_SCREENING avoids Play Permissions Declaration (no READ_CALL_LOG/SMS); service warns, never blocks; EAS-build only.
