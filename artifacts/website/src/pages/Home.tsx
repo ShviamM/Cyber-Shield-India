@@ -1,13 +1,13 @@
+import { useState, useEffect, useRef } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { motion, MotionConfig, useReducedMotion, type Variants } from "framer-motion";
-import { ShieldCheck, ArrowRight, ShieldAlert, CheckCircle, Bell, Users, ChevronRight, Footprints, Star } from "lucide-react";
+import { motion, MotionConfig, AnimatePresence, useReducedMotion, type Variants } from "framer-motion";
+import { ShieldCheck, ArrowRight, ShieldAlert, Users, ChevronRight, Search, Activity, AlertOctagon, Lock } from "lucide-react";
 import { ScamCounter } from "@/components/ScamCounter";
 import { TrustTicker } from "@/components/TrustTicker";
 import { CyberRadar } from "@/components/CyberRadar";
-import { PhoneMockup } from "@/components/PhoneMockup";
 import { FamilyStorytelling } from "@/components/FamilyStorytelling";
 import { useTranslation } from "react-i18next";
 
@@ -23,6 +23,188 @@ const staggerContainer: Variants = {
     transition: { staggerChildren: 0.1 }
   }
 };
+
+function HeroScanLine() {
+  const prefersReducedMotion = useReducedMotion();
+
+  if (prefersReducedMotion) {
+    return <div className="absolute inset-x-0 top-1/2 h-0.5 bg-accent opacity-50 shadow-[0_0_15px_rgba(255,103,19,0.6)]" />;
+  }
+
+  return (
+    <motion.div
+      className="absolute inset-x-0 h-[2px] bg-accent shadow-[0_0_20px_rgba(255,103,19,0.7)] z-50"
+      animate={{ top: ["0%", "100%", "0%"] }}
+      transition={{ duration: 3, ease: "linear", repeat: Infinity }}
+    />
+  );
+}
+
+function CinematicPhone() {
+  const prefersReducedMotion = useReducedMotion();
+  const { t } = useTranslation("home");
+
+  return (
+    <div className="relative w-[260px] sm:w-[280px] h-[540px] sm:h-[580px] rounded-[40px] border-[8px] border-[#1a253c] bg-[#0c1424] overflow-hidden shadow-2xl shrink-0 flex flex-col items-center justify-center">
+      <div className="absolute top-0 inset-x-0 flex justify-center z-50">
+        <div className="w-[120px] h-[24px] bg-[#1a253c] rounded-b-2xl" />
+      </div>
+
+      <HeroScanLine />
+
+      <div className="w-full h-full p-4 flex flex-col gap-4 relative z-10 pt-12">
+        <div className="text-center mb-4">
+          <motion.div
+            className="w-20 h-20 mx-auto rounded-full bg-destructive/20 flex items-center justify-center mb-4"
+            animate={prefersReducedMotion ? {} : { scale: [1, 1.1, 1] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <div className="w-16 h-16 rounded-full bg-destructive/40 flex items-center justify-center">
+              <ShieldAlert className="text-destructive w-8 h-8" />
+            </div>
+          </motion.div>
+          <h3 className="text-xl font-bold text-white tracking-wide">{t("hero.phone.incomingCall")}</h3>
+          <p className="text-destructive font-semibold mt-1">{t("hero.phone.highRisk")}</p>
+        </div>
+
+        <div className="bg-[#152033] rounded-2xl p-4 border border-destructive/30 backdrop-blur-md relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-16 h-16 bg-destructive/10 blur-xl rounded-full" />
+          <p className="text-white text-lg font-bold font-mono tracking-wider">{t("hero.phone.number")}</p>
+          <div className="flex items-center gap-2 mt-2">
+            <AlertOctagon className="w-4 h-4 text-destructive" />
+            <p className="text-sm text-destructive">{t("hero.phone.reported")}</p>
+          </div>
+        </div>
+
+        <div className="mt-auto grid grid-cols-2 gap-4">
+          <div className="h-14 rounded-full bg-destructive text-white font-bold flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(225,29,42,0.5)] uppercase">
+            {t("hero.phone.block")}
+          </div>
+          <div className="h-14 rounded-full bg-[#1a253c] text-white font-bold flex items-center justify-center uppercase">
+            {t("hero.phone.ignore")}
+          </div>
+        </div>
+      </div>
+
+      <div className="absolute inset-0 bg-gradient-to-t from-destructive/10 to-transparent pointer-events-none" />
+    </div>
+  );
+}
+
+function HeroTeaser() {
+  const { t } = useTranslation("home");
+  const prefersReducedMotion = useReducedMotion();
+  const [value, setValue] = useState("");
+  const [status, setStatus] = useState<"idle" | "scanning" | "result">("idle");
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
+
+  const handleCheck = () => {
+    if (!value) return;
+    setStatus("scanning");
+    if (prefersReducedMotion) {
+      setStatus("result");
+    } else {
+      timerRef.current = setTimeout(() => setStatus("result"), 2000);
+    }
+  };
+
+  const handleReset = () => {
+    setStatus("idle");
+    setValue("");
+  };
+
+  return (
+    <div className="w-full max-w-md bg-[#0c1424]/80 backdrop-blur-xl border border-white/10 p-6 rounded-3xl relative overflow-hidden">
+      <div className="absolute top-0 left-1/4 w-1/2 h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent opacity-80" />
+
+      <h4 className="text-white font-semibold mb-4 flex items-center gap-2">
+        <Search className="w-5 h-5 text-accent" />
+        {t("hero.teaser.title")}
+      </h4>
+
+      <AnimatePresence mode="wait">
+        {status === "idle" && (
+          <motion.div
+            key="idle"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="flex flex-col gap-3"
+          >
+            <input
+              type="text"
+              placeholder={t("hero.teaser.placeholder")}
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleCheck()}
+              className="w-full bg-[#152033] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:border-accent transition-colors font-mono"
+            />
+            <button
+              onClick={handleCheck}
+              disabled={!value}
+              className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-3 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {t("hero.teaser.analyzeCta")}
+            </button>
+          </motion.div>
+        )}
+
+        {status === "scanning" && (
+          <motion.div
+            key="scanning"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="py-6 flex flex-col items-center justify-center gap-4"
+          >
+            <div className="relative">
+              <Activity className="w-8 h-8 text-accent animate-pulse" />
+              {!prefersReducedMotion && (
+                <motion.div
+                  className="absolute inset-0 border-2 border-accent rounded-full"
+                  animate={{ scale: [1, 1.5], opacity: [1, 0] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                />
+              )}
+            </div>
+            <p className="text-gray-400 font-mono text-sm animate-pulse">{t("hero.teaser.scanning")}</p>
+          </motion.div>
+        )}
+
+        {status === "result" && (
+          <motion.div
+            key="result"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-col items-center text-center gap-4 py-2"
+          >
+            <div className="w-12 h-12 rounded-full bg-destructive/20 flex items-center justify-center text-destructive">
+              <ShieldAlert className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-white font-medium">{t("hero.teaser.resultTitle")}</p>
+              <p className="text-sm text-gray-400 mt-1">{t("hero.teaser.resultDesc")}</p>
+            </div>
+            <Link href="/download" className="w-full">
+              <button className="w-full mt-2 bg-primary hover:bg-primary/90 text-white py-3 rounded-xl font-medium shadow-[0_0_20px_rgba(11,61,145,0.4)] flex items-center justify-center gap-2 transition-colors">
+                {t("hero.teaser.downloadToBlock")} <ArrowRight className="w-4 h-4" />
+              </button>
+            </Link>
+            <button onClick={handleReset} className="text-xs text-gray-500 hover:text-gray-300">
+              {t("hero.teaser.checkAnother")}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 export default function Home() {
   const prefersReducedMotion = useReducedMotion();
@@ -58,97 +240,56 @@ export default function Home() {
 
       <TrustTicker />
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white pt-20 pb-32">
-        {/* Subtle Background Effects */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-100/40 rounded-full blur-3xl opacity-50" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-orange-100/40 rounded-full blur-3xl opacity-50" />
-          
-          {!prefersReducedMotion && (
-            <motion.div 
-              animate={{ y: [0, -20, 0], opacity: [0.3, 0.5, 0.3] }}
-              transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
-              className="absolute top-[20%] right-[15%] w-64 h-64 bg-primary/5 rounded-full blur-3xl"
-            />
-          )}
-
+      {/* Hero Section — Cinematic */}
+      <section className="relative overflow-hidden bg-[#061f4d] text-white">
+        {/* Atmospheric Background Depth */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_#0B3D91_0%,_transparent_60%)] opacity-40" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,_#FF6713_0%,_transparent_40%)] opacity-[0.06] mix-blend-screen" />
           {/* Decorative dotted grid */}
           <div
             aria-hidden
-            className="absolute inset-0 opacity-[0.5] [background-image:radial-gradient(circle,rgba(11,61,145,0.12)_1px,transparent_1px)] [background-size:26px_26px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]"
+            className="absolute inset-0 opacity-[0.4] [background-image:radial-gradient(circle,rgba(255,255,255,0.12)_1px,transparent_1px)] [background-size:26px_26px] [mask-image:radial-gradient(ellipse_at_center,black_25%,transparent_75%)]"
           />
-
         </div>
 
-        <div className="container mx-auto px-4 md:px-6 relative z-10">
+        <div className="container mx-auto px-4 md:px-6 relative z-10 pt-20 pb-24 lg:pt-28 lg:pb-32">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
-            
+
             {/* Hero Content */}
-            <motion.div 
+            <motion.div
               initial="hidden"
               animate="visible"
               variants={staggerContainer}
               className="max-w-2xl"
             >
-              <motion.div variants={fadeInUp} className="relative inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200/70 text-accent text-sm font-bold mb-8 shadow-sm overflow-hidden">
-                {!prefersReducedMotion && (
-                  <motion.span
-                    aria-hidden
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/70 to-transparent"
-                    animate={{ x: ["-160%", "160%"] }}
-                    transition={{ repeat: Infinity, duration: 2.4, ease: "easeInOut", repeatDelay: 1.2 }}
-                  />
-                )}
-                <motion.span
-                  aria-hidden
-                  className="relative z-10 flex items-center justify-center h-6 w-6 rounded-full bg-accent/15 text-accent"
-                  animate={prefersReducedMotion ? {} : { x: [0, 3, 0] }}
-                  transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
-                >
-                  <Footprints className="h-3.5 w-3.5" />
-                </motion.span>
-                <span className="relative z-10">{t("hero.badge")}</span>
+              <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-accent/30 bg-accent/10 text-accent text-sm font-medium mb-8 backdrop-blur-md shadow-[0_0_15px_rgba(255,103,19,0.15)]">
+                <ShieldCheck className="w-4 h-4" />
+                <span>{t("hero.badge")}</span>
               </motion.div>
-              
-              <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 tracking-tight leading-[1.1] mb-6">
+
+              <motion.h1 variants={fadeInUp} className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05] mb-6 text-white drop-shadow-lg">
                 {t("hero.titleLine1")} <br/>
-                <span className="relative inline-block text-primary group mt-2">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">
                   {t("hero.titleHighlight")}
-                  {!prefersReducedMotion && (
-                    <motion.span 
-                      className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent bg-[length:200%_100%] pointer-events-none rounded-md"
-                      animate={{ backgroundPosition: ["200% 0", "-200% 0"] }}
-                      transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
-                    />
-                  )}
                 </span>
               </motion.h1>
-              
-              <motion.p variants={fadeInUp} className="text-xl text-gray-600 mb-10 leading-relaxed max-w-xl">
+
+              <motion.p variants={fadeInUp} className="text-lg md:text-xl text-gray-300 mb-10 leading-relaxed max-w-lg font-light">
                 {t("hero.subtitle")}
               </motion.p>
-              
-              <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4">
+
+              <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row gap-4 mb-12">
                 <Link href="/download">
                   <motion.div whileHover={prefersReducedMotion ? {} : { scale: 1.02 }} whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}>
-                    <Button size="lg" className="relative overflow-hidden rounded-full bg-primary hover:bg-primary/90 text-white font-medium px-8 h-14 text-lg w-full sm:w-auto shadow-lg shadow-primary/20 group">
-                      <span className="relative z-10 flex items-center">
-                        {t("hero.downloadCta")}
-                        {!prefersReducedMotion && (
-                          <motion.span 
-                            className="absolute -inset-x-8 -inset-y-4 z-0 bg-white/20 opacity-0 group-hover:opacity-100"
-                            animate={{ x: ["-100%", "100%"] }}
-                            transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
-                          />
-                        )}
-                      </span>
+                    <Button size="lg" className="rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold px-8 h-14 text-lg w-full sm:w-auto shadow-[0_0_20px_rgba(11,61,145,0.5)] border border-[#0a3179] flex items-center justify-center gap-2">
+                      {t("hero.downloadCta")} <Lock className="h-5 w-5" />
                     </Button>
                   </motion.div>
                 </Link>
                 <Link href="/features">
                   <motion.div whileHover={prefersReducedMotion ? {} : { scale: 1.02 }} whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}>
-                    <Button size="lg" variant="outline" className="rounded-full font-medium px-8 h-14 text-lg w-full sm:w-auto border-gray-200 hover:bg-gray-50 group flex items-center justify-center gap-2">
+                    <Button size="lg" variant="outline" className="rounded-xl font-semibold px-8 h-14 text-lg w-full sm:w-auto bg-transparent border-gray-600 text-gray-200 hover:bg-white/5 hover:text-white hover:border-gray-400 flex items-center justify-center gap-2 group">
                       {t("hero.seeHowCta")}
                       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </Button>
@@ -156,79 +297,56 @@ export default function Home() {
                 </Link>
               </motion.div>
 
-              <motion.div variants={fadeInUp} className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-5">
-                <div className="flex items-center gap-3">
-                  <div className="flex -space-x-2">
-                    {[1,2,3,4].map(i => (
-                      <div key={i} className="w-9 h-9 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-xs overflow-hidden shadow-sm">
-                        <img src={`https://api.dicebear.com/7.x/initials/svg?seed=U${i}&backgroundColor=e2e8f0`} alt="" />
-                      </div>
-                    ))}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-0.5 text-accent">
-                      {[0,1,2,3,4].map(i => (
-                        <Star key={i} className="h-4 w-4 fill-current" />
-                      ))}
-                    </div>
-                    <p className="text-sm text-gray-500 font-medium mt-0.5">{t("hero.trustedBy")}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-6">
-                  <div>
-                    <p className="text-2xl font-extrabold text-gray-900 leading-none">1.2L+</p>
-                    <p className="text-xs text-gray-500 font-medium mt-1.5">{t("hero.familiesProtected")}</p>
-                  </div>
-                  <div className="w-px h-10 bg-gray-200" />
-                  <div>
-                    <p className="text-2xl font-extrabold text-gray-900 leading-none">8.5L+</p>
-                    <p className="text-xs text-gray-500 font-medium mt-1.5">{t("hero.scamsBlocked")}</p>
-                  </div>
-                </div>
+              <motion.div variants={fadeInUp}>
+                <HeroTeaser />
               </motion.div>
             </motion.div>
 
             {/* Hero Visual */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="relative lg:ml-auto flex justify-center w-full"
-            >
-              <div className="relative z-10 w-full max-w-[250px] sm:max-w-[300px] lg:max-w-[320px]">
-                <PhoneMockup />
-                
-                {/* Floating Cards */}
-                {!prefersReducedMotion && (
-                  <>
-                    <motion.div 
-                      animate={{ y: [0, -10, 0], rotate: [0, -2, 0] }} 
-                      transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
-                      className="absolute top-1/4 -left-12 sm:-left-16 lg:-left-20 bg-white p-3.5 rounded-2xl shadow-xl border border-gray-100 flex items-center gap-3 z-20"
-                    >
-                      <div className="bg-red-50 p-2 rounded-full text-red-500"><ShieldAlert className="h-5 w-5" /></div>
-                      <div>
-                        <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">{t("hero.floatingBlockedLabel")}</p>
-                        <p className="text-sm font-bold text-gray-900">{t("hero.floatingBlockedValue")}</p>
-                      </div>
-                    </motion.div>
+            <div className="relative flex justify-center lg:justify-end lg:pr-8">
 
-                    <motion.div 
-                      animate={{ y: [0, 15, 0], rotate: [0, 2, 0] }} 
-                      transition={{ repeat: Infinity, duration: 7, ease: "easeInOut", delay: 1 }}
-                      className="absolute bottom-1/3 -right-12 sm:-right-20 lg:-right-24 bg-white p-3.5 rounded-2xl shadow-xl border border-gray-100 flex items-center gap-3 z-20"
-                    >
-                      <div className="bg-green-50 p-2 rounded-full text-green-500"><CheckCircle className="h-5 w-5" /></div>
-                      <div>
-                        <p className="text-[10px] text-gray-500 font-medium uppercase tracking-wider">{t("hero.floatingScannerLabel")}</p>
-                        <p className="text-sm font-bold text-gray-900">{t("hero.floatingScannerValue")}</p>
-                      </div>
-                    </motion.div>
-                  </>
-                )}
-              </div>
-            </motion.div>
-            
+              {/* Proof Stat — floating */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, x: 20 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                transition={{ duration: 1, delay: 0.6, ease: "easeOut" }}
+                className="absolute -top-8 left-0 lg:-left-8 bg-[#0c1424]/90 backdrop-blur-md p-5 sm:p-6 rounded-3xl border border-white/10 shadow-2xl z-20"
+              >
+                <p className="text-4xl sm:text-5xl font-extrabold text-white tracking-tighter">8.5L+</p>
+                <p className="text-xs sm:text-sm font-medium text-accent mt-1 uppercase tracking-widest flex items-center gap-2">
+                  <ShieldAlert className="w-4 h-4" /> {t("hero.scamsBlocked")}
+                </p>
+              </motion.div>
+
+              {/* Status Chip — floating */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.8, ease: "easeOut" }}
+                className="absolute bottom-16 -right-2 lg:-right-6 bg-[#0c1424]/90 backdrop-blur-md px-5 py-3 rounded-full border border-[#16a34a]/40 shadow-2xl z-20 flex items-center gap-3"
+              >
+                <span className="relative flex h-2 w-2">
+                  {!prefersReducedMotion && (
+                    <span className="absolute inline-flex h-full w-full rounded-full bg-[#16a34a] opacity-75 animate-ping" />
+                  )}
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#16a34a]" />
+                </span>
+                <span className="text-sm font-medium text-white">{t("hero.activeProtection")}</span>
+              </motion.div>
+
+              {/* Saffron glow behind phone */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[600px] bg-accent/10 blur-[100px] rounded-full pointer-events-none" />
+
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 0.4, ease: "easeOut" }}
+                className="relative z-10 drop-shadow-[0_30px_50px_rgba(0,0,0,0.5)]"
+              >
+                <CinematicPhone />
+              </motion.div>
+            </div>
+
           </div>
         </div>
       </section>
