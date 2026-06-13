@@ -10,6 +10,7 @@ export interface ScamCategory {
   id: string;
   key: string;
   nameEn: string;
+  nameHi?: string | null;
   descriptionEn?: string | null;
   icon?: string | null;
   sortOrder: number;

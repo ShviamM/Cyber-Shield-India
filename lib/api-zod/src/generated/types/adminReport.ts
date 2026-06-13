@@ -13,7 +13,7 @@ export interface AdminReport {
   description: string;
   incidentDate?: Date | null;
   status: string;
-  reporterId: string;
+  reporterId: string | null;
   reporterName?: string | null;
   reporterPhone?: string | null;
   createdAt: Date;

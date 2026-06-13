@@ -288,6 +288,32 @@ paths:
         default:
           $ref: "#/components/responses/Error"
 
+  /reports/public:
+    post:
+      operationId: createPublicReport
+      tags: [reports]
+      summary: Submit an anonymous fraud report from the public website
+      description: >-
+        Lets unauthenticated website visitors report a scam phone number into
+        the community reputation database. Abuse is limited per client IP rather
+        than per account. Only phone numbers feed the reputation engine, so this
+        endpoint accepts phone numbers only.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePublicReportRequest"
+      responses:
+        "200":
+          description: Report accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublicReportResult"
+        default:
+          $ref: "#/components/responses/Error"
+
   /stats/trending:
     get:
       operationId: getTrendingScams
@@ -1397,6 +1423,9 @@ components:
           type: string
         nameEn:
           type: string
+        nameHi:
+          type: string
+          nullable: true
         descriptionEn:
           type: string
           nullable: true
@@ -1571,6 +1600,32 @@ components:
         - categoryKey
         - description
 
+    CreatePublicReportRequest:
+      type: object
+      properties:
+        phone:
+          type: string
+          description: Indian mobile number being reported as a scam.
+        categoryKey:
+          type: string
+          nullable: true
+          description: Optional scam category key. Defaults to "other" when omitted.
+      required:
+        - phone
+
+    PublicReportResult:
+      type: object
+      properties:
+        phone:
+          type: string
+          description: Normalized phone number the report was filed against.
+        reportCount:
+          type: integer
+          description: Total community reports now on record for this number.
+      required:
+        - phone
+        - reportCount
+
     Report:
       type: object
       properties:
@@ -1634,6 +1689,7 @@ components:
           type: string
         reporterId:
           type: string
+          nullable: true
         reporterName:
           type: string
           nullable: true

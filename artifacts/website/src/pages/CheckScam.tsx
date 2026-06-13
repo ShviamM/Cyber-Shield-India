@@ -21,7 +21,10 @@ import {
   type FraudVerdict,
   FraudCheckRequestType,
   ApiError,
+  useListCategories,
+  useCreatePublicReport,
 } from "@workspace/api-client-react";
+import { Flag, CheckCircle2 } from "lucide-react";
 
 type CheckType =
   (typeof FraudCheckRequestType)[keyof typeof FraudCheckRequestType];
@@ -83,6 +86,130 @@ const RISK_STYLES: Record<
 };
 
 type ErrorKind = "rateLimited" | "limitReached" | "generic" | "empty";
+
+function reportErrorKey(err: unknown): string {
+  if (err instanceof ApiError) {
+    if (err.status === 409) return "report.error.duplicate";
+    if (err.status === 429) return "report.error.rateLimited";
+    if (err.status === 400) return "report.error.invalidPhone";
+  }
+  return "report.error.generic";
+}
+
+/**
+ * Community "Report as scam" action shown under a phone verdict. Only phone
+ * numbers feed the reputation database, so this is rendered for phone checks
+ * only. Keyed by the checked number so it resets between checks.
+ */
+function ReportScam({ phone }: { phone: string }) {
+  const { t, i18n } = useTranslation("check");
+  const [open, setOpen] = useState(false);
+  const [category, setCategory] = useState("");
+
+  const isHindi = i18n.language.startsWith("hi");
+  const categoriesQuery = useListCategories();
+  const report = useCreatePublicReport();
+
+  if (report.isSuccess) {
+    return (
+      <div className="mt-7 border-t border-white/10 pt-6">
+        <div className="flex items-start gap-3 rounded-2xl bg-emerald-500/10 ring-1 ring-emerald-500/30 p-4">
+          <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+          <div>
+            <p className="font-semibold text-emerald-300">
+              {t("report.success.title")}
+            </p>
+            <p className="text-sm text-gray-300 mt-1">
+              {t("report.success.desc", {
+                count: report.data.reportCount,
+              })}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!open) {
+    return (
+      <div className="mt-7 border-t border-white/10 pt-6">
+        <p className="text-sm text-gray-400 mb-3">{t("report.prompt")}</p>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-amber-300 border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 transition-colors"
+        >
+          <Flag className="w-4 h-4" />
+          {t("report.cta")}
+        </button>
+      </div>
+    );
+  }
+
+  const categories = categoriesQuery.data?.categories ?? [];
+  const errorKey = report.isError ? reportErrorKey(report.error) : null;
+
+  return (
+    <div className="mt-7 border-t border-white/10 pt-6">
+      <p className="font-semibold text-white">{t("report.title")}</p>
+      <p className="text-sm text-gray-400 mt-1 mb-4">{t("report.desc")}</p>
+
+      <label
+        htmlFor="report-category"
+        className="block text-sm font-medium text-gray-300 mb-2"
+      >
+        {t("report.categoryLabel")}
+      </label>
+      <select
+        id="report-category"
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+        className="w-full bg-[#152033] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent transition-colors mb-4"
+      >
+        <option value="">{t("report.categoryPlaceholder")}</option>
+        {categories.map((c) => (
+          <option key={c.key} value={c.key}>
+            {isHindi && c.nameHi ? c.nameHi : c.nameEn}
+          </option>
+        ))}
+      </select>
+
+      {errorKey && <p className="text-sm text-red-400 mb-4">{t(errorKey)}</p>}
+
+      <div className="flex flex-col sm:flex-row gap-3">
+        <button
+          type="button"
+          disabled={report.isPending}
+          onClick={() =>
+            report.mutate({
+              data: { phone, categoryKey: category || undefined },
+            })
+          }
+          className="bg-primary hover:bg-primary/90 text-white font-medium px-6 py-3 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          {report.isPending ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              {t("report.submitting")}
+            </>
+          ) : (
+            <>
+              <Flag className="w-4 h-4" />
+              {t("report.submit")}
+            </>
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          className="px-5 py-3 rounded-xl font-medium text-gray-300 border border-white/10 hover:bg-white/5 transition-colors"
+        >
+          {t("report.cancel")}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function CheckScam() {
   const { t } = useTranslation("check");
@@ -326,6 +453,11 @@ export default function CheckScam() {
                     <p className="text-sm text-gray-400">{t("noReasons")}</p>
                   )}
                 </div>
+
+                {/* Community report — phone numbers only feed reputation */}
+                {verdict.type === "phone" && (
+                  <ReportScam key={verdict.value} phone={verdict.value} />
+                )}
 
                 {/* CTA */}
                 <div className="mt-7 border-t border-white/10 pt-6">

@@ -2,8 +2,10 @@ import { Router, type IRouter } from "express";
 import { and, count, desc, eq, gt, inArray } from "drizzle-orm";
 import { db, fraudReportsTable, scamCategoriesTable, usersTable } from "@workspace/db";
 import {
+  CreatePublicReportBody,
   CreateReportBody,
   ListReportsQueryParams,
+  type PublicReportResult,
   type Report,
   type ReportListResponse,
 } from "@workspace/api-zod";
@@ -11,11 +13,13 @@ import { config } from "../config";
 import { normalizeIndianPhone } from "../lib/phone";
 import { HttpError } from "../lib/http-error";
 import { toReportDto } from "../lib/dto";
+import { hitRateLimit } from "../lib/rate-limit";
 import { recomputeReputation } from "../lib/reputation";
 import { requireAuth } from "../middlewares/auth";
 
 const router: IRouter = Router();
 const VISIBLE_STATUSES = ["pending", "verified"] as const;
+const DEFAULT_PUBLIC_CATEGORY = "other";
 
 router.post("/reports", requireAuth, async (req, res) => {
   const user = req.user!;
@@ -134,7 +138,9 @@ router.get("/reports", async (req, res) => {
   const rows = await db
     .select({ report: fraudReportsTable, reporterName: usersTable.fullName })
     .from(fraudReportsTable)
-    .innerJoin(usersTable, eq(fraudReportsTable.reporterId, usersTable.id))
+    // leftJoin so anonymous web reports (null reporterId) still appear, with a
+    // null reporter name.
+    .leftJoin(usersTable, eq(fraudReportsTable.reporterId, usersTable.id))
     .where(where)
     .orderBy(desc(fraudReportsTable.createdAt))
     .limit(limit)
@@ -148,6 +154,81 @@ router.get("/reports", async (req, res) => {
   const response: ReportListResponse = {
     reports: rows.map((r) => toReportDto(r.report, r.reporterName)),
     total,
+  };
+  res.json(response);
+});
+
+/**
+ * Anonymous fraud report from the public website scam checker. Unlike the
+ * authenticated POST /reports, this has no user account, so abuse protection is
+ * keyed by client IP (rate + duplicate) instead of by user id. Only phone
+ * numbers are accepted because the community reputation engine is phone-keyed.
+ */
+router.post("/reports/public", async (req, res) => {
+  const ip = req.ip ?? "unknown";
+
+  // Per-IP hourly cap (cost/abuse guard).
+  const { allowed } = await hitRateLimit(
+    `report-web:${ip}`,
+    config.reportMaxPerHour,
+    3_600_000,
+  );
+  if (!allowed) {
+    throw new HttpError(
+      429,
+      "rate_limited",
+      "You have submitted too many reports recently. Please try again later.",
+    );
+  }
+
+  const body = CreatePublicReportBody.parse(req.body);
+
+  const phone = normalizeIndianPhone(body.phone);
+  if (!phone) {
+    throw new HttpError(
+      400,
+      "invalid_phone",
+      "Enter a valid 10-digit Indian mobile number to report",
+    );
+  }
+
+  // Resolve the category: default to "other" when the visitor doesn't pick one.
+  const categoryKey = body.categoryKey?.trim() || DEFAULT_PUBLIC_CATEGORY;
+  const [category] = await db
+    .select({ key: scamCategoriesTable.key })
+    .from(scamCategoriesTable)
+    .where(eq(scamCategoriesTable.key, categoryKey))
+    .limit(1);
+  if (!category) {
+    throw new HttpError(400, "invalid_category", "Unknown scam category.");
+  }
+
+  // Per-IP duplicate guard: one report per number per IP within the window.
+  const dup = await hitRateLimit(
+    `report-web-dup:${ip}:${phone}`,
+    1,
+    config.reportDuplicateWindowHours * 3_600_000,
+  );
+  if (!dup.allowed) {
+    throw new HttpError(
+      409,
+      "duplicate_report",
+      "You have already reported this number recently.",
+    );
+  }
+
+  await db.insert(fraudReportsTable).values({
+    reporterId: null,
+    phone,
+    categoryKey: category.key,
+    description: "Reported as a scam from the website scam checker.",
+  });
+
+  const reputation = await recomputeReputation(phone);
+
+  const response: PublicReportResult = {
+    phone,
+    reportCount: reputation.reportCount,
   };
   res.json(response);
 });

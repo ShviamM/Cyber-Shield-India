@@ -118,7 +118,9 @@ router.get("/admin/reports", requirePermission(PERMISSIONS.MODERATE_REPORTS), as
       verifiedScam: numberReputationTable.verifiedScam,
     })
     .from(fraudReportsTable)
-    .innerJoin(usersTable, eq(fraudReportsTable.reporterId, usersTable.id))
+    // leftJoin so anonymous web reports (null reporterId) still appear for
+    // moderation, with null reporter name/phone.
+    .leftJoin(usersTable, eq(fraudReportsTable.reporterId, usersTable.id))
     .leftJoin(
       numberReputationTable,
       eq(fraudReportsTable.phone, numberReputationTable.phone),
@@ -172,11 +174,14 @@ router.patch("/admin/reports/:id", requirePermission(PERMISSIONS.MODERATE_REPORT
 
   const reputation = await recomputeReputation(updated.phone);
 
-  const [reporter] = await db
-    .select({ fullName: usersTable.fullName, phone: usersTable.phone })
-    .from(usersTable)
-    .where(eq(usersTable.id, updated.reporterId))
-    .limit(1);
+  // Anonymous web reports have no reporter account.
+  const [reporter] = updated.reporterId
+    ? await db
+        .select({ fullName: usersTable.fullName, phone: usersTable.phone })
+        .from(usersTable)
+        .where(eq(usersTable.id, updated.reporterId))
+        .limit(1)
+    : [];
 
   const response: AdminReport = toAdminReportDto({
     report: updated,

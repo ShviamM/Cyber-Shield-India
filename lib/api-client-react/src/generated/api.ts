@@ -43,6 +43,7 @@ import type {
   CheckPhoneResult,
   CityHotspotListResponse,
   CreateOrderRequest,
+  CreatePublicReportRequest,
   CreateReportRequest,
   DemoLoginRequest,
   DevLoginRequest,
@@ -61,6 +62,7 @@ import type {
   NumberCheckResponse,
   NumberReputation,
   PaymentList,
+  PublicReportResult,
   RegisterPushTokenRequest,
   Report,
   ReportListResponse,
@@ -986,6 +988,78 @@ export function useListReports<TData = Awaited<ReturnType<typeof listReports>>, 
 
 
 
+
+export const getCreatePublicReportUrl = () => {
+
+
+
+
+  return `/api/reports/public`
+}
+
+/**
+ * Lets unauthenticated website visitors report a scam phone number into the community reputation database. Abuse is limited per client IP rather than per account. Only phone numbers feed the reputation engine, so this endpoint accepts phone numbers only.
+ * @summary Submit an anonymous fraud report from the public website
+ */
+export const createPublicReport = async (createPublicReportRequest: CreatePublicReportRequest, options?: RequestInit): Promise<PublicReportResult> => {
+
+  return customFetch<PublicReportResult>(getCreatePublicReportUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createPublicReportRequest,)
+  }
+);}
+
+
+
+
+export const getCreatePublicReportMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createPublicReport>>, TError,{data: BodyType<CreatePublicReportRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createPublicReport>>, TError,{data: BodyType<CreatePublicReportRequest>}, TContext> => {
+
+const mutationKey = ['createPublicReport'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createPublicReport>>, {data: BodyType<CreatePublicReportRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createPublicReport(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreatePublicReportMutationResult = NonNullable<Awaited<ReturnType<typeof createPublicReport>>>
+    export type CreatePublicReportMutationBody = BodyType<CreatePublicReportRequest>
+    export type CreatePublicReportMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Submit an anonymous fraud report from the public website
+ */
+export const useCreatePublicReport = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createPublicReport>>, TError,{data: BodyType<CreatePublicReportRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createPublicReport>>,
+        TError,
+        {data: BodyType<CreatePublicReportRequest>},
+        TContext
+      > => {
+      return useMutation(getCreatePublicReportMutationOptions(options));
+    }
 
 export const getGetTrendingScamsUrl = (params?: GetTrendingScamsParams,) => {
   const normalizedParams = new URLSearchParams();

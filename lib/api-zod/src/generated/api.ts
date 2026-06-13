@@ -166,6 +166,7 @@ export const ListCategoriesResponse = zod.object({
   "id": zod.string(),
   "key": zod.string(),
   "nameEn": zod.string(),
+  "nameHi": zod.string().nullish(),
   "descriptionEn": zod.string().nullish(),
   "icon": zod.string().nullish(),
   "sortOrder": zod.number()
@@ -221,6 +222,21 @@ export const ListReportsResponse = zod.object({
   "createdAt": zod.coerce.date()
 })),
   "total": zod.number()
+})
+
+
+/**
+ * Lets unauthenticated website visitors report a scam phone number into the community reputation database. Abuse is limited per client IP rather than per account. Only phone numbers feed the reputation engine, so this endpoint accepts phone numbers only.
+ * @summary Submit an anonymous fraud report from the public website
+ */
+export const CreatePublicReportBody = zod.object({
+  "phone": zod.string().describe('Indian mobile number being reported as a scam.'),
+  "categoryKey": zod.string().nullish().describe('Optional scam category key. Defaults to \"other\" when omitted.')
+})
+
+export const CreatePublicReportResponse = zod.object({
+  "phone": zod.string().describe('Normalized phone number the report was filed against.'),
+  "reportCount": zod.number().describe('Total community reports now on record for this number.')
 })
 
 
@@ -409,7 +425,7 @@ export const AdminListReportsResponse = zod.object({
   "description": zod.string(),
   "incidentDate": zod.coerce.date().nullish(),
   "status": zod.string(),
-  "reporterId": zod.string(),
+  "reporterId": zod.string().nullable(),
   "reporterName": zod.string().nullish(),
   "reporterPhone": zod.string().nullish(),
   "createdAt": zod.coerce.date(),
@@ -438,7 +454,7 @@ export const AdminUpdateReportResponse = zod.object({
   "description": zod.string(),
   "incidentDate": zod.coerce.date().nullish(),
   "status": zod.string(),
-  "reporterId": zod.string(),
+  "reporterId": zod.string().nullable(),
   "reporterName": zod.string().nullish(),
   "reporterPhone": zod.string().nullish(),
   "createdAt": zod.coerce.date(),

@@ -5,9 +5,11 @@ export const fraudReportsTable = pgTable(
   "fraud_reports",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    reporterId: uuid("reporter_id")
-      .notNull()
-      .references(() => usersTable.id, { onDelete: "cascade" }),
+    // Nullable: anonymous reports submitted from the public website scam
+    // checker have no user account. Authenticated (mobile) reports still set it.
+    reporterId: uuid("reporter_id").references(() => usersTable.id, {
+      onDelete: "cascade",
+    }),
     phone: text("phone").notNull(),
     categoryKey: text("category_key").notNull(),
     description: text("description").notNull(),

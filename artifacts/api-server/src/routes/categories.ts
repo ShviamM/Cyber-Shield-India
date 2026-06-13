@@ -16,6 +16,7 @@ router.get("/categories", async (_req, res) => {
       id: c.id,
       key: c.key,
       nameEn: c.nameEn,
+      nameHi: c.nameHi,
       descriptionEn: c.descriptionEn,
       icon: c.icon,
       sortOrder: c.sortOrder,

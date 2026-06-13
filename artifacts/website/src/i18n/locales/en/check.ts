@@ -56,4 +56,26 @@ export default {
     desc: "Netraksh blocks scam calls, scans links and warns your family in real time.",
     cta: "Download Netraksh",
   },
+  report: {
+    prompt: "Has this number been scamming people?",
+    cta: "Report as scam",
+    title: "Report this number",
+    desc: "Add it to Netraksh's community database so others get warned when they check it.",
+    categoryLabel: "Scam type (optional)",
+    categoryPlaceholder: "Select a category",
+    submit: "Submit report",
+    submitting: "Submitting…",
+    cancel: "Cancel",
+    success: {
+      title: "Thanks for reporting",
+      desc_one: "This number now has {{count}} community report. You're helping protect others.",
+      desc_other: "This number now has {{count}} community reports. You're helping protect others.",
+    },
+    error: {
+      duplicate: "You've already reported this number recently.",
+      rateLimited: "Too many reports in a short time. Please try again later.",
+      invalidPhone: "Only valid Indian mobile numbers can be reported.",
+      generic: "We couldn't submit your report right now. Please try again.",
+    },
+  },
 } as const;

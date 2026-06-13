@@ -77,6 +77,7 @@ export interface ScamCategory {
   id: string;
   key: string;
   nameEn: string;
+  nameHi?: string | null;
   descriptionEn?: string | null;
   icon?: string | null;
   sortOrder: number;
@@ -158,6 +159,20 @@ export interface CreateReportRequest {
   incidentDate?: string | null;
 }
 
+export interface CreatePublicReportRequest {
+  /** Indian mobile number being reported as a scam. */
+  phone: string;
+  /** Optional scam category key. Defaults to "other" when omitted. */
+  categoryKey?: string | null;
+}
+
+export interface PublicReportResult {
+  /** Normalized phone number the report was filed against. */
+  phone: string;
+  /** Total community reports now on record for this number. */
+  reportCount: number;
+}
+
 export interface Report {
   id: string;
   phone: string;
@@ -181,7 +196,7 @@ export interface AdminReport {
   description: string;
   incidentDate?: string | null;
   status: string;
-  reporterId: string;
+  reporterId: string | null;
   reporterName?: string | null;
   reporterPhone?: string | null;
   createdAt: string;

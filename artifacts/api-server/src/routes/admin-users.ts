@@ -189,7 +189,8 @@ router.get(
           .where(inArray(deviceTokensTable.userId, userIds))
           .groupBy(deviceTokensTable.userId),
       ]);
-      for (const r of reportRows) reportCounts.set(r.userId, Number(r.value));
+      for (const r of reportRows)
+        if (r.userId) reportCounts.set(r.userId, Number(r.value));
       for (const r of deviceRows) deviceCounts.set(r.userId, Number(r.value));
     }
 
