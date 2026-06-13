@@ -167,3 +167,15 @@ id = "MniXy1KTGuzCToJh-CsML"
 uri = "file://artifacts/kavach-ai/store-listing/feature-graphic-1024x500.png"
 type = "image"
 title = "Feature graphic (1024×500) — Play Store"
+
+[[outputs]]
+id = "0U6cOnJ_p0xfRXyiQo_ls"
+uri = "file://.local/review/demo-login-review.md"
+type = "text"
+title = "Demo Login — Developer Review Doc"
+
+[[outputs]]
+id = "J7PR9wa8LqXU1T8w9r0Dh"
+uri = "file://.local/review/demo-login-changes.txt"
+type = "text"
+title = "Demo Login — Exact Code Diff"
