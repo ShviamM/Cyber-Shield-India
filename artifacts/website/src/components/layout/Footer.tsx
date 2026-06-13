@@ -46,6 +46,7 @@ export function Footer() {
             <h4 className="text-white font-semibold mb-4">{t("footer.colProduct")}</h4>
             <ul className="space-y-3">
               <li><Link href="/features" className="text-gray-400 hover:text-white transition-colors">{t("footer.links.features")}</Link></li>
+              <li><Link href="/check" className="text-gray-400 hover:text-white transition-colors">{t("footer.links.checkScam")}</Link></li>
               <li><Link href="/download" className="text-gray-400 hover:text-white transition-colors">{t("footer.links.downloadApp")}</Link></li>
               <li><Link href="/family-protection" className="text-gray-400 hover:text-white transition-colors">{t("footer.links.familyProtection")}</Link></li>
             </ul>

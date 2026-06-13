@@ -15,6 +15,7 @@ export default {
     pricing: "Pricing",
     about: "About",
     founder: "Founder",
+    checkScam: "Check a Scam",
   },
   auth: {
     login: "Login",
@@ -46,6 +47,7 @@ export default {
     msme: "MSME Registered Company",
     links: {
       features: "Features",
+      checkScam: "Check a Scam",
       downloadApp: "Download App",
       familyProtection: "Family Protection",
       cyberSafetyCenter: "Cyber Safety Center",

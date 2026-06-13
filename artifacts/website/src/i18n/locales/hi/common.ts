@@ -15,6 +15,7 @@ export default {
     pricing: "कीमत",
     about: "हमारे बारे में",
     founder: "संस्थापक",
+    checkScam: "स्कैम जांचें",
   },
   auth: {
     login: "लॉगिन",
@@ -46,6 +47,7 @@ export default {
     msme: "MSME पंजीकृत कंपनी",
     links: {
       features: "फ़ीचर्स",
+      checkScam: "स्कैम जांचें",
       downloadApp: "ऐप डाउनलोड करें",
       familyProtection: "परिवार सुरक्षा",
       cyberSafetyCenter: "साइबर सुरक्षा केंद्र",

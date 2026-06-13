@@ -30,6 +30,7 @@ export function Navbar() {
     { name: t("nav.familyProtection"), href: "/family-protection" },
     { name: t("nav.cyberSafety"), href: "/cyber-safety-center" },
     { name: t("nav.laws"), href: "/cyber-laws" },
+    { name: t("nav.checkScam"), href: "/check" },
     { name: t("nav.pricing"), href: "/pricing" },
     { name: t("nav.about"), href: "/about" },
     { name: t("nav.founder"), href: "/founder" },
