@@ -6,5 +6,8 @@ export const modules: ModuleMap = {
   "./components/mockups/spam-tracker/Killer.tsx": () => import("../components/mockups/spam-tracker/Killer.tsx"),
   "./components/mockups/spam-tracker/Prevent.tsx": () => import("../components/mockups/spam-tracker/Prevent.tsx"),
   "./components/mockups/spam-tracker/Shield.tsx": () => import("../components/mockups/spam-tracker/Shield.tsx"),
-  "./components/mockups/spam-tracker/Trust.tsx": () => import("../components/mockups/spam-tracker/Trust.tsx")
+  "./components/mockups/spam-tracker/Trust.tsx": () => import("../components/mockups/spam-tracker/Trust.tsx"),
+  "./components/mockups/hero-netraksh/Cinematic.tsx": () => import("../components/mockups/hero-netraksh/Cinematic.tsx"),
+  "./components/mockups/hero-netraksh/PremiumTrust.tsx": () => import("../components/mockups/hero-netraksh/PremiumTrust.tsx"),
+  "./components/mockups/hero-netraksh/Scanner.tsx": () => import("../components/mockups/hero-netraksh/Scanner.tsx")
 };
