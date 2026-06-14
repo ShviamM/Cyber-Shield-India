@@ -226,6 +226,18 @@ export const ListReportsResponse = zod.object({
 
 
 /**
+ * Returns a short-lived, server-signed proof-of-work challenge. The public website must solve it (find a value whose sha256 hash has the required leading zeros) and submit the solution with POST /reports/public. This is a lightweight, login-free bot check that hardens the anonymous report endpoint against automated spam without slowing an honest visitor down.
+ * @summary Issue a proof-of-work challenge for an anonymous report
+ */
+export const GetPublicReportChallengeResponse = zod.object({
+  "challenge": zod.string().describe('Random nonce the client must find a solution for.'),
+  "expiresAt": zod.number().describe('Unix epoch milliseconds after which the challenge is invalid.'),
+  "difficulty": zod.number().describe('Number of leading hex zeros required in sha256(`challenge.solution`).'),
+  "signature": zod.string().describe('Server HMAC binding the challenge so it can\'t be forged.')
+})
+
+
+/**
  * Lets unauthenticated website visitors report a scam phone number, website link, or UPI ID into the community reputation database. Abuse is limited per client IP rather than per account. Phone reports feed the phone reputation store; url/upi reports feed a parallel target reputation store.
  * @summary Submit an anonymous fraud report from the public website
  */
@@ -235,7 +247,12 @@ export const CreatePublicReportBody = zod.object({
   "type": zod.enum(['phone', 'url', 'upi']).default(createPublicReportBodyTypeDefault).describe('The kind of target being reported. Defaults to \"phone\" for backward compatibility when omitted.'),
   "value": zod.string().optional().describe('The target being reported as a scam — a phone number, website link, or UPI ID. For phone reports the legacy `phone` field is also accepted.'),
   "phone": zod.string().nullish().describe('Deprecated alias for `value` when type is \"phone\". Kept for backward compatibility.'),
-  "categoryKey": zod.string().nullish().describe('Optional scam category key. Defaults to \"other\" when omitted.')
+  "categoryKey": zod.string().nullish().describe('Optional scam category key. Defaults to \"other\" when omitted.'),
+  "powChallenge": zod.string().nullish().describe('The `challenge` from GET \/reports\/public\/challenge.'),
+  "powExpiresAt": zod.number().nullish().describe('The challenge `expiresAt`, echoed back unchanged.'),
+  "powDifficulty": zod.number().nullish().describe('The challenge `difficulty`, echoed back unchanged.'),
+  "powSignature": zod.string().nullish().describe('The challenge `signature`, echoed back unchanged.'),
+  "powSolution": zod.string().nullish().describe('A value such that sha256(`challenge.solution`) has `difficulty` leading hex zeros.')
 })
 
 export const CreatePublicReportResponse = zod.object({

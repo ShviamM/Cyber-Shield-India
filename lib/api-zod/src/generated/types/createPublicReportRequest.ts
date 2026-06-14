@@ -16,4 +16,14 @@ export interface CreatePublicReportRequest {
   phone?: string | null;
   /** Optional scam category key. Defaults to "other" when omitted. */
   categoryKey?: string | null;
+  /** The `challenge` from GET /reports/public/challenge. */
+  powChallenge?: string | null;
+  /** The challenge `expiresAt`, echoed back unchanged. */
+  powExpiresAt?: number | null;
+  /** The challenge `difficulty`, echoed back unchanged. */
+  powDifficulty?: number | null;
+  /** The challenge `signature`, echoed back unchanged. */
+  powSignature?: string | null;
+  /** A value such that sha256(`challenge.solution`) has `difficulty` leading hex zeros. */
+  powSolution?: string | null;
 }

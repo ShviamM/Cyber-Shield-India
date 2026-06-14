@@ -23,6 +23,11 @@ import { HttpError } from "../lib/http-error";
 import { toReportDto } from "../lib/dto";
 import { hitRateLimit } from "../lib/rate-limit";
 import { recomputeReputation, recomputeTargetReputation } from "../lib/reputation";
+import {
+  issueChallenge,
+  verifyProofOfWork,
+  type BotCheckChallenge,
+} from "../lib/proof-of-work";
 import { requireAuth } from "../middlewares/auth";
 
 const router: IRouter = Router();
@@ -167,10 +172,23 @@ router.get("/reports", async (req, res) => {
 });
 
 /**
+ * Issues a short-lived, server-signed proof-of-work challenge for the anonymous
+ * report flow. The public website solves it and submits the solution with
+ * POST /reports/public — a login-free bot check that hardens the endpoint
+ * against automated spam without slowing an honest visitor down.
+ */
+router.get("/reports/public/challenge", async (_req, res) => {
+  const challenge: BotCheckChallenge = issueChallenge();
+  res.json(challenge);
+});
+
+/**
  * Anonymous fraud report from the public website scam checker. Unlike the
  * authenticated POST /reports, this has no user account, so abuse protection is
- * keyed by client IP (rate + duplicate) instead of by user id. Only phone
- * numbers are accepted because the community reputation engine is phone-keyed.
+ * keyed by client IP (rate + duplicate) instead of by user id, and a
+ * proof-of-work bot check (server-issued + server-verified) guards against
+ * IP-rotating spam bots. Only phone numbers feed the phone reputation store;
+ * url/upi reports feed a parallel target reputation store.
  */
 router.post("/reports/public", async (req, res) => {
   const ip = req.ip ?? "unknown";
@@ -190,6 +208,36 @@ router.post("/reports/public", async (req, res) => {
   }
 
   const body = CreatePublicReportBody.parse(req.body);
+
+  // Bot check: the client must submit a valid solution to a challenge we issued.
+  const pow = verifyProofOfWork({
+    challenge: body.powChallenge ?? undefined,
+    expiresAt: body.powExpiresAt ?? undefined,
+    difficulty: body.powDifficulty ?? undefined,
+    signature: body.powSignature ?? undefined,
+    solution: body.powSolution ?? undefined,
+  });
+  if (!pow.ok) {
+    throw new HttpError(
+      403,
+      "bot_check_failed",
+      "Could not verify you're human. Please try again.",
+    );
+  }
+  // Replay guard: a solved challenge is single-use, so one proof can't be
+  // reused to file many reports. Window matches the challenge lifetime.
+  const fresh = await hitRateLimit(
+    `pow-used:${pow.challenge}`,
+    1,
+    config.botCheckTtlMs,
+  );
+  if (!fresh.allowed) {
+    throw new HttpError(
+      403,
+      "bot_check_failed",
+      "Could not verify you're human. Please try again.",
+    );
+  }
 
   // Resolve the target: new clients send { type, value }; legacy phone clients
   // send { phone }. Default type is "phone".

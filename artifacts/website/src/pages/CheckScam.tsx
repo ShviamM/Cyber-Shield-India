@@ -23,8 +23,10 @@ import {
   ApiError,
   useListCategories,
   useCreatePublicReport,
+  getPublicReportChallenge,
 } from "@workspace/api-client-react";
 import { Flag, CheckCircle2 } from "lucide-react";
+import { solveChallenge } from "@/lib/pow";
 
 type CheckType =
   (typeof FraudCheckRequestType)[keyof typeof FraudCheckRequestType];
@@ -91,6 +93,7 @@ function reportErrorKey(err: unknown): string {
   if (err instanceof ApiError) {
     if (err.status === 409) return "report.error.duplicate";
     if (err.status === 429) return "report.error.rateLimited";
+    if (err.status === 403) return "report.error.verification";
     if (err.status === 400) return "report.error.invalidTarget";
   }
   return "report.error.generic";
@@ -108,10 +111,45 @@ function ReportScam({ type, value }: { type: ReportableType; value: string }) {
   const { t, i18n } = useTranslation("check");
   const [open, setOpen] = useState(false);
   const [category, setCategory] = useState("");
+  // Tracks the login-free bot check: fetching + solving the proof-of-work
+  // challenge before the report is actually submitted.
+  const [verifying, setVerifying] = useState(false);
+  const [verifyFailed, setVerifyFailed] = useState(false);
 
   const isHindi = i18n.language.startsWith("hi");
   const categoriesQuery = useListCategories();
   const report = useCreatePublicReport();
+
+  const submitReport = async () => {
+    setVerifyFailed(false);
+    setVerifying(true);
+    try {
+      // Solve the proof-of-work challenge so the server accepts the report.
+      const challenge = await getPublicReportChallenge();
+      const solution = await solveChallenge(
+        challenge.challenge,
+        challenge.difficulty,
+      );
+      report.mutate({
+        data: {
+          type,
+          value,
+          categoryKey: category || undefined,
+          powChallenge: challenge.challenge,
+          powExpiresAt: challenge.expiresAt,
+          powDifficulty: challenge.difficulty,
+          powSignature: challenge.signature,
+          powSolution: solution,
+        },
+      });
+    } catch {
+      // Couldn't reach the challenge endpoint or solve in time — surface the
+      // same "couldn't verify" message and let the visitor retry.
+      setVerifyFailed(true);
+    } finally {
+      setVerifying(false);
+    }
+  };
 
   if (report.isSuccess) {
     return (
@@ -150,7 +188,12 @@ function ReportScam({ type, value }: { type: ReportableType; value: string }) {
   }
 
   const categories = categoriesQuery.data?.categories ?? [];
-  const errorKey = report.isError ? reportErrorKey(report.error) : null;
+  const busy = verifying || report.isPending;
+  const errorKey = verifyFailed
+    ? "report.error.verification"
+    : report.isError
+      ? reportErrorKey(report.error)
+      : null;
 
   return (
     <div className="mt-7 border-t border-white/10 pt-6">
@@ -182,15 +225,11 @@ function ReportScam({ type, value }: { type: ReportableType; value: string }) {
       <div className="flex flex-col sm:flex-row gap-3">
         <button
           type="button"
-          disabled={report.isPending}
-          onClick={() =>
-            report.mutate({
-              data: { type, value, categoryKey: category || undefined },
-            })
-          }
+          disabled={busy}
+          onClick={() => void submitReport()}
           className="bg-primary hover:bg-primary/90 text-white font-medium px-6 py-3 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
-          {report.isPending ? (
+          {busy ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin" />
               {t("report.submitting")}
@@ -204,6 +243,7 @@ function ReportScam({ type, value }: { type: ReportableType; value: string }) {
         </button>
         <button
           type="button"
+          disabled={busy}
           onClick={() => setOpen(false)}
           className="px-5 py-3 rounded-xl font-medium text-gray-300 border border-white/10 hover:bg-white/5 transition-colors"
         >

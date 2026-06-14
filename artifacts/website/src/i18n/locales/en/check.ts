@@ -86,6 +86,7 @@ export default {
     error: {
       duplicate: "You've already reported this recently.",
       rateLimited: "Too many reports in a short time. Please try again later.",
+      verification: "We couldn't verify you're human. Please try again.",
       invalidTarget: "Only valid numbers, links or UPI IDs can be reported.",
       generic: "We couldn't submit your report right now. Please try again.",
     },

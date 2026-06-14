@@ -25,6 +25,7 @@ export * from './adminUsersParams';
 export * from './adminUserStatusResult';
 export * from './adminUserSummary';
 export * from './authResponse';
+export * from './botCheckChallenge';
 export * from './broadcast';
 export * from './broadcastList';
 export * from './businessMetrics';

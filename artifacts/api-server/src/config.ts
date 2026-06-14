@@ -1,3 +1,4 @@
+import crypto from "node:crypto";
 import { normalizeIndianPhone } from "./lib/phone";
 
 export const isProduction = process.env.NODE_ENV === "production";
@@ -102,6 +103,19 @@ export const config = {
   sessionTtlDays: intEnv("SESSION_TTL_DAYS", 60),
   reportDuplicateWindowHours: intEnv("REPORT_DUPLICATE_WINDOW_HOURS", 24),
   reportMaxPerHour: intEnv("REPORT_MAX_PER_HOUR", 20),
+  // Login-free proof-of-work bot check on the anonymous public report endpoint.
+  // The challenge is HMAC-signed with `botCheckSecret` so it can't be forged or
+  // tampered with. `botCheckDifficulty` is the number of leading hex zeros the
+  // client's sha256(challenge.solution) must have — 4 ≈ 65k hashes, well under a
+  // second in a browser, but costly to farm at scale. Set BOT_CHECK_SECRET in
+  // production so challenges issued by one API instance verify on another; when
+  // unset it falls back to a per-process random secret (fine for single
+  // instance / dev).
+  botCheckSecret:
+    (process.env.BOT_CHECK_SECRET ?? "").trim() ||
+    crypto.randomBytes(32).toString("hex"),
+  botCheckDifficulty: intEnv("BOT_CHECK_DIFFICULTY", 4),
+  botCheckTtlMs: intEnv("BOT_CHECK_TTL_MS", 5 * 60 * 1000),
   // Multi-signal fraud check: per-client rate limit (the engine may call the AI
   // model and an external threat feed, so this protects cost and abuse).
   fraudCheckMaxPerMinute: intEnv("FRAUD_CHECK_MAX_PER_MINUTE", 20),

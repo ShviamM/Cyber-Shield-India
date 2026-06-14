@@ -35,6 +35,7 @@ import type {
   AdminUsersListResponse,
   AdminUsersParams,
   AuthResponse,
+  BotCheckChallenge,
   Broadcast,
   BroadcastList,
   BusinessMetrics,
@@ -977,6 +978,84 @@ export function useListReports<TData = Awaited<ReturnType<typeof listReports>>, 
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getListReportsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetPublicReportChallengeUrl = () => {
+
+
+
+
+  return `/api/reports/public/challenge`
+}
+
+/**
+ * Returns a short-lived, server-signed proof-of-work challenge. The public website must solve it (find a value whose sha256 hash has the required leading zeros) and submit the solution with POST /reports/public. This is a lightweight, login-free bot check that hardens the anonymous report endpoint against automated spam without slowing an honest visitor down.
+ * @summary Issue a proof-of-work challenge for an anonymous report
+ */
+export const getPublicReportChallenge = async ( options?: RequestInit): Promise<BotCheckChallenge> => {
+
+  return customFetch<BotCheckChallenge>(getGetPublicReportChallengeUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPublicReportChallengeQueryKey = () => {
+    return [
+    `/api/reports/public/challenge`
+    ] as const;
+    }
+
+
+export const getGetPublicReportChallengeQueryOptions = <TData = Awaited<ReturnType<typeof getPublicReportChallenge>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicReportChallenge>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPublicReportChallengeQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPublicReportChallenge>>> = ({ signal }) => getPublicReportChallenge({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPublicReportChallenge>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPublicReportChallengeQueryResult = NonNullable<Awaited<ReturnType<typeof getPublicReportChallenge>>>
+export type GetPublicReportChallengeQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Issue a proof-of-work challenge for an anonymous report
+ */
+
+export function useGetPublicReportChallenge<TData = Awaited<ReturnType<typeof getPublicReportChallenge>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPublicReportChallenge>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPublicReportChallengeQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

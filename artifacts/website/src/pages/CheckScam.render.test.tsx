@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type {
   FraudVerdict,
   FraudVerdictRiskLevel,
@@ -31,6 +32,17 @@ import "@/i18n";
 import { ApiError } from "@workspace/api-client-react";
 import CheckScam from "./CheckScam";
 import checkEn from "@/i18n/locales/en/check";
+
+function renderCheckScam() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <CheckScam />
+    </QueryClientProvider>,
+  );
+}
 
 function makeVerdict(overrides: Partial<FraudVerdict> = {}): FraudVerdict {
   return {
@@ -112,7 +124,7 @@ describe("CheckScam verdict rendering", () => {
       );
 
       const user = userEvent.setup();
-      render(<CheckScam />);
+      renderCheckScam();
 
       await user.type(screen.getByLabelText(checkEn.inputLabel), "9876543210");
       await user.click(
@@ -135,7 +147,7 @@ describe("CheckScam verdict rendering", () => {
       );
 
       const user = userEvent.setup();
-      const { container } = render(<CheckScam />);
+      const { container } = renderCheckScam();
 
       await user.type(screen.getByLabelText(checkEn.inputLabel), "9876543210");
       await user.click(
@@ -169,7 +181,7 @@ describe("CheckScam verdict rendering", () => {
     fraudCheckMock.mockResolvedValue(makeVerdict({ reasons: [] }));
 
     const user = userEvent.setup();
-    render(<CheckScam />);
+    renderCheckScam();
 
     await user.type(screen.getByLabelText(checkEn.inputLabel), "9876543210");
     await user.click(
@@ -185,7 +197,7 @@ describe("CheckScam error rendering", () => {
     fraudCheckMock.mockRejectedValue(makeApiError(429));
 
     const user = userEvent.setup();
-    render(<CheckScam />);
+    renderCheckScam();
 
     await user.type(screen.getByLabelText(checkEn.inputLabel), "9876543210");
     await user.click(
@@ -201,7 +213,7 @@ describe("CheckScam error rendering", () => {
     fraudCheckMock.mockRejectedValue(makeApiError(402));
 
     const user = userEvent.setup();
-    render(<CheckScam />);
+    renderCheckScam();
 
     await user.type(screen.getByLabelText(checkEn.inputLabel), "9876543210");
     await user.click(
@@ -220,7 +232,7 @@ describe("CheckScam error rendering", () => {
     fraudCheckMock.mockRejectedValue(makeApiError(500));
 
     const user = userEvent.setup();
-    render(<CheckScam />);
+    renderCheckScam();
 
     await user.type(screen.getByLabelText(checkEn.inputLabel), "9876543210");
     await user.click(
@@ -234,7 +246,7 @@ describe("CheckScam error rendering", () => {
     fraudCheckMock.mockRejectedValue(new Error("network down"));
 
     const user = userEvent.setup();
-    render(<CheckScam />);
+    renderCheckScam();
 
     await user.type(screen.getByLabelText(checkEn.inputLabel), "9876543210");
     await user.click(
@@ -250,7 +262,7 @@ describe("CheckScam deep-link", () => {
     fraudCheckMock.mockResolvedValue(makeVerdict({ riskLevel: "high" }));
     window.history.replaceState({}, "", "/check?q=9876543210");
 
-    render(<CheckScam />);
+    renderCheckScam();
 
     await waitFor(() => {
       expect(fraudCheckMock).toHaveBeenCalledTimes(1);
@@ -270,7 +282,7 @@ describe("CheckScam deep-link", () => {
   });
 
   it("does not auto-run a check when no q param is present", async () => {
-    render(<CheckScam />);
+    renderCheckScam();
 
     await Promise.resolve();
     expect(fraudCheckMock).not.toHaveBeenCalled();
