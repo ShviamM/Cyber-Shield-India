@@ -1,6 +1,12 @@
 import { Router, type IRouter } from "express";
 import { and, count, desc, eq, gt, inArray } from "drizzle-orm";
-import { db, fraudReportsTable, scamCategoriesTable, usersTable } from "@workspace/db";
+import {
+  db,
+  fraudReportsTable,
+  scamCategoriesTable,
+  targetReportsTable,
+  usersTable,
+} from "@workspace/db";
 import {
   CreatePublicReportBody,
   CreateReportBody,
@@ -11,10 +17,12 @@ import {
 } from "@workspace/api-zod";
 import { config } from "../config";
 import { normalizeIndianPhone } from "../lib/phone";
+import { normalizeUrlKey } from "../lib/url-analysis";
+import { normalizeUpiKey } from "../lib/upi";
 import { HttpError } from "../lib/http-error";
 import { toReportDto } from "../lib/dto";
 import { hitRateLimit } from "../lib/rate-limit";
-import { recomputeReputation } from "../lib/reputation";
+import { recomputeReputation, recomputeTargetReputation } from "../lib/reputation";
 import { requireAuth } from "../middlewares/auth";
 
 const router: IRouter = Router();
@@ -183,13 +191,31 @@ router.post("/reports/public", async (req, res) => {
 
   const body = CreatePublicReportBody.parse(req.body);
 
-  const phone = normalizeIndianPhone(body.phone);
-  if (!phone) {
-    throw new HttpError(
-      400,
-      "invalid_phone",
-      "Enter a valid 10-digit Indian mobile number to report",
-    );
+  // Resolve the target: new clients send { type, value }; legacy phone clients
+  // send { phone }. Default type is "phone".
+  const targetType = body.type ?? "phone";
+  const rawValue = body.value ?? body.phone ?? "";
+
+  let value: string | null;
+  if (targetType === "url") {
+    value = normalizeUrlKey(rawValue);
+    if (!value) {
+      throw new HttpError(400, "invalid_target", "Enter a valid website link to report.");
+    }
+  } else if (targetType === "upi") {
+    value = normalizeUpiKey(rawValue);
+    if (!value) {
+      throw new HttpError(400, "invalid_target", "Enter a valid UPI ID (name@bank) to report.");
+    }
+  } else {
+    value = normalizeIndianPhone(rawValue);
+    if (!value) {
+      throw new HttpError(
+        400,
+        "invalid_phone",
+        "Enter a valid 10-digit Indian mobile number to report",
+      );
+    }
   }
 
   // Resolve the category: default to "other" when the visitor doesn't pick one.
@@ -203,9 +229,9 @@ router.post("/reports/public", async (req, res) => {
     throw new HttpError(400, "invalid_category", "Unknown scam category.");
   }
 
-  // Per-IP duplicate guard: one report per number per IP within the window.
+  // Per-IP duplicate guard: one report per target per IP within the window.
   const dup = await hitRateLimit(
-    `report-web-dup:${ip}:${phone}`,
+    `report-web-dup:${ip}:${targetType}:${value}`,
     1,
     config.reportDuplicateWindowHours * 3_600_000,
   );
@@ -213,22 +239,36 @@ router.post("/reports/public", async (req, res) => {
     throw new HttpError(
       409,
       "duplicate_report",
-      "You have already reported this number recently.",
+      "You have already reported this recently.",
     );
   }
 
-  await db.insert(fraudReportsTable).values({
-    reporterId: null,
-    phone,
-    categoryKey: category.key,
-    description: "Reported as a scam from the website scam checker.",
-  });
-
-  const reputation = await recomputeReputation(phone);
+  let reportCount: number;
+  if (targetType === "phone") {
+    await db.insert(fraudReportsTable).values({
+      reporterId: null,
+      phone: value,
+      categoryKey: category.key,
+      description: "Reported as a scam from the website scam checker.",
+    });
+    const reputation = await recomputeReputation(value);
+    reportCount = reputation.reportCount;
+  } else {
+    await db.insert(targetReportsTable).values({
+      reporterId: null,
+      targetType,
+      targetValue: value,
+      categoryKey: category.key,
+      description: "Reported as a scam from the website scam checker.",
+    });
+    const reputation = await recomputeTargetReputation(targetType, value);
+    reportCount = reputation.reportCount;
+  }
 
   const response: PublicReportResult = {
-    phone,
-    reportCount: reputation.reportCount,
+    type: targetType,
+    value,
+    reportCount,
   };
   res.json(response);
 });

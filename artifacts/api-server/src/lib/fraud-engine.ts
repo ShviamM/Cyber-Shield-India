@@ -2,10 +2,14 @@ import { db, numberReputationTable, scamCategoriesTable } from "@workspace/db";
 import { asc, eq } from "drizzle-orm";
 import type { FraudSignal, FraudVerdict } from "@workspace/api-zod";
 import { normalizeIndianPhone } from "./phone";
-import { computeRiskLevel, getCategoriesForNumber } from "./reputation";
+import {
+  computeRiskLevel,
+  getCategoriesForNumber,
+  getTargetReputation,
+} from "./reputation";
 import { classifyMessage, classifyUrl, type UrlClassification } from "./ai-classifier";
-import { analyzeUrlHeuristics, checkSafeBrowsing } from "./url-analysis";
-import { analyzeUpi } from "./upi";
+import { analyzeUrlHeuristics, checkSafeBrowsing, normalizeUrlKey } from "./url-analysis";
+import { analyzeUpi, normalizeUpiKey } from "./upi";
 
 export type FraudCheckType = "phone" | "url" | "upi" | "message";
 
@@ -138,6 +142,56 @@ export function urlAiSignal(result: UrlClassification): FraudSignal | null {
   return { source: "url_ai", severity, label: rationale };
 }
 
+/**
+ * Build a community-reputation signal for a url/upi target from its cached
+ * report tally, mirroring the phone-reputation flow. A verified target is a
+ * "high" signal; otherwise the level comes from computeRiskLevel. Returns
+ * { signal, hasData } where hasData marks that the community store had a
+ * definitive opinion (any reports or a verified flag).
+ */
+async function targetReputationSignal(
+  source: FraudSignal["source"],
+  targetType: "url" | "upi",
+  targetValue: string,
+): Promise<{ signal: FraudSignal; hasData: boolean }> {
+  const rep = await getTargetReputation(targetType, targetValue);
+  const reportCount = rep?.reportCount ?? 0;
+  const verifiedScam = rep?.verifiedScam ?? false;
+  const lastReportedAt = rep?.lastReportedAt ?? null;
+  const hasData = reportCount > 0 || verifiedScam;
+
+  if (verifiedScam) {
+    return {
+      signal: {
+        source,
+        severity: "high",
+        label: "Confirmed scam verified by Netraksh moderators.",
+      },
+      hasData,
+    };
+  }
+
+  const level = computeRiskLevel({ verifiedScam, reportCount, lastReportedAt });
+  if (level === "high" || level === "medium" || level === "low") {
+    return {
+      signal: {
+        source,
+        severity: level,
+        label: `Reported ${reportCount} time(s) by the community.`,
+      },
+      hasData,
+    };
+  }
+  return {
+    signal: {
+      source,
+      severity: "info",
+      label: "No community reports yet for this target.",
+    },
+    hasData,
+  };
+}
+
 async function analyzeUrlTarget(raw: string): Promise<Analysis> {
   const { url, signals } = analyzeUrlHeuristics(raw);
   if (!url) {
@@ -151,6 +205,12 @@ async function analyzeUrlTarget(raw: string): Promise<Analysis> {
   if (aiResult) {
     const signal = urlAiSignal(aiResult);
     if (signal) signals.push(signal);
+  }
+  // Fuse community URL reports into the verdict.
+  const key = normalizeUrlKey(raw);
+  if (key) {
+    const { signal } = await targetReputationSignal("url_reputation", "url", key);
+    signals.push(signal);
   }
   return { signals, couldAnalyze: true };
 }
@@ -167,6 +227,9 @@ async function analyzeUpiTarget(raw: string): Promise<Analysis> {
       signals.push(...phoneAnalysis.signals);
     }
   }
+  // Fuse community UPI reports into the verdict.
+  const { signal } = await targetReputationSignal("upi_reputation", "upi", upiId);
+  signals.push(signal);
   return { signals, couldAnalyze: true };
 }
 

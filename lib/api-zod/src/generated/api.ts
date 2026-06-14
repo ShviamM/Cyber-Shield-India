@@ -226,17 +226,22 @@ export const ListReportsResponse = zod.object({
 
 
 /**
- * Lets unauthenticated website visitors report a scam phone number into the community reputation database. Abuse is limited per client IP rather than per account. Only phone numbers feed the reputation engine, so this endpoint accepts phone numbers only.
+ * Lets unauthenticated website visitors report a scam phone number, website link, or UPI ID into the community reputation database. Abuse is limited per client IP rather than per account. Phone reports feed the phone reputation store; url/upi reports feed a parallel target reputation store.
  * @summary Submit an anonymous fraud report from the public website
  */
+export const createPublicReportBodyTypeDefault = `phone`;
+
 export const CreatePublicReportBody = zod.object({
-  "phone": zod.string().describe('Indian mobile number being reported as a scam.'),
+  "type": zod.enum(['phone', 'url', 'upi']).default(createPublicReportBodyTypeDefault).describe('The kind of target being reported. Defaults to \"phone\" for backward compatibility when omitted.'),
+  "value": zod.string().optional().describe('The target being reported as a scam — a phone number, website link, or UPI ID. For phone reports the legacy `phone` field is also accepted.'),
+  "phone": zod.string().nullish().describe('Deprecated alias for `value` when type is \"phone\". Kept for backward compatibility.'),
   "categoryKey": zod.string().nullish().describe('Optional scam category key. Defaults to \"other\" when omitted.')
 })
 
 export const CreatePublicReportResponse = zod.object({
-  "phone": zod.string().describe('Normalized phone number the report was filed against.'),
-  "reportCount": zod.number().describe('Total community reports now on record for this number.')
+  "type": zod.enum(['phone', 'url', 'upi']).describe('The kind of target the report was filed against.'),
+  "value": zod.string().describe('Normalized target the report was filed against.'),
+  "reportCount": zod.number().describe('Total community reports now on record for this target.')
 })
 
 
@@ -357,7 +362,7 @@ export const FraudCheckResponse = zod.object({
   "confidence": zod.number().nullish().describe('AI classification confidence (0-1) when applicable'),
   "reasons": zod.array(zod.string()).describe('Human-readable contributing reasons'),
   "signals": zod.array(zod.object({
-  "source": zod.enum(['message_ai', 'url_heuristic', 'url_threat_feed', 'url_ai', 'phone_reputation', 'upi_heuristic']).describe('Which analyzer produced this signal'),
+  "source": zod.enum(['message_ai', 'url_heuristic', 'url_threat_feed', 'url_ai', 'url_reputation', 'phone_reputation', 'upi_heuristic', 'upi_reputation']).describe('Which analyzer produced this signal'),
   "severity": zod.enum(['info', 'low', 'medium', 'high']),
   "label": zod.string().describe('Human-readable explanation of the signal')
 }).describe('A single contributing factor in the overall verdict')).describe('Structured breakdown of every contributing signal')

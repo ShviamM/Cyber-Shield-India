@@ -2,7 +2,10 @@ import {
   db,
   fraudReportsTable,
   numberReputationTable,
+  targetReportsTable,
+  targetReputationTable,
   type NumberReputation,
+  type TargetReputation,
 } from "@workspace/db";
 import { and, eq, inArray, sql } from "drizzle-orm";
 import type { NumberCheckResponseRiskLevel } from "@workspace/api-zod";
@@ -75,6 +78,63 @@ export async function setVerifiedScam(
     .where(eq(numberReputationTable.phone, phone))
     .returning();
   return row;
+}
+
+/**
+ * Recompute the cached report count and last-reported timestamp for a url/upi
+ * target from its currently-visible reports, preserving verifiedScam. The
+ * target/value pair must already be normalized by the caller. Mirrors
+ * recomputeReputation (phone).
+ */
+export async function recomputeTargetReputation(
+  targetType: string,
+  targetValue: string,
+): Promise<TargetReputation> {
+  const [agg] = await db
+    .select({
+      count: sql<number>`count(*)::int`,
+      last: sql<string | null>`max(${targetReportsTable.createdAt})`,
+    })
+    .from(targetReportsTable)
+    .where(
+      and(
+        eq(targetReportsTable.targetType, targetType),
+        eq(targetReportsTable.targetValue, targetValue),
+        inArray(targetReportsTable.status, [...VISIBLE_STATUSES]),
+      ),
+    );
+
+  const reportCount = agg?.count ?? 0;
+  const lastReportedAt = agg?.last ? new Date(agg.last) : null;
+
+  const [row] = await db
+    .insert(targetReputationTable)
+    .values({ targetType, targetValue, reportCount, lastReportedAt })
+    .onConflictDoUpdate({
+      target: [targetReputationTable.targetType, targetReputationTable.targetValue],
+      set: { reportCount, lastReportedAt, updatedAt: new Date() },
+    })
+    .returning();
+
+  return row;
+}
+
+/** Read the cached reputation row for a url/upi target, if any. */
+export async function getTargetReputation(
+  targetType: string,
+  targetValue: string,
+): Promise<TargetReputation | null> {
+  const [row] = await db
+    .select()
+    .from(targetReputationTable)
+    .where(
+      and(
+        eq(targetReputationTable.targetType, targetType),
+        eq(targetReputationTable.targetValue, targetValue),
+      ),
+    )
+    .limit(1);
+  return row ?? null;
 }
 
 export async function getCategoriesForNumber(

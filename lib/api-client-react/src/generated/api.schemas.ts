@@ -159,17 +159,47 @@ export interface CreateReportRequest {
   incidentDate?: string | null;
 }
 
+/**
+ * The kind of target being reported. Defaults to "phone" for backward compatibility when omitted.
+ */
+export type CreatePublicReportRequestType = typeof CreatePublicReportRequestType[keyof typeof CreatePublicReportRequestType];
+
+
+export const CreatePublicReportRequestType = {
+  phone: 'phone',
+  url: 'url',
+  upi: 'upi',
+} as const;
+
 export interface CreatePublicReportRequest {
-  /** Indian mobile number being reported as a scam. */
-  phone: string;
+  /** The kind of target being reported. Defaults to "phone" for backward compatibility when omitted. */
+  type?: CreatePublicReportRequestType;
+  /** The target being reported as a scam — a phone number, website link, or UPI ID. For phone reports the legacy `phone` field is also accepted. */
+  value?: string;
+  /** Deprecated alias for `value` when type is "phone". Kept for backward compatibility. */
+  phone?: string | null;
   /** Optional scam category key. Defaults to "other" when omitted. */
   categoryKey?: string | null;
 }
 
+/**
+ * The kind of target the report was filed against.
+ */
+export type PublicReportResultType = typeof PublicReportResultType[keyof typeof PublicReportResultType];
+
+
+export const PublicReportResultType = {
+  phone: 'phone',
+  url: 'url',
+  upi: 'upi',
+} as const;
+
 export interface PublicReportResult {
-  /** Normalized phone number the report was filed against. */
-  phone: string;
-  /** Total community reports now on record for this number. */
+  /** The kind of target the report was filed against. */
+  type: PublicReportResultType;
+  /** Normalized target the report was filed against. */
+  value: string;
+  /** Total community reports now on record for this target. */
   reportCount: number;
 }
 
@@ -621,8 +651,10 @@ export const FraudSignalSource = {
   url_heuristic: 'url_heuristic',
   url_threat_feed: 'url_threat_feed',
   url_ai: 'url_ai',
+  url_reputation: 'url_reputation',
   phone_reputation: 'phone_reputation',
   upi_heuristic: 'upi_heuristic',
+  upi_reputation: 'upi_reputation',
 } as const;
 
 export type FraudSignalSeverity = typeof FraudSignalSeverity[keyof typeof FraudSignalSeverity];

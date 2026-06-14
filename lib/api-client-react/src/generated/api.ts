@@ -998,7 +998,7 @@ export const getCreatePublicReportUrl = () => {
 }
 
 /**
- * Lets unauthenticated website visitors report a scam phone number into the community reputation database. Abuse is limited per client IP rather than per account. Only phone numbers feed the reputation engine, so this endpoint accepts phone numbers only.
+ * Lets unauthenticated website visitors report a scam phone number, website link, or UPI ID into the community reputation database. Abuse is limited per client IP rather than per account. Phone reports feed the phone reputation store; url/upi reports feed a parallel target reputation store.
  * @summary Submit an anonymous fraud report from the public website
  */
 export const createPublicReport = async (createPublicReportRequest: CreatePublicReportRequest, options?: RequestInit): Promise<PublicReportResult> => {

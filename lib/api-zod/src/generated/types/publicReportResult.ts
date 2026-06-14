@@ -5,10 +5,13 @@
  * Netraksh API — phone-OTP auth, fraud-number reporting, and trust scoring
  * OpenAPI spec version: 0.1.0
  */
+import type { PublicReportResultType } from './publicReportResultType';
 
 export interface PublicReportResult {
-  /** Normalized phone number the report was filed against. */
-  phone: string;
-  /** Total community reports now on record for this number. */
+  /** The kind of target the report was filed against. */
+  type: PublicReportResultType;
+  /** Normalized target the report was filed against. */
+  value: string;
+  /** Total community reports now on record for this target. */
   reportCount: number;
 }

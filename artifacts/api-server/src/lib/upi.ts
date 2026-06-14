@@ -45,6 +45,15 @@ export type UpiAnalysis = {
   signals: FraudSignal[];
 };
 
+/**
+ * Canonical key for community UPI reputation: the lowercased, validated VPA, or
+ * null when malformed. Report-time and check-time use this so lookups agree.
+ */
+export function normalizeUpiKey(raw: string): string | null {
+  const value = raw.trim().toLowerCase();
+  return UPI_RE.test(value) ? value : null;
+}
+
 export function analyzeUpi(raw: string): UpiAnalysis {
   const value = raw.trim().toLowerCase();
   const signals: FraudSignal[] = [];

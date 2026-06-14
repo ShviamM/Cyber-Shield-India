@@ -5,10 +5,15 @@
  * Netraksh API — phone-OTP auth, fraud-number reporting, and trust scoring
  * OpenAPI spec version: 0.1.0
  */
+import type { CreatePublicReportRequestType } from './createPublicReportRequestType';
 
 export interface CreatePublicReportRequest {
-  /** Indian mobile number being reported as a scam. */
-  phone: string;
+  /** The kind of target being reported. Defaults to "phone" for backward compatibility when omitted. */
+  type?: CreatePublicReportRequestType;
+  /** The target being reported as a scam — a phone number, website link, or UPI ID. For phone reports the legacy `phone` field is also accepted. */
+  value?: string;
+  /** Deprecated alias for `value` when type is "phone". Kept for backward compatibility. */
+  phone?: string | null;
   /** Optional scam category key. Defaults to "other" when omitted. */
   categoryKey?: string | null;
 }

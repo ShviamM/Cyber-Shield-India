@@ -86,6 +86,20 @@ export function parseUrl(raw: string): URL | null {
   }
 }
 
+/**
+ * Canonical key for community URL reputation. Drops scheme, leading "www.",
+ * query and fragment, and any trailing slashes so that report-time and
+ * check-time lookups for the same link agree. Returns null when unparseable.
+ */
+export function normalizeUrlKey(raw: string): string | null {
+  const url = parseUrl(raw);
+  if (!url) return null;
+  let host = url.hostname.toLowerCase();
+  if (host.startsWith("www.")) host = host.slice(4);
+  const path = url.pathname.replace(/\/+$/, "");
+  return `${host}${path}`;
+}
+
 function registrableTld(host: string): string {
   const parts = host.split(".");
   return parts.length ? parts[parts.length - 1].toLowerCase() : "";

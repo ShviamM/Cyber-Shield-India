@@ -17,6 +17,8 @@ export const FraudSignalSource = {
   url_heuristic: 'url_heuristic',
   url_threat_feed: 'url_threat_feed',
   url_ai: 'url_ai',
+  url_reputation: 'url_reputation',
   phone_reputation: 'phone_reputation',
   upi_heuristic: 'upi_heuristic',
+  upi_reputation: 'upi_reputation',
 } as const;

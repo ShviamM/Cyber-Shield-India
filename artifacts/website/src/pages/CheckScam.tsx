@@ -91,17 +91,20 @@ function reportErrorKey(err: unknown): string {
   if (err instanceof ApiError) {
     if (err.status === 409) return "report.error.duplicate";
     if (err.status === 429) return "report.error.rateLimited";
-    if (err.status === 400) return "report.error.invalidPhone";
+    if (err.status === 400) return "report.error.invalidTarget";
   }
   return "report.error.generic";
 }
 
+/** Target types the community report flow supports (excludes "message"). */
+type ReportableType = "phone" | "url" | "upi";
+
 /**
- * Community "Report as scam" action shown under a phone verdict. Only phone
- * numbers feed the reputation database, so this is rendered for phone checks
- * only. Keyed by the checked number so it resets between checks.
+ * Community "Report as scam" action shown under a phone, url or upi verdict.
+ * Each target type feeds its own community reputation store. Keyed by the
+ * checked value so it resets between checks.
  */
-function ReportScam({ phone }: { phone: string }) {
+function ReportScam({ type, value }: { type: ReportableType; value: string }) {
   const { t, i18n } = useTranslation("check");
   const [open, setOpen] = useState(false);
   const [category, setCategory] = useState("");
@@ -120,7 +123,7 @@ function ReportScam({ phone }: { phone: string }) {
               {t("report.success.title")}
             </p>
             <p className="text-sm text-gray-300 mt-1">
-              {t("report.success.desc", {
+              {t(`report.success.${type}`, {
                 count: report.data.reportCount,
               })}
             </p>
@@ -133,7 +136,7 @@ function ReportScam({ phone }: { phone: string }) {
   if (!open) {
     return (
       <div className="mt-7 border-t border-white/10 pt-6">
-        <p className="text-sm text-gray-400 mb-3">{t("report.prompt")}</p>
+        <p className="text-sm text-gray-400 mb-3">{t(`report.prompt.${type}`)}</p>
         <button
           type="button"
           onClick={() => setOpen(true)}
@@ -151,7 +154,7 @@ function ReportScam({ phone }: { phone: string }) {
 
   return (
     <div className="mt-7 border-t border-white/10 pt-6">
-      <p className="font-semibold text-white">{t("report.title")}</p>
+      <p className="font-semibold text-white">{t(`report.title.${type}`)}</p>
       <p className="text-sm text-gray-400 mt-1 mb-4">{t("report.desc")}</p>
 
       <label
@@ -182,7 +185,7 @@ function ReportScam({ phone }: { phone: string }) {
           disabled={report.isPending}
           onClick={() =>
             report.mutate({
-              data: { phone, categoryKey: category || undefined },
+              data: { type, value, categoryKey: category || undefined },
             })
           }
           className="bg-primary hover:bg-primary/90 text-white font-medium px-6 py-3 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
@@ -454,9 +457,16 @@ export default function CheckScam() {
                   )}
                 </div>
 
-                {/* Community report — phone numbers only feed reputation */}
-                {verdict.type === "phone" && (
-                  <ReportScam key={verdict.value} phone={verdict.value} />
+                {/* Community report — phone, link and UPI verdicts feed
+                    their respective reputation stores (not free-text messages). */}
+                {(verdict.type === "phone" ||
+                  verdict.type === "url" ||
+                  verdict.type === "upi") && (
+                  <ReportScam
+                    key={`${verdict.type}:${verdict.value}`}
+                    type={verdict.type}
+                    value={verdict.value}
+                  />
                 )}
 
                 {/* CTA */}
