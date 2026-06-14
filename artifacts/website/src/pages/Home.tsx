@@ -4,7 +4,7 @@ import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "wouter";
 import { motion, MotionConfig, useReducedMotion, type Variants } from "framer-motion";
-import { ShieldCheck, ArrowRight, ShieldAlert, Users, ChevronRight, Search, AlertOctagon, Lock } from "lucide-react";
+import { ShieldCheck, ArrowRight, ShieldAlert, Users, ChevronRight, Search, AlertOctagon, Lock, Phone, Link2, QrCode } from "lucide-react";
 import { ScamCounter } from "@/components/ScamCounter";
 import { TrustTicker } from "@/components/TrustTicker";
 import { CyberRadar } from "@/components/CyberRadar";
@@ -368,6 +368,70 @@ export default function Home() {
                 <p className="text-gray-600 leading-relaxed">{step.desc}</p>
               </motion.div>
             ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Try the Scam Checker — CTA Band */}
+      <section className="py-20 bg-[#061f4d] text-white relative overflow-hidden">
+        {/* Atmospheric depth */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_#0B3D91_0%,_transparent_55%)] opacity-50" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,_#FF6713_0%,_transparent_45%)] opacity-[0.08] mix-blend-screen" />
+          <div
+            aria-hidden
+            className="absolute inset-0 opacity-[0.35] [background-image:radial-gradient(circle,rgba(255,255,255,0.1)_1px,transparent_1px)] [background-size:24px_24px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]"
+          />
+        </div>
+
+        <div className="container mx-auto px-4 md:px-6 relative z-10">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+            className="max-w-4xl mx-auto rounded-3xl border border-white/10 bg-[#0c1424]/70 backdrop-blur-xl p-8 md:p-12 text-center relative overflow-hidden"
+          >
+            <div className="absolute top-0 left-1/4 w-1/2 h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent opacity-80" />
+
+            <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-accent/30 bg-accent/10 text-accent text-sm font-medium mb-6 backdrop-blur-md shadow-[0_0_15px_rgba(255,103,19,0.15)]">
+              <Search className="w-4 h-4" />
+              <span>{t("tryChecker.badge")}</span>
+            </motion.div>
+
+            <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-bold tracking-tight mb-5 text-white">
+              {t("tryChecker.heading")}
+            </motion.h2>
+
+            <motion.p variants={fadeInUp} className="text-lg md:text-xl text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed font-light">
+              {t("tryChecker.subtitle")}
+            </motion.p>
+
+            <motion.div variants={fadeInUp} className="flex flex-wrap justify-center gap-3 mb-10">
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#152033] border border-white/10 text-sm font-medium text-gray-200">
+                <Phone className="w-4 h-4 text-accent" /> {t("tryChecker.items.number")}
+              </span>
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#152033] border border-white/10 text-sm font-medium text-gray-200">
+                <Link2 className="w-4 h-4 text-accent" /> {t("tryChecker.items.link")}
+              </span>
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#152033] border border-white/10 text-sm font-medium text-gray-200">
+                <QrCode className="w-4 h-4 text-accent" /> {t("tryChecker.items.upi")}
+              </span>
+            </motion.div>
+
+            <motion.div variants={fadeInUp}>
+              <Link href="/check">
+                <motion.div
+                  className="inline-block"
+                  whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
+                  whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
+                >
+                  <Button size="lg" className="rounded-xl bg-accent hover:bg-accent/90 text-white font-semibold px-10 h-14 text-lg shadow-[0_0_25px_rgba(255,103,19,0.4)] flex items-center justify-center gap-2">
+                    {t("tryChecker.cta")} <ArrowRight className="h-5 w-5" />
+                  </Button>
+                </motion.div>
+              </Link>
+            </motion.div>
           </motion.div>
         </div>
       </section>

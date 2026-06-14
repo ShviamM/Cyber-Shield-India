@@ -81,6 +81,18 @@ export default {
       },
     ],
   },
+  tryChecker: {
+    badge: "Free Scam Checker",
+    heading: "Try it now — check any number, link or UPI",
+    subtitle:
+      "Paste a suspicious phone number, website link or UPI ID and get an instant threat report. No download, no sign-up.",
+    cta: "Check for free",
+    items: {
+      number: "Phone numbers",
+      link: "Website links",
+      upi: "UPI IDs",
+    },
+  },
   family: {
     heading: "Family Guardian",
     subtitle:
