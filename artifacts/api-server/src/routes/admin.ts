@@ -9,18 +9,26 @@ import {
   paymentsTable,
   sessionsTable,
   subscriptionsTable,
+  targetReportsTable,
+  targetReputationTable,
   usersTable,
   type Broadcast as DbBroadcast,
 } from "@workspace/db";
 import {
   AdminListReportsQueryParams,
+  AdminListTargetReportsQueryParams,
   AdminSendBroadcastBody,
   AdminUpdateReportBody,
   AdminUpdateReportParams,
+  AdminUpdateTargetReportBody,
+  AdminUpdateTargetReportParams,
   AdminVerifyNumberBody,
   AdminVerifyNumberParams,
+  AdminVerifyTargetBody,
   type AdminReport,
   type AdminReportListResponse,
+  type AdminTargetReport,
+  type AdminTargetReportListResponse,
   type AdminStats,
   type Broadcast,
   type BroadcastList,
@@ -28,13 +36,19 @@ import {
   type FraudMapResponse,
   type FraudMapState,
   type NumberReputation,
+  type TargetReputation,
   type TrialListResponse as TrialList,
 } from "@workspace/api-zod";
 import { sendExpoPush } from "../lib/expo-push";
 import { normalizeIndianPhone } from "../lib/phone";
 import { HttpError, isUuid } from "../lib/http-error";
-import { toAdminReportDto } from "../lib/dto";
-import { recomputeReputation, setVerifiedScam } from "../lib/reputation";
+import { toAdminReportDto, toAdminTargetReportDto } from "../lib/dto";
+import {
+  recomputeReputation,
+  recomputeTargetReputation,
+  setVerifiedScam,
+  setTargetVerifiedScam,
+} from "../lib/reputation";
 import { PLANS, monthlyAmount } from "../lib/plans";
 import { isPremiumNowCondition } from "../lib/subscription";
 import { resolveState } from "../lib/states";
@@ -208,6 +222,135 @@ router.post("/admin/numbers/:phone/verify", requirePermission(PERMISSIONS.MANAGE
   const row = await setVerifiedScam(phone, body.verifiedScam);
   const response: NumberReputation = {
     phone: row.phone,
+    reportCount: row.reportCount,
+    verifiedScam: row.verifiedScam,
+    lastReportedAt: row.lastReportedAt,
+  };
+  res.json(response);
+});
+
+router.get("/admin/target-reports", requirePermission(PERMISSIONS.MODERATE_REPORTS), async (req, res) => {
+  const query = AdminListTargetReportsQueryParams.parse(req.query);
+
+  const conditions = [];
+  if (query.status) {
+    conditions.push(eq(targetReportsTable.status, query.status));
+  }
+  if (query.type) {
+    conditions.push(eq(targetReportsTable.targetType, query.type));
+  }
+  if (query.search) {
+    conditions.push(
+      sql`${targetReportsTable.targetValue} ilike ${"%" + query.search + "%"}`,
+    );
+  }
+  const where = conditions.length > 0 ? and(...conditions) : undefined;
+
+  const limit = Math.min(Math.max(query.limit, 1), 200);
+  const offset = Math.max(query.offset, 0);
+
+  const rows = await db
+    .select({
+      report: targetReportsTable,
+      reporterName: usersTable.fullName,
+      reporterPhone: usersTable.phone,
+      verifiedScam: targetReputationTable.verifiedScam,
+      reportCount: targetReputationTable.reportCount,
+    })
+    .from(targetReportsTable)
+    // leftJoin so anonymous web reports (null reporterId) still appear for
+    // moderation, with null reporter name/phone.
+    .leftJoin(usersTable, eq(targetReportsTable.reporterId, usersTable.id))
+    .leftJoin(
+      targetReputationTable,
+      and(
+        eq(targetReportsTable.targetType, targetReputationTable.targetType),
+        eq(targetReportsTable.targetValue, targetReputationTable.targetValue),
+      ),
+    )
+    .where(where)
+    .orderBy(desc(targetReportsTable.createdAt))
+    .limit(limit)
+    .offset(offset);
+
+  const [{ total }] = await db
+    .select({ total: count() })
+    .from(targetReportsTable)
+    .where(where);
+
+  const response: AdminTargetReportListResponse = {
+    reports: rows.map((r) =>
+      toAdminTargetReportDto({
+        report: r.report,
+        reporterName: r.reporterName,
+        reporterPhone: r.reporterPhone,
+        verifiedScam: r.verifiedScam ?? false,
+        reportCount: r.reportCount ?? 0,
+      }),
+    ),
+    total,
+  };
+  res.json(response);
+});
+
+router.patch("/admin/target-reports/:id", requirePermission(PERMISSIONS.MODERATE_REPORTS), async (req, res) => {
+  const params = AdminUpdateTargetReportParams.parse(req.params);
+  const body = AdminUpdateTargetReportBody.parse(req.body);
+
+  if (!isUuid(params.id)) {
+    throw new HttpError(404, "not_found", "Report not found");
+  }
+
+  const [existing] = await db
+    .select({ id: targetReportsTable.id })
+    .from(targetReportsTable)
+    .where(eq(targetReportsTable.id, params.id))
+    .limit(1);
+  if (!existing) {
+    throw new HttpError(404, "not_found", "Report not found");
+  }
+
+  const [updated] = await db
+    .update(targetReportsTable)
+    .set({ status: body.status, updatedAt: new Date() })
+    .where(eq(targetReportsTable.id, params.id))
+    .returning();
+
+  const reputation = await recomputeTargetReputation(
+    updated.targetType,
+    updated.targetValue,
+  );
+
+  // Anonymous web reports have no reporter account.
+  const [reporter] = updated.reporterId
+    ? await db
+        .select({ fullName: usersTable.fullName, phone: usersTable.phone })
+        .from(usersTable)
+        .where(eq(usersTable.id, updated.reporterId))
+        .limit(1)
+    : [];
+
+  const response: AdminTargetReport = toAdminTargetReportDto({
+    report: updated,
+    reporterName: reporter?.fullName ?? null,
+    reporterPhone: reporter?.phone ?? null,
+    verifiedScam: reputation.verifiedScam,
+    reportCount: reputation.reportCount,
+  });
+  res.json(response);
+});
+
+router.post("/admin/targets/verify", requirePermission(PERMISSIONS.MANAGE_NUMBERS), async (req, res) => {
+  const body = AdminVerifyTargetBody.parse(req.body);
+
+  const row = await setTargetVerifiedScam(
+    body.targetType,
+    body.targetValue,
+    body.verifiedScam,
+  );
+  const response: TargetReputation = {
+    targetType: row.targetType as TargetReputation["targetType"],
+    targetValue: row.targetValue,
     reportCount: row.reportCount,
     verifiedScam: row.verifiedScam,
     lastReportedAt: row.lastReportedAt,

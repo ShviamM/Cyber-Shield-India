@@ -24,10 +24,13 @@ import type {
   AddFamilyMemberRequest,
   AdminAuditLogListResponse,
   AdminListReportsParams,
+  AdminListTargetReportsParams,
   AdminLoginRequest,
   AdminReport,
   AdminReportListResponse,
   AdminStats,
+  AdminTargetReport,
+  AdminTargetReportListResponse,
   AdminTrialActionResponse,
   AdminUserDetail,
   AdminUserRoleResult,
@@ -78,6 +81,7 @@ import type {
   SubscriptionStatus,
   SuccessResponse,
   SuperAdminOverview,
+  TargetReputation,
   TrendingScamListResponse,
   TrialListResponse,
   UpdateLocationRequest,
@@ -88,6 +92,7 @@ import type {
   User,
   VerifyNumberRequest,
   VerifyPaymentRequest,
+  VerifyTargetRequest,
   VerifyTokenRequest
 } from './api.schemas';
 
@@ -2066,6 +2071,233 @@ export const useAdminVerifyNumber = <TError = ErrorType<ErrorResponse>,
         TContext
       > => {
       return useMutation(getAdminVerifyNumberMutationOptions(options));
+    }
+
+export const getAdminListTargetReportsUrl = (params?: AdminListTargetReportsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/target-reports?${stringifiedParams}` : `/api/admin/target-reports`
+}
+
+/**
+ * @summary List url/upi community reports for moderation
+ */
+export const adminListTargetReports = async (params?: AdminListTargetReportsParams, options?: RequestInit): Promise<AdminTargetReportListResponse> => {
+
+  return customFetch<AdminTargetReportListResponse>(getAdminListTargetReportsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getAdminListTargetReportsQueryKey = (params?: AdminListTargetReportsParams,) => {
+    return [
+    `/api/admin/target-reports`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getAdminListTargetReportsQueryOptions = <TData = Awaited<ReturnType<typeof adminListTargetReports>>, TError = ErrorType<ErrorResponse>>(params?: AdminListTargetReportsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminListTargetReports>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdminListTargetReportsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListTargetReports>>> = ({ signal }) => adminListTargetReports(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminListTargetReports>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type AdminListTargetReportsQueryResult = NonNullable<Awaited<ReturnType<typeof adminListTargetReports>>>
+export type AdminListTargetReportsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List url/upi community reports for moderation
+ */
+
+export function useAdminListTargetReports<TData = Awaited<ReturnType<typeof adminListTargetReports>>, TError = ErrorType<ErrorResponse>>(
+ params?: AdminListTargetReportsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminListTargetReports>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getAdminListTargetReportsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getAdminUpdateTargetReportUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/target-reports/${id}`
+}
+
+/**
+ * @summary Update a url/upi report's moderation status
+ */
+export const adminUpdateTargetReport = async (id: string,
+    updateReportStatusRequest: UpdateReportStatusRequest, options?: RequestInit): Promise<AdminTargetReport> => {
+
+  return customFetch<AdminTargetReport>(getAdminUpdateTargetReportUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateReportStatusRequest,)
+  }
+);}
+
+
+
+
+export const getAdminUpdateTargetReportMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminUpdateTargetReport>>, TError,{id: string;data: BodyType<UpdateReportStatusRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminUpdateTargetReport>>, TError,{id: string;data: BodyType<UpdateReportStatusRequest>}, TContext> => {
+
+const mutationKey = ['adminUpdateTargetReport'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminUpdateTargetReport>>, {id: string;data: BodyType<UpdateReportStatusRequest>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  adminUpdateTargetReport(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminUpdateTargetReportMutationResult = NonNullable<Awaited<ReturnType<typeof adminUpdateTargetReport>>>
+    export type AdminUpdateTargetReportMutationBody = BodyType<UpdateReportStatusRequest>
+    export type AdminUpdateTargetReportMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Update a url/upi report's moderation status
+ */
+export const useAdminUpdateTargetReport = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminUpdateTargetReport>>, TError,{id: string;data: BodyType<UpdateReportStatusRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminUpdateTargetReport>>,
+        TError,
+        {id: string;data: BodyType<UpdateReportStatusRequest>},
+        TContext
+      > => {
+      return useMutation(getAdminUpdateTargetReportMutationOptions(options));
+    }
+
+export const getAdminVerifyTargetUrl = () => {
+
+
+
+
+  return `/api/admin/targets/verify`
+}
+
+/**
+ * @summary Mark a url/upi target as verified scam (or clear it)
+ */
+export const adminVerifyTarget = async (verifyTargetRequest: VerifyTargetRequest, options?: RequestInit): Promise<TargetReputation> => {
+
+  return customFetch<TargetReputation>(getAdminVerifyTargetUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      verifyTargetRequest,)
+  }
+);}
+
+
+
+
+export const getAdminVerifyTargetMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminVerifyTarget>>, TError,{data: BodyType<VerifyTargetRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminVerifyTarget>>, TError,{data: BodyType<VerifyTargetRequest>}, TContext> => {
+
+const mutationKey = ['adminVerifyTarget'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminVerifyTarget>>, {data: BodyType<VerifyTargetRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  adminVerifyTarget(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminVerifyTargetMutationResult = NonNullable<Awaited<ReturnType<typeof adminVerifyTarget>>>
+    export type AdminVerifyTargetMutationBody = BodyType<VerifyTargetRequest>
+    export type AdminVerifyTargetMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Mark a url/upi target as verified scam (or clear it)
+ */
+export const useAdminVerifyTarget = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminVerifyTarget>>, TError,{data: BodyType<VerifyTargetRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminVerifyTarget>>,
+        TError,
+        {data: BodyType<VerifyTargetRequest>},
+        TContext
+      > => {
+      return useMutation(getAdminVerifyTargetMutationOptions(options));
     }
 
 export const getSuperAdminOverviewUrl = () => {

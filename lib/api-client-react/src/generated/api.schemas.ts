@@ -260,6 +260,38 @@ export interface AdminReportListResponse {
   total: number;
 }
 
+export type AdminTargetReportTargetType = typeof AdminTargetReportTargetType[keyof typeof AdminTargetReportTargetType];
+
+
+export const AdminTargetReportTargetType = {
+  url: 'url',
+  upi: 'upi',
+} as const;
+
+/**
+ * A community report against a url/upi target, with moderation metadata.
+ */
+export interface AdminTargetReport {
+  id: string;
+  targetType: AdminTargetReportTargetType;
+  targetValue: string;
+  categoryKey: string;
+  description: string;
+  status: string;
+  reporterId: string | null;
+  reporterName?: string | null;
+  reporterPhone?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  verifiedScam: boolean;
+  reportCount: number;
+}
+
+export interface AdminTargetReportListResponse {
+  reports: AdminTargetReport[];
+  total: number;
+}
+
 export interface AdminStats {
   totalUsers: number;
   premiumUsers: number;
@@ -641,6 +673,37 @@ export interface NumberReputation {
   lastReportedAt?: string | null;
 }
 
+export type VerifyTargetRequestTargetType = typeof VerifyTargetRequestTargetType[keyof typeof VerifyTargetRequestTargetType];
+
+
+export const VerifyTargetRequestTargetType = {
+  url: 'url',
+  upi: 'upi',
+} as const;
+
+export interface VerifyTargetRequest {
+  targetType: VerifyTargetRequestTargetType;
+  /** The normalized target value, as stored on the report. */
+  targetValue: string;
+  verifiedScam: boolean;
+}
+
+export type TargetReputationTargetType = typeof TargetReputationTargetType[keyof typeof TargetReputationTargetType];
+
+
+export const TargetReputationTargetType = {
+  url: 'url',
+  upi: 'upi',
+} as const;
+
+export interface TargetReputation {
+  targetType: TargetReputationTargetType;
+  targetValue: string;
+  reportCount: number;
+  verifiedScam: boolean;
+  lastReportedAt?: string | null;
+}
+
 /**
  * The kind of target being checked
  */
@@ -954,6 +1017,28 @@ phone?: string;
 limit?: number;
 offset?: number;
 };
+
+export type AdminListTargetReportsParams = {
+status?: string;
+/**
+ * Filter by target kind ("url" or "upi").
+ */
+type?: AdminListTargetReportsType;
+/**
+ * Case-insensitive substring match on the target value.
+ */
+search?: string;
+limit?: number;
+offset?: number;
+};
+
+export type AdminListTargetReportsType = typeof AdminListTargetReportsType[keyof typeof AdminListTargetReportsType];
+
+
+export const AdminListTargetReportsType = {
+  url: 'url',
+  upi: 'upi',
+} as const;
 
 export type AdminUsersParams = {
 search?: string;

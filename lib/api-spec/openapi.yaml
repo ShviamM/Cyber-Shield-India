@@ -626,6 +626,106 @@ paths:
         default:
           $ref: "#/components/responses/Error"
 
+  /admin/target-reports:
+    get:
+      operationId: adminListTargetReports
+      tags: [admin]
+      summary: List url/upi community reports for moderation
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: type
+          in: query
+          required: false
+          description: Filter by target kind ("url" or "upi").
+          schema:
+            type: string
+            enum: [url, upi]
+        - name: search
+          in: query
+          required: false
+          description: Case-insensitive substring match on the target value.
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 100
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Target reports
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminTargetReportListResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /admin/target-reports/{id}:
+    patch:
+      operationId: adminUpdateTargetReport
+      tags: [admin]
+      summary: Update a url/upi report's moderation status
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateReportStatusRequest"
+      responses:
+        "200":
+          description: Updated target report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminTargetReport"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /admin/targets/verify:
+    post:
+      operationId: adminVerifyTarget
+      tags: [admin]
+      summary: Mark a url/upi target as verified scam (or clear it)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyTargetRequest"
+      responses:
+        "200":
+          description: Updated target reputation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TargetReputation"
+        default:
+          $ref: "#/components/responses/Error"
+
   /admin/super/overview:
     get:
       operationId: superAdminOverview
@@ -1814,6 +1914,68 @@ components:
         - reports
         - total
 
+    AdminTargetReport:
+      type: object
+      description: A community report against a url/upi target, with moderation metadata.
+      properties:
+        id:
+          type: string
+        targetType:
+          type: string
+          enum: [url, upi]
+        targetValue:
+          type: string
+        categoryKey:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        reporterId:
+          type: string
+          nullable: true
+        reporterName:
+          type: string
+          nullable: true
+        reporterPhone:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        verifiedScam:
+          type: boolean
+        reportCount:
+          type: integer
+      required:
+        - id
+        - targetType
+        - targetValue
+        - categoryKey
+        - description
+        - status
+        - reporterId
+        - createdAt
+        - updatedAt
+        - verifiedScam
+        - reportCount
+
+    AdminTargetReportListResponse:
+      type: object
+      properties:
+        reports:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdminTargetReport"
+        total:
+          type: integer
+      required:
+        - reports
+        - total
+
     AdminStats:
       type: object
       properties:
@@ -2510,6 +2672,44 @@ components:
           nullable: true
       required:
         - phone
+        - reportCount
+        - verifiedScam
+
+    VerifyTargetRequest:
+      type: object
+      properties:
+        targetType:
+          type: string
+          enum: [url, upi]
+        targetValue:
+          type: string
+          description: The normalized target value, as stored on the report.
+        verifiedScam:
+          type: boolean
+      required:
+        - targetType
+        - targetValue
+        - verifiedScam
+
+    TargetReputation:
+      type: object
+      properties:
+        targetType:
+          type: string
+          enum: [url, upi]
+        targetValue:
+          type: string
+        reportCount:
+          type: integer
+        verifiedScam:
+          type: boolean
+        lastReportedAt:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - targetType
+        - targetValue
         - reportCount
         - verifiedScam
 

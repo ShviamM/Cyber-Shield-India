@@ -119,6 +119,30 @@ export async function recomputeTargetReputation(
   return row;
 }
 
+/**
+ * Set or clear the admin-controlled verifiedScam flag for a url/upi target,
+ * recomputing the cached report aggregates first. Mirrors setVerifiedScam
+ * (phone). The target/value pair must already be normalized by the caller.
+ */
+export async function setTargetVerifiedScam(
+  targetType: string,
+  targetValue: string,
+  verifiedScam: boolean,
+): Promise<TargetReputation> {
+  await recomputeTargetReputation(targetType, targetValue);
+  const [row] = await db
+    .update(targetReputationTable)
+    .set({ verifiedScam, updatedAt: new Date() })
+    .where(
+      and(
+        eq(targetReputationTable.targetType, targetType),
+        eq(targetReputationTable.targetValue, targetValue),
+      ),
+    )
+    .returning();
+  return row;
+}
+
 /** Read the cached reputation row for a url/upi target, if any. */
 export async function getTargetReputation(
   targetType: string,

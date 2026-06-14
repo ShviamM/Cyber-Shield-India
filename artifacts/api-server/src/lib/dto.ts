@@ -1,5 +1,14 @@
-import type { AdminReport, Report, User } from "@workspace/api-zod";
-import type { FraudReport, User as DbUser } from "@workspace/db";
+import type {
+  AdminReport,
+  AdminTargetReport,
+  Report,
+  User,
+} from "@workspace/api-zod";
+import type {
+  FraudReport,
+  TargetReport,
+  User as DbUser,
+} from "@workspace/db";
 import { isSuperAdmin } from "./super-admin";
 
 export function toUserDto(u: DbUser): User {
@@ -51,5 +60,31 @@ export function toAdminReportDto(input: {
     createdAt: report.createdAt,
     updatedAt: report.updatedAt,
     verifiedScam,
+  };
+}
+
+export function toAdminTargetReportDto(input: {
+  report: TargetReport;
+  reporterName: string | null;
+  reporterPhone: string | null;
+  verifiedScam: boolean;
+  reportCount: number;
+}): AdminTargetReport {
+  const { report, reporterName, reporterPhone, verifiedScam, reportCount } =
+    input;
+  return {
+    id: report.id,
+    targetType: report.targetType as AdminTargetReport["targetType"],
+    targetValue: report.targetValue,
+    categoryKey: report.categoryKey,
+    description: report.description,
+    status: report.status,
+    reporterId: report.reporterId,
+    reporterName,
+    reporterPhone,
+    createdAt: report.createdAt,
+    updatedAt: report.updatedAt,
+    verifiedScam,
+    reportCount,
   };
 }

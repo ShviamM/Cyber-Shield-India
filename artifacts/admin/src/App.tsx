@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import Login from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
+import TargetReports from "@/pages/target-reports";
 import BusinessMetrics from "@/pages/business-metrics";
 import Users from "@/pages/users";
 import FraudMap from "@/pages/fraud-map";
@@ -64,6 +65,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/privacy" component={Privacy} />
       <Route path="/" component={() => <ProtectedRoute component={Dashboard} />} />
+      <Route path="/target-reports" component={() => <ProtectedRoute component={TargetReports} />} />
       <Route path="/business" component={() => <ProtectedRoute component={BusinessMetrics} />} />
       <Route path="/users" component={() => <ProtectedRoute component={Users} />} />
       <Route path="/fraud-map" component={() => <ProtectedRoute component={FraudMap} />} />

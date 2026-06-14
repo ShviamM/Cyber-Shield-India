@@ -505,6 +505,86 @@ export const AdminVerifyNumberResponse = zod.object({
 
 
 /**
+ * @summary List url/upi community reports for moderation
+ */
+export const adminListTargetReportsQueryLimitDefault = 100;
+export const adminListTargetReportsQueryOffsetDefault = 0;
+
+export const AdminListTargetReportsQueryParams = zod.object({
+  "status": zod.coerce.string().optional(),
+  "type": zod.enum(['url', 'upi']).optional().describe('Filter by target kind (\"url\" or \"upi\").'),
+  "search": zod.coerce.string().optional().describe('Case-insensitive substring match on the target value.'),
+  "limit": zod.coerce.number().default(adminListTargetReportsQueryLimitDefault),
+  "offset": zod.coerce.number().default(adminListTargetReportsQueryOffsetDefault)
+})
+
+export const AdminListTargetReportsResponse = zod.object({
+  "reports": zod.array(zod.object({
+  "id": zod.string(),
+  "targetType": zod.enum(['url', 'upi']),
+  "targetValue": zod.string(),
+  "categoryKey": zod.string(),
+  "description": zod.string(),
+  "status": zod.string(),
+  "reporterId": zod.string().nullable(),
+  "reporterName": zod.string().nullish(),
+  "reporterPhone": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date(),
+  "verifiedScam": zod.boolean(),
+  "reportCount": zod.number()
+}).describe('A community report against a url\/upi target, with moderation metadata.')),
+  "total": zod.number()
+})
+
+
+/**
+ * @summary Update a url/upi report's moderation status
+ */
+export const AdminUpdateTargetReportParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const AdminUpdateTargetReportBody = zod.object({
+  "status": zod.enum(['pending', 'verified', 'rejected', 'spam'])
+})
+
+export const AdminUpdateTargetReportResponse = zod.object({
+  "id": zod.string(),
+  "targetType": zod.enum(['url', 'upi']),
+  "targetValue": zod.string(),
+  "categoryKey": zod.string(),
+  "description": zod.string(),
+  "status": zod.string(),
+  "reporterId": zod.string().nullable(),
+  "reporterName": zod.string().nullish(),
+  "reporterPhone": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date(),
+  "verifiedScam": zod.boolean(),
+  "reportCount": zod.number()
+}).describe('A community report against a url\/upi target, with moderation metadata.')
+
+
+/**
+ * @summary Mark a url/upi target as verified scam (or clear it)
+ */
+export const AdminVerifyTargetBody = zod.object({
+  "targetType": zod.enum(['url', 'upi']),
+  "targetValue": zod.string().describe('The normalized target value, as stored on the report.'),
+  "verifiedScam": zod.boolean()
+})
+
+export const AdminVerifyTargetResponse = zod.object({
+  "targetType": zod.enum(['url', 'upi']),
+  "targetValue": zod.string(),
+  "reportCount": zod.number(),
+  "verifiedScam": zod.boolean(),
+  "lastReportedAt": zod.coerce.date().nullish()
+})
+
+
+/**
  * Owner-only dashboard data: revenue, AI usage and estimated cost, infrastructure health, database health, storage consumption, and cloud cost. Restricted to platform owners (super admins).
  * @summary Platform owner operations overview
  */
