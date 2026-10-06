@@ -95,6 +95,27 @@ export default {
       "Shivam often sits down with policymakers, administrators, and police officers to talk about keeping ordinary Indians safe from cyber fraud, and to share his book, Digital Dhokha.",
     items: [
       {
+        name: "Mahendra Singh Tanwar, IAS",
+        role: "District Magistrate, Kanpur Nagar",
+        blurb:
+          "The District Magistrate of Kanpur Nagar honoured me with the ‘Kanpur Icon Samman’ for my work as an international cyber security expert. It was a proud moment, and a reminder of how much our city values keeping people safe online.",
+        alt: "Shivam Malaviya with Mahendra Singh Tanwar, IAS, District Magistrate of Kanpur Nagar, at the District Magistrate's office",
+      },
+      {
+        name: "BBC News Urdu",
+        role: "Live expert segment",
+        blurb:
+          "BBC News Urdu invited me as an expert for a live news segment on leaked photos online and cyber security. I explained how people can protect their photos and privacy, and the steps to take if it happens to them. Taking Kanpur's voice and cyber awareness to an international platform was a proud moment for the whole city.",
+        alt: "Shivam Malaviya speaking as an expert on a BBC News Urdu live segment",
+      },
+      {
+        name: "Sumit Sudhakar Ramteke, IPS",
+        role: "ADCP, Police Commissionerate",
+        blurb:
+          "I met ADCP Sumit Sudhakar Ramteke for a detailed discussion on a highly sensitive and important issue concerning the country, and presented him with a copy of my book, Digital Dhokha.",
+        alt: "Shivam Malaviya presenting his book Digital Dhokha to Sumit Sudhakar Ramteke, IPS, ADCP, Police Commissionerate",
+      },
+      {
         name: "Satish Mahana",
         role: "Speaker, U.P. Legislative Assembly",
         blurb:
@@ -158,6 +179,7 @@ export default {
       "/images/event-workshop-2.jpg": "Workshop venue prepared for a Netraksh cyber awareness session",
       "/images/event-press-3.jpg": "Newspaper feature on community skill and awareness initiatives",
       "/images/event-launch-5.jpg": "Readers and guests with Digital Dhokha at the World Book Fair",
+      "/images/event-award-2.jpg": "Shivam Malaviya receiving the Kanpur Icon Samman on stage",
       "/images/event-award-1.jpg": "Shivam Malaviya speaking and honoured at the Pratibha Samman Samaroh",
       "/images/event-felicitation-2.jpg": "Shivam Malaviya presenting a Cyber Empowered certificate at a digital safety recognition event",
       "/images/event-launch-7.jpg": "Shivam Malaviya presenting his book Digital Dhokha to dignitaries",
