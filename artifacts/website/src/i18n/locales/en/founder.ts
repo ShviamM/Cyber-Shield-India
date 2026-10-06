@@ -95,11 +95,18 @@ export default {
       "Shivam often sits down with policymakers, administrators, and police officers to talk about keeping ordinary Indians safe from cyber fraud, and to share his book, Digital Dhokha.",
     items: [
       {
+        name: "Kanpur Icon Samman",
+        role: "Award",
+        blurb:
+          "I was honoured with the ‘Kanpur Icon Samman’ for my work as an international cyber security expert. It was a proud moment, and a reminder of how much our city values keeping people safe online.",
+        alt: "Shivam Malaviya receiving the Kanpur Icon Samman on stage",
+      },
+      {
         name: "Mahendra Singh Tanwar, IAS",
         role: "District Magistrate, Kanpur Nagar",
         blurb:
-          "The District Magistrate of Kanpur Nagar honoured me with the ‘Kanpur Icon Samman’ for my work as an international cyber security expert. It was a proud moment, and a reminder of how much our city values keeping people safe online.",
-        alt: "Shivam Malaviya with Mahendra Singh Tanwar, IAS, District Magistrate of Kanpur Nagar, at the District Magistrate's office",
+          "I met the District Magistrate of Kanpur Nagar at his office and presented him with a copy of my book, Digital Dhokha.",
+        alt: "Shivam Malaviya presenting his book Digital Dhokha to Mahendra Singh Tanwar, IAS, District Magistrate of Kanpur Nagar",
       },
       {
         name: "BBC News Urdu",
@@ -179,7 +186,6 @@ export default {
       "/images/event-workshop-2.jpg": "Workshop venue prepared for a Netraksh cyber awareness session",
       "/images/event-press-3.jpg": "Newspaper feature on community skill and awareness initiatives",
       "/images/event-launch-5.jpg": "Readers and guests with Digital Dhokha at the World Book Fair",
-      "/images/event-award-2.jpg": "Shivam Malaviya receiving the Kanpur Icon Samman on stage",
       "/images/event-award-1.jpg": "Shivam Malaviya speaking and honoured at the Pratibha Samman Samaroh",
       "/images/event-felicitation-2.jpg": "Shivam Malaviya presenting a Cyber Empowered certificate at a digital safety recognition event",
       "/images/event-launch-7.jpg": "Shivam Malaviya presenting his book Digital Dhokha to dignitaries",
