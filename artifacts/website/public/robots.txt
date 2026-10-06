@@ -1,2 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /account
+
+Sitemap: https://netraksh.com/sitemap.xml

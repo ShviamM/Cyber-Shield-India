@@ -21,6 +21,7 @@ ENV NODE_ENV=production PORT=5000 BASE_PATH=/ \
 RUN pnpm --filter @workspace/website build
 
 FROM nginx:alpine
+COPY deploy/nginx/security-headers.conf /etc/nginx/snippets/security-headers.conf
 COPY artifacts/website/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/artifacts/website/dist/public /usr/share/nginx/html
 EXPOSE 80

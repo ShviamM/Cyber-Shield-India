@@ -6,6 +6,7 @@ import { hitRateLimit } from "../lib/rate-limit";
 import { resolveOptionalCaller, usageSubject } from "../lib/caller";
 import { enforceDailyQuota } from "../lib/usage";
 import { runFraudCheck, type FraudCheckType } from "../lib/fraud-engine";
+import { clientIp } from "../lib/client-ip";
 
 const router: IRouter = Router();
 
@@ -15,7 +16,7 @@ router.post("/check", async (req, res) => {
   const caller = await resolveOptionalCaller(req);
   const clientKey = caller
     ? `user:${caller.userId}`
-    : `ip:${req.ip ?? "unknown"}`;
+    : `ip:${clientIp(req)}`;
 
   // Per-minute abuse/cost guard (premium gets a higher burst budget).
   const limit = caller?.isPremium

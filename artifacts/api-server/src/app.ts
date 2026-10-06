@@ -22,9 +22,10 @@ const corsOptions: CorsOptions = {
   },
 };
 
-// Behind Replit's managed proxy the real client IP arrives via X-Forwarded-For.
-// Trust it so req.ip reflects the actual client for per-IP rate limiting.
-app.set("trust proxy", true);
+// Trust only the configured number of proxy hops. `true` would make req.ip the
+// leftmost (client-supplied, spoofable) X-Forwarded-For entry. Rate limits key
+// on clientIp() (lib/client-ip.ts), which prefers the edge's client-IP header.
+app.set("trust proxy", config.trustProxyHops);
 
 app.use(
   pinoHttp({
@@ -45,6 +46,19 @@ app.use(
     },
   }),
 );
+// Baseline security headers on every API response (JSON only, so a strict
+// CSP is safe here).
+app.use((_req, res, next) => {
+  res.set({
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "no-referrer",
+    "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'",
+  });
+  next();
+});
+app.disable("x-powered-by");
 app.use(cors(corsOptions));
 app.use(
   express.json({
