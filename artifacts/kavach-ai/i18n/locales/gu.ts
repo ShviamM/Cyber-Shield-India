@@ -451,6 +451,7 @@ const gu = {
 
   callAlert: {
     incoming: "આવી રહેલો કૉલ",
+    verificationFailed: "નેટવર્ક આ કૉલરનો નંબર ચકાસી શક્યું નથી. કૉલર ID નકલી હોઈ શકે છે.",
     unknownCaller: "અજાણ્યો કૉલ કરનાર · કોઈ સંપર્ક મેળ નથી",
     scamReports: "છેતરપિંડીની જાણ",
     victimsReported: "ભોગ બનેલાની જાણ",

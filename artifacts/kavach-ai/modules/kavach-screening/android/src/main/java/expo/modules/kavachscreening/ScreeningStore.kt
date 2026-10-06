@@ -16,6 +16,7 @@ object ScreeningStore {
   private const val KEY_BLOCKLIST = "blocklist"
   private const val KEY_USER_BLOCKLIST = "user_blocklist"
   private const val KEY_KEYWORDS = "keywords"
+  private const val KEY_BLOCK_PATTERNS = "block_patterns"
   private const val KEY_LANGUAGE = "language"
   private const val KEY_API_BASE = "api_base"
   private const val KEY_AUTH_TOKEN = "auth_token"
@@ -105,6 +106,23 @@ object ScreeningStore {
     prefs(ctx).edit().putStringSet(KEY_USER_BLOCKLIST, updated).apply()
   }
 
+  /** The user's block patterns (e.g. "140*", "+92*"), see [BlockPatterns]. */
+  fun getBlockPatterns(ctx: Context): Set<String> =
+    prefs(ctx).getStringSet(KEY_BLOCK_PATTERNS, emptySet()) ?: emptySet()
+
+  /** Add a pattern; returns the cleaned-up pattern, or null if it isn't valid. */
+  fun addBlockPattern(ctx: Context, raw: String): String? {
+    val p = BlockPatterns.normalizePattern(raw) ?: return null
+    val updated = getBlockPatterns(ctx).toMutableSet().apply { add(p) }
+    prefs(ctx).edit().putStringSet(KEY_BLOCK_PATTERNS, updated).apply()
+    return p
+  }
+
+  fun removeBlockPattern(ctx: Context, pattern: String) {
+    val updated = getBlockPatterns(ctx).filterNot { it == pattern }.toSet()
+    prefs(ctx).edit().putStringSet(KEY_BLOCK_PATTERNS, updated).apply()
+  }
+
   fun setKeywords(ctx: Context, keywords: List<String>) {
     prefs(ctx).edit().putStringSet(KEY_KEYWORDS, keywords.toSet()).apply()
   }
@@ -117,6 +135,8 @@ object ScreeningStore {
    * same Indian number all resolve to the same entry.
    */
   fun isBlocked(ctx: Context, rawNumber: String): Boolean {
+    // Pattern rules first: they can target short codes that are under 6 digits.
+    if (BlockPatterns.matchesAny(getBlockPatterns(ctx), rawNumber)) return true
     val n = normalize(rawNumber)
     if (n.length < 6) return false
     val tail = n.takeLast(10)

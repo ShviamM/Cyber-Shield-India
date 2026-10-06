@@ -56,6 +56,16 @@ class KavachScreeningModule extends NativeModule<KavachScreeningEvents> {
 
   unblockNumber(_number: string): void {}
 
+  getBlockPatterns(): string[] {
+    return [];
+  }
+
+  addBlockPattern(_pattern: string): string | null {
+    return null;
+  }
+
+  removeBlockPattern(_pattern: string): void {}
+
   syncBlocklist(_numbers: string[]): void {}
 
   syncKeywords(_keywords: string[]): void {}

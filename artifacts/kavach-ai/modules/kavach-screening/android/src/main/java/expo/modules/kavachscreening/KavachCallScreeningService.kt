@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Build
 import android.telecom.Call
 import android.telecom.CallScreeningService
+import android.telecom.Connection
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import java.net.URLEncoder
@@ -59,7 +60,15 @@ class KavachCallScreeningService : CallScreeningService() {
 
     if (!enabled || !isIncoming || number == null) return
 
-    launchCallScreen(ctx, number)
+    // Caller verification (STIR/SHAKEN, Android 11+). Only an explicit FAILED
+    // result is treated as a spoofing sign: most Indian calls are simply
+    // NOT_VERIFIED because the standard isn't deployed on Indian networks yet.
+    // We warn on the caller card; we never block on this alone. Check adapted
+    // from SpamBlocker (MIT, (c) 2024 aj3423).
+    val verificationFailed = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+      callDetails.callerNumberVerificationStatus == Connection.VERIFICATION_STATUS_FAILED
+
+    launchCallScreen(ctx, number, verificationFailed)
     // A quiet, persistent "report this call" notification posted now survives
     // the call, giving a Play-compliant post-call reporting moment. (Android
     // exposes no compliant call-ended hook without restricted call-state
@@ -81,8 +90,8 @@ class KavachCallScreeningService : CallScreeningService() {
      * Exposed on the companion so [KavachScreeningModule]'s "Send test alert"
      * self-test can fire the exact same experience a real call produces.
      */
-    fun launchCallScreen(ctx: Context, number: String) {
-      val intent = buildDeepLinkIntent(ctx, number)
+    fun launchCallScreen(ctx: Context, number: String, verificationFailed: Boolean = false) {
+      val intent = buildDeepLinkIntent(ctx, number, verificationFailed)
 
       if (KavachCallOverlay.canDraw(ctx)) {
         try {
@@ -92,14 +101,15 @@ class KavachCallScreeningService : CallScreeningService() {
         }
       }
 
-      postFullScreenAlert(ctx, number, intent)
+      postFullScreenAlert(ctx, number, intent, verificationFailed)
     }
 
-    private fun buildDeepLinkIntent(ctx: Context, number: String): Intent {
+    private fun buildDeepLinkIntent(ctx: Context, number: String, verificationFailed: Boolean): Intent {
       val encoded = URLEncoder.encode(number, "UTF-8")
+      val verify = if (verificationFailed) "&verify=failed" else ""
       return Intent(
         Intent.ACTION_VIEW,
-        Uri.parse("kavach-ai://call-alert?number=$encoded"),
+        Uri.parse("kavach-ai://call-alert?number=$encoded$verify"),
       ).apply {
         setPackage(ctx.packageName)
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -111,7 +121,7 @@ class KavachCallScreeningService : CallScreeningService() {
      * screen. On a locked/dozing device Android launches it full-screen;
      * otherwise it shows as a heads-up the user can tap.
      */
-    private fun postFullScreenAlert(ctx: Context, number: String, deepLink: Intent) {
+    private fun postFullScreenAlert(ctx: Context, number: String, deepLink: Intent, verificationFailed: Boolean) {
       ensureChannel(ctx)
 
       val flags = PendingIntent.FLAG_UPDATE_CURRENT or
@@ -121,7 +131,10 @@ class KavachCallScreeningService : CallScreeningService() {
       val notification = NotificationCompat.Builder(ctx, CHANNEL_ID)
         .setSmallIcon(android.R.drawable.stat_sys_warning)
         .setContentTitle("Incoming call — Netraksh")
-        .setContentText("Tap to see scam-protection details for $number.")
+        .setContentText(
+          if (verificationFailed) "Warning: the network could not verify $number. The caller ID may be faked."
+          else "Tap to see scam-protection details for $number."
+        )
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setCategory(NotificationCompat.CATEGORY_CALL)
         // Show full content on the lock screen so the caller card fronts reliably.

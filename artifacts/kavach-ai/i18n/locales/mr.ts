@@ -451,6 +451,7 @@ const mr = {
 
   callAlert: {
     incoming: "येणारा कॉल",
+    verificationFailed: "नेटवर्क या कॉलरचा नंबर पडताळू शकले नाही. कॉलर ID बनावट असू शकतो.",
     unknownCaller: "अनोळखी कॉलर · कोणताही संपर्क जुळत नाही",
     scamReports: "फसवणुकीच्या तक्रारी",
     victimsReported: "नोंदवलेले बळी",
