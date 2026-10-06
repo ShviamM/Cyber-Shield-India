@@ -937,12 +937,83 @@ export interface RegisterPushTokenRequest {
   platform?: RegisterPushTokenRequestPlatform;
 }
 
+/**
+ * Whether the member has accepted Family Guardian alerts
+ */
+export type FamilyMemberStatus = typeof FamilyMemberStatus[keyof typeof FamilyMemberStatus];
+
+
+export const FamilyMemberStatus = {
+  pending: 'pending',
+  accepted: 'accepted',
+  declined: 'declined',
+} as const;
+
+export type FamilyAlertRiskLevel = typeof FamilyAlertRiskLevel[keyof typeof FamilyAlertRiskLevel];
+
+
+export const FamilyAlertRiskLevel = {
+  high: 'high',
+  medium: 'medium',
+} as const;
+
+export interface FamilyAlert {
+  id: string;
+  memberId: string;
+  memberName: string;
+  memberPhone: string;
+  callerPhone: string;
+  riskLevel: FamilyAlertRiskLevel;
+  reportCount: number;
+  category?: string | null;
+  resolved: boolean;
+  createdAt: string;
+}
+
 export interface FamilyMember {
   id: string;
   name: string;
   phone: string;
   relationship?: string | null;
   createdAt: string;
+  /** Whether the member has accepted Family Guardian alerts */
+  status: FamilyMemberStatus;
+  /** Most recent unresolved alert from the last 24 hours */
+  latestAlert?: FamilyAlert | null;
+}
+
+export interface FamilyAlertList {
+  alerts: FamilyAlert[];
+}
+
+export type FamilyInviteStatus = typeof FamilyInviteStatus[keyof typeof FamilyInviteStatus];
+
+
+export const FamilyInviteStatus = {
+  pending: 'pending',
+  accepted: 'accepted',
+  declined: 'declined',
+} as const;
+
+export interface FamilyInvite {
+  id: string;
+  ownerName: string;
+  relationship?: string | null;
+  status: FamilyInviteStatus;
+  createdAt: string;
+}
+
+export interface FamilyInviteList {
+  invites: FamilyInvite[];
+}
+
+export interface ReportFamilyCallRequest {
+  callerPhone: string;
+}
+
+export interface FamilyCallResult {
+  /** Number of guardians notified (0 when the caller isn't risky) */
+  notified: number;
 }
 
 export type FamilyMemberListPlan = typeof FamilyMemberListPlan[keyof typeof FamilyMemberListPlan];

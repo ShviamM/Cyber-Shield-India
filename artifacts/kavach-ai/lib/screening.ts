@@ -363,6 +363,19 @@ export function syncScreeningApiConfig(baseUrl: string, token: string | null): v
 }
 
 /**
+ * Family Guardian: when on, the native call-screening service reports incoming
+ * calls to the server so it can alert the family members this user accepted.
+ */
+export function setFamilyAlertsEnabled(enabled: boolean): void {
+  if (!isScreeningSupported()) return;
+  try {
+    KavachScreening.setFamilyAlertsEnabled(enabled);
+  } catch {
+    // ignore
+  }
+}
+
+/**
  * Push the latest engine-derived risk data into on-device storage. `numbers`
  * are normalized to E.164 where possible; keywords default to the built-in
  * scam phrase list.

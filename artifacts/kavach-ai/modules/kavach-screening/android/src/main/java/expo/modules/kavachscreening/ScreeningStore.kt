@@ -20,6 +20,7 @@ object ScreeningStore {
   private const val KEY_LANGUAGE = "language"
   private const val KEY_API_BASE = "api_base"
   private const val KEY_AUTH_TOKEN = "auth_token"
+  private const val KEY_FAMILY_ALERTS = "family_alerts"
 
   private fun prefs(ctx: Context) =
     ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -53,6 +54,14 @@ object ScreeningStore {
       .putString(KEY_API_BASE, baseUrl.trimEnd('/'))
       .putString(KEY_AUTH_TOKEN, token)
       .apply()
+  }
+
+  /** True once the user accepted a Family Guardian invite (synced from JS). */
+  fun isFamilyAlertsEnabled(ctx: Context): Boolean =
+    prefs(ctx).getBoolean(KEY_FAMILY_ALERTS, false)
+
+  fun setFamilyAlertsEnabled(ctx: Context, enabled: Boolean) {
+    prefs(ctx).edit().putBoolean(KEY_FAMILY_ALERTS, enabled).apply()
   }
 
   fun isCallEnabled(ctx: Context): Boolean =

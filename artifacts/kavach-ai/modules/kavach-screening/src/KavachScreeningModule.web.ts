@@ -74,6 +74,8 @@ class KavachScreeningModule extends NativeModule<KavachScreeningEvents> {
 
   syncApiConfig(_baseUrl: string, _token: string | null): void {}
 
+  setFamilyAlertsEnabled(_enabled: boolean): void {}
+
   async requestCallScreeningRole(): Promise<boolean> {
     return false;
   }

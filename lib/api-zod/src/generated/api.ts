@@ -1091,7 +1091,20 @@ export const ListFamilyMembersResponse = zod.object({
   "name": zod.string(),
   "phone": zod.string(),
   "relationship": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "status": zod.enum(['pending', 'accepted', 'declined']).describe('Whether the member has accepted Family Guardian alerts'),
+  "latestAlert": zod.object({
+  "id": zod.string(),
+  "memberId": zod.string(),
+  "memberName": zod.string(),
+  "memberPhone": zod.string(),
+  "callerPhone": zod.string(),
+  "riskLevel": zod.enum(['high', 'medium']),
+  "reportCount": zod.number(),
+  "category": zod.string().nullish(),
+  "resolved": zod.boolean(),
   "createdAt": zod.coerce.date()
+}).nullish().describe('Most recent unresolved alert from the last 24 hours')
 })),
   "maxMembers": zod.number().describe('Maximum members allowed on the user\'s current plan'),
   "plan": zod.enum(['free', 'premium', 'family'])
@@ -1112,7 +1125,20 @@ export const AddFamilyMemberResponse = zod.object({
   "name": zod.string(),
   "phone": zod.string(),
   "relationship": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "status": zod.enum(['pending', 'accepted', 'declined']).describe('Whether the member has accepted Family Guardian alerts'),
+  "latestAlert": zod.object({
+  "id": zod.string(),
+  "memberId": zod.string(),
+  "memberName": zod.string(),
+  "memberPhone": zod.string(),
+  "callerPhone": zod.string(),
+  "riskLevel": zod.enum(['high', 'medium']),
+  "reportCount": zod.number(),
+  "category": zod.string().nullish(),
+  "resolved": zod.boolean(),
   "createdAt": zod.coerce.date()
+}).nullish().describe('Most recent unresolved alert from the last 24 hours')
 })
 
 
@@ -1124,6 +1150,97 @@ export const RemoveFamilyMemberParams = zod.object({
 })
 
 export const RemoveFamilyMemberResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary Family Guardian invites sent to the signed-in user's phone number
+ */
+export const ListFamilyInvitesResponse = zod.object({
+  "invites": zod.array(zod.object({
+  "id": zod.string(),
+  "ownerName": zod.string(),
+  "relationship": zod.string().nullish(),
+  "status": zod.enum(['pending', 'accepted', 'declined']),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+
+/**
+ * @summary Let the inviting family member get alerts about scam calls to me
+ */
+export const AcceptFamilyInviteParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const AcceptFamilyInviteResponse = zod.object({
+  "id": zod.string(),
+  "ownerName": zod.string(),
+  "relationship": zod.string().nullish(),
+  "status": zod.enum(['pending', 'accepted', 'declined']),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Decline an invite, or stop sharing alerts after accepting
+ */
+export const DeclineFamilyInviteParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const DeclineFamilyInviteResponse = zod.object({
+  "id": zod.string(),
+  "ownerName": zod.string(),
+  "relationship": zod.string().nullish(),
+  "status": zod.enum(['pending', 'accepted', 'declined']),
+  "createdAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Recent scam-call alerts about the signed-in user's family members
+ */
+export const ListFamilyAlertsResponse = zod.object({
+  "alerts": zod.array(zod.object({
+  "id": zod.string(),
+  "memberId": zod.string(),
+  "memberName": zod.string(),
+  "memberPhone": zod.string(),
+  "callerPhone": zod.string(),
+  "riskLevel": zod.enum(['high', 'medium']),
+  "reportCount": zod.number(),
+  "category": zod.string().nullish(),
+  "resolved": zod.boolean(),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+
+/**
+ * Sent by the member's app for an incoming call. The server looks up the caller's reputation itself and, only when it is medium or high risk, notifies every family member who was given consent.
+
+ * @summary A family member's phone reports an incoming call
+ */
+export const ReportFamilyCallBody = zod.object({
+  "callerPhone": zod.string()
+})
+
+export const ReportFamilyCallResponse = zod.object({
+  "notified": zod.number().describe('Number of guardians notified (0 when the caller isn\'t risky)')
+})
+
+
+/**
+ * @summary Mark a family alert as handled (the member is safe)
+ */
+export const ResolveFamilyAlertParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const ResolveFamilyAlertResponse = zod.object({
   "success": zod.boolean()
 })
 

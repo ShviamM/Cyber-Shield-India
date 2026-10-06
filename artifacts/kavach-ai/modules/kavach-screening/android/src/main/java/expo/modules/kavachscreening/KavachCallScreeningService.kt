@@ -69,6 +69,9 @@ class KavachCallScreeningService : CallScreeningService() {
       callDetails.callerNumberVerificationStatus == Connection.VERIFICATION_STATUS_FAILED
 
     launchCallScreen(ctx, number, verificationFailed)
+    // Family Guardian: let the server alert this user's guardians if the caller
+    // is a reported scam number (no-op unless the user accepted an invite).
+    FamilyAlertReporter.reportIncomingCall(ctx, number)
     // A quiet, persistent "report this call" notification posted now survives
     // the call, giving a Play-compliant post-call reporting moment. (Android
     // exposes no compliant call-ended hook without restricted call-state

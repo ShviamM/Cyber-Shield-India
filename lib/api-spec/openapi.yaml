@@ -1343,6 +1343,134 @@ paths:
         default:
           $ref: "#/components/responses/Error"
 
+  /family/invites:
+    get:
+      operationId: listFamilyInvites
+      tags: [family]
+      summary: Family Guardian invites sent to the signed-in user's phone number
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Pending and accepted invites
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FamilyInviteList"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /family/invites/{id}/accept:
+    post:
+      operationId: acceptFamilyInvite
+      tags: [family]
+      summary: Let the inviting family member get alerts about scam calls to me
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The updated invite
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FamilyInvite"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /family/invites/{id}/decline:
+    post:
+      operationId: declineFamilyInvite
+      tags: [family]
+      summary: Decline an invite, or stop sharing alerts after accepting
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The updated invite
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FamilyInvite"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /family/alerts:
+    get:
+      operationId: listFamilyAlerts
+      tags: [family]
+      summary: Recent scam-call alerts about the signed-in user's family members
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Most recent alerts first
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FamilyAlertList"
+        default:
+          $ref: "#/components/responses/Error"
+    post:
+      operationId: reportFamilyCall
+      tags: [family]
+      summary: A family member's phone reports an incoming call
+      description: >
+        Sent by the member's app for an incoming call. The server looks up the
+        caller's reputation itself and, only when it is medium or high risk,
+        notifies every family member who was given consent.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReportFamilyCallRequest"
+      responses:
+        "200":
+          description: How many guardians were notified
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FamilyCallResult"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /family/alerts/{id}/resolve:
+    post:
+      operationId: resolveFamilyAlert
+      tags: [family]
+      summary: Mark a family alert as handled (the member is safe)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Resolved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
   /admin/broadcasts:
     get:
       operationId: adminListBroadcasts
@@ -3143,11 +3271,117 @@ components:
         createdAt:
           type: string
           format: date-time
+        status:
+          type: string
+          enum: [pending, accepted, declined]
+          description: Whether the member has accepted Family Guardian alerts
+        latestAlert:
+          allOf:
+            - $ref: "#/components/schemas/FamilyAlert"
+          nullable: true
+          description: Most recent unresolved alert from the last 24 hours
       required:
         - id
         - name
         - phone
         - createdAt
+        - status
+
+    FamilyAlert:
+      type: object
+      properties:
+        id:
+          type: string
+        memberId:
+          type: string
+        memberName:
+          type: string
+        memberPhone:
+          type: string
+        callerPhone:
+          type: string
+        riskLevel:
+          type: string
+          enum: [high, medium]
+        reportCount:
+          type: integer
+        category:
+          type: string
+          nullable: true
+        resolved:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - memberId
+        - memberName
+        - memberPhone
+        - callerPhone
+        - riskLevel
+        - reportCount
+        - resolved
+        - createdAt
+
+    FamilyAlertList:
+      type: object
+      properties:
+        alerts:
+          type: array
+          items:
+            $ref: "#/components/schemas/FamilyAlert"
+      required:
+        - alerts
+
+    FamilyInvite:
+      type: object
+      properties:
+        id:
+          type: string
+        ownerName:
+          type: string
+        relationship:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [pending, accepted, declined]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - ownerName
+        - status
+        - createdAt
+
+    FamilyInviteList:
+      type: object
+      properties:
+        invites:
+          type: array
+          items:
+            $ref: "#/components/schemas/FamilyInvite"
+      required:
+        - invites
+
+    ReportFamilyCallRequest:
+      type: object
+      properties:
+        callerPhone:
+          type: string
+      required:
+        - callerPhone
+
+    FamilyCallResult:
+      type: object
+      properties:
+        notified:
+          type: integer
+          description: Number of guardians notified (0 when the caller isn't risky)
+      required:
+        - notified
 
     FamilyMemberList:
       type: object

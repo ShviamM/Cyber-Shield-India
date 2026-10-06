@@ -14,6 +14,7 @@ declare class KavachScreeningModule extends NativeModule<KavachScreeningEvents> 
   syncKeywords(keywords: string[]): void;
   syncLanguage(code: string): void;
   syncApiConfig(baseUrl: string, token: string | null): void;
+  setFamilyAlertsEnabled(enabled: boolean): void;
   requestCallScreeningRole(): Promise<boolean>;
   requestOverlayPermission(): Promise<boolean>;
   requestFullScreenIntentPermission(): Promise<boolean>;

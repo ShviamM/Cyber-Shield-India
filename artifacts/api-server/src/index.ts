@@ -4,6 +4,7 @@ import { seedScamCategories } from "./lib/seed";
 import { ensureRolesSeeded } from "./lib/rbac";
 import { ensureWebsiteFormTables } from "./lib/waitlist";
 import { startPhishFeed } from "./lib/phish-feed";
+import { ensureFamilyGuardianSchema } from "./lib/family-schema";
 
 const rawPort = process.env["PORT"];
 
@@ -29,5 +30,6 @@ app.listen(port, (err) => {
   void seedScamCategories();
   void ensureRolesSeeded();
   void ensureWebsiteFormTables();
+  void ensureFamilyGuardianSchema();
   startPhishFeed();
 });

@@ -65,3 +65,22 @@ export async function registerForPushNotifications(): Promise<void> {
     // Non-fatal — the app works without push.
   }
 }
+
+/**
+ * Call [onOpen] when the user taps a Family Guardian alert notification,
+ * including the tap that cold-started the app. Returns an unsubscribe function.
+ */
+export function onFamilyAlertOpened(onOpen: () => void): () => void {
+  if (Platform.OS === "web") return () => {};
+  const isFamilyAlert = (r: Notifications.NotificationResponse | null) =>
+    r?.notification.request.content.data?.type === "family_alert";
+  Notifications.getLastNotificationResponseAsync()
+    .then((r) => {
+      if (isFamilyAlert(r)) onOpen();
+    })
+    .catch(() => {});
+  const sub = Notifications.addNotificationResponseReceivedListener((r) => {
+    if (isFamilyAlert(r)) onOpen();
+  });
+  return () => sub.remove();
+}

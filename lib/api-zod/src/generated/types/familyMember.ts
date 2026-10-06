@@ -5,6 +5,8 @@
  * Netraksh API — phone-OTP auth, fraud-number reporting, and trust scoring
  * OpenAPI spec version: 0.1.0
  */
+import type { FamilyAlert } from './familyAlert';
+import type { FamilyMemberStatus } from './familyMemberStatus';
 
 export interface FamilyMember {
   id: string;
@@ -12,4 +14,8 @@ export interface FamilyMember {
   phone: string;
   relationship?: string | null;
   createdAt: Date;
+  /** Whether the member has accepted Family Guardian alerts */
+  status: FamilyMemberStatus;
+  /** Most recent unresolved alert from the last 24 hours */
+  latestAlert?: FamilyAlert | null;
 }
