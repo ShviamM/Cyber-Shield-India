@@ -25,6 +25,9 @@ declare class KavachScreeningModule extends NativeModule<KavachScreeningEvents> 
   blockNumber(number: string): void;
   getBlockedNumbers(): string[];
   unblockNumber(number: string): void;
+  getBlockPatterns(): string[];
+  addBlockPattern(pattern: string): string | null;
+  removeBlockPattern(pattern: string): void;
 }
 
 // Loads the native module backing the JS `KavachScreening` API on Android.

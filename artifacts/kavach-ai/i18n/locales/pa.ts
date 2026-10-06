@@ -451,6 +451,7 @@ const pa = {
 
   callAlert: {
     incoming: "ਆ ਰਹੀ ਕਾਲ",
+    verificationFailed: "ਨੈੱਟਵਰਕ ਇਸ ਕਾਲਰ ਦਾ ਨੰਬਰ ਪ੍ਰਮਾਣਿਤ ਨਹੀਂ ਕਰ ਸਕਿਆ। ਕਾਲਰ ID ਨਕਲੀ ਹੋ ਸਕਦੀ ਹੈ।",
     unknownCaller: "ਅਣਜਾਣ ਕਾਲਰ · ਕੋਈ ਸੰਪਰਕ ਮੇਲ ਨਹੀਂ",
     scamReports: "ਠੱਗੀ ਦੀਆਂ ਰਿਪੋਰਟਾਂ",
     victimsReported: "ਪੀੜਤ ਰਿਪੋਰਟ ਹੋਏ",

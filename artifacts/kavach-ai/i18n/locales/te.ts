@@ -451,6 +451,7 @@ const te = {
 
   callAlert: {
     incoming: "వచ్చే కాల్",
+    verificationFailed: "నెట్‌వర్క్ ఈ కాలర్ నంబర్‌ను ధృవీకరించలేకపోయింది. కాలర్ ID నకిలీ కావచ్చు.",
     unknownCaller: "తెలియని కాలర్ · కాంటాక్ట్‌లో లేదు",
     scamReports: "మోసపు ఫిర్యాదులు",
     victimsReported: "బాధితులు నమోదయ్యారు",

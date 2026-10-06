@@ -50,8 +50,11 @@ type ReportPhase =
 export default function CallAlertScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
-  const params = useLocalSearchParams<{ number?: string | string[] }>();
+  const params = useLocalSearchParams<{ number?: string | string[]; verify?: string | string[] }>();
   const rawNumber = Array.isArray(params.number) ? params.number[0] : params.number;
+  // Set by the native screening service when Android reports the caller's
+  // number FAILED network verification (STIR/SHAKEN): a sign of spoofing.
+  const verificationFailed = (Array.isArray(params.verify) ? params.verify[0] : params.verify) === "failed";
   const callerNumber = rawNumber && rawNumber.trim() ? rawNumber.trim() : DEMO_NUMBER;
   const isDemo = !(rawNumber && rawNumber.trim());
   const topInset = Platform.OS === "web" ? 67 : insets.top;
@@ -406,6 +409,12 @@ export default function CallAlertScreen() {
       {/* Always-on safety reminder — shown for EVERY caller in the user's
           chosen language, so even an unverified/unknown number still warns
           about OTP & money. */}
+      {verificationFailed && (
+        <View style={s.spoofBox} accessibilityRole="alert">
+          <Feather name="alert-octagon" size={16} color="#FF6B6B" />
+          <Text style={s.spoofTxt}>{t("callAlert.verificationFailed")}</Text>
+        </View>
+      )}
       <View style={s.safetyReminderBox}>
         <Feather name="alert-triangle" size={16} color="#FF6713" />
         <Text style={s.safetyReminder}>{t("callAlert.safetyReminder")}</Text>
@@ -734,6 +743,19 @@ const s = StyleSheet.create({
     textAlign: "center",
     lineHeight: 32,
   },
+  spoofBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "rgba(239,68,68,0.5)",
+    backgroundColor: "rgba(239,68,68,0.12)",
+  },
+  spoofTxt: { flex: 1, color: "#FFD1D1", fontSize: 13.5, fontWeight: "700", lineHeight: 19 },
   safetyReminderBox: {
     flexDirection: "row",
     alignItems: "center",

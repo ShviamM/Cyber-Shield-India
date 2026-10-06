@@ -451,6 +451,7 @@ const bn = {
 
   callAlert: {
     incoming: "আসছে কল",
+    verificationFailed: "নেটওয়ার্ক এই কলারের নম্বর যাচাই করতে পারেনি। কলার আইডি নকল হতে পারে।",
     unknownCaller: "অজানা কলকারী · কোনো কন্টাক্টের সঙ্গে মেলেনি",
     scamReports: "প্রতারণার রিপোর্ট",
     victimsReported: "ভুক্তভোগী রিপোর্ট",

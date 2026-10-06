@@ -99,6 +99,9 @@ export default function AboutScreen() {
       </TouchableOpacity>
 
       <Text style={s.version}>{t("profile.version")}</Text>
+      <Text style={s.credits}>
+        Number-pattern blocking adapted from SpamBlocker (MIT License, © 2024 aj3423).
+      </Text>
     </ScrollView>
   );
 }
@@ -152,4 +155,5 @@ const s = StyleSheet.create({
   },
   helplineTxt: { flex: 1, fontSize: 13, lineHeight: 19, fontWeight: "600", color: "#991b1b" },
   version: { textAlign: "center", fontSize: 12, color: "#94a3b8", marginTop: 24 },
+  credits: { textAlign: "center", fontSize: 11, color: "#94a3b8", marginTop: 8 },
 });

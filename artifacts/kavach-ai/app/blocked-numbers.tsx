@@ -16,15 +16,129 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useColors } from "@/hooks/useColors";
 import {
+  addBlockPattern,
   blockNumber,
   getBlockedNumbers,
+  getBlockPatterns,
   isScreeningSupported,
+  removeBlockPattern,
   unblockNumber,
 } from "@/lib/screening";
 import { formatIndianPhone, isValidIndianPhone, phoneForApi } from "@/lib/phone";
 
 const SAFFRON = "#FF6713";
 const GREEN = "#138808";
+
+// India's TRAI-mandated series for promotional telemarketing calls. (The 160
+// series is used by banks and government for service calls, so we never
+// suggest blocking it.)
+const PRESET_PATTERNS = ["140*"];
+
+/**
+ * Block whole series of numbers with simple wildcard patterns ("140*",
+ * "+92*"). Matching runs on-device in the call screening service; see
+ * modules/kavach-screening/.../BlockPatterns.kt.
+ */
+function PatternRules() {
+  const colors = useColors();
+  const { t } = useTranslation();
+  const [patterns, setPatterns] = React.useState<string[]>([]);
+  const [input, setInput] = React.useState("");
+  const [error, setError] = React.useState<string | null>(null);
+
+  const refresh = React.useCallback(() => setPatterns(getBlockPatterns()), []);
+  useFocusEffect(refresh);
+
+  const add = (raw: string) => {
+    const saved = addBlockPattern(raw);
+    if (!saved) {
+      setError(t("blockedNumbers.patternInvalid"));
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      return;
+    }
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    setInput("");
+    setError(null);
+    refresh();
+  };
+
+  const remove = (pattern: string) => {
+    Haptics.selectionAsync();
+    removeBlockPattern(pattern);
+    refresh();
+  };
+
+  const presets = PRESET_PATTERNS.filter((p) => !patterns.includes(p));
+
+  return (
+    <View style={s.addBox}>
+      <Text style={[s.addLabel, { color: colors.text }]}>{t("blockedNumbers.patternTitle")}</Text>
+      <Text style={[s.patternHelp, { color: colors.mutedForeground }]}>
+        {t("blockedNumbers.patternHelp")}
+      </Text>
+      <View style={s.addRow}>
+        <View style={[s.inputWrap, { backgroundColor: colors.card, borderColor: colors.border }]}>
+          <TextInput
+            style={[s.input, { color: colors.text }]}
+            value={input}
+            onChangeText={(v) => {
+              setInput(v);
+              if (error) setError(null);
+            }}
+            placeholder={t("blockedNumbers.patternPlaceholder")}
+            placeholderTextColor={colors.mutedForeground}
+            keyboardType="phone-pad"
+            maxLength={16}
+            returnKeyType="done"
+            onSubmitEditing={() => input && add(input)}
+            accessibilityLabel={t("blockedNumbers.patternTitle")}
+          />
+        </View>
+        <TouchableOpacity
+          style={[s.addBtn, { backgroundColor: input.length ? colors.danger : colors.border }]}
+          onPress={() => add(input)}
+          disabled={!input.length}
+          activeOpacity={0.85}
+        >
+          <Feather name="slash" size={15} color="#fff" />
+          <Text style={s.addBtnTxt}>{t("blockedNumbers.addButton")}</Text>
+        </TouchableOpacity>
+      </View>
+      {error && <Text style={s.addError}>{error}</Text>}
+      {presets.map((p) => (
+        <TouchableOpacity
+          key={p}
+          style={[s.preset, { borderColor: colors.border }]}
+          onPress={() => add(p)}
+          activeOpacity={0.8}
+        >
+          <Feather name="plus" size={14} color={SAFFRON} />
+          <Text style={[s.presetTxt, { color: colors.text }]}>
+            {t("blockedNumbers.patternPreset140")}
+          </Text>
+        </TouchableOpacity>
+      ))}
+      {patterns.map((p) => (
+        <View key={p} style={[s.card, { backgroundColor: colors.card, borderColor: colors.border, marginTop: 8 }]}>
+          <View style={s.cardIcon}>
+            <Feather name="hash" size={16} color={colors.danger} />
+          </View>
+          <Text style={[s.number, { color: colors.text }]} numberOfLines={1}>
+            {p}
+          </Text>
+          <TouchableOpacity
+            style={[s.unblockBtn, { borderColor: colors.border }]}
+            onPress={() => remove(p)}
+            activeOpacity={0.8}
+            accessibilityLabel={t("blockedNumbers.patternRemove", { pattern: p })}
+          >
+            <Text style={[s.unblockTxt, { color: SAFFRON }]}>{t("blockedNumbers.unblock")}</Text>
+          </TouchableOpacity>
+        </View>
+      ))}
+    </View>
+  );
+}
 
 export default function BlockedNumbersScreen() {
   const colors = useColors();
@@ -153,6 +267,7 @@ export default function BlockedNumbersScreen() {
                 {error && <Text style={s.addError}>{error}</Text>}
               </View>
             )}
+            {supported && <PatternRules />}
           </View>
         }
         ListEmptyComponent={
@@ -225,6 +340,19 @@ const s = StyleSheet.create({
   },
   addBtnTxt: { color: "#fff", fontSize: 14, fontWeight: "700" },
   addError: { color: "#dc2626", fontSize: 12.5, marginTop: 6, fontWeight: "600" },
+  patternHelp: { fontSize: 13, lineHeight: 18, marginBottom: 8 },
+  preset: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderStyle: "dashed",
+  },
+  presetTxt: { fontSize: 13.5, fontWeight: "600", flex: 1 },
   center: {
     flex: 1,
     alignItems: "center",

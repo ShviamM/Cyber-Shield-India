@@ -451,6 +451,7 @@ const or = {
 
   callAlert: {
     incoming: "ଆସୁଥିବା କଲ୍",
+    verificationFailed: "ନେଟୱାର୍କ ଏହି କଲରଙ୍କ ନମ୍ବର ଯାଞ୍ଚ କରିପାରିଲା ନାହିଁ। କଲର୍ ID ନକଲି ହୋଇପାରେ।",
     unknownCaller: "ଅଜଣା କଲର୍ · କୌଣସି କଣ୍ଟାକ୍ଟ ମେଳ ନାହିଁ",
     scamReports: "ଠକେଇ ରିପୋର୍ଟ",
     victimsReported: "ରିପୋର୍ଟ ହୋଇଥିବା ଶିକାର",

@@ -308,6 +308,35 @@ export function unblockNumber(number: string): void {
   }
 }
 
+/** The user's block patterns, e.g. "140*" or "+92*" (Android only). */
+export function getBlockPatterns(): string[] {
+  if (!isScreeningSupported()) return [];
+  try {
+    return KavachScreening.getBlockPatterns();
+  } catch {
+    return [];
+  }
+}
+
+/** Add a block pattern; returns the saved pattern, or null if it's invalid. */
+export function addBlockPattern(pattern: string): string | null {
+  if (!isScreeningSupported()) return null;
+  try {
+    return KavachScreening.addBlockPattern(pattern);
+  } catch {
+    return null;
+  }
+}
+
+export function removeBlockPattern(pattern: string): void {
+  if (!isScreeningSupported()) return;
+  try {
+    KavachScreening.removeBlockPattern(pattern);
+  } catch {
+    // ignore
+  }
+}
+
 /** Tell the native overlay which language (e.g. "en"/"hi") to render in. */
 export function syncScreeningLanguage(code: string): void {
   if (!isScreeningSupported()) return;

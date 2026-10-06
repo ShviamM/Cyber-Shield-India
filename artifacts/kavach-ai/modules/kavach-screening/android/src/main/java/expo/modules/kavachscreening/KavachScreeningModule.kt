@@ -105,6 +105,20 @@ class KavachScreeningModule : Module() {
       ScreeningStore.getUserBlocklist(context).sorted()
     }
 
+    // Number patterns ("140*", "+92*") whose calls are rejected, see BlockPatterns.
+    Function("getBlockPatterns") {
+      ScreeningStore.getBlockPatterns(context).sorted()
+    }
+
+    // Returns the cleaned-up pattern, or null when it isn't a valid pattern.
+    Function("addBlockPattern") { pattern: String ->
+      ScreeningStore.addBlockPattern(context, pattern)
+    }
+
+    Function("removeBlockPattern") { pattern: String ->
+      ScreeningStore.removeBlockPattern(context, pattern)
+    }
+
     // Remove a user-blocked number — the in-app Unblock action.
     Function("unblockNumber") { number: String ->
       ScreeningStore.removeFromUserBlock(context, number)

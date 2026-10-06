@@ -594,6 +594,7 @@ const en = {
 
   callAlert: {
     incoming: "INCOMING CALL",
+    verificationFailed: "The network could not verify this caller's number. The caller ID may be faked.",
     unknownCaller: "Unknown Caller · No Contact Match",
     scamReports: "Scam Reports",
     victimsReported: "Victims Reported",
@@ -740,6 +741,12 @@ const en = {
     addButton: "Block",
     addInvalid: "Enter a valid 10-digit Indian mobile number.",
     addDuplicate: "This number is already blocked.",
+    patternTitle: "Block a number series",
+    patternHelp: "Use * for any digits. For example, 140* blocks promotional telemarketing calls, and +92* blocks calls from that country code.",
+    patternPlaceholder: "e.g. 140* or +92*",
+    patternInvalid: "Enter digits with * as a wildcard, like 140* or +92*. Use at least 3 digits.",
+    patternPreset140: "Block 140* (promotional telemarketing calls)",
+    patternRemove: "Remove {{pattern}}",
   },
 
   language: {

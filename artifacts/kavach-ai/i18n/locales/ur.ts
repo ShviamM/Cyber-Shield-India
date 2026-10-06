@@ -451,6 +451,7 @@ const ur = {
 
   callAlert: {
     incoming: "آنے والی کال",
+    verificationFailed: "نیٹ ورک اس کالر کا نمبر تصدیق نہیں کر سکا۔ کالر ID جعلی ہو سکتی ہے۔",
     unknownCaller: "نامعلوم کالر · کوئی رابطہ نہیں ملا",
     scamReports: "فراڈ رپورٹیں",
     victimsReported: "متاثرین رپورٹ ہوئے",
