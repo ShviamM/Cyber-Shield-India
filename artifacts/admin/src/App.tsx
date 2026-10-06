@@ -10,6 +10,8 @@ import BusinessMetrics from "@/pages/business-metrics";
 import Users from "@/pages/users";
 import FraudMap from "@/pages/fraud-map";
 import Broadcasts from "@/pages/broadcasts";
+import Waitlist from "@/pages/waitlist";
+import ContactMessages from "@/pages/contact-messages";
 import SuperAdmin from "@/pages/super-admin";
 import Privacy from "@/pages/privacy";
 import NotFound from "@/pages/not-found";
@@ -70,6 +72,8 @@ function Router() {
       <Route path="/users" component={() => <ProtectedRoute component={Users} />} />
       <Route path="/fraud-map" component={() => <ProtectedRoute component={FraudMap} />} />
       <Route path="/broadcasts" component={() => <ProtectedRoute component={Broadcasts} />} />
+      <Route path="/waitlist" component={() => <ProtectedRoute component={Waitlist} />} />
+      <Route path="/messages" component={() => <ProtectedRoute component={ContactMessages} />} />
       <Route path="/super" component={() => <SuperAdminRoute />} />
       <Route component={NotFound} />
     </Switch>

@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { LogOut, ShieldCheck, BarChart3, MapPin, Megaphone, AlertTriangle, Crown, Users, Link2 } from "lucide-react";
+import { LogOut, ShieldCheck, BarChart3, MapPin, Megaphone, AlertTriangle, Crown, Users, Link2, BellRing, Inbox } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { BrandLogo, Wordmark, BrandTaglines } from "@/components/brand";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,8 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/users", label: "User Management", icon: Users },
   { href: "/fraud-map", label: "India Fraud Map", icon: MapPin },
   { href: "/broadcasts", label: "Broadcast Center", icon: Megaphone },
+  { href: "/messages", label: "Contact Messages", icon: Inbox },
+  { href: "/waitlist", label: "Launch Waitlist", icon: BellRing },
   { href: "/super", label: "Super Admin", icon: Crown, superAdminOnly: true },
 ];
 

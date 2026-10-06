@@ -36,7 +36,7 @@ router.post("/waitlist", async (req, res) => {
 
   // Same response for new and repeat sign-ups, so the endpoint can't be used to
   // check whether someone is already on the list.
-  res.status(201).json({ ok: true });
+  res.status(201).json({ success: true });
 });
 
 // Admin: see who signed up.
@@ -50,7 +50,10 @@ router.get(
       .from(launchWaitlistTable)
       .orderBy(desc(launchWaitlistTable.createdAt))
       .limit(1000);
-    res.json({ total, entries });
+    res.json({
+      total,
+      entries: entries.map((e) => ({ ...e, createdAt: e.createdAt.toISOString() })),
+    });
   },
 );
 

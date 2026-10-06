@@ -8,14 +8,42 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { Mail, MessageSquare, Building2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { ApiError, submitContactMessage, type ContactMessageRequestSubject } from "@workspace/api-client-react";
 
 export default function Contact() {
-  const { t } = useTranslation("misc");
+  const { t, i18n } = useTranslation("misc");
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const update = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+    setForm((f) => ({ ...f, [field]: e.target.value }));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSending(true);
+    setError(null);
+    try {
+      await submitContactMessage({
+        name: form.name,
+        email: form.email,
+        subject: form.subject as ContactMessageRequestSubject,
+        message: form.message,
+        lang: i18n.language?.startsWith("hi") ? "hi" : "en",
+      });
+      setSubmitted(true);
+    } catch (err) {
+      const status = err instanceof ApiError ? err.status : 0;
+      setError(
+        status === 429
+          ? t("contact.form.rateLimited")
+          : status === 400
+            ? t("contact.form.invalidEmail")
+            : t("contact.form.error"),
+      );
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -78,15 +106,15 @@ export default function Contact() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="name">{t("contact.form.nameLabel")}</Label>
-                  <Input id="name" placeholder={t("contact.form.namePlaceholder")} required className="h-12" />
+                  <Input id="name" value={form.name} onChange={update("name")} maxLength={120} placeholder={t("contact.form.namePlaceholder")} required className="h-12" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">{t("contact.form.emailLabel")}</Label>
-                  <Input id="email" type="email" placeholder={t("contact.form.emailPlaceholder")} required className="h-12" />
+                  <Input id="email" type="email" value={form.email} onChange={update("email")} maxLength={254} placeholder={t("contact.form.emailPlaceholder")} required className="h-12" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="subject">{t("contact.form.subjectLabel")}</Label>
-                  <select id="subject" className="w-full h-12 px-3 border border-input rounded-md bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" required>
+                  <select id="subject" value={form.subject} onChange={update("subject")} className="w-full h-12 px-3 border border-input rounded-md bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" required>
                     <option value="">{t("contact.form.subjectPlaceholder")}</option>
                     <option value="support">{t("contact.form.subjectSupport")}</option>
                     <option value="partnership">{t("contact.form.subjectPartnership")}</option>
@@ -96,10 +124,15 @@ export default function Contact() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="message">{t("contact.form.messageLabel")}</Label>
-                  <Textarea id="message" placeholder={t("contact.form.messagePlaceholder")} rows={5} required className="resize-none" />
+                  <Textarea id="message" value={form.message} onChange={update("message")} maxLength={5000} placeholder={t("contact.form.messagePlaceholder")} rows={5} required className="resize-none" />
                 </div>
-                <Button type="submit" className="w-full h-12 text-lg rounded-xl bg-primary hover:bg-primary/90 text-white">
-                  {t("contact.form.submit")}
+                {error && (
+                  <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                    {error}
+                  </p>
+                )}
+                <Button type="submit" disabled={sending} className="w-full h-12 text-lg rounded-xl bg-primary hover:bg-primary/90 text-white">
+                  {sending ? t("contact.form.sending") : t("contact.form.submit")}
                 </Button>
               </form>
             )}

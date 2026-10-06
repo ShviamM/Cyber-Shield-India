@@ -1381,6 +1381,118 @@ paths:
         default:
           $ref: "#/components/responses/Error"
 
+  /waitlist:
+    post:
+      operationId: joinWaitlist
+      tags: [public]
+      summary: Join the app-launch notification list from the website
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JoinWaitlistRequest"
+      responses:
+        "201":
+          description: Added (or already on the list)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /contact:
+    post:
+      operationId: submitContactMessage
+      tags: [public]
+      summary: Send a message from the website contact form
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactMessageRequest"
+      responses:
+        "201":
+          description: Message stored
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /admin/waitlist:
+    get:
+      operationId: adminListWaitlist
+      tags: [admin]
+      summary: List app-launch sign-ups, newest first (up to 1000)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Waitlist entries
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WaitlistList"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /admin/contact-messages:
+    get:
+      operationId: adminListContactMessages
+      tags: [admin]
+      summary: List website contact messages, newest first (up to 500)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [new, handled]
+      responses:
+        "200":
+          description: Contact messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactMessageList"
+        default:
+          $ref: "#/components/responses/Error"
+
+  /admin/contact-messages/{id}:
+    patch:
+      operationId: adminUpdateContactMessage
+      tags: [admin]
+      summary: Mark a contact message as handled or new
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateContactMessageRequest"
+      responses:
+        "200":
+          description: Updated message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactMessage"
+        default:
+          $ref: "#/components/responses/Error"
+
 components:
   securitySchemes:
     bearerAuth:
@@ -3141,3 +3253,136 @@ components:
       required:
         - title
         - body
+
+    JoinWaitlistRequest:
+      type: object
+      properties:
+        contact:
+          type: string
+          description: Email address or Indian mobile number
+        lang:
+          type: string
+          enum: [en, hi]
+      required:
+        - contact
+
+    WaitlistEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        contact:
+          type: string
+        contactType:
+          type: string
+          enum: [email, phone]
+        lang:
+          type: string
+        source:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - contact
+        - contactType
+        - lang
+        - source
+        - createdAt
+
+    WaitlistList:
+      type: object
+      properties:
+        total:
+          type: integer
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/WaitlistEntry"
+      required:
+        - total
+        - entries
+
+    ContactMessageRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 120
+        email:
+          type: string
+          minLength: 3
+          maxLength: 254
+        subject:
+          type: string
+          enum: [support, partnership, media, other]
+        message:
+          type: string
+          minLength: 1
+          maxLength: 5000
+        lang:
+          type: string
+          enum: [en, hi]
+      required:
+        - name
+        - email
+        - subject
+        - message
+
+    ContactMessage:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        subject:
+          type: string
+        message:
+          type: string
+        lang:
+          type: string
+        status:
+          type: string
+          enum: [new, handled]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - email
+        - subject
+        - message
+        - lang
+        - status
+        - createdAt
+
+    ContactMessageList:
+      type: object
+      properties:
+        total:
+          type: integer
+        newCount:
+          type: integer
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContactMessage"
+      required:
+        - total
+        - newCount
+        - messages
+
+    UpdateContactMessageRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [new, handled]
+      required:
+        - status

@@ -1161,3 +1161,95 @@ export const AdminSendBroadcastResponse = zod.object({
 })
 
 
+/**
+ * @summary Join the app-launch notification list from the website
+ */
+export const JoinWaitlistBody = zod.object({
+  "contact": zod.string().describe('Email address or Indian mobile number'),
+  "lang": zod.enum(['en', 'hi']).optional()
+})
+
+
+/**
+ * @summary Send a message from the website contact form
+ */
+export const submitContactMessageBodyNameMax = 120;
+
+export const submitContactMessageBodyEmailMin = 3;
+export const submitContactMessageBodyEmailMax = 254;
+
+export const submitContactMessageBodyMessageMax = 5000;
+
+
+
+export const SubmitContactMessageBody = zod.object({
+  "name": zod.string().min(1).max(submitContactMessageBodyNameMax),
+  "email": zod.string().min(submitContactMessageBodyEmailMin).max(submitContactMessageBodyEmailMax),
+  "subject": zod.enum(['support', 'partnership', 'media', 'other']),
+  "message": zod.string().min(1).max(submitContactMessageBodyMessageMax),
+  "lang": zod.enum(['en', 'hi']).optional()
+})
+
+
+/**
+ * @summary List app-launch sign-ups, newest first (up to 1000)
+ */
+export const AdminListWaitlistResponse = zod.object({
+  "total": zod.number(),
+  "entries": zod.array(zod.object({
+  "id": zod.string(),
+  "contact": zod.string(),
+  "contactType": zod.enum(['email', 'phone']),
+  "lang": zod.string(),
+  "source": zod.string(),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+
+/**
+ * @summary List website contact messages, newest first (up to 500)
+ */
+export const AdminListContactMessagesQueryParams = zod.object({
+  "status": zod.enum(['new', 'handled']).optional()
+})
+
+export const AdminListContactMessagesResponse = zod.object({
+  "total": zod.number(),
+  "newCount": zod.number(),
+  "messages": zod.array(zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "subject": zod.string(),
+  "message": zod.string(),
+  "lang": zod.string(),
+  "status": zod.enum(['new', 'handled']),
+  "createdAt": zod.coerce.date()
+}))
+})
+
+
+/**
+ * @summary Mark a contact message as handled or new
+ */
+export const AdminUpdateContactMessageParams = zod.object({
+  "id": zod.coerce.string()
+})
+
+export const AdminUpdateContactMessageBody = zod.object({
+  "status": zod.enum(['new', 'handled'])
+})
+
+export const AdminUpdateContactMessageResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "subject": zod.string(),
+  "message": zod.string(),
+  "lang": zod.string(),
+  "status": zod.enum(['new', 'handled']),
+  "createdAt": zod.coerce.date()
+})
+
+

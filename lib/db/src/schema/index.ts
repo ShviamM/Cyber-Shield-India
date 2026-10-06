@@ -15,3 +15,4 @@ export * from "./broadcasts";
 export * from "./ai-usage";
 export * from "./daily-usage";
 export * from "./launch-waitlist";
+export * from "./contact-messages";

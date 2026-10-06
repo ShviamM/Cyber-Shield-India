@@ -16,6 +16,7 @@ import notificationsRouter from "./notifications";
 import familyRouter from "./family";
 import webhooksRouter from "./webhooks";
 import waitlistRouter from "./waitlist";
+import contactRouter from "./contact";
 
 const router: IRouter = Router();
 
@@ -36,5 +37,6 @@ router.use(notificationsRouter);
 router.use(familyRouter);
 router.use(webhooksRouter);
 router.use(waitlistRouter);
+router.use(contactRouter);
 
 export default router;

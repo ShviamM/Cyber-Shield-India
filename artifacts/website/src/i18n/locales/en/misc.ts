@@ -36,6 +36,10 @@ export default {
       messageLabel: "Message",
       messagePlaceholder: "How can we help you?",
       submit: "Send Message",
+      sending: "Sending…",
+      error: "Your message couldn't be sent. Please try again, or email support@netraksh.com.",
+      invalidEmail: "Enter a valid email address.",
+      rateLimited: "You've sent several messages recently. Please wait a while and try again.",
     },
   },
   faq: {
