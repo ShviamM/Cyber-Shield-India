@@ -16,9 +16,14 @@ export default {
   },
   stats: {
     items: [
-      { value: "₹11,000 करोड़+", label: "एक ही साल में भारत में साइबर धोखाधड़ी से गँवाए गए" },
-      { value: "हर 10 मिनट", label: "में एक बुज़ुर्ग ऑनलाइन scam का शिकार बनाया जाता है" },
+      { value: "₹22,845 करोड़", label: "2024 में भारत में साइबर धोखाधड़ी से गँवाए गए", source: 0 },
+      { value: "हर 5 मिनट", label: "में एक बुज़ुर्ग वित्तीय साइबर धोखाधड़ी की शिकायत करता है (2025 में 1,03,488 शिकायतें)", source: 1 },
       { value: "1 ऐप", label: "जो आपके 5 अपनों तक की रक्षा करता है" },
+    ],
+    sourcesLabel: "स्रोत",
+    sources: [
+      { label: "लोकसभा में गृह मंत्रालय का जवाब, जुलाई 2025", url: "https://scroll.in/latest/1084796/indians-lost-rs-22845-crore-to-cyber-fraud-in-2024-a-206-rise-from-previous-year-centre" },
+      { label: "राज्यसभा में गृह मंत्रालय का जवाब, अगस्त 2026 (राष्ट्रीय साइबर अपराध रिपोर्टिंग पोर्टल का डेटा)", url: "https://thenewsmill.com/2026/08/over-1-lakh-senior-citizens-and-4-63-lakh-women-report-rs-7769-crore-cyber-fraud-in-2025/" },
     ],
   },
   clippingsSection: {

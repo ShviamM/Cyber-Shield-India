@@ -16,9 +16,14 @@ export default {
   },
   stats: {
     items: [
-      { value: "₹11,000 Cr+", label: "lost to cyber fraud in India in a single year" },
-      { value: "Every 10 min", label: "a senior citizen is targeted by an online scam" },
+      { value: "₹22,845 Cr", label: "lost to cyber fraud in India in 2024", source: 0 },
+      { value: "Every 5 min", label: "a senior citizen reports a financial cyber fraud (1,03,488 complaints in 2025)", source: 1 },
       { value: "1 app", label: "to protect up to 5 of your loved ones" },
+    ],
+    sourcesLabel: "Sources",
+    sources: [
+      { label: "Ministry of Home Affairs reply in the Lok Sabha, July 2025", url: "https://scroll.in/latest/1084796/indians-lost-rs-22845-crore-to-cyber-fraud-in-2024-a-206-rise-from-previous-year-centre" },
+      { label: "Ministry of Home Affairs reply in the Rajya Sabha, August 2026 (National Cyber Crime Reporting Portal data)", url: "https://thenewsmill.com/2026/08/over-1-lakh-senior-citizens-and-4-63-lakh-women-report-rs-7769-crore-cyber-fraud-in-2025/" },
     ],
   },
   clippingsSection: {

@@ -22,7 +22,9 @@ export default function FamilyProtection() {
   const stats = t("stats.items", { returnObjects: true }) as Array<{
     value: string;
     label: string;
+    source?: number;
   }>;
+  const statSources = t("stats.sources", { returnObjects: true }) as Array<{ label: string; url: string }>;
   return (
     <Layout>
       <MotionConfig reducedMotion="user">
@@ -49,11 +51,24 @@ export default function FamilyProtection() {
         <dl className="mx-auto mt-12 grid max-w-3xl overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] text-left sm:grid-cols-3">
           {stats.map((s, i) => (
             <div key={s.label} className={`p-5 ${i > 0 ? "border-t border-white/10 sm:border-l sm:border-t-0" : ""}`}>
-              <dd className="text-2xl font-bold text-white">{s.value}</dd>
+              <dd className="text-2xl font-bold text-white">
+                {s.value}
+                {s.source !== undefined && <sup className="ml-0.5 text-sm font-semibold text-[#FFB55C]">{s.source + 1}</sup>}
+              </dd>
               <dt className="mt-1 text-[15px] text-[#B4BBD0]">{s.label}</dt>
             </div>
           ))}
         </dl>
+        <ol className="mx-auto mt-4 max-w-3xl list-none space-y-1 text-left text-[13px] text-[#B4BBD0]">
+          {statSources.map((src, i) => (
+            <li key={src.url}>
+              <span className="font-semibold text-[#FFB55C]">{i + 1}</span>{" "}
+              <a href={src.url} target="_blank" rel="noopener noreferrer" className="underline decoration-white/30 underline-offset-2 hover:text-white">
+                {src.label}
+              </a>
+            </li>
+          ))}
+        </ol>
       </PageHero>
 
       {/* Newspaper clippings — the pinboard */}

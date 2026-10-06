@@ -25,7 +25,7 @@ import {
   useCreatePublicReport,
   getPublicReportChallenge,
 } from "@workspace/api-client-react";
-import { Flag, CheckCircle2 } from "lucide-react";
+import { Flag, CheckCircle2, Bell } from "lucide-react";
 import { solveChallenge } from "@/lib/pow";
 
 type CheckType =
@@ -410,7 +410,7 @@ export default function CheckScam() {
               >
                 <p className="text-gray-200">{t(`error.${errorKind}`)}</p>
                 {errorKind === "limitReached" && (
-                  <Link href="/download" className="inline-block mt-4">
+                  <Link href="/download#notify" className="inline-block mt-4">
                     <button className="bg-primary hover:bg-primary/90 text-white py-3 px-6 rounded-xl font-medium flex items-center gap-2 transition-colors">
                       {t("download.cta")} <ArrowRight className="w-4 h-4" />
                     </button>
@@ -518,8 +518,8 @@ export default function CheckScam() {
                     {t("download.desc")}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3">
-                    <Link href="/download" className="sm:flex-1">
-                      <button className="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors shadow-[0_0_20px_rgba(11,61,145,0.4)]">
+                    <Link href="/download#notify" className="sm:flex-1">
+                      <button className="w-full bg-primary hover:bg-primary/90 text-white py-3 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors ">
                         {t("download.cta")} <ArrowRight className="w-4 h-4" />
                       </button>
                     </Link>
@@ -545,12 +545,12 @@ export default function CheckScam() {
             {t("download.title")}
           </h2>
           <p className="text-gray-600 mb-8">{t("download.desc")}</p>
-          <Link href="/download">
+          <Link href="/download#notify">
             <Button
               size="lg"
               className="rounded-xl bg-primary hover:bg-primary/90 text-white font-semibold px-8 h-14 text-lg gap-2"
             >
-              {t("download.cta")} <Lock className="h-5 w-5" />
+              <Bell className="h-5 w-5" /> {t("download.cta")}
             </Button>
           </Link>
         </div>
