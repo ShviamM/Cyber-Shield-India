@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout/Layout";
+import { PageHero } from "@/components/layout/PageHero";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -179,16 +180,9 @@ export default function Pricing() {
         title={t("seo.title")}
         description={t("seo.description")}
       />
-      <section className="py-20 px-4 bg-gradient-to-b from-white to-gray-50">
+      <PageHero title={t("hero.heading")} subtitle={t("hero.subtitle")} />
+      <section className="py-16 px-4 bg-[#F5F6FA]">
         <div className="container mx-auto max-w-6xl">
-          <div className="text-center max-w-2xl mx-auto mb-14">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              {t("hero.heading")}
-            </h1>
-            <p className="text-lg text-gray-600">
-              {t("hero.subtitle")}
-            </p>
-          </div>
 
           {loading ? (
             <div className="flex justify-center py-20">
@@ -215,7 +209,7 @@ export default function Pricing() {
                     key={key}
                     className={`relative flex flex-col rounded-3xl p-8 transition-transform ${
                       featured
-                        ? "bg-gradient-to-br from-[#0B3D91] to-[#06245c] text-white shadow-2xl shadow-primary/30 md:-translate-y-4 ring-1 ring-white/10"
+                        ? "bg-gradient-to-br from-[#121731] to-[#0A0F24] text-white shadow-2xl shadow-primary/30 md:-translate-y-4 ring-1 ring-white/10"
                         : "bg-white border border-gray-200 shadow-sm"
                     }`}
                   >
@@ -238,7 +232,7 @@ export default function Pricing() {
                       </h2>
                     </div>
 
-                    <p className={`text-sm mb-6 ${featured ? "text-blue-100" : "text-gray-600"}`}>
+                    <p className={`text-sm mb-6 ${featured ? "text-[#B4BBD0]" : "text-gray-600"}`}>
                       {planTagline}
                     </p>
 
@@ -251,11 +245,11 @@ export default function Pricing() {
                             <span className={`text-5xl font-extrabold tracking-tight ${featured ? "text-white" : "text-gray-900"}`}>
                               {plan ? formatPrice(plan.amount) : "—"}
                             </span>
-                            <span className={`mb-1.5 ${featured ? "text-blue-200" : "text-gray-500"}`}>{t("perYear")}</span>
+                            <span className={`mb-1.5 ${featured ? "text-[#C9CEE0]" : "text-gray-500"}`}>{t("perYear")}</span>
                           </div>
                           {plan && (
                             <div className="mt-3 flex flex-wrap items-center gap-2">
-                              <span className={`text-sm ${featured ? "text-blue-100" : "text-gray-500"}`}>
+                              <span className={`text-sm ${featured ? "text-[#B4BBD0]" : "text-gray-500"}`}>
                                 {t("monthlyEquivalent", { price: monthlyEquivalent(plan.amount) })}
                               </span>
                               <span
@@ -286,7 +280,7 @@ export default function Pricing() {
                       {planFeatures.map((feature) => (
                         <li
                           key={feature}
-                          className={`flex items-start gap-3 text-sm ${featured ? "text-blue-50" : "text-gray-700"}`}
+                          className={`flex items-start gap-3 text-sm ${featured ? "text-[#E2E6F0]" : "text-gray-700"}`}
                         >
                           <Check className={`w-5 h-5 shrink-0 mt-0.5 ${featured ? "text-accent" : "text-green-600"}`} />
                           <span>{feature}</span>

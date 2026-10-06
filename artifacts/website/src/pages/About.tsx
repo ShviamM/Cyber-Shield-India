@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout/Layout";
+import { PageHero } from "@/components/layout/PageHero";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
@@ -47,38 +48,12 @@ export default function About() {
         />
 
         {/* HERO */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white pt-12 pb-16">
-          <div className="absolute inset-0 pointer-events-none opacity-[0.6]">
-            <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
-            <div className="absolute top-1/3 -left-24 h-80 w-80 rounded-full bg-accent/10 blur-3xl" />
-          </div>
-          <div className="container mx-auto px-4 md:px-6 relative z-10 text-center max-w-3xl">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-primary text-sm font-semibold mb-6"
-            >
-              <ShieldCheck className="h-4 w-4" /> {t("hero.badge")}
-            </motion.div>
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 tracking-tight leading-tight"
-            >
-              {t("hero.titleLead")} <span className="text-primary">{t("hero.titleHighlight")}</span>{t("hero.titleTail")}
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-xl text-gray-600 leading-relaxed"
-            >
-              {t("hero.subtitle")}
-            </motion.p>
-          </div>
-        </section>
+        <PageHero
+          badgeIcon={<ShieldCheck />}
+          badge={t("hero.badge")}
+          title={<>{t("hero.titleLead")} {t("hero.titleHighlight")}{t("hero.titleTail")}</>}
+          subtitle={t("hero.subtitle")}
+        />
 
         {/* NAME MEANING */}
         <section className="py-24 bg-white">
@@ -87,7 +62,7 @@ export default function About() {
               initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
-              className="max-w-3xl mx-auto rounded-3xl bg-gradient-to-br from-primary to-[#0a2f6e] text-white p-8 sm:p-10 text-center relative overflow-hidden"
+              className="max-w-3xl mx-auto rounded-3xl bg-gradient-to-br from-[#121731] to-[#0A0F24] text-white p-8 sm:p-10 text-center relative overflow-hidden"
             >
               <div className="absolute -top-12 -right-8 h-40 w-40 rounded-full bg-accent/20 blur-3xl pointer-events-none" />
               <div className="relative z-10">
@@ -95,7 +70,7 @@ export default function About() {
                   <Eye className="h-7 w-7 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold mb-3">{t("why.name.title")}</h3>
-                <p className="text-blue-100 text-lg leading-relaxed">
+                <p className="text-[#B4BBD0] text-lg leading-relaxed">
                   <span className="font-semibold text-white">{t("why.name.netra")}</span> {t("why.name.netraGloss")} +{" "}
                   <span className="font-semibold text-white">{t("why.name.raksha")}</span> {t("why.name.rakshaGloss")} ={" "}
                   <span className="font-semibold text-white">{t("why.name.brand")}</span> {t("why.name.tail")}
@@ -235,7 +210,7 @@ export default function About() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto leading-relaxed"
+              className="text-xl text-[#B4BBD0] mb-10 max-w-2xl mx-auto leading-relaxed"
             >
               {t("cta.subtitle")}
             </motion.p>

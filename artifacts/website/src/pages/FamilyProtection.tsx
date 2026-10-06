@@ -10,6 +10,7 @@ import {
   HeartHandshake,
 } from "lucide-react";
 import { Layout } from "@/components/layout/Layout";
+import { PageHero, heroBtnLight, heroBtnGlow } from "@/components/layout/PageHero";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { NewspaperClippings } from "@/components/NewspaperClippings";
@@ -31,70 +32,29 @@ export default function FamilyProtection() {
       />
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-primary/5 via-white to-white">
-        <div className="container mx-auto px-4 pb-12 pt-14 text-center">
-          <motion.span
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary"
-          >
-            <HeartHandshake className="h-4 w-4" /> {t("hero.badge")}
-          </motion.span>
-          <motion.h1
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.05 }}
-            className="mx-auto mt-5 max-w-3xl text-4xl font-bold text-gray-900 md:text-6xl"
-          >
-            {t("hero.titleStart")}
-            <span className="text-accent">{t("hero.titleAccent")}</span>
-            {t("hero.titleEnd")}
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.12 }}
-            className="mx-auto mt-5 max-w-2xl text-lg text-gray-600 md:text-xl"
-          >
-            {t("hero.subtitle")}
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.18 }}
-            className="mt-8 flex flex-wrap justify-center gap-3"
-          >
-            <Link href="/pricing">
-              <Button size="lg" className="gap-2">
-                {t("hero.protectBtn")} <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href="/download">
-              <Button size="lg" variant="outline">
-                {t("hero.downloadBtn")}
-              </Button>
-            </Link>
-          </motion.div>
-
-          {/* Stats strip */}
-          <div className="mx-auto mt-12 grid max-w-3xl gap-4 sm:grid-cols-3">
-            {stats.map((s, i) => (
-              <motion.div
-                key={s.label}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.08 }}
-                className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
-              >
-                <p className="text-2xl font-bold text-primary">{s.value}</p>
-                <p className="mt-1 text-sm text-gray-600">{s.label}</p>
-              </motion.div>
-            ))}
-          </div>
+      <PageHero
+        badgeIcon={<HeartHandshake />}
+        badge={t("hero.badge")}
+        title={<>{t("hero.titleStart")}{t("hero.titleAccent")}{t("hero.titleEnd")}</>}
+        subtitle={t("hero.subtitle")}
+      >
+        <div className="mt-8 flex flex-col justify-center gap-3.5 sm:flex-row">
+          <Link href="/pricing" className={heroBtnLight}>
+            {t("hero.protectBtn")} <ArrowRight className="h-5 w-5" />
+          </Link>
+          <Link href="/download" className={heroBtnGlow}>
+            {t("hero.downloadBtn")}
+          </Link>
         </div>
-      </section>
+        <dl className="mx-auto mt-12 grid max-w-3xl overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] text-left sm:grid-cols-3">
+          {stats.map((s, i) => (
+            <div key={s.label} className={`p-5 ${i > 0 ? "border-t border-white/10 sm:border-l sm:border-t-0" : ""}`}>
+              <dd className="text-2xl font-bold text-white">{s.value}</dd>
+              <dt className="mt-1 text-[15px] text-[#B4BBD0]">{s.label}</dt>
+            </div>
+          ))}
+        </dl>
+      </PageHero>
 
       {/* Newspaper clippings — the pinboard */}
       <section className="bg-[#efe9da] py-16">
@@ -157,7 +117,7 @@ export default function FamilyProtection() {
           <h2 className="mx-auto mt-4 max-w-2xl text-3xl font-bold md:text-4xl">
             {t("cta.title")}
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-blue-100">
+          <p className="mx-auto mt-3 max-w-xl text-[#B4BBD0]">
             {t("cta.subtitle")}
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">

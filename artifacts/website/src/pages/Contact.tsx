@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout/Layout";
+import { PageHero } from "@/components/layout/PageHero";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,11 +24,10 @@ export default function Contact() {
         title={t("contact.seoTitle")} 
         description={t("contact.seoDescription")}
       />
-      <div className="container mx-auto px-4 pt-10 pb-16 max-w-6xl">
+      <PageHero title={t("contact.heading")} subtitle={t("contact.subheading")} />
+      <div className="container mx-auto px-4 pt-14 pb-16 max-w-6xl">
         <div className="grid lg:grid-cols-2 gap-16">
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">{t("contact.heading")}</h1>
-            <p className="text-xl text-gray-600 mb-12">{t("contact.subheading")}</p>
             
             <div className="space-y-8">
               <div className="flex items-start gap-4">

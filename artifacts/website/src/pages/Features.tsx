@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout/Layout";
+import { PageHero } from "@/components/layout/PageHero";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
@@ -110,39 +111,12 @@ export default function Features() {
         />
 
         {/* HERO */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-gray-50 to-white pt-12 pb-16">
-          <div className="absolute inset-0 pointer-events-none opacity-[0.6]">
-            <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
-            <div className="absolute top-1/2 -left-24 h-96 w-96 rounded-full bg-accent/10 blur-3xl" />
-          </div>
-          <div className="container mx-auto px-4 md:px-6 relative z-10 text-center max-w-3xl">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-50 border border-orange-100 text-accent text-sm font-semibold mb-6"
-            >
-              <Sparkles className="h-4 w-4" /> {t("hero.badge")}
-            </motion.div>
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 tracking-tight"
-            >
-              {t("hero.titleLead")}{" "}
-              <span className="text-primary">{t("hero.titleHighlight")}</span>
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-xl text-gray-600 leading-relaxed"
-            >
-              {t("hero.subtitle")}
-            </motion.p>
-          </div>
-        </section>
+        <PageHero
+          badgeIcon={<Sparkles />}
+          badge={t("hero.badge")}
+          title={<>{t("hero.titleLead")} {t("hero.titleHighlight")}</>}
+          subtitle={t("hero.subtitle")}
+        />
 
         {/* SECTION 1 — WHAT ARE YOU PROTECTING */}
         <section className="py-24 bg-gray-900 text-white relative overflow-hidden">
@@ -457,7 +431,7 @@ export default function Features() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto leading-relaxed"
+              className="text-xl text-[#B4BBD0] mb-10 max-w-2xl mx-auto leading-relaxed"
             >
               {t("finalCta.subtitle")}
             </motion.p>

@@ -1,23 +1,25 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle } from "lucide-react";
+import { Link } from "wouter";
+import { Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Layout } from "@/components/layout/Layout";
+import { PageHero, heroBtnGlow, heroBtnLight } from "@/components/layout/PageHero";
+import { SEOHead } from "@/components/SEOHead";
 
 export default function NotFound() {
   const { t } = useTranslation("misc");
+  const { t: tc } = useTranslation("common");
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md mx-4">
-        <CardContent className="pt-6">
-          <div className="flex mb-4 gap-2">
-            <AlertCircle className="h-8 w-8 text-red-500" />
-            <h1 className="text-2xl font-bold text-gray-900">{t("notFound.title")}</h1>
-          </div>
-
-          <p className="mt-4 text-sm text-gray-600">
-            {t("notFound.description")}
-          </p>
-        </CardContent>
-      </Card>
-    </div>
+    <Layout>
+      <SEOHead title={`${t("notFound.title")} | Netraksh`} description={t("notFound.description")} />
+      <PageHero badge="404" title={t("notFound.title")} subtitle={t("notFound.description")}>
+        <div className="mt-8 flex flex-col justify-center gap-3.5 sm:flex-row">
+          <Link href="/" className={heroBtnLight}>{t("notFound.home")}</Link>
+          <Link href="/check" className={heroBtnGlow}>
+            <Search className="h-5 w-5" />
+            {tc("nav.checkScam")}
+          </Link>
+        </div>
+      </PageHero>
+    </Layout>
   );
 }

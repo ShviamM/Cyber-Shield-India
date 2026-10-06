@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Layout } from "@/components/layout/Layout";
+import { PageHero } from "@/components/layout/PageHero";
 import { SEOHead } from "@/components/SEOHead";
 import { legalContent } from "@/data/legalContent";
 
@@ -12,8 +13,8 @@ export default function GenericLegalPage({ slug }: { slug: string }) {
   return (
     <Layout>
       <SEOHead title={`${title} | Netraksh`} description={description} />
-      <div className="container mx-auto px-4 py-20 max-w-4xl">
-        <h1 className="text-4xl font-bold mb-8">{title}</h1>
+      <PageHero title={title} subtitle={description} glow={false} />
+      <div className="container mx-auto px-4 py-14 max-w-4xl">
         <div className="prose prose-lg text-gray-600 max-w-none">
           {content ? (
             <div dangerouslySetInnerHTML={{ __html: content }} />

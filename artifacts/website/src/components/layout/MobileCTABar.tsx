@@ -2,7 +2,7 @@ import { Link, useLocation } from "wouter";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck } from "lucide-react";
+import { Search } from "lucide-react";
 
 export function MobileCTABar() {
   const [location] = useLocation();
@@ -18,7 +18,7 @@ export function MobileCTABar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  if (location === "/download" || location === "/login") {
+  if (location === "/check" || location === "/login") {
     return null;
   }
 
@@ -28,14 +28,14 @@ export function MobileCTABar() {
         visible ? "translate-y-0" : "translate-y-full"
       }`}
     >
-      <div className="bg-white/90 backdrop-blur-md border-t border-gray-200 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+      <div className="bg-[#0A0F24]/95 backdrop-blur-md border-t border-white/10 px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
         <Button
           asChild
-          className="w-full rounded-full bg-primary hover:bg-primary/90 text-white font-semibold h-12 text-base shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
+          className="w-full rounded-xl bg-[#F6F7FB] hover:bg-white text-[#121731] font-semibold h-12 text-base flex items-center justify-center gap-2"
         >
-          <Link href="/download">
-            <ShieldCheck className="h-5 w-5" />
-            {t("cta.downloadFree")}
+          <Link href="/check">
+            <Search className="h-5 w-5" />
+            {t("cta.checkNumberFree")}
           </Link>
         </Button>
       </div>

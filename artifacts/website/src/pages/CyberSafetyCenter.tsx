@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout/Layout";
+import { PageHero } from "@/components/layout/PageHero";
 import { SEOHead } from "@/components/SEOHead";
 import { Link } from "wouter";
 import { useState } from "react";
@@ -58,20 +59,9 @@ export default function CyberSafetyCenter() {
         description={t("seo.description")}
         url="https://netraksh.com/cyber-safety-center"
       />
-      <div className="bg-gray-50 pt-10 pb-16 md:pt-14 md:pb-20">
+      <PageHero badgeIcon={<ShieldCheck />} badge={t("badge")} title={t("heading")} subtitle={t("subtitle")} />
+      <div className="bg-[#F5F6FA] pt-12 pb-16 md:pt-14 md:pb-20">
         <div className="container mx-auto px-4 max-w-6xl">
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 text-primary text-sm font-semibold mb-6">
-              <ShieldCheck className="h-4 w-4" />
-              {t("badge")}
-            </div>
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-              {t("heading")}
-            </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              {t("subtitle")}
-            </p>
-          </div>
 
           <div className="max-w-md mx-auto mb-8">
             <div className="relative">

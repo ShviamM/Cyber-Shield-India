@@ -210,7 +210,7 @@ function ReportScam({ type, value }: { type: ReportableType; value: string }) {
         id="report-category"
         value={category}
         onChange={(e) => setCategory(e.target.value)}
-        className="w-full bg-[#152033] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent transition-colors mb-4"
+        className="w-full bg-[#161E3D] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-accent transition-colors mb-4"
       >
         <option value="">{t("report.categoryPlaceholder")}</option>
         {categories.map((c) => (
@@ -329,7 +329,7 @@ export default function CheckScam() {
     <Layout>
       <SEOHead title={t("seo.title")} description={t("seo.description")} />
 
-      <section className="relative overflow-hidden bg-[#061f4d] text-white">
+      <section className="relative overflow-hidden bg-[#0A0F24] text-white">
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_#0B3D91_0%,_transparent_60%)] opacity-40" />
           <div
@@ -355,7 +355,7 @@ export default function CheckScam() {
           {/* Input card */}
           <form
             onSubmit={handleSubmit}
-            className="w-full bg-[#0c1424]/80 backdrop-blur-xl border border-white/10 p-6 rounded-3xl relative overflow-hidden"
+            className="w-full bg-[#10162F]/80 backdrop-blur-xl border border-white/10 p-6 rounded-3xl relative overflow-hidden"
           >
             <div className="absolute top-0 left-1/4 w-1/2 h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent opacity-80" />
             <label
@@ -372,7 +372,7 @@ export default function CheckScam() {
                 placeholder={t("placeholder")}
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
-                className="flex-1 bg-[#152033] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:border-accent transition-colors font-mono"
+                className="flex-1 bg-[#161E3D] border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-gray-500 focus:outline-none focus:border-accent transition-colors font-mono"
               />
               <button
                 type="submit"
@@ -406,7 +406,7 @@ export default function CheckScam() {
                 initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={prefersReducedMotion ? undefined : { opacity: 0, y: -10 }}
-                className="mt-6 bg-[#0c1424]/80 border border-white/10 rounded-3xl p-6 text-center"
+                className="mt-6 bg-[#10162F]/80 border border-white/10 rounded-3xl p-6 text-center"
               >
                 <p className="text-gray-200">{t(`error.${errorKind}`)}</p>
                 {errorKind === "limitReached" && (
@@ -427,7 +427,7 @@ export default function CheckScam() {
                 }
                 animate={{ opacity: 1, scale: 1 }}
                 exit={prefersReducedMotion ? undefined : { opacity: 0 }}
-                className="mt-6 bg-[#0c1424]/80 border border-white/10 rounded-3xl p-6 sm:p-8"
+                className="mt-6 bg-[#10162F]/80 border border-white/10 rounded-3xl p-6 sm:p-8"
               >
                 <div className="flex items-start gap-4">
                   <div
