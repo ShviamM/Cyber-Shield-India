@@ -9,6 +9,8 @@ import {
 } from "./reputation";
 import { classifyMessage, classifyUrl, type UrlClassification } from "./ai-classifier";
 import { analyzeUrlHeuristics, checkSafeBrowsing, normalizeUrlKey } from "./url-analysis";
+import { checkPhishFeed } from "./phish-feed";
+import { config } from "../config";
 import { analyzeUpi, normalizeUpiKey } from "./upi";
 
 export type FraudCheckType = "phone" | "url" | "upi" | "message";
@@ -201,7 +203,10 @@ async function analyzeUrlTarget(raw: string): Promise<Analysis> {
     checkSafeBrowsing(url),
     classifyUrl(url.toString()),
   ]);
-  signals.push(safeBrowsing);
+  signals.push(checkPhishFeed(url));
+  // Google Safe Browsing is optional (and its v4 API is non-commercial only);
+  // don't show a "not configured" note when the phishing feed already ran.
+  if (config.safeBrowsingApiKey) signals.push(safeBrowsing);
   if (aiResult) {
     const signal = urlAiSignal(aiResult);
     if (signal) signals.push(signal);
