@@ -2,7 +2,7 @@ export default {
   seo: {
     title: "Family Guardian | Protect Your Loved Ones",
     description:
-      "Netraksh Family Guardian lets you monitor and block cyber threats targeting your parents, seniors, and children — with real-time alerts the moment a scam is stopped.",
+      "Netraksh helps protect your parents, grandparents and children from scam calls, fake links and UPI fraud. Family alerts, which tell you when a scam targets them, are coming soon.",
   },
   hero: {
     badge: "Family Guardian",
@@ -18,7 +18,7 @@ export default {
     items: [
       { value: "₹22,845 Cr", label: "lost to cyber fraud in India in 2024", source: 0 },
       { value: "Every 5 min", label: "a senior citizen reports a financial cyber fraud (1,03,488 complaints in 2025)", source: 1 },
-      { value: "1 app", label: "to protect up to 5 of your loved ones" },
+      { value: "Up to 5", label: "family members you can add to your Family Shield" },
     ],
     sourcesLabel: "Sources",
     sources: [
@@ -39,15 +39,15 @@ export default {
       "Tap a person to see the scam they’re most likely to face — and exactly how Netraksh shields them.",
   },
   alertSection: {
-    badge: "Real-time peace of mind",
-    title: "You’ll know the moment a threat is stopped",
+    badge: "Coming soon",
+    title: "Family alerts are on the way",
     subtitle:
-      "When Netraksh blocks a scam on your loved one’s phone, you get notified instantly — no more finding out too late.",
+      "We're building alerts that tell you when Netraksh stops a scam on your loved one's phone. Here's how they will work.",
   },
   cta: {
     title: "Give your family the digital bodyguard they deserve",
     subtitle:
-      "One subscription protects up to 5 loved ones. Start a 7-day free trial — no card needed.",
+      "Start a 7-day free trial. No card needed.",
     startBtn: "Start Free Trial",
     seeAllBtn: "See All Features",
   },
@@ -120,9 +120,9 @@ export default {
         scenario:
           "A caller claims their account will be frozen tonight unless they ‘re-verify’ over the phone.",
         protections: [
-          "Real-time scam-call warning before they pick up",
-          "Suspicious link & APK blocking inside SMS and WhatsApp",
-          "Instant alert sent to you when a threat is stopped",
+          "Warns about reported scam numbers when a call comes in",
+          "Check any SMS or WhatsApp link by sharing it to Netraksh",
+          "Family alerts to your phone (coming soon)",
         ],
       },
       {
@@ -133,9 +133,9 @@ export default {
         scenario:
           "Fraudsters posing as police or bank officers keep them on a video call, isolating them from family.",
         protections: [
-          "Flags impersonation and pressure-tactic scripts",
-          "One-tap ‘Ask Family’ button to break the isolation",
-          "You can review what was blocked from your own phone",
+          "Flags numbers reported for digital-arrest and impersonation scams",
+          "One-tap report after a suspicious call",
+          "Family alerts to your phone (coming soon)",
         ],
       },
       {
@@ -146,9 +146,9 @@ export default {
         scenario:
           "A ‘free reward’ or part-time job link asks them to share an OTP or download an app.",
         protections: [
-          "Blocks malicious links shared in games and chats",
-          "Warns before installing risky apps",
-          "Safe-by-default settings tuned for young users",
+          "Check job offers and reward links before opening them",
+          "Warns about reported scam numbers when a call comes in",
+          "Simple guides to common traps in the Cyber Safety Center",
         ],
       },
       {
@@ -160,8 +160,8 @@ export default {
           "A ‘refund’ asks you to scan a QR code or approve a collect request that actually pays them.",
         protections: [
           "Checks UPI IDs and QR codes before you pay",
-          "Detects fake refund and delivery scams",
-          "Manage protection for your whole family in one place",
+          "Check refund and delivery messages before you act",
+          "Add up to 5 family members to your Family Shield",
         ],
       },
     ],
@@ -171,12 +171,12 @@ export default {
     step1Desc:
       "A suspicious SMS claims their bank account is blocked, urging an immediate click.",
     step1Sms: '"Dear Customer, your A/c is blocked. Update Pan card link..."',
-    step2Title: "2. Netraksh Intervenes",
+    step2Title: "2. They Check It With Netraksh",
     step2Desc:
-      "AI instantly scans the sender and link, recognizing it as a known phishing vector. Access is blocked.",
-    step3Title: "3. You Are Notified",
+      "They share the message to Netraksh, which checks the sender and link and warns them it's a phishing scam.",
+    step3Title: "3. You're Notified (Coming Soon)",
     step3Desc:
-      "As the trusted family contact, you receive an instant alert that a threat was blocked on their device.",
+      "Soon, as their trusted family contact, you'll get an alert on your phone when a scam targets them.",
     familyProtected: "Family Protected",
   },
 };

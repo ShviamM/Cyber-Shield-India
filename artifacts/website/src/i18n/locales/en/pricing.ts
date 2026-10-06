@@ -2,7 +2,7 @@ export default {
   seo: {
     title: "Pricing & Plans | Netraksh",
     description:
-      "Start a 7-day free trial of Netraksh — Premium at ₹99/year for full real-time scam protection, or Family at ₹449/year to protect up to 5 loved ones.",
+      "Start a 7-day free trial of Netraksh — Premium at ₹99/year for full real-time scam protection, or Family at ₹449/year for up to 5 family members.",
   },
   hero: {
     heading: "Protection that fits your life",
@@ -36,9 +36,8 @@ export default {
       tagline: "Protect your whole family",
       features: [
         "Everything in Premium",
-        "Cover up to 5 family members",
-        "Shared family safety dashboard",
-        "Alerts for elderly & children",
+        "Add up to 5 family members to your Family Shield",
+        "Family alerts for elderly & children (coming soon)",
       ],
     },
   },
