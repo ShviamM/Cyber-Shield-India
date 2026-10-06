@@ -38,8 +38,8 @@ export default {
       {
         badge: "SMS Fraud",
         title: "A message says your bank account will be blocked",
-        desc: "“Update your KYC now or your account will be frozen.” Netraksh analyses the sender and link instantly, flagging it as dangerous so you never click.",
-        steps: ["Message Received", "Netraksh Analyzes", "Marked Dangerous", "Do Not Click"],
+        desc: "“Update your KYC now or your account will be frozen.” Share the SMS to Netraksh and it checks the sender and link in seconds, flagging it as dangerous before you click.",
+        steps: ["Message Received", "Share to Netraksh", "Marked Dangerous", "Do Not Click"],
       },
       {
         badge: "WhatsApp",

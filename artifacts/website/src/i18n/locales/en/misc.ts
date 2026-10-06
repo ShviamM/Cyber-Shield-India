@@ -67,7 +67,7 @@ export default {
       },
       {
         q: "Can Netraksh protect my family?",
-        a: "Yes. Our 'Family Guardian' feature allows you to link accounts with elderly parents or vulnerable family members. You'll receive real-time alerts if they are targeted by a known scammer, allowing you to intervene quickly.",
+        a: "Yes. Install Netraksh on your parents' or other family members' phones so it can warn them about scam calls and let them check links and UPI requests. Our Family Guardian alerts, which will notify you when a known scammer targets them, are coming soon.",
       },
       {
         q: "What should I do if I lose money to cyber fraud?",
