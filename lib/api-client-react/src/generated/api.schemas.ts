@@ -996,6 +996,117 @@ export interface SendBroadcastRequest {
   body: string;
 }
 
+export type JoinWaitlistRequestLang = typeof JoinWaitlistRequestLang[keyof typeof JoinWaitlistRequestLang];
+
+
+export const JoinWaitlistRequestLang = {
+  en: 'en',
+  hi: 'hi',
+} as const;
+
+export interface JoinWaitlistRequest {
+  /** Email address or Indian mobile number */
+  contact: string;
+  lang?: JoinWaitlistRequestLang;
+}
+
+export type WaitlistEntryContactType = typeof WaitlistEntryContactType[keyof typeof WaitlistEntryContactType];
+
+
+export const WaitlistEntryContactType = {
+  email: 'email',
+  phone: 'phone',
+} as const;
+
+export interface WaitlistEntry {
+  id: string;
+  contact: string;
+  contactType: WaitlistEntryContactType;
+  lang: string;
+  source: string;
+  createdAt: string;
+}
+
+export interface WaitlistList {
+  total: number;
+  entries: WaitlistEntry[];
+}
+
+export type ContactMessageRequestSubject = typeof ContactMessageRequestSubject[keyof typeof ContactMessageRequestSubject];
+
+
+export const ContactMessageRequestSubject = {
+  support: 'support',
+  partnership: 'partnership',
+  media: 'media',
+  other: 'other',
+} as const;
+
+export type ContactMessageRequestLang = typeof ContactMessageRequestLang[keyof typeof ContactMessageRequestLang];
+
+
+export const ContactMessageRequestLang = {
+  en: 'en',
+  hi: 'hi',
+} as const;
+
+export interface ContactMessageRequest {
+  /**
+     * @minLength 1
+     * @maxLength 120
+     */
+  name: string;
+  /**
+     * @minLength 3
+     * @maxLength 254
+     */
+  email: string;
+  subject: ContactMessageRequestSubject;
+  /**
+     * @minLength 1
+     * @maxLength 5000
+     */
+  message: string;
+  lang?: ContactMessageRequestLang;
+}
+
+export type ContactMessageStatus = typeof ContactMessageStatus[keyof typeof ContactMessageStatus];
+
+
+export const ContactMessageStatus = {
+  new: 'new',
+  handled: 'handled',
+} as const;
+
+export interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  lang: string;
+  status: ContactMessageStatus;
+  createdAt: string;
+}
+
+export interface ContactMessageList {
+  total: number;
+  newCount: number;
+  messages: ContactMessage[];
+}
+
+export type UpdateContactMessageRequestStatus = typeof UpdateContactMessageRequestStatus[keyof typeof UpdateContactMessageRequestStatus];
+
+
+export const UpdateContactMessageRequestStatus = {
+  new: 'new',
+  handled: 'handled',
+} as const;
+
+export interface UpdateContactMessageRequest {
+  status: UpdateContactMessageRequestStatus;
+}
+
 export type ListReportsParams = {
 phone?: string;
 category?: string;
@@ -1047,4 +1158,16 @@ status?: string;
 page?: number;
 pageSize?: number;
 };
+
+export type AdminListContactMessagesParams = {
+status?: AdminListContactMessagesStatus;
+};
+
+export type AdminListContactMessagesStatus = typeof AdminListContactMessagesStatus[keyof typeof AdminListContactMessagesStatus];
+
+
+export const AdminListContactMessagesStatus = {
+  new: 'new',
+  handled: 'handled',
+} as const;
 

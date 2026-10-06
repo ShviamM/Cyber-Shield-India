@@ -36,6 +36,10 @@ export default {
       messageLabel: "संदेश",
       messagePlaceholder: "हम आपकी कैसे मदद कर सकते हैं?",
       submit: "संदेश भेजें",
+      sending: "भेज रहे हैं…",
+      error: "आपका संदेश नहीं भेजा जा सका। कृपया फिर कोशिश करें, या support@netraksh.com पर ईमेल करें।",
+      invalidEmail: "सही ईमेल पता डालें।",
+      rateLimited: "आपने हाल ही में कई संदेश भेजे हैं। कृपया थोड़ी देर बाद फिर कोशिश करें।",
     },
   },
   faq: {

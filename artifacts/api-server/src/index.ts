@@ -2,7 +2,7 @@ import app from "./app";
 import { logger } from "./lib/logger";
 import { seedScamCategories } from "./lib/seed";
 import { ensureRolesSeeded } from "./lib/rbac";
-import { ensureWaitlistTable } from "./lib/waitlist";
+import { ensureWebsiteFormTables } from "./lib/waitlist";
 
 const rawPort = process.env["PORT"];
 
@@ -27,5 +27,5 @@ app.listen(port, (err) => {
   logger.info({ port }, "Server listening");
   void seedScamCategories();
   void ensureRolesSeeded();
-  void ensureWaitlistTable();
+  void ensureWebsiteFormTables();
 });

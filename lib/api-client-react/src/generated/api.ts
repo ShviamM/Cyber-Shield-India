@@ -23,6 +23,7 @@ import type {
   ActivateTrialRequest,
   AddFamilyMemberRequest,
   AdminAuditLogListResponse,
+  AdminListContactMessagesParams,
   AdminListReportsParams,
   AdminListTargetReportsParams,
   AdminLoginRequest,
@@ -46,6 +47,9 @@ import type {
   CheckPhoneRequest,
   CheckPhoneResult,
   CityHotspotListResponse,
+  ContactMessage,
+  ContactMessageList,
+  ContactMessageRequest,
   CreateOrderRequest,
   CreatePublicReportRequest,
   CreateReportRequest,
@@ -61,6 +65,7 @@ import type {
   GetCityHotspotsParams,
   GetTrendingScamsParams,
   HealthStatus,
+  JoinWaitlistRequest,
   ListReportsParams,
   NotificationList,
   NumberCheckResponse,
@@ -84,6 +89,7 @@ import type {
   TargetReputation,
   TrendingScamListResponse,
   TrialListResponse,
+  UpdateContactMessageRequest,
   UpdateLocationRequest,
   UpdateReportStatusRequest,
   UpdateUserRoleRequest,
@@ -93,7 +99,8 @@ import type {
   VerifyNumberRequest,
   VerifyPaymentRequest,
   VerifyTargetRequest,
-  VerifyTokenRequest
+  VerifyTokenRequest,
+  WaitlistList
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -4402,5 +4409,380 @@ export const useAdminSendBroadcast = <TError = ErrorType<ErrorResponse>,
         TContext
       > => {
       return useMutation(getAdminSendBroadcastMutationOptions(options));
+    }
+
+export const getJoinWaitlistUrl = () => {
+
+
+
+
+  return `/api/waitlist`
+}
+
+/**
+ * @summary Join the app-launch notification list from the website
+ */
+export const joinWaitlist = async (joinWaitlistRequest: JoinWaitlistRequest, options?: RequestInit): Promise<SuccessResponse> => {
+
+  return customFetch<SuccessResponse>(getJoinWaitlistUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      joinWaitlistRequest,)
+  }
+);}
+
+
+
+
+export const getJoinWaitlistMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof joinWaitlist>>, TError,{data: BodyType<JoinWaitlistRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof joinWaitlist>>, TError,{data: BodyType<JoinWaitlistRequest>}, TContext> => {
+
+const mutationKey = ['joinWaitlist'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof joinWaitlist>>, {data: BodyType<JoinWaitlistRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  joinWaitlist(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type JoinWaitlistMutationResult = NonNullable<Awaited<ReturnType<typeof joinWaitlist>>>
+    export type JoinWaitlistMutationBody = BodyType<JoinWaitlistRequest>
+    export type JoinWaitlistMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Join the app-launch notification list from the website
+ */
+export const useJoinWaitlist = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof joinWaitlist>>, TError,{data: BodyType<JoinWaitlistRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof joinWaitlist>>,
+        TError,
+        {data: BodyType<JoinWaitlistRequest>},
+        TContext
+      > => {
+      return useMutation(getJoinWaitlistMutationOptions(options));
+    }
+
+export const getSubmitContactMessageUrl = () => {
+
+
+
+
+  return `/api/contact`
+}
+
+/**
+ * @summary Send a message from the website contact form
+ */
+export const submitContactMessage = async (contactMessageRequest: ContactMessageRequest, options?: RequestInit): Promise<SuccessResponse> => {
+
+  return customFetch<SuccessResponse>(getSubmitContactMessageUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      contactMessageRequest,)
+  }
+);}
+
+
+
+
+export const getSubmitContactMessageMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitContactMessage>>, TError,{data: BodyType<ContactMessageRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof submitContactMessage>>, TError,{data: BodyType<ContactMessageRequest>}, TContext> => {
+
+const mutationKey = ['submitContactMessage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof submitContactMessage>>, {data: BodyType<ContactMessageRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  submitContactMessage(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SubmitContactMessageMutationResult = NonNullable<Awaited<ReturnType<typeof submitContactMessage>>>
+    export type SubmitContactMessageMutationBody = BodyType<ContactMessageRequest>
+    export type SubmitContactMessageMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Send a message from the website contact form
+ */
+export const useSubmitContactMessage = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof submitContactMessage>>, TError,{data: BodyType<ContactMessageRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof submitContactMessage>>,
+        TError,
+        {data: BodyType<ContactMessageRequest>},
+        TContext
+      > => {
+      return useMutation(getSubmitContactMessageMutationOptions(options));
+    }
+
+export const getAdminListWaitlistUrl = () => {
+
+
+
+
+  return `/api/admin/waitlist`
+}
+
+/**
+ * @summary List app-launch sign-ups, newest first (up to 1000)
+ */
+export const adminListWaitlist = async ( options?: RequestInit): Promise<WaitlistList> => {
+
+  return customFetch<WaitlistList>(getAdminListWaitlistUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getAdminListWaitlistQueryKey = () => {
+    return [
+    `/api/admin/waitlist`
+    ] as const;
+    }
+
+
+export const getAdminListWaitlistQueryOptions = <TData = Awaited<ReturnType<typeof adminListWaitlist>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminListWaitlist>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdminListWaitlistQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListWaitlist>>> = ({ signal }) => adminListWaitlist({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminListWaitlist>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type AdminListWaitlistQueryResult = NonNullable<Awaited<ReturnType<typeof adminListWaitlist>>>
+export type AdminListWaitlistQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List app-launch sign-ups, newest first (up to 1000)
+ */
+
+export function useAdminListWaitlist<TData = Awaited<ReturnType<typeof adminListWaitlist>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminListWaitlist>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getAdminListWaitlistQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getAdminListContactMessagesUrl = (params?: AdminListContactMessagesParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/contact-messages?${stringifiedParams}` : `/api/admin/contact-messages`
+}
+
+/**
+ * @summary List website contact messages, newest first (up to 500)
+ */
+export const adminListContactMessages = async (params?: AdminListContactMessagesParams, options?: RequestInit): Promise<ContactMessageList> => {
+
+  return customFetch<ContactMessageList>(getAdminListContactMessagesUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getAdminListContactMessagesQueryKey = (params?: AdminListContactMessagesParams,) => {
+    return [
+    `/api/admin/contact-messages`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getAdminListContactMessagesQueryOptions = <TData = Awaited<ReturnType<typeof adminListContactMessages>>, TError = ErrorType<ErrorResponse>>(params?: AdminListContactMessagesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminListContactMessages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getAdminListContactMessagesQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof adminListContactMessages>>> = ({ signal }) => adminListContactMessages(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof adminListContactMessages>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type AdminListContactMessagesQueryResult = NonNullable<Awaited<ReturnType<typeof adminListContactMessages>>>
+export type AdminListContactMessagesQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary List website contact messages, newest first (up to 500)
+ */
+
+export function useAdminListContactMessages<TData = Awaited<ReturnType<typeof adminListContactMessages>>, TError = ErrorType<ErrorResponse>>(
+ params?: AdminListContactMessagesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof adminListContactMessages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getAdminListContactMessagesQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getAdminUpdateContactMessageUrl = (id: string,) => {
+
+
+
+
+  return `/api/admin/contact-messages/${id}`
+}
+
+/**
+ * @summary Mark a contact message as handled or new
+ */
+export const adminUpdateContactMessage = async (id: string,
+    updateContactMessageRequest: UpdateContactMessageRequest, options?: RequestInit): Promise<ContactMessage> => {
+
+  return customFetch<ContactMessage>(getAdminUpdateContactMessageUrl(id),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateContactMessageRequest,)
+  }
+);}
+
+
+
+
+export const getAdminUpdateContactMessageMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminUpdateContactMessage>>, TError,{id: string;data: BodyType<UpdateContactMessageRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof adminUpdateContactMessage>>, TError,{id: string;data: BodyType<UpdateContactMessageRequest>}, TContext> => {
+
+const mutationKey = ['adminUpdateContactMessage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof adminUpdateContactMessage>>, {id: string;data: BodyType<UpdateContactMessageRequest>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  adminUpdateContactMessage(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AdminUpdateContactMessageMutationResult = NonNullable<Awaited<ReturnType<typeof adminUpdateContactMessage>>>
+    export type AdminUpdateContactMessageMutationBody = BodyType<UpdateContactMessageRequest>
+    export type AdminUpdateContactMessageMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Mark a contact message as handled or new
+ */
+export const useAdminUpdateContactMessage = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof adminUpdateContactMessage>>, TError,{id: string;data: BodyType<UpdateContactMessageRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof adminUpdateContactMessage>>,
+        TError,
+        {id: string;data: BodyType<UpdateContactMessageRequest>},
+        TContext
+      > => {
+      return useMutation(getAdminUpdateContactMessageMutationOptions(options));
     }
 
