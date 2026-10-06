@@ -58,11 +58,11 @@ export default function ProfileScreen() {
     const primary =
       Platform.OS === "ios"
         ? "itms-apps://apps.apple.com/search?term=Netraksh"
-        : "market://details?id=com.kavachai.com";
+        : "market://details?id=com.netraksh.app";
     const web =
       Platform.OS === "ios"
         ? "https://apps.apple.com/in/search?term=Netraksh"
-        : "https://play.google.com/store/apps/details?id=com.kavachai.com";
+        : "https://play.google.com/store/apps/details?id=com.netraksh.app";
     Linking.openURL(primary).catch(() => Linking.openURL(web).catch(() => {}));
   }
 
