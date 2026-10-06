@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Netraksh — India's Digital Bodyguard",
+    "name": "Netraksh",
     "slug": "kavach-ai",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -11,24 +11,23 @@
     "splash": {
       "image": "./assets/images/icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0B3D91"
+      "backgroundColor": "#0A0F24"
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.kavachai.app",
+      "bundleIdentifier": "com.netraksh.app",
       "buildNumber": "1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "com.kavachai.com",
-      "backgroundColor": "#0B3D91",
+      "package": "com.netraksh.app",
+      "backgroundColor": "#0A0F24",
       "permissions": [
         "android.permission.POST_NOTIFICATIONS",
         "android.permission.CAMERA",
         "android.permission.ACCESS_COARSE_LOCATION",
-        "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.SYSTEM_ALERT_WINDOW",
         "android.permission.USE_FULL_SCREEN_INTENT",
         "android.permission.ANSWER_PHONE_CALLS"
@@ -47,6 +46,9 @@
             "DEFAULT"
           ]
         }
+      ],
+      "blockedPermissions": [
+        "android.permission.ACCESS_FINE_LOCATION"
       ]
     },
     "web": {
@@ -71,7 +73,8 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Netraksh uses your location to show scams reported in your city."
+          "locationWhenInUsePermission": "Netraksh uses your location to show scams reported in your city.",
+          "isAndroidForegroundServiceEnabled": false
         }
       ],
       [

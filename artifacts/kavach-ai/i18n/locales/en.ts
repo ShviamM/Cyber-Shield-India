@@ -114,7 +114,7 @@ const en = {
     notifications: "Threat Notifications",
     notificationsSub: "Alerts for new scams in your city",
     screening: "On-Device Screening",
-    screeningSub: "Screen calls & SMS for scams (Android)",
+    screeningSub: "Screen calls for scams (Android)",
     displayLanguage: "Display Language",
     helplineCardTitle: "Cyber Crime Helpline",
     helplineCardSub: "Call immediately if you've been scammed",
@@ -223,7 +223,7 @@ const en = {
     guardianBody:
       "Netraksh watches for scam calls and fraud messages to help keep you safe.",
     guardianPoint1: "Scam call screening",
-    guardianPoint2: "Scam SMS screening",
+    guardianPoint2: "Check SMS by sharing",
     guardianPoint3: "Fraud alert monitoring",
     getStarted: "Get Started",
   },
@@ -557,7 +557,7 @@ const en = {
     addToShield: "Add to Shield",
     emptyTitle: "No members yet",
     emptyDesc:
-      "Add family members to monitor their protection status and get alerts when they may be at risk.",
+      "Add family members to your Family Shield. Alerts when a scam targets them are coming soon.",
     addFirst: "Add First Member",
     suspiciousCallNow: "Receiving a suspicious call right now!",
     statusAlert: "Alert — Possible Scam Call",
@@ -641,9 +641,9 @@ const en = {
 
   screening: {
     title: "On-Device Screening",
-    subtitle: "Real-time scam call & SMS protection",
+    subtitle: "Real-time scam call protection",
     intro:
-      "Let Netraksh watch for scam calls and messages right on your phone and warn you the moment one arrives. Checks happen on your device.",
+      "Let Netraksh watch for scam calls right on your phone and warn you the moment one arrives. To check a message, share it to Netraksh.",
     unavailableTitle: "Available on Android app builds",
     unavailableBuild:
       "On-device screening needs the installed Android app. It can't run in this preview or Expo Go. You can still review the settings and privacy model here.",
@@ -704,7 +704,7 @@ const en = {
     fullScreenGrant: "Allow full-screen alerts",
     sectionPrivacy: "YOUR PRIVACY",
     privacy: {
-      onDevice: "SMS screening runs on your phone. For calls, only the number is checked against Netraksh's scam database to warn you.",
+      onDevice: "Messages are only checked when you share them. For calls, only the number is checked against Netraksh's scam database to warn you.",
       noContent: "Message contents are never sent off your device without your tap.",
       userControl: "Turn each protection on or off any time.",
       neverBlocks: "Netraksh acts on a live call only when you tap Block or Answer. Numbers you've blocked are auto-rejected on future calls; it never answers a call on its own.",
@@ -934,7 +934,7 @@ const en = {
         tagline: "Full real-time protection for you",
         features: [
           "Everything in Free",
-          "Real-time call & SMS scam screening",
+          "Real-time scam call screening",
           "AI fraud analysis for messages & links",
           "Priority scam alerts",
           "Unlimited number checks",
@@ -945,9 +945,8 @@ const en = {
         tagline: "Protect your whole family",
         features: [
           "Everything in Premium",
-          "Cover up to 5 family members",
-          "Shared family safety dashboard",
-          "Alerts for elderly & children",
+          "Add up to 5 family members to your Family Shield",
+          "Family alerts for elderly & children (coming soon)",
         ],
       },
     },
