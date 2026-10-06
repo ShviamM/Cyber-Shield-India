@@ -93,7 +93,7 @@ const achievementMeta = [
 
 // Order must match leaders.items in the founder locale files (newest first).
 const leaderImages = [leaderTanwar, leaderBbc, leaderRamteke, leaderMahana, leaderKapoor, leaderVishwakarma, leaderJitendra];
-const leaderImagePositions = ["object-[center_30%]", "object-center", "object-[center_22%]", "object-top", "object-top", "object-[center_33%]", "object-top"];
+const leaderImagePositions = ["object-[center_30%]", "object-[center_45%]", "object-[center_22%]", "object-top", "object-top", "object-[center_33%]", "object-top"];
 
 const serviceIcons = [Presentation, School, Building2, Flag, Mic, ShieldCheck, Handshake];
 
