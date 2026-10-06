@@ -53,8 +53,8 @@ export default {
   },
   download: {
     title: "Protected on every call, link and text",
-    desc: "Netraksh blocks scam calls, scans links and warns your family in real time.",
-    cta: "Download Netraksh",
+    desc: "The Netraksh app will block scam calls, scan links and warn your family in real time. It's launching soon.",
+    cta: "Get notified at launch",
   },
   report: {
     prompt: {

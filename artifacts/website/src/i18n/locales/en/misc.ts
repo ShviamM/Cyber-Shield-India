@@ -87,6 +87,13 @@ export default {
     googlePlay: "Google Play",
     launchingSoon: "Launching soon",
     notifyMe: "Notify me at launch",
+    notifyLabel: "Your email or mobile number",
+    notifyPlaceholder: "you@example.com or 98765 43210",
+    notifySending: "Adding you…",
+    notifySuccess: "You're on the list. We'll tell you the moment Netraksh launches.",
+    notifyInvalid: "Enter a valid email address or 10-digit Indian mobile number.",
+    notifyError: "Something went wrong. Please try again in a minute.",
+    notifyPrivacy: "We'll only use this to tell you when the app launches.",
   },
   notFound: {
     title: "Page not found",
