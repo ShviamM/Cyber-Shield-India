@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { db, sessionsTable, usersTable } from "@workspace/db";
 import { hashToken } from "./token";
 import { getEffectiveSubscription } from "./subscription";
+import { clientIp } from "./client-ip";
 
 export interface Caller {
   userId: string;
@@ -40,5 +41,5 @@ export async function resolveOptionalCaller(
 
 /** Stable per-caller usage subject: account-scoped when signed in, else per-IP. */
 export function usageSubject(req: Request, caller: Caller | null): string {
-  return caller ? `user:${caller.userId}` : `ip:${req.ip ?? "unknown"}`;
+  return caller ? `user:${caller.userId}` : `ip:${clientIp(req)}`;
 }

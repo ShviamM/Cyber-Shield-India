@@ -29,6 +29,7 @@ import {
   type BotCheckChallenge,
 } from "../lib/proof-of-work";
 import { requireAuth } from "../middlewares/auth";
+import { clientIp } from "../lib/client-ip";
 
 const router: IRouter = Router();
 const VISIBLE_STATUSES = ["pending", "verified"] as const;
@@ -191,7 +192,7 @@ router.get("/reports/public/challenge", async (_req, res) => {
  * url/upi reports feed a parallel target reputation store.
  */
 router.post("/reports/public", async (req, res) => {
-  const ip = req.ip ?? "unknown";
+  const ip = clientIp(req);
 
   // Per-IP hourly cap (cost/abuse guard).
   const { allowed } = await hitRateLimit(

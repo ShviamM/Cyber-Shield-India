@@ -84,6 +84,13 @@ export const config = {
   // Single shared password for the admin web console (password-only login).
   // Server-side only; never sent to clients.
   adminPassword: (process.env.ADMIN_PASSWORD ?? "").trim(),
+  // Client IP resolution for per-IP throttles (see lib/client-ip.ts).
+  // CLIENT_IP_HEADER: header set by the edge proxy with the real client IP
+  // (DigitalOcean App Platform sets `do-connecting-ip`); "" disables it.
+  // TRUST_PROXY: number of proxy hops in front of the API whose
+  // X-Forwarded-For entries are trusted (Express `trust proxy`).
+  clientIpHeader: (process.env.CLIENT_IP_HEADER ?? "do-connecting-ip").trim(),
+  trustProxyHops: intEnv("TRUST_PROXY", 1),
   // Per-IP throttles on the auth endpoints (cost/abuse protection): stop one
   // client from probing many phone numbers or replaying tokens.
   otpRequestMaxPerIpPerHour: intEnv("OTP_REQUEST_MAX_PER_IP_PER_HOUR", 30),

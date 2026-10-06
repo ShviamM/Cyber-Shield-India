@@ -21,6 +21,7 @@ import { HttpError } from "../lib/http-error";
 import { hitRateLimit } from "../lib/rate-limit";
 import { toUserDto } from "../lib/dto";
 import { requireAuth } from "../middlewares/auth";
+import { clientIp } from "../lib/client-ip";
 
 const router: IRouter = Router();
 
@@ -29,7 +30,7 @@ const router: IRouter = Router();
 // new account, so it can collect registration details before launching the
 // widget. It never sends an OTP itself.
 router.post("/auth/check-phone", async (req, res) => {
-  const clientKey = req.ip ?? "unknown";
+  const clientKey = clientIp(req);
   const ipLimit = await hitRateLimit(
     `phone-check:${clientKey}`,
     config.otpRequestMaxPerIpPerHour,
@@ -67,7 +68,7 @@ router.post("/auth/check-phone", async (req, res) => {
 // verified phone number comes from MSG91 (never from the client), so a caller
 // can't authenticate as a number they didn't actually verify.
 router.post("/auth/verify-token", async (req, res) => {
-  const clientKey = req.ip ?? "unknown";
+  const clientKey = clientIp(req);
   const ipLimit = await hitRateLimit(
     `token-verify:${clientKey}`,
     config.otpVerifyMaxPerIpPerMinute,
@@ -142,7 +143,7 @@ router.post("/auth/verify-token", async (req, res) => {
 // (ADMIN_PASSWORD) is compared in constant time; on success we issue a session
 // for the configured admin account (first entry in ADMIN_PHONES).
 router.post("/auth/admin-login", async (req, res) => {
-  const clientKey = req.ip ?? "unknown";
+  const clientKey = clientIp(req);
   // Two-tier per-IP throttle to slow brute-force guessing of the shared password.
   const [perMinute, perHour] = await Promise.all([
     hitRateLimit(
@@ -222,7 +223,7 @@ router.post("/auth/dev-login", async (req, res) => {
     throw new HttpError(404, "not_found", "Not found.");
   }
 
-  const clientKey = req.ip ?? "unknown";
+  const clientKey = clientIp(req);
   const ipLimit = await hitRateLimit(
     `dev-login:${clientKey}`,
     config.devLoginMaxPerIpPerMinute,
@@ -314,7 +315,7 @@ router.post("/auth/demo-login", async (req, res) => {
     throw new HttpError(404, "not_found", "Not found.");
   }
 
-  const clientKey = req.ip ?? "unknown";
+  const clientKey = clientIp(req);
   const ipLimit = await hitRateLimit(
     `demo-login:${clientKey}`,
     config.demoLoginMaxPerIpPerMinute,

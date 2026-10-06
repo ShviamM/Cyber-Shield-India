@@ -14,6 +14,7 @@ ENV NODE_ENV=production PORT=5000 BASE_PATH=/admin/
 RUN pnpm --filter @workspace/admin build
 
 FROM nginx:alpine
+COPY deploy/nginx/security-headers.conf /etc/nginx/snippets/security-headers.conf
 COPY artifacts/admin/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/artifacts/admin/dist/public /usr/share/nginx/html
 EXPOSE 80
