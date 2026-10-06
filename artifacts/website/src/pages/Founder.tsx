@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout/Layout";
+import { HeroGlow } from "@/components/layout/PageHero";
 import { SEOHead } from "@/components/SEOHead";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -244,17 +245,11 @@ export default function Founder() {
       />
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-[#08183f] text-white">
-        <div className="absolute inset-0 opacity-[0.35] bg-[radial-gradient(circle_at_20%_20%,rgba(255,103,19,0.25),transparent_45%),radial-gradient(circle_at_80%_0%,rgba(59,130,246,0.25),transparent_40%)]" />
-        <div
-          className="absolute inset-0 opacity-[0.06]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)",
-            backgroundSize: "44px 44px",
-          }}
-        />
-        <div className="container relative mx-auto px-4 md:px-6 pt-32 pb-24">
+      <section className="relative overflow-hidden bg-[#0A0F24] text-white">
+        <div aria-hidden className="pointer-events-none absolute inset-y-0 left-[max(12px,calc(50%-612px))] w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+        <div aria-hidden className="pointer-events-none absolute inset-y-0 right-[max(12px,calc(50%-612px))] w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+        <HeroGlow className="-bottom-[320px]" />
+        <div className="container relative z-10 mx-auto px-4 md:px-6 pt-16 pb-24">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <motion.div initial="hidden" animate="show" variants={fadeUp} transition={{ duration: 0.7 }}>
               <span className="inline-flex items-center gap-2 text-xs font-semibold tracking-[0.25em] uppercase text-accent">
@@ -264,10 +259,10 @@ export default function Founder() {
               <h1 className="mt-6 text-5xl md:text-7xl font-bold tracking-tight leading-[1.05]">
                 {t("hero.firstName")} <span className="text-accent">{t("hero.lastName")}</span>
               </h1>
-              <p className="mt-5 text-lg md:text-xl text-blue-100/80 font-medium">
+              <p className="mt-5 text-lg md:text-xl text-[#B4BBD0] font-medium">
                 {t("hero.roles")}
               </p>
-              <p className="mt-4 max-w-xl text-blue-100/70 leading-relaxed">
+              <p className="mt-4 max-w-xl text-[#B4BBD0] leading-relaxed">
                 {t("hero.intro")}
               </p>
 
@@ -300,7 +295,7 @@ export default function Founder() {
               transition={{ duration: 0.8, delay: 0.15 }}
               className="relative mx-auto"
             >
-              <div className="absolute -inset-4 rounded-[2.5rem] bg-gradient-to-tr from-accent/40 via-transparent to-blue-400/30 blur-2xl" />
+              <div className="absolute -inset-4 rounded-[2.5rem] bg-gradient-to-tr from-accent/40 via-transparent to-[#F7931E]/20 blur-2xl" />
               <div className="relative rounded-[2rem] p-2 bg-gradient-to-tr from-accent/70 to-amber-200/40">
                 <img
                   src="/images/founder-shivam.png"
@@ -308,7 +303,7 @@ export default function Founder() {
                   className="rounded-[1.6rem] w-[300px] md:w-[360px] object-cover shadow-2xl"
                 />
               </div>
-              <div className="absolute -bottom-5 -left-5 rounded-2xl border border-white/15 bg-[#08183f]/80 backdrop-blur-md px-5 py-3 shadow-xl">
+              <div className="absolute -bottom-5 -left-5 rounded-2xl border border-white/15 bg-[#0A0F24]/80 backdrop-blur-md px-5 py-3 shadow-xl">
                 <div className="flex items-center gap-2 text-sm font-semibold">
                   <ShieldCheck className="h-4 w-4 text-accent" />
                   {t("hero.badge")}
@@ -352,7 +347,7 @@ export default function Founder() {
             <p className="mt-3 text-lg text-gray-600 max-w-2xl mx-auto">{t("book.subtitle")}</p>
           </motion.div>
 
-          <div className="rounded-[2rem] bg-[#08183f] text-white overflow-hidden shadow-2xl">
+          <div className="rounded-[2rem] bg-[#0A0F24] text-white overflow-hidden shadow-2xl">
             <div className="grid lg:grid-cols-2">
               <div className="relative flex items-center justify-center p-10 lg:p-14 bg-[radial-gradient(circle_at_50%_30%,rgba(255,103,19,0.18),transparent_60%)]">
                 <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="relative w-full max-w-md">
@@ -371,7 +366,7 @@ export default function Founder() {
                 </motion.div>
               </div>
               <div className="p-8 md:p-12 lg:py-14">
-                <p className="text-blue-100/80 leading-relaxed mb-6">
+                <p className="text-[#B4BBD0] leading-relaxed mb-6">
                   {t("book.intro")}
                 </p>
                 <div className="grid sm:grid-cols-2 gap-4 mb-8">
@@ -384,14 +379,14 @@ export default function Founder() {
                         </div>
                         <div>
                           <div className="text-sm font-semibold">{item.title}</div>
-                          <div className="text-xs text-blue-100/60 leading-snug">{item.desc}</div>
+                          <div className="text-xs text-[#B4BBD0] leading-snug">{item.desc}</div>
                         </div>
                       </div>
                     );
                   })}
                 </div>
                 <div className="rounded-xl border border-white/10 bg-white/5 p-4 mb-8">
-                  <p className="text-sm italic text-blue-100/80">
+                  <p className="text-sm italic text-[#B4BBD0]">
                     {t("book.quote")}
                   </p>
                   <p className="mt-2 text-xs font-semibold text-accent">{t("book.quoteAuthor")}</p>
@@ -415,7 +410,7 @@ export default function Founder() {
       </section>
 
       {/* Founder Quote */}
-      <section className="bg-[#08183f] py-24 text-white relative overflow-hidden">
+      <section className="bg-[#0A0F24] py-24 text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.3] bg-[radial-gradient(circle_at_50%_0%,rgba(255,103,19,0.25),transparent_45%)]" />
         <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.7 }} className="container relative mx-auto px-4 md:px-6 max-w-4xl text-center">
           <Quote className="h-12 w-12 text-accent mx-auto mb-8" />
@@ -426,7 +421,7 @@ export default function Founder() {
             <img src="/images/founder-shivam.png" alt={t("quote.name")} className="h-14 w-14 rounded-full object-cover border-2 border-accent/60" />
             <div className="text-left">
               <div className="font-semibold">{t("quote.name")}</div>
-              <div className="text-sm text-blue-100/70">{t("quote.role")}</div>
+              <div className="text-sm text-[#B4BBD0]">{t("quote.role")}</div>
             </div>
           </div>
         </motion.div>
@@ -451,7 +446,7 @@ export default function Founder() {
                 transition={{ duration: 0.55, delay: i * 0.12 }}
                 className="group flex flex-col overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-accent/30"
               >
-                <div className="relative aspect-[4/3] overflow-hidden bg-[#08183f]">
+                <div className="relative aspect-[4/3] overflow-hidden bg-[#0A0F24]">
                   <img
                     src={leaderImages[i]}
                     alt={leader.alt}
@@ -506,12 +501,12 @@ export default function Founder() {
               const Icon = storyFlowIcons[i];
               return (
               <motion.div key={step.title} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp} transition={{ duration: 0.5, delay: i * 0.12 }} className="relative">
-                <div className={`h-full rounded-3xl p-7 border shadow-sm ${i === storyItems.length - 1 ? "bg-[#08183f] border-[#08183f] text-white" : "bg-white border-gray-100"}`}>
+                <div className={`h-full rounded-3xl p-7 border shadow-sm ${i === storyItems.length - 1 ? "bg-[#0A0F24] border-[#0A0F24] text-white" : "bg-white border-gray-100"}`}>
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl mb-5 bg-accent/10 text-accent">
                     <Icon className="h-6 w-6" />
                   </div>
                   <h3 className={`text-lg font-bold mb-2 ${i === storyItems.length - 1 ? "text-white" : "text-gray-900"}`}>{step.title}</h3>
-                  <p className={`text-sm leading-relaxed ${i === storyItems.length - 1 ? "text-blue-100/70" : "text-gray-600"}`}>{step.desc}</p>
+                  <p className={`text-sm leading-relaxed ${i === storyItems.length - 1 ? "text-[#B4BBD0]" : "text-gray-600"}`}>{step.desc}</p>
                 </div>
                 {i < storyItems.length - 1 && (
                   <div className="hidden md:flex absolute top-1/2 -right-3 -translate-y-1/2 z-10 h-6 w-6 items-center justify-center rounded-full bg-accent text-white shadow">
@@ -566,7 +561,7 @@ export default function Founder() {
       </section>
 
       {/* Recognition & Impact */}
-      <section className="bg-[#08183f] py-24 text-white relative overflow-hidden">
+      <section className="bg-[#0A0F24] py-24 text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.25] bg-[radial-gradient(circle_at_85%_15%,rgba(255,103,19,0.3),transparent_45%)]" />
         <div className="container relative mx-auto px-4 md:px-6 max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-14">
@@ -580,9 +575,9 @@ export default function Founder() {
               <motion.div key={a.title} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp} transition={{ duration: 0.5, delay: i * 0.1 }} className="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-6 hover:border-accent/40 transition-colors">
                 <div className="text-3xl font-bold text-accent/80 mb-3">{achievementMeta[i].no}</div>
                 <Icon className="h-6 w-6 text-accent mb-3" />
-                <div className="text-xs font-semibold tracking-[0.15em] uppercase text-blue-100/60 mb-1">{a.tag}</div>
+                <div className="text-xs font-semibold tracking-[0.15em] uppercase text-[#B4BBD0] mb-1">{a.tag}</div>
                 <h3 className="text-lg font-bold mb-2">{a.title}</h3>
-                <p className="text-sm text-blue-100/70 leading-relaxed">{a.desc}</p>
+                <p className="text-sm text-[#B4BBD0] leading-relaxed">{a.desc}</p>
               </motion.div>
               );
             })}
@@ -619,7 +614,7 @@ export default function Founder() {
               <button
                 key={g.src}
                 onClick={() => setLightbox(i)}
-                className={`group relative ${g.h} w-full mb-4 break-inside-avoid rounded-2xl overflow-hidden bg-gradient-to-br from-[#0e2350] to-[#08183f]`}
+                className={`group relative ${g.h} w-full mb-4 break-inside-avoid rounded-2xl overflow-hidden bg-gradient-to-br from-[#0e2350] to-[#0A0F24]`}
               >
                 <img
                   src={g.type === "video" ? g.poster : g.src}
@@ -630,7 +625,7 @@ export default function Founder() {
                 <span className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-black/0" />
                 {g.type === "video" && (
                   <span className="absolute inset-0 flex items-center justify-center">
-                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/90 text-[#08183f] shadow-lg transition-transform group-hover:scale-110">
+                    <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/90 text-[#0A0F24] shadow-lg transition-transform group-hover:scale-110">
                       <Play className="h-6 w-6 translate-x-0.5 fill-current" />
                     </span>
                   </span>
@@ -706,7 +701,7 @@ export default function Founder() {
               const Icon = workshopIcons[i];
               return (
               <motion.div key={p.title} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp} transition={{ duration: 0.5, delay: i * 0.05 }} className="rounded-3xl border border-gray-100 bg-gray-50 overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="relative h-32 bg-gradient-to-br from-[#0e2350] to-[#08183f] flex items-center justify-center">
+                <div className="relative h-32 bg-gradient-to-br from-[#0e2350] to-[#0A0F24] flex items-center justify-center">
                   <Icon className="h-9 w-9 text-accent/90" />
                   <span className="absolute bottom-2 right-2 text-[10px] uppercase tracking-wider text-white/40">{t("workshops.photo")}</span>
                 </div>
@@ -838,29 +833,29 @@ export default function Founder() {
       </section>
 
       {/* Book Shivam for an Event */}
-      <section id="book-event" className="bg-[#08183f] py-24 text-white relative overflow-hidden scroll-mt-24">
+      <section id="book-event" className="bg-[#0A0F24] py-24 text-white relative overflow-hidden scroll-mt-24">
         <div className="absolute inset-0 opacity-[0.3] bg-[radial-gradient(circle_at_15%_20%,rgba(255,103,19,0.25),transparent_45%)]" />
         <div className="container relative mx-auto px-4 md:px-6 max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }}>
               <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">Book Shivam for an Event</span>
               <h2 className="mt-4 text-4xl md:text-5xl font-bold leading-tight">Invite Shivam to speak or train your audience</h2>
-              <p className="mt-5 text-blue-100/75 leading-relaxed">
+              <p className="mt-5 text-[#B4BBD0] leading-relaxed">
                 From school programs to government training and podcast appearances. Share a few details and the team will get back to you.
               </p>
               <div className="mt-8 space-y-4">
-                <a href={`mailto:${BOOKING_EMAIL}`} className="flex items-center gap-3 text-blue-100/90 hover:text-accent transition-colors">
+                <a href={`mailto:${BOOKING_EMAIL}`} className="flex items-center gap-3 text-[#B4BBD0] hover:text-accent transition-colors">
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10"><Mail className="h-5 w-5" /></span>
                   {BOOKING_EMAIL}
                 </a>
-                <button onClick={() => scrollToId("book-event")} className="flex items-center gap-3 text-blue-100/90 hover:text-accent transition-colors">
+                <button onClick={() => scrollToId("book-event")} className="flex items-center gap-3 text-[#B4BBD0] hover:text-accent transition-colors">
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10"><MessageCircle className="h-5 w-5" /></span>
                   Send a booking enquiry
                 </button>
               </div>
               <div className="mt-8 flex flex-wrap gap-2">
                 {eventTypes.map((et) => (
-                  <span key={et} className="rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs text-blue-100/80">{et}</span>
+                  <span key={et} className="rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs text-[#B4BBD0]">{et}</span>
                 ))}
               </div>
             </motion.div>
@@ -947,7 +942,7 @@ export default function Founder() {
           <button onClick={() => setLightbox(null)} className="absolute top-6 right-6 text-white/80 hover:text-white" aria-label="Close">
             <X className="h-7 w-7" />
           </button>
-          <div className="relative w-full max-w-3xl rounded-2xl overflow-hidden bg-gradient-to-br from-[#0e2350] to-[#08183f]" onClick={(e) => e.stopPropagation()}>
+          <div className="relative w-full max-w-3xl rounded-2xl overflow-hidden bg-gradient-to-br from-[#0e2350] to-[#0A0F24]" onClick={(e) => e.stopPropagation()}>
             {filteredGallery[lightbox].type === "video" ? (
               <>
                 <video

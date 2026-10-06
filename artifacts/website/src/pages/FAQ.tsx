@@ -1,4 +1,5 @@
 import { Layout } from "@/components/layout/Layout";
+import { PageHero } from "@/components/layout/PageHero";
 import { SEOHead } from "@/components/SEOHead";
 import {
   Accordion,
@@ -33,11 +34,8 @@ export default function FAQ() {
           }))
         }}
       />
-      <div className="container mx-auto px-4 pt-10 pb-16 max-w-4xl">
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">{t("faq.heading")}</h1>
-          <p className="text-xl text-gray-600">{t("faq.subheading")}</p>
-        </div>
+      <PageHero title={t("faq.heading")} subtitle={t("faq.subheading")} />
+      <div className="container mx-auto px-4 pt-12 pb-16 max-w-4xl">
 
         <div className="bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
           <Accordion type="single" collapsible className="w-full">

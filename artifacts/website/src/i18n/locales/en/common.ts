@@ -24,6 +24,8 @@ export default {
   },
   cta: {
     downloadApp: "Download App",
+    checkNumber: "Check a number",
+    checkNumberFree: "Check a number free",
     downloadFree: "Download Netraksh — Free",
     startFreeTrial: "Start Free Trial",
     protectMyFamily: "Protect My Family",

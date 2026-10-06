@@ -89,7 +89,8 @@ export default {
     notifyMe: "Notify me at launch",
   },
   notFound: {
-    title: "404 Page Not Found",
-    description: "Did you forget to add the page to the router?",
+    title: "Page not found",
+    description: "This page doesn't exist or has moved. If someone sent you this link, be careful: scammers often share broken or fake links.",
+    home: "Go to homepage",
   },
 };

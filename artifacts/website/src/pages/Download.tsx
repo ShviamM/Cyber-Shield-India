@@ -34,10 +34,10 @@ export default function Download() {
         description={t("download.seoDescription")}
       />
       <div className="container mx-auto px-4 py-20 max-w-5xl">
-        <div className="bg-gray-900 rounded-[3rem] overflow-hidden relative text-white shadow-2xl">
+        <div className="bg-[#0A0F24] rounded-[3rem] overflow-hidden relative text-white shadow-2xl">
           <div className="grid lg:grid-cols-2 gap-12 p-12 md:p-20 relative z-10">
             <div className="flex flex-col justify-center">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-sm font-medium mb-6 w-fit">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F7931E]/15 text-[#FFB55C] text-sm font-medium mb-6 w-fit">
                 <Shield className="w-4 h-4" />
                 {t("download.badge")}
               </div>
