@@ -15,6 +15,7 @@ import leaderKapoor from "@assets/Sanjay_Kapoor_Cricket_Association_Kanpur_17809
 import leaderVishwakarma from "@assets/Add_SP_Anjali_Vishkarma_Cyber_1780923818911.jpeg";
 import leaderJitendra from "@assets/Jitendra_Pratap_DM_Kanpur.jpg";
 import leaderTanwar from "@assets/Mahendra_Singh_Tanwar_DM_Kanpur_Nagar.jpg";
+import leaderKanpurIcon from "@assets/Kanpur_Icon_Samman.jpg";
 import leaderBbc from "@assets/BBC_News_Urdu_Live.jpg";
 import leaderRamteke from "@assets/Sumit_Ramteke_ADCP_Kanpur.jpg";
 import {
@@ -92,8 +93,8 @@ const achievementMeta = [
 ];
 
 // Order must match leaders.items in the founder locale files (newest first).
-const leaderImages = [leaderTanwar, leaderBbc, leaderRamteke, leaderMahana, leaderKapoor, leaderVishwakarma, leaderJitendra];
-const leaderImagePositions = ["object-[center_30%]", "object-[center_45%]", "object-[center_22%]", "object-top", "object-top", "object-[center_33%]", "object-top"];
+const leaderImages = [leaderKanpurIcon, leaderTanwar, leaderBbc, leaderRamteke, leaderMahana, leaderKapoor, leaderVishwakarma, leaderJitendra];
+const leaderImagePositions = ["object-[center_25%]", "object-[center_30%]", "object-[center_45%]", "object-[center_22%]", "object-top", "object-top", "object-[center_33%]", "object-top"];
 
 const serviceIcons = [Presentation, School, Building2, Flag, Mic, ShieldCheck, Handshake];
 
@@ -141,7 +142,6 @@ const galleryItems: GalleryItem[] = [
   { category: "Workshops", h: "h-56", src: "/images/event-workshop-2.jpg", alt: "Workshop venue prepared for a Netraksh cyber awareness session" },
   { category: "Media Coverage", h: "h-72", src: "/images/event-press-3.jpg", alt: "Newspaper feature on community skill and awareness initiatives" },
   { category: "Book Launch", h: "h-56", src: "/images/event-launch-5.jpg", alt: "Readers and guests with Digital Dhokha at the World Book Fair" },
-  { category: "Community Outreach", h: "h-72", src: "/images/event-award-2.jpg", alt: "Shivam Malaviya receiving the Kanpur Icon Samman on stage" },
   { category: "Public Speaking", h: "h-72", src: "/images/event-award-1.jpg", alt: "Shivam Malaviya speaking and honoured at the Pratibha Samman Samaroh" },
   { category: "Community Outreach", h: "h-80", src: "/images/event-felicitation-2.jpg", alt: "Shivam Malaviya presenting a Cyber Empowered certificate at a digital safety recognition event" },
   { category: "Book Launch", h: "h-64", src: "/images/event-launch-7.jpg", alt: "Shivam Malaviya presenting his book Digital Dhokha to dignitaries" },
