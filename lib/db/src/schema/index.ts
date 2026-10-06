@@ -11,6 +11,7 @@ export * from "./subscriptions";
 export * from "./payments";
 export * from "./device-tokens";
 export * from "./family-members";
+export * from "./family-alerts";
 export * from "./broadcasts";
 export * from "./ai-usage";
 export * from "./daily-usage";

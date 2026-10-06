@@ -79,6 +79,12 @@ class KavachScreeningModule : Module() {
       ScreeningStore.setApiConfig(context, baseUrl, token ?: "")
     }
 
+    // Family Guardian: on once the user accepted an invite, so incoming calls
+    // are reported to the server (see FamilyAlertReporter).
+    Function("setFamilyAlertsEnabled") { enabled: Boolean ->
+      ScreeningStore.setFamilyAlertsEnabled(context, enabled)
+    }
+
     // Accept the ringing call (the popup's "Answer" button). Requires the
     // ANSWER_PHONE_CALLS runtime permission; returns false if unavailable so the
     // JS screen can still dismiss gracefully.

@@ -8,6 +8,7 @@ import {
   Alert,
   FlatList,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   StyleSheet,
   Text,
@@ -17,7 +18,10 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import type { FamilyInvite } from "@workspace/api-client-react";
+
 import { FamilyMember, FamilyMemberError, useAppContext } from "@/context/AppContext";
+import { formatIndianPhone } from "@/lib/phone";
 import { useColors } from "@/hooks/useColors";
 
 const NAVY = "#0B3D91";
@@ -51,6 +55,9 @@ export default function FamilyScreen() {
     addFamilyMember,
     removeFamilyMember,
     markFamilyMemberSafe,
+    familyInvites,
+    acceptFamilyInvite,
+    declineFamilyInvite,
   } = useAppContext();
 
   const relationLabel = (rel: string) =>
@@ -241,6 +248,29 @@ export default function FamilyScreen() {
         }}
         showsVerticalScrollIndicator={false}
         scrollEnabled
+        ListHeaderComponent={
+          familyInvites.length > 0 ? (
+            <View style={{ gap: 10, marginBottom: 4 }}>
+              {familyInvites.map((inv) => (
+                <InviteCard
+                  key={inv.id}
+                  invite={inv}
+                  onAccept={() => {
+                    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                    acceptFamilyInvite(inv.id).catch(() =>
+                      Alert.alert(t("family.inviteFailedTitle"), t("family.addFailedMessage")),
+                    );
+                  }}
+                  onDecline={() => {
+                    declineFamilyInvite(inv.id).catch(() =>
+                      Alert.alert(t("family.inviteFailedTitle"), t("family.addFailedMessage")),
+                    );
+                  }}
+                />
+              ))}
+            </View>
+          ) : null
+        }
         ListEmptyComponent={
           <View style={s.emptyState}>
             <View style={s.emptyIconBox}>
@@ -267,12 +297,54 @@ export default function FamilyScreen() {
             onDelete={() => handleDelete(item)}
             onMarkSafe={() => {
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              markFamilyMemberSafe(item.id);
+              markFamilyMemberSafe(item.id).catch(() => {});
             }}
           />
         )}
       />
     </KeyboardAvoidingView>
+  );
+}
+
+function InviteCard({
+  invite,
+  onAccept,
+  onDecline,
+}: {
+  invite: FamilyInvite;
+  onAccept: () => void;
+  onDecline: () => void;
+}) {
+  const { t } = useTranslation();
+  const accepted = invite.status === "accepted";
+  const owner = invite.ownerName || t("family.inviteSomeone");
+  return (
+    <View style={[mc.card, { padding: 14, gap: 10 }]}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+        <View style={[mc.avatar, { width: 40, height: 40, backgroundColor: "rgba(11,61,145,0.08)" }]}>
+          <Feather name={accepted ? "shield" : "user-check"} size={18} color={NAVY} />
+        </View>
+        <Text style={[mc.name, { flex: 1 }]}>
+          {accepted
+            ? t("family.inviteAcceptedTitle", { name: owner })
+            : t("family.inviteTitle", { name: owner })}
+        </Text>
+      </View>
+      <Text style={mc.relation}>
+        {accepted ? t("family.inviteAcceptedBody", { name: owner }) : t("family.inviteBody", { name: owner })}
+      </Text>
+      <View style={{ flexDirection: "row", gap: 8 }}>
+        {!accepted && (
+          <TouchableOpacity style={[mc.callBtn, { backgroundColor: NAVY }]} onPress={onAccept} activeOpacity={0.85}>
+            <Feather name="check" size={12} color="#fff" />
+            <Text style={mc.callTxt}>{t("family.inviteAccept")}</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity style={mc.declineBtn} onPress={onDecline} activeOpacity={0.85}>
+          <Text style={mc.declineTxt}>{accepted ? t("family.inviteStop") : t("family.inviteDecline")}</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
 
@@ -289,8 +361,23 @@ function MemberCard({
 }) {
   const { t } = useTranslation();
   const isWarning = member.status === "warning";
-  const statusColor = isWarning ? "#ea580c" : GREEN;
-  const statusBg = isWarning ? "rgba(234,88,12,0.08)" : "rgba(19,136,8,0.08)";
+  const accepted = member.inviteStatus === "accepted";
+  const statusColor = isWarning ? "#ea580c" : accepted ? GREEN : "#64748b";
+  const statusBg = isWarning
+    ? "rgba(234,88,12,0.08)"
+    : accepted
+      ? "rgba(19,136,8,0.08)"
+      : "rgba(100,116,139,0.08)";
+  const badgeIcon: keyof typeof Feather.glyphMap = accepted
+    ? "shield"
+    : member.inviteStatus === "declined"
+      ? "x-circle"
+      : "clock";
+  const badgeLabel = accepted
+    ? t("family.statusSafe")
+    : member.inviteStatus === "declined"
+      ? t("family.statusDeclined")
+      : t("family.statusPending");
   const avatarBg = isWarning ? "rgba(234,88,12,0.12)" : "rgba(19,136,8,0.1)";
 
   return (
@@ -307,10 +394,15 @@ function MemberCard({
         </View>
         <View style={{ flex: 1 }}>
           <Text style={mc.name}>{member.name}</Text>
-          <Text style={mc.relation}>{relationLabel(member.relation)} · {member.phone}</Text>
-          {isWarning && (
+          <Text style={mc.relation}>{relationLabel(member.relation)} · {formatIndianPhone(member.phone)}</Text>
+          {isWarning && member.latestAlert && (
             <Text style={mc.lastSeen}>
-              {t("family.lastActivity", { value: resolveLastSeen(member.lastSeen, t) })}
+              {t("family.alertDetail", {
+                caller: formatIndianPhone(member.latestAlert.callerPhone),
+                count: member.latestAlert.reportCount,
+              })}
+              {" · "}
+              {resolveLastSeen(member.lastSeen, t)}
             </Text>
           )}
         </View>
@@ -318,18 +410,36 @@ function MemberCard({
           <Feather name="trash-2" size={15} color="#dc2626" />
         </TouchableOpacity>
       </View>
+      {!isWarning && member.inviteStatus !== "accepted" && (
+        <Text style={mc.inviteHint}>
+          {member.inviteStatus === "declined"
+            ? t("family.inviteDeclinedHint", { name: member.name })
+            : t("family.invitePendingHint", { name: member.name, phone: formatIndianPhone(member.phone) })}
+        </Text>
+      )}
       <View style={mc.footer}>
         <View style={[mc.statusBadge, { backgroundColor: statusBg }]}>
-          <Feather name={isWarning ? "alert-triangle" : "shield"} size={12} color={statusColor} />
+          <Feather name={isWarning ? "alert-triangle" : badgeIcon} size={12} color={statusColor} />
           <Text style={[mc.statusTxt, { color: statusColor }]}>
-            {isWarning ? t("family.statusAlert") : t("family.statusSafe")}
+            {isWarning ? t("family.statusAlert") : badgeLabel}
           </Text>
         </View>
         {isWarning && (
-          <TouchableOpacity style={mc.markSafeBtn} onPress={onMarkSafe} activeOpacity={0.8}>
-            <Feather name="check" size={12} color={GREEN} />
-            <Text style={mc.markSafeTxt}>{t("family.markSafe")}</Text>
-          </TouchableOpacity>
+          <View style={{ flexDirection: "row", gap: 8 }}>
+            <TouchableOpacity
+              style={mc.callBtn}
+              onPress={() => Linking.openURL(`tel:${member.phone}`).catch(() => {})}
+              activeOpacity={0.8}
+              accessibilityRole="button"
+            >
+              <Feather name="phone" size={12} color="#fff" />
+              <Text style={mc.callTxt}>{t("family.callMember", { name: member.name })}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={mc.markSafeBtn} onPress={onMarkSafe} activeOpacity={0.8}>
+              <Feather name="check" size={12} color={GREEN} />
+              <Text style={mc.markSafeTxt}>{t("family.markSafe")}</Text>
+            </TouchableOpacity>
+          </View>
         )}
       </View>
     </View>
@@ -447,4 +557,16 @@ const mc = StyleSheet.create({
     borderWidth: 1, borderColor: "rgba(19,136,8,0.25)",
   },
   markSafeTxt: { fontSize: 12, fontWeight: "700" as const, color: GREEN },
+  callBtn: {
+    flexDirection: "row", alignItems: "center", gap: 5,
+    paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10,
+    backgroundColor: "#dc2626",
+  },
+  callTxt: { fontSize: 12, fontWeight: "700" as const, color: "#fff" },
+  declineBtn: {
+    paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10,
+    borderWidth: 1, borderColor: "rgba(100,116,139,0.3)",
+  },
+  declineTxt: { fontSize: 12, fontWeight: "600" as const, color: "#64748b" },
+  inviteHint: { fontSize: 12, color: "#64748b", paddingHorizontal: 14, paddingBottom: 10, lineHeight: 17 },
 });

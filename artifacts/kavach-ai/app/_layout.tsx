@@ -26,6 +26,7 @@ import { AppProvider } from "@/context/AppContext";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { initI18n } from "@/i18n";
 import { consumePendingPostCallReport } from "@/lib/postCallReport";
+import { onFamilyAlertOpened } from "@/lib/push";
 import { initializeRevenueCat, SubscriptionProvider } from "@/lib/revenuecat";
 import { syncScreeningApiConfig } from "@/lib/screening";
 import { getToken } from "@/lib/session";
@@ -140,6 +141,13 @@ function RootLayoutNav() {
     });
     return () => sub.remove();
   }, [router]);
+
+  // Tapping a Family Guardian alert opens the Family tab, where the member's
+  // card shows the scam caller with "Call" and "Mark safe" buttons.
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    return onFamilyAlertOpened(() => router.push("/(tabs)/family"));
+  }, [status, router]);
 
   // First-launch onboarding (language pick + Guardian explainer). Null until the
   // stored flag resolves so we never flash it for a returning user.

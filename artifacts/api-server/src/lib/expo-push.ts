@@ -23,6 +23,7 @@ export async function sendExpoPush(
   tokens: string[],
   title: string,
   body: string,
+  options: { data?: Record<string, string>; priority?: "default" | "high" } = {},
 ): Promise<SendResult> {
   const valid = tokens.filter((t) => t.startsWith("ExponentPushToken"));
   let successCount = 0;
@@ -36,6 +37,8 @@ export async function sendExpoPush(
       title,
       body,
       sound: "default" as const,
+      ...(options.data ? { data: options.data } : {}),
+      ...(options.priority ? { priority: options.priority } : {}),
     }));
     try {
       const resp = await fetch(EXPO_PUSH_URL, {

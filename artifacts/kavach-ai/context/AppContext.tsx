@@ -1,12 +1,19 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useQueryClient } from "@tanstack/react-query";
 import {
+  acceptFamilyInvite as apiAcceptFamilyInvite,
   addFamilyMember as apiAddFamilyMember,
+  declineFamilyInvite as apiDeclineFamilyInvite,
   getGetScreeningBlocklistQueryKey,
+  getListFamilyInvitesQueryKey,
   getListFamilyMembersQueryKey,
   removeFamilyMember as apiRemoveFamilyMember,
+  resolveFamilyAlert as apiResolveFamilyAlert,
   useGetScreeningBlocklist,
+  useListFamilyInvites,
   useListFamilyMembers,
+  type FamilyAlert,
+  type FamilyInvite,
 } from "@workspace/api-client-react";
 import React, {
   createContext,
@@ -20,21 +27,24 @@ import { Platform } from "react-native";
 
 import { useAuth } from "@/context/AuthContext";
 import {
-  onCallScreened,
-  onSmsScreened,
   setCallScreeningEnabled as nativeSetCall,
+  setFamilyAlertsEnabled as nativeSetFamilyAlerts,
   setSmsScreeningEnabled as nativeSetSms,
   syncEngineData,
 } from "@/lib/screening";
-import { tenDigits } from "@/lib/phone";
 
 export type FamilyMember = {
   id: string;
   name: string;
   phone: string;
   relation: string;
+  /** "warning" while the member has an unresolved scam-call alert. */
   status: "safe" | "warning" | "danger";
   lastSeen: string;
+  /** Family Guardian consent: has the member accepted alerts? */
+  inviteStatus: "pending" | "accepted" | "declined";
+  /** Most recent unresolved alert from the last 24 hours. */
+  latestAlert: FamilyAlert | null;
 };
 
 export type CheckItem = {
@@ -81,8 +91,12 @@ type AppContextType = {
     relationship: string;
   }) => Promise<void>;
   removeFamilyMember: (id: string) => Promise<void>;
-  /** Reset a member auto-flagged to "warning" back to "safe". */
-  markFamilyMemberSafe: (id: string) => void;
+  /** Resolve the member's open scam-call alert ("they're safe"). */
+  markFamilyMemberSafe: (id: string) => Promise<void>;
+  /** Family Guardian invites sent to this user's phone number. */
+  familyInvites: FamilyInvite[];
+  acceptFamilyInvite: (id: string) => Promise<void>;
+  declineFamilyInvite: (id: string) => Promise<void>;
   addCheck: (check: Omit<CheckItem, "id" | "timestamp">) => void;
   setCallScreening: (enabled: boolean) => void;
   setSmsScreening: (enabled: boolean) => void;
@@ -113,17 +127,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     Platform.OS === "android",
   );
   const [loaded, setLoaded] = useState(false);
-  // Ephemeral, device-local overlay: ids of members flagged "warning" by the
-  // live on-device screener. Not persisted server-side — it resets on reload.
-  const [warnings, setWarnings] = useState<Set<string>>(() => new Set());
 
-  // The family roster is server-owned. Fetch it once authenticated.
+  // The family roster is server-owned. Fetch it once authenticated, and poll
+  // while the app is open so a Family Guardian alert shows up on the member's
+  // card even if its push notification was missed.
   const { data: familyData, isLoading: familyLoading } = useListFamilyMembers({
     query: {
       queryKey: getListFamilyMembersQueryKey(),
       enabled: authStatus === "authenticated",
+      refetchInterval: 60_000,
     },
   });
+
+  // Invites other users sent to this user's phone number (the member side).
+  const { data: invitesData } = useListFamilyInvites({
+    query: {
+      queryKey: getListFamilyInvitesQueryKey(),
+      enabled: authStatus === "authenticated",
+    },
+  });
+  const familyInvites = invitesData?.invites ?? [];
 
   // Community-sourced known-scam numbers for on-device call/SMS screening. This
   // is what lets the device warn about scam calls the user never personally
@@ -140,22 +163,29 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const familyMembers = useMemo<FamilyMember[]>(() => {
     const members = familyData?.members ?? [];
     return members.map((m) => {
-      const isWarning = warnings.has(m.id);
+      const alert = m.latestAlert ?? null;
       return {
         id: m.id,
         name: m.name,
         phone: m.phone,
         relation: m.relationship ?? "Other",
-        status: isWarning ? ("warning" as const) : ("safe" as const),
-        lastSeen: isWarning ? "justNow" : "",
+        status: alert ? ("warning" as const) : ("safe" as const),
+        lastSeen: alert ? new Date(alert.createdAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) : "",
+        inviteStatus: m.status,
+        latestAlert: alert,
       };
     });
-  }, [familyData, warnings]);
+  }, [familyData]);
 
-  // Keep the latest roster available to the screening listeners below without
-  // re-subscribing on every roster change.
-  const membersRef = useRef(familyMembers);
-  membersRef.current = familyMembers;
+  // Family Guardian, member side: once this user has accepted an invite, the
+  // native call screener reports incoming calls so the server can alert their
+  // guardians. Turned off again if every invite is declined or on sign-out.
+  const familyAlertsOn =
+    authStatus === "authenticated" && familyInvites.some((i) => i.status === "accepted");
+  useEffect(() => {
+    if (authStatus === "authenticated" && invitesData === undefined) return;
+    nativeSetFamilyAlerts(familyAlertsOn);
+  }, [authStatus, invitesData, familyAlertsOn]);
 
   useEffect(() => {
     (async () => {
@@ -196,7 +226,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     prevAuthStatus.current = authStatus;
     if (prev === "authenticated" && authStatus === "unauthenticated") {
       setRecentChecks([]);
-      setWarnings(new Set());
       setGuardianActive(true);
       setCallScreeningState(Platform.OS === "android");
       setSmsScreeningState(Platform.OS === "android");
@@ -222,35 +251,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     nativeSetCall(callScreening);
     nativeSetSms(smsScreening);
   }, [loaded, callScreening, smsScreening]);
-
-  // Live Family Shield: when the on-device engine screens a risky call/SMS and
-  // the caller/sender matches a saved family contact, flag that member as
-  // "warning" so their card surfaces the alert. No-op on web / non-Android.
-  useEffect(() => {
-    if (!loaded) return;
-    const flagByPhone = (raw: string) => {
-      const key = tenDigits(raw);
-      if (!key) return;
-      const match = membersRef.current.find((m) => tenDigits(m.phone) === key);
-      if (!match) return;
-      setWarnings((prev) => {
-        if (prev.has(match.id)) return prev;
-        const next = new Set(prev);
-        next.add(match.id);
-        return next;
-      });
-    };
-    const callSub = onCallScreened((e) => {
-      if (e.blocked) flagByPhone(e.number);
-    });
-    // Any screened SMS reached us because it matched a blocked sender or a scam
-    // keyword — both are risk signals worth flagging the contact for.
-    const smsSub = onSmsScreened((e) => flagByPhone(e.sender));
-    return () => {
-      callSub.remove();
-      smsSub.remove();
-    };
-  }, [loaded]);
 
   function toggleGuardian() {
     setGuardianActive((v) => !v);
@@ -292,23 +292,31 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   async function removeFamilyMember(id: string) {
     await apiRemoveFamilyMember(id);
-    setWarnings((prev) => {
-      if (!prev.has(id)) return prev;
-      const next = new Set(prev);
-      next.delete(id);
-      return next;
-    });
     await queryClient.invalidateQueries({
       queryKey: getListFamilyMembersQueryKey(),
     });
   }
 
-  function markFamilyMemberSafe(id: string) {
-    setWarnings((prev) => {
-      if (!prev.has(id)) return prev;
-      const next = new Set(prev);
-      next.delete(id);
-      return next;
+  async function markFamilyMemberSafe(id: string) {
+    const alert = familyMembers.find((m) => m.id === id)?.latestAlert;
+    if (!alert) return;
+    await apiResolveFamilyAlert(alert.id);
+    await queryClient.invalidateQueries({
+      queryKey: getListFamilyMembersQueryKey(),
+    });
+  }
+
+  async function acceptFamilyInvite(id: string) {
+    await apiAcceptFamilyInvite(id);
+    await queryClient.invalidateQueries({
+      queryKey: getListFamilyInvitesQueryKey(),
+    });
+  }
+
+  async function declineFamilyInvite(id: string) {
+    await apiDeclineFamilyInvite(id);
+    await queryClient.invalidateQueries({
+      queryKey: getListFamilyInvitesQueryKey(),
     });
   }
 
@@ -336,6 +344,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         addFamilyMember,
         removeFamilyMember,
         markFamilyMemberSafe,
+        familyInvites,
+        acceptFamilyInvite,
+        declineFamilyInvite,
         addCheck,
         setCallScreening,
         setSmsScreening,

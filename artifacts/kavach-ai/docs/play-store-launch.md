@@ -6,7 +6,7 @@ EAS project: `e5d1313b-c177-4200-96df-82bfce6d97ee` (owner `shviam`).
 Steps marked **(you)** need an account or console only the owner can access.
 
 ## 1. Firebase, for Android push notifications (you)
-Push (admin broadcasts, and later Family Guardian alerts) needs Firebase Cloud Messaging.
+Push (admin broadcasts and Family Guardian alerts) needs Firebase Cloud Messaging. Without it, Family Guardian alerts still appear on the owner's Family tab (it refreshes every minute while the app is open), but no notification arrives.
 
 1. Create a Firebase project at <https://console.firebase.google.com> (Analytics optional).
 2. Add an **Android app** with package name `com.netraksh.app`. Download `google-services.json`.
@@ -47,6 +47,7 @@ The Android app in RevenueCat must use the new package name.
 | Phone numbers / links / UPI IDs the user checks or reports | Yes | App functionality, fraud prevention | Aggregated, anonymised stats only |
 | Device push token | Yes | Notifications | No |
 | Purchase history | Yes (via Google Play / RevenueCat) | Subscriptions | With RevenueCat (processor) |
+| Incoming caller's number (only for users who accepted a Family Guardian invite) | Yes, sent for each incoming call | Family Guardian: alert the family members the user chose when a reported scam number calls | Only a reported scam number is shown, and only to the family members the user accepted. Other calls are not stored or shown. |
 
 - Data is encrypted in transit (HTTPS). Users can delete their account in the app (Profile → Delete account), which deletes their data.
 - Precise location is **not** collected (`ACCESS_FINE_LOCATION` is blocked in `app.json`).
@@ -55,4 +56,5 @@ The Android app in RevenueCat must use the new package name.
 ## 5. Before promoting to production
 - [ ] Test on 2–3 real phones (incl. Xiaomi/Realme/Vivo): call screening role, lock-screen caller card, post-call report notification, share-to-check SMS, QR scan, login (OTP + demo), subscription purchase in Play's test track, account deletion.
 - [ ] Push: send a test broadcast from Admin → Broadcast Center.
+- [ ] Family Guardian on two phones: owner (Family plan) adds the member's number → member signs in with that number, accepts on the Family tab, keeps call protection on → call the member from a number reported 5+ times → owner gets the push, "Call" and "Mark safe" work.
 - [ ] Email the website launch waitlist (Admin → Launch Waitlist → Export CSV) once the app is live.

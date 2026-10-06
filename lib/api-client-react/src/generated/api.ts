@@ -57,6 +57,10 @@ import type {
   DevLoginRequest,
   ErrorResponse,
   ExtendTrialRequest,
+  FamilyAlertList,
+  FamilyCallResult,
+  FamilyInvite,
+  FamilyInviteList,
   FamilyMember,
   FamilyMemberList,
   FraudCheckRequest,
@@ -74,6 +78,7 @@ import type {
   PublicReportResult,
   RegisterPushTokenRequest,
   Report,
+  ReportFamilyCallRequest,
   ReportListResponse,
   ResetTrialRequest,
   RolesListResponse,
@@ -4261,6 +4266,443 @@ export const useRemoveFamilyMember = <TError = ErrorType<ErrorResponse>,
         TContext
       > => {
       return useMutation(getRemoveFamilyMemberMutationOptions(options));
+    }
+
+export const getListFamilyInvitesUrl = () => {
+
+
+
+
+  return `/api/family/invites`
+}
+
+/**
+ * @summary Family Guardian invites sent to the signed-in user's phone number
+ */
+export const listFamilyInvites = async ( options?: RequestInit): Promise<FamilyInviteList> => {
+
+  return customFetch<FamilyInviteList>(getListFamilyInvitesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListFamilyInvitesQueryKey = () => {
+    return [
+    `/api/family/invites`
+    ] as const;
+    }
+
+
+export const getListFamilyInvitesQueryOptions = <TData = Awaited<ReturnType<typeof listFamilyInvites>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listFamilyInvites>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListFamilyInvitesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listFamilyInvites>>> = ({ signal }) => listFamilyInvites({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listFamilyInvites>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListFamilyInvitesQueryResult = NonNullable<Awaited<ReturnType<typeof listFamilyInvites>>>
+export type ListFamilyInvitesQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Family Guardian invites sent to the signed-in user's phone number
+ */
+
+export function useListFamilyInvites<TData = Awaited<ReturnType<typeof listFamilyInvites>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listFamilyInvites>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListFamilyInvitesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getAcceptFamilyInviteUrl = (id: string,) => {
+
+
+
+
+  return `/api/family/invites/${id}/accept`
+}
+
+/**
+ * @summary Let the inviting family member get alerts about scam calls to me
+ */
+export const acceptFamilyInvite = async (id: string, options?: RequestInit): Promise<FamilyInvite> => {
+
+  return customFetch<FamilyInvite>(getAcceptFamilyInviteUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getAcceptFamilyInviteMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof acceptFamilyInvite>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof acceptFamilyInvite>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['acceptFamilyInvite'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof acceptFamilyInvite>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  acceptFamilyInvite(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AcceptFamilyInviteMutationResult = NonNullable<Awaited<ReturnType<typeof acceptFamilyInvite>>>
+
+    export type AcceptFamilyInviteMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Let the inviting family member get alerts about scam calls to me
+ */
+export const useAcceptFamilyInvite = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof acceptFamilyInvite>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof acceptFamilyInvite>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getAcceptFamilyInviteMutationOptions(options));
+    }
+
+export const getDeclineFamilyInviteUrl = (id: string,) => {
+
+
+
+
+  return `/api/family/invites/${id}/decline`
+}
+
+/**
+ * @summary Decline an invite, or stop sharing alerts after accepting
+ */
+export const declineFamilyInvite = async (id: string, options?: RequestInit): Promise<FamilyInvite> => {
+
+  return customFetch<FamilyInvite>(getDeclineFamilyInviteUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getDeclineFamilyInviteMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof declineFamilyInvite>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof declineFamilyInvite>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['declineFamilyInvite'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof declineFamilyInvite>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  declineFamilyInvite(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeclineFamilyInviteMutationResult = NonNullable<Awaited<ReturnType<typeof declineFamilyInvite>>>
+
+    export type DeclineFamilyInviteMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Decline an invite, or stop sharing alerts after accepting
+ */
+export const useDeclineFamilyInvite = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof declineFamilyInvite>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof declineFamilyInvite>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getDeclineFamilyInviteMutationOptions(options));
+    }
+
+export const getListFamilyAlertsUrl = () => {
+
+
+
+
+  return `/api/family/alerts`
+}
+
+/**
+ * @summary Recent scam-call alerts about the signed-in user's family members
+ */
+export const listFamilyAlerts = async ( options?: RequestInit): Promise<FamilyAlertList> => {
+
+  return customFetch<FamilyAlertList>(getListFamilyAlertsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListFamilyAlertsQueryKey = () => {
+    return [
+    `/api/family/alerts`
+    ] as const;
+    }
+
+
+export const getListFamilyAlertsQueryOptions = <TData = Awaited<ReturnType<typeof listFamilyAlerts>>, TError = ErrorType<ErrorResponse>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listFamilyAlerts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListFamilyAlertsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listFamilyAlerts>>> = ({ signal }) => listFamilyAlerts({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listFamilyAlerts>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListFamilyAlertsQueryResult = NonNullable<Awaited<ReturnType<typeof listFamilyAlerts>>>
+export type ListFamilyAlertsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Recent scam-call alerts about the signed-in user's family members
+ */
+
+export function useListFamilyAlerts<TData = Awaited<ReturnType<typeof listFamilyAlerts>>, TError = ErrorType<ErrorResponse>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listFamilyAlerts>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListFamilyAlertsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getReportFamilyCallUrl = () => {
+
+
+
+
+  return `/api/family/alerts`
+}
+
+/**
+ * Sent by the member's app for an incoming call. The server looks up the caller's reputation itself and, only when it is medium or high risk, notifies every family member who was given consent.
+
+ * @summary A family member's phone reports an incoming call
+ */
+export const reportFamilyCall = async (reportFamilyCallRequest: ReportFamilyCallRequest, options?: RequestInit): Promise<FamilyCallResult> => {
+
+  return customFetch<FamilyCallResult>(getReportFamilyCallUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      reportFamilyCallRequest,)
+  }
+);}
+
+
+
+
+export const getReportFamilyCallMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reportFamilyCall>>, TError,{data: BodyType<ReportFamilyCallRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof reportFamilyCall>>, TError,{data: BodyType<ReportFamilyCallRequest>}, TContext> => {
+
+const mutationKey = ['reportFamilyCall'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reportFamilyCall>>, {data: BodyType<ReportFamilyCallRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  reportFamilyCall(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReportFamilyCallMutationResult = NonNullable<Awaited<ReturnType<typeof reportFamilyCall>>>
+    export type ReportFamilyCallMutationBody = BodyType<ReportFamilyCallRequest>
+    export type ReportFamilyCallMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary A family member's phone reports an incoming call
+ */
+export const useReportFamilyCall = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reportFamilyCall>>, TError,{data: BodyType<ReportFamilyCallRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof reportFamilyCall>>,
+        TError,
+        {data: BodyType<ReportFamilyCallRequest>},
+        TContext
+      > => {
+      return useMutation(getReportFamilyCallMutationOptions(options));
+    }
+
+export const getResolveFamilyAlertUrl = (id: string,) => {
+
+
+
+
+  return `/api/family/alerts/${id}/resolve`
+}
+
+/**
+ * @summary Mark a family alert as handled (the member is safe)
+ */
+export const resolveFamilyAlert = async (id: string, options?: RequestInit): Promise<SuccessResponse> => {
+
+  return customFetch<SuccessResponse>(getResolveFamilyAlertUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getResolveFamilyAlertMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resolveFamilyAlert>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof resolveFamilyAlert>>, TError,{id: string}, TContext> => {
+
+const mutationKey = ['resolveFamilyAlert'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resolveFamilyAlert>>, {id: string}> = (props) => {
+          const {id} = props ?? {};
+
+          return  resolveFamilyAlert(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ResolveFamilyAlertMutationResult = NonNullable<Awaited<ReturnType<typeof resolveFamilyAlert>>>
+
+    export type ResolveFamilyAlertMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Mark a family alert as handled (the member is safe)
+ */
+export const useResolveFamilyAlert = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resolveFamilyAlert>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof resolveFamilyAlert>>,
+        TError,
+        {id: string},
+        TContext
+      > => {
+      return useMutation(getResolveFamilyAlertMutationOptions(options));
     }
 
 export const getAdminListBroadcastsUrl = () => {

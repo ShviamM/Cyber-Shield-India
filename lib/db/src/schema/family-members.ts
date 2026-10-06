@@ -25,6 +25,15 @@ export const familyMembersTable = pgTable(
     phone: text("phone").notNull(),
     // Optional free-text relationship label (e.g. "Mother", "Son").
     relationship: text("relationship"),
+    // Family Guardian consent. Adding a member is an invite: the person signs in
+    // to Netraksh with this phone number and accepts before any of their calls
+    // can alert the owner. "pending" | "accepted" | "declined".
+    status: text("status").notNull().default("pending"),
+    // The member's own account, set when they accept.
+    memberUserId: uuid("member_user_id").references(() => usersTable.id, {
+      onDelete: "set null",
+    }),
+    respondedAt: timestamp("responded_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -35,6 +44,8 @@ export const familyMembersTable = pgTable(
   (table) => [
     uniqueIndex("family_members_owner_phone_idx").on(table.ownerId, table.phone),
     index("family_members_owner_idx").on(table.ownerId),
+    index("family_members_phone_idx").on(table.phone),
+    index("family_members_member_user_idx").on(table.memberUserId),
   ],
 );
 
