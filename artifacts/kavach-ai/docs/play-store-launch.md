@@ -5,17 +5,14 @@ EAS project: `e5d1313b-c177-4200-96df-82bfce6d97ee` (owner `shviam`).
 
 Steps marked **(you)** need an account or console only the owner can access.
 
-## 1. Firebase, for Android push notifications (you)
-Push (admin broadcasts and Family Guardian alerts) needs Firebase Cloud Messaging. Without it, Family Guardian alerts still appear on the owner's Family tab (it refreshes every minute while the app is open), but no notification arrives.
+## 1. Firebase, for Android push notifications
+Push (admin broadcasts and Family Guardian alerts) uses Firebase Cloud Messaging.
 
-1. Create a Firebase project at <https://console.firebase.google.com> (Analytics optional).
-2. Add an **Android app** with package name `com.netraksh.app`. Download `google-services.json`.
-3. Give it to the build. Do one of:
-   - `eas env:create --name GOOGLE_SERVICES_JSON --type file --value ./google-services.json --environment production --environment preview` (recommended), or
-   - put the file at `artifacts/kavach-ai/google-services.json` (it's not secret).
-   `app.config.js` picks it up automatically.
-4. Firebase console → Project settings → Service accounts → **Generate new private key**.
-   Upload it to Expo: `eas credentials` → Android → production → *Google Service Account* → *Push Notifications (FCM V1)*.
+- [x] Firebase project `kavach-98e72` with Android app `com.netraksh.app`.
+- [x] `google-services.json` is committed at `artifacts/kavach-ai/google-services.json` (not secret); `app.config.js` picks it up.
+- [x] FCM v1 API enabled and the service account can send (checked with a validate-only request).
+- [ ] **(you)** Upload the FCM v1 service-account key to Expo: expo.dev → project → Credentials → Android → `com.netraksh.app` → *FCM V1 service account key*. Or run `eas credentials` → Android → production → *Google Service Account* → *Push Notifications (FCM V1)*.
+  The key is a secret: never commit it (`*firebase-adminsdk*.json` is git-ignored).
 
 ## 2. RevenueCat (you)
 The Android app in RevenueCat must use the new package name.

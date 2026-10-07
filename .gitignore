@@ -47,3 +47,6 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# Firebase service-account keys are secrets: upload them to Expo, never commit.
+*firebase-adminsdk*.json

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "20060600060",
+    "project_id": "kavach-98e72",
+    "storage_bucket": "kavach-98e72.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:20060600060:android:0992829943855f005a4979",
+        "android_client_info": {
+          "package_name": "com.netraksh.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmrvG5L65_666LxcvGU-6-C4YWMsC6z8Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
