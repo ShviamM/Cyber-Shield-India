@@ -138,7 +138,7 @@ export default function HomeScreen() {
   }, [nearbyStatus, nearbyCity, updateLocation]);
 
   const topInset = Platform.OS === "web" ? 0 : insets.top;
-  const bottomPad = (Platform.OS === "web" ? 34 : insets.bottom) + 140;
+  const bottomPad = (Platform.OS === "web" ? 34 : insets.bottom) + 90;
 
   const SERVICE_LINKS = [
     { icon: "grid" as const, label: t("services.scamCategories"), color: "#7c3aed", bg: "#f5f3ff", route: "/categories" },
@@ -292,6 +292,14 @@ export default function HomeScreen() {
               </TouchableOpacity>
             ))}
           </View>
+          {/* Scan a QR before paying: full width so it never covers other content. */}
+          <TouchableOpacity style={s.scanBtn} onPress={goScan} activeOpacity={0.9}>
+            <View style={s.scanIconBox}>
+              <Feather name="maximize" size={20} color="#fff" />
+            </View>
+            <Text style={s.scanTxt} numberOfLines={1}>{t("home.scanBeforePay")}</Text>
+            <Feather name="chevron-right" size={18} color="#fff" />
+          </TouchableOpacity>
         </View>
 
         {/* Learn & Report quick links */}
@@ -593,7 +601,7 @@ export default function HomeScreen() {
                 <View style={[s.ruleIcon, { backgroundColor: bg }]}>
                   <Feather name={r.icon as any} size={14} color={c} />
                 </View>
-                <Text style={s.ruleTxt} numberOfLines={2}>{r.english}</Text>
+                <Text style={s.ruleTxt} numberOfLines={2}>{isHindi ? r.hindi : r.english}</Text>
                 <View style={[s.ruleDot, { backgroundColor: c }]} />
               </View>
             );
@@ -768,15 +776,6 @@ export default function HomeScreen() {
         )}
       </ScrollView>
 
-      {/* Floating "Scan Before You Pay" action */}
-      <TouchableOpacity
-        style={[s.fab, { bottom: (Platform.OS === "web" ? 16 : insets.bottom) + 74 }]}
-        onPress={goScan}
-        activeOpacity={0.9}
-      >
-        <Feather name="maximize" size={20} color="#fff" />
-        <Text style={s.fabTxt}>{t("home.scanBeforePay")}</Text>
-      </TouchableOpacity>
     </View>
   );
 }
@@ -808,7 +807,7 @@ const s = StyleSheet.create({
   },
   logoImg: { width: "100%", height: "100%" },
   logoTitle: { fontSize: 18, fontWeight: "900" as const, color: "#fff", letterSpacing: -0.4 },
-  logoSub: { fontSize: 9, color: "rgba(255,255,255,0.55)", letterSpacing: 1, marginTop: 1 },
+  logoSub: { fontSize: 11, color: "rgba(255,255,255,0.7)", marginTop: 1 },
   headerIcons: { flexDirection: "row", alignItems: "center", gap: 14 },
   headerIconBtn: { position: "relative" },
   bellDot: {
@@ -826,7 +825,7 @@ const s = StyleSheet.create({
     elevation: 6,
   },
   sosBigNum: { fontSize: 20, fontWeight: "900" as const, color: "#fff" },
-  sosSubLabel: { fontSize: 8, color: "rgba(255,255,255,0.8)", textAlign: "center" },
+  sosSubLabel: { fontSize: 10, color: "rgba(255,255,255,0.9)", textAlign: "center" },
   statsBox: { flex: 1, borderRadius: 14, backgroundColor: "rgba(255,255,255,0.08)", padding: 12, gap: 8 },
   guardianToggle: {
     flexDirection: "row", alignItems: "center", gap: 6,
@@ -838,7 +837,7 @@ const s = StyleSheet.create({
   headerStats: { flexDirection: "row", alignItems: "center" },
   hStat: { flex: 1, alignItems: "center" },
   hStatNum: { fontSize: 18, fontWeight: "800" as const, color: "#fff" },
-  hStatLbl: { fontSize: 9, color: "rgba(255,255,255,0.5)", marginTop: 1 },
+  hStatLbl: { fontSize: 11, color: "rgba(255,255,255,0.72)", marginTop: 1 },
   hStatDiv: { width: 1, height: 24, backgroundColor: "rgba(255,255,255,0.15)" },
 
   // Section wrappers
@@ -849,11 +848,11 @@ const s = StyleSheet.create({
   },
   sectionHeader: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 14 },
   sectionIconBox: {
-    width: 28, height: 28, borderRadius: 8,
+    width: 32, height: 32, borderRadius: 10,
     alignItems: "center", justifyContent: "center",
   },
-  sectionTitle: { fontSize: 13, fontWeight: "800" as const },
-  sectionSub: { fontSize: 10, marginTop: 1 },
+  sectionTitle: { fontSize: 15, fontWeight: "800" as const },
+  sectionSub: { fontSize: 12, marginTop: 2 },
   outerSectionTitle: { fontSize: 13, fontWeight: "800" as const },
   seeAll: { fontSize: 11, fontWeight: "600" as const },
   liveRow: { flexDirection: "row", alignItems: "center", gap: 8 },
@@ -885,17 +884,17 @@ const s = StyleSheet.create({
   toolSublabel: { fontSize: 9, color: "#64748b" },
 
   // Service quick links
-  serviceRow: { flexDirection: "row", gap: 8, marginHorizontal: 16, marginTop: 12 },
+  serviceRow: { flexDirection: "row", gap: 8, marginHorizontal: 16, marginTop: 16 },
   serviceChip: { flex: 1, alignItems: "center", gap: 6 },
   serviceIconBox: {
     width: 48, height: 48, borderRadius: 14,
     alignItems: "center", justifyContent: "center",
   },
-  serviceLabel: { fontSize: 10, fontWeight: "600" as const, color: "#475569", textAlign: "center", lineHeight: 13 },
+  serviceLabel: { fontSize: 12, fontWeight: "600" as const, color: "#334155", textAlign: "center", lineHeight: 16 },
 
   // Scam cards
   nearbyCard: {
-    marginHorizontal: 16, marginTop: 4, marginBottom: 14,
+    marginHorizontal: 16, marginTop: 16, marginBottom: 4,
     backgroundColor: "#fff", borderRadius: 18,
     borderWidth: 1.5, borderColor: NAVY + "22", padding: 16,
     shadowColor: "#000", shadowOpacity: 0.05, shadowRadius: 10, shadowOffset: { width: 0, height: 3 },
@@ -988,7 +987,7 @@ const s = StyleSheet.create({
   ruleRow: { flexDirection: "row", alignItems: "center", padding: 12, gap: 12 },
   ruleRowBorder: { borderBottomWidth: 1, borderBottomColor: "#f8fafc" },
   ruleIcon: { width: 30, height: 30, borderRadius: 8, alignItems: "center", justifyContent: "center", flexShrink: 0 },
-  ruleTxt: { flex: 1, fontSize: 11, color: "#334155", lineHeight: 15 },
+  ruleTxt: { flex: 1, fontSize: 13, color: "#334155", lineHeight: 18 },
   ruleDot: { width: 6, height: 6, borderRadius: 3, flexShrink: 0 },
 
   // Hotspots card
@@ -1093,22 +1092,21 @@ const s = StyleSheet.create({
   actionLabel: { fontSize: 15, fontWeight: "800" as const, color: "#0f172a" },
   actionSub: { fontSize: 11.5, color: "#64748b", marginTop: -2 },
 
-  // Floating "Scan Before You Pay"
-  fab: {
-    position: "absolute",
-    right: 16,
+  // "Scan before you pay" (full width, inside the check card)
+  scanBtn: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: 12,
+    marginTop: 10,
     backgroundColor: SAFFRON,
-    paddingVertical: 14,
-    paddingHorizontal: 18,
-    borderRadius: 30,
-    shadowColor: SAFFRON,
-    shadowOpacity: 0.45,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 8,
+    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
   },
-  fabTxt: { color: "#fff", fontSize: 14, fontWeight: "800" as const },
+  scanIconBox: {
+    width: 36, height: 36, borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    alignItems: "center", justifyContent: "center",
+  },
+  scanTxt: { flex: 1, color: "#fff", fontSize: 15, fontWeight: "800" as const },
 });

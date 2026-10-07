@@ -27,6 +27,7 @@ import { categoryIcon, isCallReportCategory } from "@/constants/strings";
 import { formatIndianPhone, phoneForApi } from "@/lib/phone";
 import { setPendingPostCallReport } from "@/lib/postCallReport";
 import { answerCall, blockNumber, endCall } from "@/lib/screening";
+import { useStatusBarStyle } from "@/hooks/useStatusBarStyle";
 
 const DEMO_NUMBER = "+91 87654-32100";
 
@@ -48,6 +49,7 @@ type ReportPhase =
   | "error";
 
 export default function CallAlertScreen() {
+  useStatusBarStyle("light");
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const params = useLocalSearchParams<{ number?: string | string[]; verify?: string | string[] }>();
