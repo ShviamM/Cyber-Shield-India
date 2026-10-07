@@ -262,6 +262,13 @@ export default function ScreeningScreen() {
 
         {/* Intro */}
         <Text style={s.intro}>{t("screening.intro")}</Text>
+        {/* Android only passes calls from numbers that aren't saved contacts to a
+            screening app that isn't the default phone app. Say so, so a test call
+            from a saved contact isn't mistaken for a bug. */}
+        <View style={s.contactsNote}>
+          <Feather name="info" size={15} color={NAVY} />
+          <Text style={s.contactsNoteTxt}>{t("screening.contactsNote")}</Text>
+        </View>
 
         {/* Protections */}
         <Text style={s.sectionLabel}>{t("screening.sectionProtections")}</Text>
@@ -591,6 +598,11 @@ const s = StyleSheet.create({
   noticeText: { fontSize: 12, color: "#334155", lineHeight: 18 },
 
   intro: { fontSize: 13, color: "#475569", lineHeight: 20, marginBottom: 18 },
+  contactsNote: {
+    flexDirection: "row", gap: 8, alignItems: "flex-start",
+    backgroundColor: "#EBF0FA", borderRadius: 12, padding: 12, marginTop: -6, marginBottom: 18,
+  },
+  contactsNoteTxt: { flex: 1, fontSize: 12.5, color: "#1e3a8a", lineHeight: 18 },
 
   sectionLabel: {
     fontSize: 11, fontWeight: "700" as const, letterSpacing: 1,

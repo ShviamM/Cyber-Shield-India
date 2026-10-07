@@ -151,6 +151,10 @@ const en = {
     logoSub: "CYBER CRIME PREVENTION · INDIA",
     sosHelpline: "Cyber Helpline",
     guardianActive: "Guardian Active",
+    protectionSetupPill: "Set up protection",
+    setupTitle: "Call protection is off",
+    setupBody: "{{n}} step(s) left before Netraksh can warn you about scam calls.",
+    setupCta: "Set up",
     guardianPaused: "Guardian Paused",
     statChecked: "Checked",
     statThreats: "Threats",
@@ -660,6 +664,7 @@ const en = {
     subtitle: "Real-time scam call protection",
     intro:
       "Let Netraksh watch for scam calls right on your phone and warn you the moment one arrives. To check a message, share it to Netraksh.",
+    contactsNote: "Android only checks calls from numbers that are not saved in your contacts. To test, call from a number that isn't in your contacts, or use \"Send test alert\" below.",
     unavailableTitle: "Available on Android app builds",
     unavailableBuild:
       "On-device screening needs the installed Android app. It can't run in this preview or Expo Go. You can still review the settings and privacy model here.",

@@ -1,6 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -28,6 +29,7 @@ import {
 import { BookPromo } from "@/components/BookPromo";
 import { useAppContext } from "@/context/AppContext";
 import { GOLDEN_RULES } from "@/constants/data";
+import { useCallProtection } from "@/hooks/useCallProtection";
 import { useColors } from "@/hooks/useColors";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useNearbyCity } from "@/hooks/useNearbyCity";
@@ -50,6 +52,26 @@ export default function HomeScreen() {
   const isHindi = i18n.language?.startsWith("hi");
   const { guardianActive, familyMembers, recentChecks, toggleGuardian } = useAppContext();
   const { hasUnread: hasUnreadNotifications } = useNotifications();
+  // Real call-protection state from the native screener (Android). The header
+  // pill and the setup card reflect it, so the app never claims protection
+  // that Android hasn't actually granted.
+  const protection = useCallProtection();
+  const protectionPaused =
+    protection.supported && protection.gaps.length === 1 && protection.gaps[0] === "enabled";
+  const needsSetup = protection.supported && !protection.ready && !protectionPaused;
+
+  // First run on Android: open the setup screen once, so call protection isn't
+  // left off just because nobody found it under Profile.
+  useEffect(() => {
+    if (!protection.supported || !protection.status || protection.status.hasCallRole) return;
+    AsyncStorage.getItem("kv_screening_prompted")
+      .then((v) => {
+        if (v) return;
+        AsyncStorage.setItem("kv_screening_prompted", "1").catch(() => {});
+        router.push("/screening");
+      })
+      .catch(() => {});
+  }, [protection.supported, protection.status]);
   // Don't auto-fire the OS location dialog the instant Home mounts. We read the
   // already-granted permission silently ({ prompt: false }) — returning users
   // who granted it still get their city with no prompt — and a fresh user sees
@@ -230,16 +252,32 @@ export default function HomeScreen() {
             <Text style={s.sosSubLabel}>{t("home.sosHelpline")}</Text>
           </TouchableOpacity>
           <View style={s.statsBox}>
-            <TouchableOpacity
-              style={[s.guardianToggle, { borderColor: guardianActive ? "rgba(74,222,128,0.4)" : "rgba(255,255,255,0.15)" }]}
-              onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); toggleGuardian(); }}
-              activeOpacity={0.8}
-            >
-              <View style={[s.guardianDot, { backgroundColor: guardianActive ? "#4ade80" : "#94a3b8" }]} />
-              <Text style={s.guardianLabel}>
-                {guardianActive ? t("home.guardianActive") : t("home.guardianPaused")}
-              </Text>
-            </TouchableOpacity>
+            {needsSetup ? (
+              <TouchableOpacity
+                style={[s.guardianToggle, { borderColor: "rgba(251,191,36,0.6)", backgroundColor: "rgba(251,191,36,0.12)" }]}
+                onPress={() => { Haptics.selectionAsync(); router.push("/screening"); }}
+                activeOpacity={0.8}
+              >
+                <View style={[s.guardianDot, { backgroundColor: "#fbbf24" }]} />
+                <Text style={s.guardianLabel}>{t("home.protectionSetupPill")}</Text>
+                <Feather name="chevron-right" size={12} color="#fff" />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={[s.guardianToggle, { borderColor: guardianActive ? "rgba(74,222,128,0.4)" : "rgba(255,255,255,0.15)" }]}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  if (protection.supported) router.push("/screening");
+                  else toggleGuardian();
+                }}
+                activeOpacity={0.8}
+              >
+                <View style={[s.guardianDot, { backgroundColor: guardianActive ? "#4ade80" : "#94a3b8" }]} />
+                <Text style={s.guardianLabel}>
+                  {guardianActive ? t("home.guardianActive") : t("home.guardianPaused")}
+                </Text>
+              </TouchableOpacity>
+            )}
             <View style={s.headerStats}>
               <View style={s.hStat}>
                 <Text style={s.hStatNum}>{todayChecks.length}</Text>
@@ -265,6 +303,26 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: bottomPad }}
       >
+        {/* Call protection isn't working yet: say exactly what's missing. */}
+        {needsSetup && (
+          <TouchableOpacity
+            style={s.setupCard}
+            onPress={() => { Haptics.selectionAsync(); router.push("/screening"); }}
+            activeOpacity={0.85}
+          >
+            <View style={s.setupIconBox}>
+              <Feather name="phone-incoming" size={20} color="#b45309" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={s.setupTitle}>{t("home.setupTitle")}</Text>
+              <Text style={s.setupBody}>{t("home.setupBody", { n: protection.gaps.length })}</Text>
+            </View>
+            <View style={s.setupCta}>
+              <Text style={s.setupCtaTxt}>{t("home.setupCta")}</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+
         {/* Primary actions — the main things you can check, one tap each */}
         <View style={[s.section, s.verifyCard]}>
           <View style={s.sectionHeader}>
@@ -1072,6 +1130,22 @@ const s = StyleSheet.create({
   },
   demoBtnTitle: { fontSize: 13, fontWeight: "600" as const, color: "#0f172a" },
   demoBtnSub: { fontSize: 11, color: "#64748b", marginTop: 2 },
+
+  // Call-protection setup card
+  setupCard: {
+    marginHorizontal: 16, marginTop: 16,
+    flexDirection: "row", alignItems: "center", gap: 12,
+    backgroundColor: "#fffbeb", borderRadius: 18, padding: 14,
+    borderWidth: 1.5, borderColor: "#fcd34d",
+  },
+  setupIconBox: {
+    width: 40, height: 40, borderRadius: 12, backgroundColor: "#fef3c7",
+    alignItems: "center", justifyContent: "center",
+  },
+  setupTitle: { fontSize: 15, fontWeight: "800" as const, color: "#78350f" },
+  setupBody: { fontSize: 12, color: "#92400e", marginTop: 2, lineHeight: 17 },
+  setupCta: { backgroundColor: "#d97706", borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8 },
+  setupCtaTxt: { fontSize: 13, fontWeight: "800" as const, color: "#fff" },
 
   // Primary actions (4 big one-tap)
   actionGrid: { flexDirection: "row", flexWrap: "wrap", gap: 10 },

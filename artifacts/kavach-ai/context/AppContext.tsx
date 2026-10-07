@@ -116,7 +116,6 @@ const AppContext = createContext<AppContextType>({} as AppContextType);
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const { status: authStatus } = useAuth();
   const queryClient = useQueryClient();
-  const [guardianActive, setGuardianActive] = useState(true);
   const [recentChecks, setRecentChecks] = useState<CheckItem[]>([]);
   // On-device screening only runs on Android, so default both toggles ON there
   // for a fresh install. A stored preference (below) still overrides this.
@@ -196,7 +195,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           AsyncStorage.getItem("kv_call_screening"),
           AsyncStorage.getItem("kv_sms_screening"),
         ]);
-        if (g !== null) setGuardianActive(JSON.parse(g));
+        // Older builds kept a separate, cosmetic "guardian" flag. It now mirrors
+        // call protection, so carry an explicit "off" over once.
+        if (g !== null && cs === null && JSON.parse(g) === false) setCallScreeningState(false);
         if (rc) setRecentChecks(JSON.parse(rc));
         if (cs !== null) setCallScreeningState(JSON.parse(cs));
         if (ss !== null) setSmsScreeningState(JSON.parse(ss));
@@ -208,12 +209,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!loaded) return;
     AsyncStorage.multiSet([
-      ["kv_guardian", JSON.stringify(guardianActive)],
       ["kv_checks", JSON.stringify(recentChecks)],
       ["kv_call_screening", JSON.stringify(callScreening)],
       ["kv_sms_screening", JSON.stringify(smsScreening)],
     ]).catch(() => {});
-  }, [guardianActive, recentChecks, callScreening, smsScreening, loaded]);
+  }, [recentChecks, callScreening, smsScreening, loaded]);
 
   // Wipe device-local user data on an actual sign-out / account deletion
   // (authenticated -> unauthenticated), so a deleted or switched account leaves
@@ -226,7 +226,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     prevAuthStatus.current = authStatus;
     if (prev === "authenticated" && authStatus === "unauthenticated") {
       setRecentChecks([]);
-      setGuardianActive(true);
       setCallScreeningState(Platform.OS === "android");
       setSmsScreeningState(Platform.OS === "android");
     }
@@ -252,8 +251,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     nativeSetSms(smsScreening);
   }, [loaded, callScreening, smsScreening]);
 
+  // "Guardian" is the user-facing name for call protection: one real setting,
+  // synced to the native call screener, not a separate cosmetic flag.
+  const guardianActive = callScreening;
   function toggleGuardian() {
-    setGuardianActive((v) => !v);
+    setCallScreeningState((v) => !v);
   }
 
   // Native sync is handled centrally by the effect above; the setters only
