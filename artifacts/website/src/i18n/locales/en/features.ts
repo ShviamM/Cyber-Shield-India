@@ -1,8 +1,8 @@
 export default {
   seo: {
-    title: "Features | Your Digital Life, Protected — Netraksh",
+    title: "Features | Your Digital Life, Protected | Netraksh",
     description:
-      "See how Netraksh protects you and your family from scam calls, fraud SMS, WhatsApp scams, QR fraud and UPI fraud — explained through real-life protection scenarios.",
+      "See how Netraksh protects you and your family from scam calls, fraud SMS, WhatsApp scams, QR fraud and UPI fraud, explained through real-life protection scenarios.",
   },
   hero: {
     badge: "Protection that feels personal",
@@ -15,7 +15,7 @@ export default {
     title: "What Are You Protecting?",
     subtitle: "Netraksh stands guard over every part of your digital life.",
     items: [
-      { title: "Yourself", desc: "Stay safe from scam calls, phishing and fraud — wherever you are." },
+      { title: "Yourself", desc: "Stay safe from scam calls, phishing and fraud, wherever you are." },
       { title: "Your Family", desc: "Shield parents, children and loved ones from digital threats." },
       { title: "Your Money", desc: "Stop UPI fraud, fake payments and bank scams before they cost you." },
       { title: "Your Digital Identity", desc: "Guard your OTPs, KYC and personal data from impersonators." },
@@ -25,7 +25,7 @@ export default {
   scenarios: {
     title: "Real Moments. Real Protection.",
     subtitle:
-      "These aren't features on a checklist — they're the everyday situations Netraksh quietly handles for you.",
+      "These aren't features on a checklist. They're the everyday situations Netraksh quietly handles for you.",
     cta: "See How It Works",
     flowLabel: "Protection Flow",
     items: [
@@ -44,7 +44,7 @@ export default {
       {
         badge: "WhatsApp",
         title: "A relative forwards you a suspicious WhatsApp message",
-        desc: "A “lucky prize” forward looks harmless. Share it to Netraksh and our AI breaks down exactly why it's a scam — plus what to do next.",
+        desc: "A “lucky prize” forward looks harmless. Share it to Netraksh and our AI breaks down exactly why it's a scam, plus what to do next.",
         steps: ["Share to Netraksh", "AI Analysis", "Scam Detected", "Protection Advice"],
       },
       {
@@ -83,7 +83,7 @@ export default {
   },
   demo: {
     title: "See Protection In Action",
-    subtitle: "Pick a threat and watch how Netraksh responds — step by step, in real time.",
+    subtitle: "Pick a threat and watch how Netraksh responds, step by step, in real time.",
   },
   india: {
     badge: "India's Digital Bodyguard",

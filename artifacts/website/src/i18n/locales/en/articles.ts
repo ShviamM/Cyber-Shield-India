@@ -32,7 +32,7 @@ export default {
     shareAriaLabel: "Share this article",
     protectTitle: "Protect yourself automatically",
     protectDesc:
-      "Netraksh blocks scam calls, fake links and fraud messages like this in real time — before they reach you.",
+      "Netraksh blocks scam calls, fake links and fraud messages like this in real time, before they reach you.",
     download: "Download Netraksh",
     reportTitle: "Report fraud immediately",
     reportDescBefore:

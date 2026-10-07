@@ -51,11 +51,11 @@ export default {
     items: [
       {
         q: "What is Netraksh?",
-        a: "Netraksh is India's Digital Bodyguard — a safety app that protects you from scam calls, fraudulent SMS, malicious links, and UPI fraud using AI threat detection.",
+        a: "Netraksh is India's Digital Bodyguard: a safety app that protects you from scam calls, fraudulent SMS, malicious links, and UPI fraud using AI threat detection.",
       },
       {
         q: "How is Netraksh different from caller ID apps?",
-        a: "Caller ID apps rely on crowdsourced phone books to show who's calling. Netraksh is a security tool: it uses threat intelligence and AI to detect WhatsApp fraud, QR code traps, and malicious URLs in real time — not just names.",
+        a: "Caller ID apps rely on crowdsourced phone books to show who's calling. Netraksh is a security tool: it uses threat intelligence and AI to detect WhatsApp fraud, QR code traps, and malicious URLs in real time, not just names.",
       },
       {
         q: "How does scam detection work?",

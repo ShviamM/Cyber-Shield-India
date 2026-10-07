@@ -243,7 +243,7 @@ export default function Pricing() {
                         <>
                           <div className="flex items-end gap-1.5">
                             <span className={`text-5xl font-extrabold tracking-tight ${featured ? "text-white" : "text-gray-900"}`}>
-                              {plan ? formatPrice(plan.amount) : "—"}
+                              {plan ? formatPrice(plan.amount) : "-"}
                             </span>
                             <span className={`mb-1.5 ${featured ? "text-[#C9CEE0]" : "text-gray-500"}`}>{t("perYear")}</span>
                           </div>

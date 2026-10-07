@@ -47,3 +47,23 @@ export async function ensureFamilyGuardianSchema(): Promise<void> {
     logger.error({ err }, "Failed to ensure Family Guardian schema");
   }
 }
+
+/** Family Guardian alerts are kept for this long, then deleted. */
+export const FAMILY_ALERT_RETENTION_DAYS = 90;
+
+/** Delete alerts older than the retention period (runs daily). */
+export async function pruneOldFamilyAlerts(): Promise<void> {
+  try {
+    await db.execute(
+      sql`DELETE FROM family_alerts WHERE created_at < now() - make_interval(days => ${FAMILY_ALERT_RETENTION_DAYS})`,
+    );
+  } catch (err) {
+    logger.error({ err }, "Failed to prune old family alerts");
+  }
+}
+
+export function startFamilyAlertPruning(): void {
+  const run = () => void ensureFamilyGuardianSchema().then(pruneOldFamilyAlerts);
+  run();
+  setInterval(() => void pruneOldFamilyAlerts(), 24 * 60 * 60 * 1000).unref();
+}

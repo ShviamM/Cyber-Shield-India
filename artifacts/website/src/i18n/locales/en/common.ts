@@ -26,7 +26,7 @@ export default {
     downloadApp: "Download App",
     checkNumber: "Check a number",
     checkNumberFree: "Check a number free",
-    downloadFree: "Download Netraksh — Free",
+    downloadFree: "Download Netraksh Free",
     startFreeTrial: "Start Free Trial",
     protectMyFamily: "Protect My Family",
     seeAllFeatures: "See All Features",

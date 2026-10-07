@@ -118,7 +118,7 @@ export default function Features() {
           subtitle={t("hero.subtitle")}
         />
 
-        {/* SECTION 1 — WHAT ARE YOU PROTECTING */}
+        {/* SECTION 1 - WHAT ARE YOU PROTECTING */}
         <section className="py-24 bg-gray-900 text-white relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/25 via-gray-900 to-gray-900 pointer-events-none" />
           <div className="container mx-auto px-4 md:px-6 relative z-10">
@@ -166,7 +166,7 @@ export default function Features() {
           </div>
         </section>
 
-        {/* SECTION 2 — SCENARIOS */}
+        {/* SECTION 2 - SCENARIOS */}
         <section className="py-24 bg-white">
           <div className="container mx-auto px-4 md:px-6">
             <motion.div
@@ -290,7 +290,7 @@ export default function Features() {
           </div>
         </section>
 
-        {/* SECTION 3 — WHY DIFFERENT */}
+        {/* SECTION 3 - WHY DIFFERENT */}
         <section className="py-24 bg-white">
           <div className="container mx-auto px-4 md:px-6">
             <motion.div
@@ -344,7 +344,7 @@ export default function Features() {
           </div>
         </section>
 
-        {/* SECTION 4 — LIVE DEMO */}
+        {/* SECTION 4 - LIVE DEMO */}
         <section className="py-24 bg-gray-50 border-y border-gray-200/60">
           <div className="container mx-auto px-4 md:px-6">
             <motion.div
@@ -366,7 +366,7 @@ export default function Features() {
           </div>
         </section>
 
-        {/* SECTION 6 — BUILT FOR INDIA */}
+        {/* SECTION 6 - BUILT FOR INDIA */}
         <section className="py-24 bg-white">
           <div className="container mx-auto px-4 md:px-6">
             <motion.div
@@ -414,7 +414,7 @@ export default function Features() {
           </div>
         </section>
 
-        {/* SECTION 7 — FINAL CTA */}
+        {/* SECTION 7 - FINAL CTA */}
         <section className="py-24 bg-primary text-white text-center relative overflow-hidden">
           <div className="absolute inset-0 opacity-[0.07] [background-image:radial-gradient(circle,white_1px,transparent_1px)] [background-size:22px_22px]" />
           <div className="container mx-auto px-4 relative z-10">
