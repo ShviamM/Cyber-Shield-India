@@ -230,6 +230,7 @@ const ta = {
       warning: "எச்சரிக்கை",
       danger: "ஆபத்து",
       invalid: "தவறானது",
+      unknown: "புகார்கள் இல்லை",
     },
     local: {
       linkInvalidHeadline: "சரியான URL-ஐ உள்ளிடவும்",

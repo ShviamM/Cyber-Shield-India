@@ -923,6 +923,10 @@ export interface PaymentList {
   payments: Payment[];
 }
 
+export interface UnregisterPushTokenRequest {
+  token: string;
+}
+
 export type RegisterPushTokenRequestPlatform = typeof RegisterPushTokenRequestPlatform[keyof typeof RegisterPushTokenRequestPlatform] | null;
 
 

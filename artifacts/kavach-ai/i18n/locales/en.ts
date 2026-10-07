@@ -335,6 +335,7 @@ const en = {
       warning: "Warning",
       danger: "Danger",
       invalid: "Invalid",
+      unknown: "No reports",
     },
     local: {
       linkInvalidHeadline: "Enter a valid URL",
@@ -400,6 +401,7 @@ const en = {
     successTitle: "Report submitted",
     successMsg: "Thank you for helping protect the community.",
     submitFailed: "Couldn't submit your report. Please try again.",
+    dateInvalid: "Enter the date as YYYY-MM-DD, and not in the future.",
     done: "Done",
     disclaimer:
       "Reports are reviewed by moderators. False reports may be removed. For financial loss, also call 1930.",
@@ -599,6 +601,9 @@ const en = {
     limitMessage: "Your plan allows up to {{n}} family members.",
     addFailedTitle: "Couldn't add member",
     addFailedMessage: "Something went wrong. Please try again.",
+    invalidPhone: "Enter a valid 10-digit Indian mobile number.",
+    ownNumber: "That's your own number. Add a family member's number instead.",
+    duplicateMember: "This number is already in your family list.",
     removeFailedTitle: "Couldn't remove member",
     removeFailedMessage: "Something went wrong. Please try again.",
     relations: {
@@ -881,6 +886,8 @@ const en = {
     title: "Premium",
     entryTitle: "Netraksh Premium",
     entrySub: "Unlock advanced protection for you and your family",
+    entryActiveTitle: "Netraksh Premium is active",
+    entryActiveSub: "Manage your plan and payments",
     choosePlan: "Choose your plan",
     mostPopular: "Most popular",
     free: "Free",

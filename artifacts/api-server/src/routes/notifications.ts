@@ -3,6 +3,7 @@ import { and, desc, eq, ne } from "drizzle-orm";
 import { db, deviceTokensTable, broadcastsTable } from "@workspace/db";
 import {
   RegisterPushTokenBody,
+  UnregisterPushTokenBody,
   type SuccessResponse,
   type NotificationList,
 } from "@workspace/api-zod";
@@ -77,6 +78,26 @@ router.post("/me/push-token", requireAuth, async (req, res) => {
       ),
     );
 
+  const response: SuccessResponse = { success: true };
+  res.json(response);
+});
+
+/**
+ * Remove this device's push token from the signed-in user, so a phone that
+ * signs out stops receiving that account's Family Guardian alerts and
+ * broadcasts (e.g. a shared family phone).
+ */
+router.delete("/me/push-token", requireAuth, async (req, res) => {
+  const user = req.user!;
+  const body = UnregisterPushTokenBody.parse(req.body);
+  await db
+    .delete(deviceTokensTable)
+    .where(
+      and(
+        eq(deviceTokensTable.token, body.token.trim()),
+        eq(deviceTokensTable.userId, user.id),
+      ),
+    );
   const response: SuccessResponse = { success: true };
   res.json(response);
 });

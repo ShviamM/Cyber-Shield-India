@@ -7,6 +7,8 @@ import {
   useGetSubscriptionPlans,
   useListMyPayments,
   useStartSubscriptionTrial,
+  getGetUsageQueryKey,
+  getListFamilyMembersQueryKey,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
@@ -135,6 +137,9 @@ export default function SubscriptionScreen() {
   function refreshSubscriptionData() {
     queryClient.invalidateQueries({ queryKey: getGetMySubscriptionQueryKey() });
     queryClient.invalidateQueries({ queryKey: getListMyPaymentsQueryKey() });
+    // Premium changes the free-check meter and the family member limit.
+    queryClient.invalidateQueries({ queryKey: getGetUsageQueryKey() });
+    queryClient.invalidateQueries({ queryKey: getListFamilyMembersQueryKey() });
   }
 
   async function runPurchase(
@@ -328,10 +333,12 @@ export default function SubscriptionScreen() {
     : rc.isSubscribed
       ? (planFromProductId(rc.activeProductId) ?? "premium")
       : "free";
-  // The billing period of the active subscription. Razorpay (website) plans are
-  // monthly; store purchases derive it from the product id.
+  // The billing period of the active subscription. Server-side plans (website
+  // payments and the free trial) carry their own interval, which is yearly for
+  // every current plan; store purchases derive it from the product id.
+  const serverInterval = plansQuery.data?.plans?.find((p) => p.key === status.plan)?.interval;
   const currentPeriod: BillingPeriod = status.isPremium
-    ? "monthly"
+    ? serverInterval === "month" ? "monthly" : "annual"
     : rc.isSubscribed
       ? (periodFromProductId(rc.activeProductId) ?? "monthly")
       : "monthly";

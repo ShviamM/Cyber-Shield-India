@@ -8,7 +8,7 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-nati
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { EmptyState, ErrorState, LoadingState } from "@/components/StateViews";
-import { categoryIcon } from "@/constants/strings";
+import { categoryIcon, isCallReportCategory, localCategoryName } from "@/constants/strings";
 import { useColors } from "@/hooks/useColors";
 
 const NAVY = "#0B3D91";
@@ -17,7 +17,7 @@ const SAFFRON = "#FF6713";
 export default function CategoriesScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const bottomPad = (insets.bottom || 0) + 24;
 
   const { data, isLoading, isError, refetch } = useQuery({
@@ -25,7 +25,9 @@ export default function CategoriesScreen() {
     queryFn: () => listCategories(),
   });
 
-  const categories = data?.categories ?? [];
+  // Call-only keys (scam/spam call...) belong to the quick post-call report and
+  // can't be picked on the Report form, so they aren't listed here.
+  const categories = (data?.categories ?? []).filter((c) => !isCallReportCategory(c.key));
 
   return (
     <View style={[s.root, { backgroundColor: colors.background }]}>
@@ -48,7 +50,7 @@ export default function CategoriesScreen() {
                 <View style={s.iconBox}>
                   <Feather name={categoryIcon(c.key)} size={20} color={SAFFRON} />
                 </View>
-                <Text style={s.cardTitle}>{c.nameEn}</Text>
+                <Text style={s.cardTitle}>{localCategoryName(c, i18n.language)}</Text>
               </View>
               {c.descriptionEn ? (
                 <Text style={s.cardDesc}>{c.descriptionEn}</Text>

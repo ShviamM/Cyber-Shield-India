@@ -230,6 +230,7 @@ const ml = {
       warning: "മുന്നറിയിപ്പ്",
       danger: "അപകടം",
       invalid: "അസാധു",
+      unknown: "റിപ്പോർട്ടുകളില്ല",
     },
     local: {
       linkInvalidHeadline: "സാധുവായ URL നൽകുക",

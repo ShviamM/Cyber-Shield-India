@@ -135,6 +135,7 @@ export * from './trendingScamListResponse';
 export * from './trendingScamTrend';
 export * from './trial';
 export * from './trialListResponse';
+export * from './unregisterPushTokenRequest';
 export * from './updateContactMessageRequest';
 export * from './updateContactMessageRequestStatus';
 export * from './updateLocationRequest';

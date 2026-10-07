@@ -230,6 +230,7 @@ const mr = {
       warning: "इशारा",
       danger: "धोका",
       invalid: "अवैध",
+      unknown: "कोणताही रिपोर्ट नाही",
     },
     local: {
       linkInvalidHeadline: "वैध URL टाका",

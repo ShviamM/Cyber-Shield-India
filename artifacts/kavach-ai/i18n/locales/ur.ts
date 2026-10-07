@@ -230,6 +230,7 @@ const ur = {
       warning: "وارننگ",
       danger: "خطرہ",
       invalid: "غلط",
+      unknown: "کوئی رپورٹ نہیں",
     },
     local: {
       linkInvalidHeadline: "ایک درست URL درج کریں",

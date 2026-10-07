@@ -51,7 +51,7 @@ export type CheckItem = {
   id: string;
   type: "number" | "link" | "upi" | "qr" | "message";
   value: string;
-  result: "safe" | "warning" | "danger" | "invalid";
+  result: "safe" | "warning" | "danger" | "unknown" | "invalid";
   timestamp: number;
 };
 

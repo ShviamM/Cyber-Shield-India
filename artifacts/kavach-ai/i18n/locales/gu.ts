@@ -230,6 +230,7 @@ const gu = {
       warning: "ચેતવણી",
       danger: "ખતરો",
       invalid: "અમાન્ય",
+      unknown: "કોઈ રિપોર્ટ નથી",
     },
     local: {
       linkInvalidHeadline: "માન્ય URL દાખલ કરો",

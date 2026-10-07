@@ -230,6 +230,7 @@ const te = {
       warning: "హెచ్చరిక",
       danger: "ప్రమాదం",
       invalid: "చెల్లదు",
+      unknown: "నివేదికలు లేవు",
     },
     local: {
       linkInvalidHeadline: "సరైన URL ఎంటర్ చేయండి",

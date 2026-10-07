@@ -1070,6 +1070,18 @@ export const RegisterPushTokenResponse = zod.object({
 
 
 /**
+ * @summary Stop sending pushes to this device (called on sign-out)
+ */
+export const UnregisterPushTokenBody = zod.object({
+  "token": zod.string()
+})
+
+export const UnregisterPushTokenResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
  * @summary List safety broadcasts sent to the current user
  */
 export const ListNotificationsResponse = zod.object({

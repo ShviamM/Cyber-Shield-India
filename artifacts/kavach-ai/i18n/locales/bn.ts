@@ -230,6 +230,7 @@ const bn = {
       warning: "সতর্কতা",
       danger: "বিপদ",
       invalid: "অবৈধ",
+      unknown: "কোনো রিপোর্ট নেই",
     },
     local: {
       linkInvalidHeadline: "একটি সঠিক URL দিন",

@@ -230,6 +230,7 @@ const kn = {
       warning: "ಎಚ್ಚರಿಕೆ",
       danger: "ಅಪಾಯ",
       invalid: "ಅಮಾನ್ಯ",
+      unknown: "ವರದಿಗಳಿಲ್ಲ",
     },
     local: {
       linkInvalidHeadline: "ಸರಿಯಾದ URL ನಮೂದಿಸಿ",

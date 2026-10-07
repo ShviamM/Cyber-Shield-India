@@ -230,6 +230,7 @@ const pa = {
       warning: "ਚੇਤਾਵਨੀ",
       danger: "ਖ਼ਤਰਾ",
       invalid: "ਗ਼ਲਤ",
+      unknown: "ਕੋਈ ਰਿਪੋਰਟ ਨਹੀਂ",
     },
     local: {
       linkInvalidHeadline: "ਸਹੀ URL ਪਾਓ",

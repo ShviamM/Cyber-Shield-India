@@ -1,6 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
-import { checkNumber, listCategories, useCreateReport } from "@workspace/api-client-react";
+import { checkNumber, getCheckNumberQueryKey, listCategories, useCreateReport } from "@workspace/api-client-react";
 import * as Haptics from "expo-haptics";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useState } from "react";
@@ -19,7 +19,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ErrorState, LoadingState } from "@/components/StateViews";
-import { categoryIcon, isCallReportCategory } from "@/constants/strings";
+import { categoryIcon, isCallReportCategory, localCategoryName } from "@/constants/strings";
 import { useColors } from "@/hooks/useColors";
 import { useNearbyCity } from "@/hooks/useNearbyCity";
 import { isValidIndianPhone, phoneForApi } from "@/lib/phone";
@@ -31,7 +31,7 @@ const GREEN = "#138808";
 export default function ReportScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const params = useLocalSearchParams<{ categoryKey?: string; phone?: string }>();
 
   const [phone, setPhone] = useState(params.phone ?? "");
@@ -43,18 +43,23 @@ export default function ReportScreen() {
 
   const phoneValid = isValidIndianPhone(phone);
   const apiPhone = phoneForApi(phone);
-  const { city: detectedCity } = useNearbyCity();
+  // Use the city only if location was already granted; never pop the system
+  // dialog the moment the report form opens.
+  const { city: detectedCity } = useNearbyCity({ prompt: false });
 
   const categoriesQuery = useQuery({
     queryKey: ["categories"],
     queryFn: () => listCategories(),
   });
 
-  // Surface how many times this number was already reported.
+  // Surface how many times this number was already reported, but only from a
+  // lookup the app already made (the call card or a Verify check). A fresh
+  // lookup here would spend one of the user's free daily checks just to file
+  // a report.
   const reputationQuery = useQuery({
-    queryKey: ["numberCheck", apiPhone],
+    queryKey: getCheckNumberQueryKey(apiPhone ?? ""),
     queryFn: () => checkNumber(apiPhone as string),
-    enabled: phoneValid && apiPhone !== null,
+    enabled: false,
   });
 
   const createReport = useCreateReport();
@@ -85,6 +90,14 @@ export default function ReportScreen() {
       setError(t("report.descriptionTooShort"));
       return;
     }
+    const date = incidentDate.trim();
+    if (date) {
+      const parsed = /^\d{4}-\d{2}-\d{2}$/.test(date) ? new Date(`${date}T00:00:00`) : null;
+      if (!parsed || Number.isNaN(parsed.getTime()) || parsed.getTime() > Date.now()) {
+        setError(t("report.dateInvalid"));
+        return;
+      }
+    }
     setError(null);
     try {
       await createReport.mutateAsync({
@@ -92,14 +105,17 @@ export default function ReportScreen() {
           phone: apiPhone as string,
           categoryKey,
           description: desc,
-          incidentDate: incidentDate.trim() ? incidentDate.trim() : undefined,
+          incidentDate: date || undefined,
           city: detectedCity ?? undefined,
         },
       });
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setSubmitted(true);
-    } catch {
-      setError(t("report.submitFailed"));
+    } catch (err) {
+      const status = (err as { status?: number } | null)?.status;
+      if (status === 409) setError(t("reportCall.duplicateMsg"));
+      else if (status === 429) setError(t("reportCall.rateLimitedMsg"));
+      else setError(t("report.submitFailed"));
     }
   }
 
@@ -198,7 +214,7 @@ export default function ReportScreen() {
                     color={active ? "#fff" : NAVY}
                   />
                   <Text style={[s.catChipTxt, active && { color: "#fff" }]} numberOfLines={1}>
-                    {c.nameEn}
+                    {localCategoryName(c, i18n.language)}
                   </Text>
                 </TouchableOpacity>
               );

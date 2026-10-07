@@ -16,7 +16,7 @@ export const CATEGORY_ICONS: Record<string, FeatherName> = {
   upi_fraud: "credit-card",
   otp_scam: "key",
   kyc_fraud: "file-text",
-  loan_scam: "dollar-sign",
+  loan_scam: "credit-card",
   job_scam: "briefcase",
   lottery_scam: "gift",
   investment_fraud: "trending-up",
@@ -68,7 +68,7 @@ export const SAFETY_TOPIC_META: { id: string; icon: FeatherName }[] = [
   { id: "phishing", icon: "link" },
   { id: "otp", icon: "key" },
   { id: "upi", icon: "credit-card" },
-  { id: "loan_apps", icon: "dollar-sign" },
+  { id: "loan_apps", icon: "credit-card" },
   { id: "impersonation", icon: "user-x" },
 ];
 
@@ -77,3 +77,11 @@ export const HELPLINE_STEP_COUNT = 5;
 
 export const HELPLINE_NUMBER = "1930";
 export const CYBERCRIME_PORTAL_URL = "https://cybercrime.gov.in";
+
+/** A scam category's name in the app language (Hindi when available, else English). */
+export function localCategoryName(
+  c: { nameEn: string; nameHi?: string | null },
+  language: string | undefined,
+): string {
+  return language?.startsWith("hi") && c.nameHi ? c.nameHi : c.nameEn;
+}

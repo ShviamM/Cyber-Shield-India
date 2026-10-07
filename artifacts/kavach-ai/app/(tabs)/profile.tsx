@@ -20,6 +20,8 @@ import { BookPromo } from "@/components/BookPromo";
 import { LANGUAGES } from "@/i18n/languages";
 import { useAppContext } from "@/context/AppContext";
 import { useAuth } from "@/context/AuthContext";
+import { useSubscription } from "@/lib/revenuecat";
+import { getGetMySubscriptionQueryKey, useGetMySubscription } from "@workspace/api-client-react";
 import { useColors } from "@/hooks/useColors";
 import { formatIndianPhone } from "@/lib/phone";
 
@@ -35,10 +37,13 @@ export default function ProfileScreen() {
   const { t, i18n } = useTranslation();
   const { guardianActive, toggleGuardian } = useAppContext();
   const { user, signOut, deleteAccount } = useAuth();
+  // Paying users see their plan here, not the upsell.
+  const subQuery = useGetMySubscription({ query: { queryKey: getGetMySubscriptionQueryKey() } });
+  const rc = useSubscription();
+  const premiumActive = !!subQuery.data?.isPremium || rc.isSubscribed;
 
   const topInset = Platform.OS === "web" ? 0 : insets.top;
   const bottomPad = (Platform.OS === "web" ? 34 : insets.bottom) + 80;
-  const [notifications, setNotifications] = React.useState(true);
 
   const displayName = user?.fullName ?? t("profile.member");
   const displayPhone = user ? formatIndianPhone(user.phone) : "";
@@ -180,8 +185,12 @@ export default function ProfileScreen() {
             <Feather name="star" size={22} color="#fff" />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={s.premiumTitle}>{t("subscription.entryTitle")}</Text>
-            <Text style={s.premiumSub}>{t("subscription.entrySub")}</Text>
+            <Text style={s.premiumTitle}>
+              {premiumActive ? t("subscription.entryActiveTitle") : t("subscription.entryTitle")}
+            </Text>
+            <Text style={s.premiumSub}>
+              {premiumActive ? t("subscription.entryActiveSub") : t("subscription.entrySub")}
+            </Text>
           </View>
           <Feather name="chevron-right" size={18} color="rgba(255,255,255,0.7)" />
         </TouchableOpacity>
@@ -211,14 +220,10 @@ export default function ProfileScreen() {
             iconBg="#fff7ed"
             label={t("profile.notifications")}
             sub={t("profile.notificationsSub")}
-            right={
-              <Switch
-                value={notifications}
-                onValueChange={(v) => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); setNotifications(v); }}
-                trackColor={{ false: "#e2e8f0", true: NAVY }}
-                thumbColor="#FFFFFF"
-              />
-            }
+            // Notifications are controlled by Android, per app; a switch here
+            // would only pretend. Open the system settings instead.
+            onPress={() => { Haptics.selectionAsync(); Linking.openSettings().catch(() => {}); }}
+            right={<Feather name="external-link" size={16} color="#94a3b8" />}
             isLast={false}
           />
           <TouchableOpacity

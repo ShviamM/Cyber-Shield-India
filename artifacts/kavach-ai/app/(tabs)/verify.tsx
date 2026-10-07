@@ -1,9 +1,10 @@
 import { Feather } from "@expo/vector-icons";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   ApiError,
   checkNumber,
   fraudCheck,
+  getCheckNumberQueryKey,
   listCategories,
   useGetUsage,
 } from "@workspace/api-client-react";
@@ -30,6 +31,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CheckItem, useAppContext } from "@/context/AppContext";
+import { localCategoryName } from "@/constants/strings";
 import { useColors } from "@/hooks/useColors";
 import { isValidIndianPhone, phoneForApi } from "@/lib/phone";
 
@@ -67,7 +69,8 @@ const ENGINE_TYPE: Record<Exclude<CheckType, "number">, FraudCheckRequestType> =
 };
 
 type Result = {
-  status: "safe" | "warning" | "danger" | "invalid";
+  /** "unknown": the number has no reports. Never shown as safe. */
+  status: "safe" | "warning" | "danger" | "unknown" | "invalid";
   headline: string;
   detail: string;
   /** True when the check could not be completed (offline / server error). */
@@ -133,13 +136,15 @@ const STATUS_CONFIG = {
   warning: { color: "#ea580c", bg: "rgba(234,88,12,0.08)", border: "rgba(234,88,12,0.2)", icon: "alert-triangle" as const },
   danger: { color: "#dc2626", bg: "rgba(220,38,38,0.08)", border: "rgba(220,38,38,0.2)", icon: "alert-octagon" as const },
   invalid: { color: "#64748b", bg: "rgba(100,116,139,0.06)", border: "rgba(100,116,139,0.15)", icon: "info" as const },
+  unknown: { color: "#0B3D91", bg: "rgba(11,61,145,0.06)", border: "rgba(11,61,145,0.18)", icon: "help-circle" as const },
 };
 
 export default function VerifyScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { recentChecks, addCheck } = useAppContext();
+  const queryClient = useQueryClient();
   const params = useLocalSearchParams<{
     q?: string | string[];
     kind?: string | string[];
@@ -168,8 +173,10 @@ export default function VerifyScreen() {
     router.push("/subscription");
   }
 
-  const categoryName = (key: string) =>
-    catData?.categories.find((c) => c.key === key)?.nameEn ?? key;
+  const categoryName = (key: string) => {
+    const c = catData?.categories.find((x) => x.key === key);
+    return c ? localCategoryName(c, i18n.language) : key;
+  };
 
   const types = TYPE_META.map((m) => ({
     ...m,
@@ -197,8 +204,17 @@ export default function VerifyScreen() {
       } else {
         try {
           const res = await checkNumber(phoneForApi(value) as string);
-          const status =
-            res.riskLevel === "high" ? "danger" : res.riskLevel === "medium" ? "warning" : "safe";
+          // Share the result with the Report form so reporting this number
+          // doesn't spend another free check.
+          queryClient.setQueryData(getCheckNumberQueryKey(phoneForApi(value) as string), res);
+          // A number with no reports is "unknown", not safe; one with any report
+          // (riskLevel "low") is a warning, matching the incoming-call card.
+          const status: Result["status"] =
+            res.riskLevel === "high" || res.verifiedScam
+              ? "danger"
+              : res.riskLevel === "medium" || res.riskLevel === "low"
+                ? "warning"
+                : "unknown";
           r = {
             status,
             headline: t(`verify.risk.${res.riskLevel}.headline`),

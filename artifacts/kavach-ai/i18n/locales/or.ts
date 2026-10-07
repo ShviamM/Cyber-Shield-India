@@ -230,6 +230,7 @@ const or = {
       warning: "ଚେତାବନୀ",
       danger: "ବିପଦ",
       invalid: "ଅବୈଧ",
+      unknown: "କୌଣସି ରିପୋର୍ଟ ନାହିଁ",
     },
     local: {
       linkInvalidHeadline: "ଏକ ବୈଧ URL ଦିଅନ୍ତୁ",
