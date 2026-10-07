@@ -72,13 +72,13 @@ export default function FamilyProtection() {
       </PageHero>
 
       {/* Newspaper clippings - the pinboard */}
-      <section className="bg-[#efe9da] py-16">
+      <section className="py-12 md:py-16 bg-[#efe9da]">
         <div className="container mx-auto px-4">
           <div className="mx-auto mb-10 max-w-2xl text-center">
             <span className="inline-flex items-center gap-2 rounded-full bg-black/5 px-4 py-1.5 text-sm font-semibold text-gray-700">
               <Newspaper className="h-4 w-4" /> {t("clippingsSection.badge")}
             </span>
-            <h2 className="mt-4 text-3xl font-bold text-gray-900 md:text-4xl">
+            <h2 className="mt-4 text-3xl text-gray-900 md:text-4xl">
               {t("clippingsSection.title")}
             </h2>
             <p className="mt-3 text-gray-600">
@@ -90,13 +90,13 @@ export default function FamilyProtection() {
       </section>
 
       {/* Interactive risk selector */}
-      <section className="bg-white py-16">
+      <section className="py-12 md:py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="mx-auto mb-10 max-w-2xl text-center">
             <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary">
               <Users className="h-4 w-4" /> {t("riskSection.badge")}
             </span>
-            <h2 className="mt-4 text-3xl font-bold text-gray-900 md:text-4xl">
+            <h2 className="mt-4 text-3xl text-gray-900 md:text-4xl">
               {t("riskSection.title")}
             </h2>
             <p className="mt-3 text-gray-600">
@@ -108,13 +108,13 @@ export default function FamilyProtection() {
       </section>
 
       {/* How the alert flow works */}
-      <section className="bg-gradient-to-b from-white to-primary/5 py-16">
+      <section className="py-12 md:py-16 bg-gradient-to-b from-white to-primary/5">
         <div className="container mx-auto px-4">
           <div className="mx-auto mb-10 max-w-2xl text-center">
             <span className="inline-flex items-center gap-2 rounded-full bg-green-100 px-4 py-1.5 text-sm font-semibold text-green-700">
               <BellRing className="h-4 w-4" /> {t("alertSection.badge")}
             </span>
-            <h2 className="mt-4 text-3xl font-bold text-gray-900 md:text-4xl">
+            <h2 className="mt-4 text-3xl text-gray-900 md:text-4xl">
               {t("alertSection.title")}
             </h2>
             <p className="mt-3 text-gray-600">
@@ -126,10 +126,10 @@ export default function FamilyProtection() {
       </section>
 
       {/* CTA */}
-      <section className="bg-primary py-16 text-white">
+      <section className="py-14 md:py-20 bg-primary text-white">
         <div className="container mx-auto px-4 text-center">
           <ShieldCheck className="mx-auto h-12 w-12 text-accent" />
-          <h2 className="mx-auto mt-4 max-w-2xl text-3xl font-bold md:text-4xl">
+          <h2 className="mx-auto mt-4 max-w-2xl text-3xl md:text-4xl">
             {t("cta.title")}
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-[#B4BBD0]">

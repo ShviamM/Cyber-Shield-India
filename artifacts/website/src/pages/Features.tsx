@@ -26,7 +26,7 @@ import {
   Briefcase,
   Sparkles,
   Radar,
-  Globe2,
+  Map,
 } from "lucide-react";
 import { LiveProtectionDemo } from "@/components/LiveProtectionDemo";
 
@@ -98,7 +98,7 @@ export default function Features() {
   const whyRows = t("why.rows", { returnObjects: true }) as string[];
   const audiences = t("india.audiences", { returnObjects: true }) as string[];
 
-  const aiIcons = [Radar, Globe2, Users, BrainCircuit];
+  const aiIcons = [Radar, Map, Users, BrainCircuit];
   const whyOthers = [true, false, false, false, false, false, false];
   const audienceIcons = [GraduationCap, UserRound, HeartHandshake, Briefcase, Users];
 
@@ -119,7 +119,7 @@ export default function Features() {
         />
 
         {/* SECTION 1 - WHAT ARE YOU PROTECTING */}
-        <section className="py-24 bg-gray-900 text-white relative overflow-hidden">
+        <section className="py-12 md:py-16 bg-gray-900 text-white relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/25 via-gray-900 to-gray-900 pointer-events-none" />
           <div className="container mx-auto px-4 md:px-6 relative z-10">
             <motion.div
@@ -127,9 +127,9 @@ export default function Features() {
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
               variants={staggerContainer}
-              className="text-center max-w-2xl mx-auto mb-16"
+              className="text-center max-w-2xl mx-auto mb-10 md:mb-12"
             >
-              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-bold mb-6">
+              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl mb-6">
                 {t("protect.title")}
               </motion.h2>
               <motion.p variants={fadeInUp} className="text-xl text-gray-400">
@@ -157,7 +157,7 @@ export default function Features() {
                     <div className="inline-flex p-3 rounded-2xl bg-accent/15 text-accent mb-5 group-hover:scale-110 transition-transform">
                       <Icon className="h-6 w-6" />
                     </div>
-                    <h3 className="text-lg font-bold mb-2">{item.title}</h3>
+                    <h3 className="text-lg mb-2">{item.title}</h3>
                     <p className="text-sm text-gray-400 leading-relaxed">{item.desc}</p>
                   </motion.div>
                 );
@@ -167,16 +167,16 @@ export default function Features() {
         </section>
 
         {/* SECTION 2 - SCENARIOS */}
-        <section className="py-24 bg-white">
+        <section className="py-12 md:py-16 bg-white">
           <div className="container mx-auto px-4 md:px-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
               variants={staggerContainer}
-              className="text-center max-w-2xl mx-auto mb-20"
+              className="text-center max-w-2xl mx-auto mb-10 md:mb-12"
             >
-              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl text-gray-900 mb-6">
                 {t("scenarios.title")}
               </motion.h2>
               <motion.p variants={fadeInUp} className="text-xl text-gray-600">
@@ -204,7 +204,7 @@ export default function Features() {
                       <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold mb-5 ${style.iconBg}`}>
                         <Icon className="h-4 w-4" /> {s.badge}
                       </div>
-                      <h3 className="text-2xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">{s.title}</h3>
+                      <h3 className="text-2xl md:text-4xl text-gray-900 mb-4 leading-tight">{s.title}</h3>
                       <p className="text-lg text-gray-600 leading-relaxed mb-8">{s.desc}</p>
                       <Link href="/download">
                         <Button size="lg" className="rounded-full bg-gray-900 hover:bg-gray-800 text-white font-medium px-7 transition-transform hover:scale-105 active:scale-95">
@@ -241,7 +241,7 @@ export default function Features() {
         </section>
 
         {/* AI ENGINE */}
-        <section className="py-24 bg-gray-900 text-white relative overflow-hidden">
+        <section className="py-12 md:py-16 bg-gray-900 text-white relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-primary/25 via-gray-900 to-gray-900 pointer-events-none" />
           <div className="container mx-auto px-4 md:px-6 relative z-10">
             <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -254,7 +254,7 @@ export default function Features() {
                 <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/10 text-accent text-sm font-semibold mb-6">
                   <BrainCircuit className="h-4 w-4" /> {t("ai.badge")}
                 </motion.div>
-                <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-bold mb-6 leading-tight">
+                <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl mb-6 leading-tight">
                   {t("ai.title")}
                 </motion.h2>
                 <motion.p variants={fadeInUp} className="text-xl text-gray-400 leading-relaxed">
@@ -280,7 +280,7 @@ export default function Features() {
                       <div className="inline-flex p-2.5 rounded-xl bg-accent/15 text-accent mb-4">
                         <Icon className="h-5 w-5" />
                       </div>
-                      <h3 className="font-bold mb-1.5">{f.title}</h3>
+                      <h3 className="mb-1.5">{f.title}</h3>
                       <p className="text-sm text-gray-400 leading-relaxed">{f.desc}</p>
                     </motion.div>
                   );
@@ -291,16 +291,16 @@ export default function Features() {
         </section>
 
         {/* SECTION 3 - WHY DIFFERENT */}
-        <section className="py-24 bg-white">
+        <section className="py-12 md:py-16 bg-white">
           <div className="container mx-auto px-4 md:px-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
               variants={staggerContainer}
-              className="text-center max-w-2xl mx-auto mb-14"
+              className="text-center max-w-2xl mx-auto mb-10 md:mb-12"
             >
-              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl text-gray-900 mb-6">
                 {t("why.title")}
               </motion.h2>
               <motion.p variants={fadeInUp} className="text-xl text-gray-600">
@@ -345,7 +345,7 @@ export default function Features() {
         </section>
 
         {/* SECTION 4 - LIVE DEMO */}
-        <section className="py-24 bg-gray-50 border-y border-gray-200/60">
+        <section className="py-12 md:py-16 bg-gray-50 border-y border-gray-200/60">
           <div className="container mx-auto px-4 md:px-6">
             <motion.div
               initial="hidden"
@@ -354,7 +354,7 @@ export default function Features() {
               variants={staggerContainer}
               className="text-center max-w-2xl mx-auto mb-12"
             >
-              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl text-gray-900 mb-6">
                 {t("demo.title")}
               </motion.h2>
               <motion.p variants={fadeInUp} className="text-xl text-gray-600">
@@ -367,19 +367,19 @@ export default function Features() {
         </section>
 
         {/* SECTION 6 - BUILT FOR INDIA */}
-        <section className="py-24 bg-white">
+        <section className="py-12 md:py-16 bg-white">
           <div className="container mx-auto px-4 md:px-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
               variants={staggerContainer}
-              className="text-center max-w-2xl mx-auto mb-16"
+              className="text-center max-w-2xl mx-auto mb-10 md:mb-12"
             >
               <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-primary text-sm font-semibold mb-6">
                 <ShieldCheck className="h-4 w-4" /> {t("india.badge")}
               </motion.div>
-              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl text-gray-900 mb-6 leading-tight">
                 {t("india.titleLine1")}<br />{t("india.titleLine2")}
               </motion.h2>
               <motion.p variants={fadeInUp} className="text-xl text-gray-600">
@@ -415,14 +415,14 @@ export default function Features() {
         </section>
 
         {/* SECTION 7 - FINAL CTA */}
-        <section className="py-24 bg-primary text-white text-center relative overflow-hidden">
+        <section className="py-14 md:py-20 bg-primary text-white text-center relative overflow-hidden">
           <div className="absolute inset-0 opacity-[0.07] [background-image:radial-gradient(circle,white_1px,transparent_1px)] [background-size:22px_22px]" />
           <div className="container mx-auto px-4 relative z-10">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-4xl md:text-6xl font-bold mb-6 tracking-tight"
+              className="text-4xl md:text-6xl mb-6 tracking-tight"
             >
               {t("finalCta.titleLine1")}<br />{t("finalCta.titleLine2")}
             </motion.h2>

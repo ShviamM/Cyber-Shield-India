@@ -10,14 +10,14 @@ import {
   ShieldCheck,
   Target,
   Heart,
-  Globe2,
-  Brain,
   Lock,
-  Languages,
   Sparkles,
   ArrowRight,
-  TrendingUp,
   Award,
+  Flag,
+  Smartphone,
+  Radar,
+  Telescope,
 } from "lucide-react";
 
 const fadeInUp: Variants = {
@@ -30,7 +30,7 @@ const staggerContainer: Variants = {
   visible: { opacity: 1, transition: { staggerChildren: 0.12 } },
 };
 
-const pillarIcons = [Eye, Heart, Globe2, Languages, Lock, Brain];
+const pillarIcons = [Eye, Heart, Flag, Smartphone, Lock, Radar];
 
 export default function About() {
   const { t } = useTranslation("about");
@@ -56,7 +56,7 @@ export default function About() {
         />
 
         {/* NAME MEANING */}
-        <section className="py-24 bg-white">
+        <section className="py-12 md:py-16 bg-white">
           <div className="container mx-auto px-4 md:px-6">
             <motion.div
               initial={{ opacity: 0, y: 24 }}
@@ -69,7 +69,7 @@ export default function About() {
                 <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 mb-5">
                   <Eye className="h-7 w-7 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold mb-3">{t("why.name.title")}</h3>
+                <h3 className="text-2xl mb-3">{t("why.name.title")}</h3>
                 <p className="text-[#B4BBD0] text-lg leading-relaxed">
                   <span className="font-semibold text-white">{t("why.name.netra")}</span> {t("why.name.netraGloss")} +{" "}
                   <span className="font-semibold text-white">{t("why.name.raksha")}</span> {t("why.name.rakshaGloss")} ={" "}
@@ -81,7 +81,7 @@ export default function About() {
         </section>
 
         {/* MISSION & VISION */}
-        <section className="py-24 bg-gray-50 border-y border-gray-200/60">
+        <section className="py-12 md:py-16 bg-gray-50 border-y border-gray-200/60">
           <div className="container mx-auto px-4 md:px-6">
             <motion.div
               initial="hidden"
@@ -94,16 +94,16 @@ export default function About() {
                 <div className="h-12 w-12 rounded-2xl bg-accent/10 text-accent flex items-center justify-center mb-5">
                   <Target className="h-6 w-6" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">{t("missionVision.missionTitle")}</h3>
+                <h3 className="text-2xl text-gray-900 mb-3">{t("missionVision.missionTitle")}</h3>
                 <p className="text-gray-600 leading-relaxed text-lg">
                   {t("missionVision.missionDesc")}
                 </p>
               </motion.div>
               <motion.div variants={fadeInUp} className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8">
                 <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-5">
-                  <TrendingUp className="h-6 w-6" />
+                  <Telescope className="h-6 w-6" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">{t("missionVision.visionTitle")}</h3>
+                <h3 className="text-2xl text-gray-900 mb-3">{t("missionVision.visionTitle")}</h3>
                 <p className="text-gray-600 leading-relaxed text-lg">
                   {t("missionVision.visionDesc")}
                 </p>
@@ -113,16 +113,16 @@ export default function About() {
         </section>
 
         {/* WHAT WE STAND FOR */}
-        <section className="py-24 bg-white">
+        <section className="py-12 md:py-16 bg-white">
           <div className="container mx-auto px-4 md:px-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
               variants={staggerContainer}
-              className="text-center max-w-2xl mx-auto mb-16"
+              className="text-center max-w-2xl mx-auto mb-10 md:mb-12"
             >
-              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl text-gray-900 mb-6">
                 {t("standFor.title")}
               </motion.h2>
               <motion.p variants={fadeInUp} className="text-xl text-gray-600">
@@ -148,7 +148,7 @@ export default function About() {
                     <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-5">
                       <Icon className="h-6 w-6" />
                     </div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-2">{p.title}</h3>
+                    <h3 className="text-lg text-gray-900 mb-2">{p.title}</h3>
                     <p className="text-gray-600 leading-relaxed">{p.desc}</p>
                   </motion.div>
                 );
@@ -158,7 +158,7 @@ export default function About() {
         </section>
 
         {/* FOUNDER TIE-IN */}
-        <section className="py-24 bg-gray-50 border-y border-gray-200/60">
+        <section className="py-12 md:py-16 bg-gray-50 border-y border-gray-200/60">
           <div className="container mx-auto px-4 md:px-6">
             <motion.div
               initial={{ opacity: 0, y: 24 }}
@@ -170,7 +170,7 @@ export default function About() {
                 <Award className="h-7 w-7" />
               </div>
               <div className="flex-1">
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">{t("founder.title")}</h3>
+                <h3 className="text-2xl text-gray-900 mb-3">{t("founder.title")}</h3>
                 <p className="text-gray-600 leading-relaxed text-lg mb-6">
                   {t("founder.descBefore")}<em>{t("founder.descBook")}</em>{t("founder.descAfter")}
                 </p>
@@ -185,7 +185,7 @@ export default function About() {
         </section>
 
         {/* CTA */}
-        <section className="py-24 bg-primary text-white text-center relative overflow-hidden">
+        <section className="py-14 md:py-20 bg-primary text-white text-center relative overflow-hidden">
           <div className="absolute inset-0 opacity-[0.07] [background-image:radial-gradient(circle,white_1px,transparent_1px)] [background-size:22px_22px]" />
           <div className="container mx-auto px-4 relative z-10">
             <motion.div
@@ -201,7 +201,7 @@ export default function About() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.05 }}
-              className="text-3xl md:text-5xl font-bold mb-6 tracking-tight"
+              className="text-3xl md:text-5xl mb-6 tracking-tight"
             >
               {t("cta.title")}
             </motion.h2>

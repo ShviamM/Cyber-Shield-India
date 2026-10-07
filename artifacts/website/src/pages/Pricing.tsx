@@ -181,7 +181,7 @@ export default function Pricing() {
         description={t("seo.description")}
       />
       <PageHero title={t("hero.heading")} subtitle={t("hero.subtitle")} />
-      <section className="py-16 px-4 bg-[#F5F6FA]">
+      <section className="py-12 md:py-16 px-4 bg-[#F5F6FA]">
         <div className="container mx-auto max-w-6xl">
 
           {loading ? (
@@ -227,7 +227,7 @@ export default function Pricing() {
                       >
                         <Icon className="w-6 h-6" />
                       </div>
-                      <h2 className={`text-xl font-bold ${featured ? "text-white" : "text-gray-900"}`}>
+                      <h2 className={`text-xl  ${featured ? "text-white" : "text-gray-900"}`}>
                         {planName}
                       </h2>
                     </div>

@@ -22,7 +22,6 @@ import {
   Check,
   X,
   CreditCard,
-  Lock,
   UserX,
   MessageSquareWarning,
   ExternalLink,
@@ -34,6 +33,7 @@ import {
   Fingerprint,
   ArrowRight,
   Info,
+  EyeOff,
 } from "lucide-react";
 
 const fadeInUp: Variants = {
@@ -48,7 +48,7 @@ const staggerContainer: Variants = {
 
 const sopIcons = [PhoneCall, FileText, Camera, CreditCard, ClipboardCheck, Search];
 
-const scenarioIcons = [CreditCard, UserX, Lock, MessageSquareWarning];
+const scenarioIcons = [CreditCard, UserX, EyeOff, MessageSquareWarning];
 const scenarioTones = [
   "bg-red-50 text-red-600",
   "bg-amber-50 text-amber-600",
@@ -73,7 +73,7 @@ function LawAccordion({ laws }: { laws: Law[] }) {
               <span className="shrink-0 rounded-lg bg-primary/10 text-primary text-xs font-bold px-2.5 py-1">
                 {law.code}
               </span>
-              <span className="font-semibold text-gray-900">{law.title}</span>
+              <span className="font-heading font-semibold text-gray-900">{law.title}</span>
             </span>
           </AccordionTrigger>
           <AccordionContent className="text-base">
@@ -142,7 +142,7 @@ export default function CyberLaws() {
                   <div className="inline-flex items-center gap-2 text-red-400 font-bold text-sm uppercase tracking-wider mb-2">
                     <AlertTriangle className="h-4 w-4" /> {t("emergency.badge")}
                   </div>
-                  <h2 className="text-2xl font-bold mb-1">{t("emergency.title")}</h2>
+                  <h2 className="text-2xl mb-1">{t("emergency.title")}</h2>
                   <p className="text-gray-400">
                     {t("emergency.desc")}
                   </p>
@@ -165,16 +165,16 @@ export default function CyberLaws() {
         </section>
 
         {/* SOP TIMELINE */}
-        <section className="py-24 bg-white">
+        <section className="py-12 md:py-16 bg-white">
           <div className="container mx-auto px-4 md:px-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
               variants={staggerContainer}
-              className="text-center max-w-2xl mx-auto mb-16"
+              className="text-center max-w-2xl mx-auto mb-10 md:mb-12"
             >
-              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl text-gray-900 mb-6">
                 {t("sop.heading")}
               </motion.h2>
               <motion.p variants={fadeInUp} className="text-xl text-gray-600">
@@ -207,7 +207,7 @@ export default function CyberLaws() {
                             <Clock className="h-3 w-3" /> {step.time}
                           </span>
                         </div>
-                        <h3 className="text-lg font-bold text-gray-900 mb-1.5">{step.title}</h3>
+                        <h3 className="text-lg text-gray-900 mb-1.5">{step.title}</h3>
                         <p className="text-gray-600 leading-relaxed">{step.desc}</p>
                       </div>
                     </motion.div>
@@ -219,16 +219,16 @@ export default function CyberLaws() {
         </section>
 
         {/* SCENARIO SOPs */}
-        <section className="py-24 bg-gray-50 border-y border-gray-200/60">
+        <section className="py-12 md:py-16 bg-gray-50 border-y border-gray-200/60">
           <div className="container mx-auto px-4 md:px-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
               variants={staggerContainer}
-              className="text-center max-w-2xl mx-auto mb-16"
+              className="text-center max-w-2xl mx-auto mb-10 md:mb-12"
             >
-              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl text-gray-900 mb-6">
                 {t("scenarios.heading")}
               </motion.h2>
               <motion.p variants={fadeInUp} className="text-xl text-gray-600">
@@ -255,7 +255,7 @@ export default function CyberLaws() {
                     <div className={`h-12 w-12 rounded-2xl flex items-center justify-center mb-4 ${tone}`}>
                       <Icon className="h-6 w-6" />
                     </div>
-                    <h3 className="font-bold text-gray-900 mb-4 text-lg leading-snug">{s.title}</h3>
+                    <h3 className="text-gray-900 mb-4 text-lg leading-snug">{s.title}</h3>
                     <ul className="space-y-2.5">
                       {s.steps.map((step) => (
                         <li key={step} className="flex items-start gap-2.5 text-sm text-gray-600">
@@ -272,19 +272,19 @@ export default function CyberLaws() {
         </section>
 
         {/* KNOW YOUR RIGHTS - LAWS */}
-        <section className="py-24 bg-white">
+        <section className="py-12 md:py-16 bg-white">
           <div className="container mx-auto px-4 md:px-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
               variants={staggerContainer}
-              className="text-center max-w-2xl mx-auto mb-16"
+              className="text-center max-w-2xl mx-auto mb-10 md:mb-12"
             >
               <motion.div variants={fadeInUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-primary text-sm font-semibold mb-6">
                 <Gavel className="h-4 w-4" /> {t("rights.badge")}
               </motion.div>
-              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl text-gray-900 mb-6">
                 {t("rights.heading")}
               </motion.h2>
               <motion.p variants={fadeInUp} className="text-xl text-gray-600">
@@ -301,7 +301,7 @@ export default function CyberLaws() {
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2.5 rounded-xl bg-primary/10 text-primary"><FileText className="h-5 w-5" /></div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900">{t("rights.itAct.title")}</h3>
+                    <h3 className="text-xl text-gray-900">{t("rights.itAct.title")}</h3>
                     <p className="text-sm text-gray-500">{t("rights.itAct.subtitle")}</p>
                   </div>
                 </div>
@@ -316,7 +316,7 @@ export default function CyberLaws() {
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2.5 rounded-xl bg-accent/10 text-accent"><Scale className="h-5 w-5" /></div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900">{t("rights.bns.title")}</h3>
+                    <h3 className="text-xl text-gray-900">{t("rights.bns.title")}</h3>
                     <p className="text-sm text-gray-500">{t("rights.bns.subtitle")}</p>
                   </div>
                 </div>
@@ -332,7 +332,7 @@ export default function CyberLaws() {
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2.5 rounded-xl bg-green-100 text-green-700"><Fingerprint className="h-5 w-5" /></div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900">{t("rights.dpdp.title")}</h3>
+                    <h3 className="text-xl text-gray-900">{t("rights.dpdp.title")}</h3>
                     <p className="text-sm text-gray-500">{t("rights.dpdp.subtitle")}</p>
                   </div>
                 </div>
@@ -350,7 +350,7 @@ export default function CyberLaws() {
         </section>
 
         {/* SAFETY GUIDELINES - DO / DON'T */}
-        <section className="py-24 bg-gray-900 text-white relative overflow-hidden">
+        <section className="py-12 md:py-16 bg-gray-900 text-white relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/25 via-gray-900 to-gray-900 pointer-events-none" />
           <div className="container mx-auto px-4 md:px-6 relative z-10">
             <motion.div
@@ -358,9 +358,9 @@ export default function CyberLaws() {
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
               variants={staggerContainer}
-              className="text-center max-w-2xl mx-auto mb-16"
+              className="text-center max-w-2xl mx-auto mb-10 md:mb-12"
             >
-              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-bold mb-6">
+              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl mb-6">
                 {t("guidelines.heading")}
               </motion.h2>
               <motion.p variants={fadeInUp} className="text-xl text-gray-400">
@@ -377,7 +377,7 @@ export default function CyberLaws() {
               >
                 <div className="flex items-center gap-3 mb-5 text-green-400">
                   <div className="p-2 rounded-xl bg-green-500/15"><Check className="h-5 w-5" /></div>
-                  <h3 className="text-xl font-bold">{t("guidelines.alwaysDo")}</h3>
+                  <h3 className="text-xl">{t("guidelines.alwaysDo")}</h3>
                 </div>
                 <ul className="space-y-3">
                   {dos.map((d) => (
@@ -397,7 +397,7 @@ export default function CyberLaws() {
               >
                 <div className="flex items-center gap-3 mb-5 text-red-400">
                   <div className="p-2 rounded-xl bg-red-500/15"><X className="h-5 w-5" /></div>
-                  <h3 className="text-xl font-bold">{t("guidelines.neverDo")}</h3>
+                  <h3 className="text-xl">{t("guidelines.neverDo")}</h3>
                 </div>
                 <ul className="space-y-3">
                   {donts.map((d) => (
@@ -413,16 +413,16 @@ export default function CyberLaws() {
         </section>
 
         {/* OFFICIAL RESOURCES */}
-        <section className="py-24 bg-white">
+        <section className="py-12 md:py-16 bg-white">
           <div className="container mx-auto px-4 md:px-6">
             <motion.div
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
               variants={staggerContainer}
-              className="text-center max-w-2xl mx-auto mb-16"
+              className="text-center max-w-2xl mx-auto mb-10 md:mb-12"
             >
-              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+              <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl text-gray-900 mb-6">
                 {t("resources.heading")}
               </motion.h2>
               <motion.p variants={fadeInUp} className="text-xl text-gray-600">
@@ -451,7 +451,7 @@ export default function CyberLaws() {
                         <Icon className="h-6 w-6" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-gray-900">{r.name}</h3>
+                        <h3 className="text-gray-900">{r.name}</h3>
                         <p className="text-sm text-gray-600 leading-relaxed mt-1">{r.desc}</p>
                       </div>
                     </div>
@@ -484,14 +484,14 @@ export default function CyberLaws() {
         </section>
 
         {/* FINAL CTA */}
-        <section className="py-24 bg-primary text-white text-center relative overflow-hidden">
+        <section className="py-14 md:py-20 bg-primary text-white text-center relative overflow-hidden">
           <div className="absolute inset-0 opacity-[0.07] [background-image:radial-gradient(circle,white_1px,transparent_1px)] [background-size:22px_22px]" />
           <div className="container mx-auto px-4 relative z-10">
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-3xl md:text-5xl font-bold mb-6 tracking-tight"
+              className="text-3xl md:text-5xl mb-6 tracking-tight"
             >
               {t("finalCta.title")}
             </motion.h2>

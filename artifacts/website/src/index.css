@@ -57,6 +57,7 @@
   --color-sidebar-ring: hsl(var(--sidebar-ring));
 
   --font-sans: var(--app-font-sans);
+  --font-heading: var(--app-font-heading);
   --font-serif: var(--app-font-serif);
   --font-mono: var(--app-font-mono);
 
@@ -113,6 +114,9 @@
   --chart-5: 27 87% 67%;
 
   --app-font-sans: 'Inter', sans-serif;
+  /* Brand title font: Montserrat SemiBold (600). Hindi falls back to the system
+     Devanagari font, as Montserrat has no Devanagari glyphs. */
+  --app-font-heading: 'Montserrat', 'Inter', sans-serif;
   --app-font-serif: Georgia, serif;
   --app-font-mono: Menlo, monospace;
   --radius: 0.75rem;
@@ -177,6 +181,17 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
   }
+  /* All titles use Montserrat SemiBold. Headings set no weight class of their
+     own, so this is the single place the title weight is defined. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -188,4 +203,11 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Legal pages render their HTML through the typography plugin, which sets its
+   own heading weights; keep them on the brand title font and weight. */
+.prose :where(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-heading);
+  font-weight: 600;
 }

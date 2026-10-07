@@ -181,10 +181,10 @@ export default function Login() {
               alt={t("login.logoAlt")}
               className="w-16 h-16 rounded-2xl mx-auto mb-4 object-cover shadow-lg shadow-primary/20"
             />
-            <span className="block font-bold text-xl tracking-tight text-gray-900 mb-4">
+            <span className="block font-heading font-semibold text-xl tracking-tight text-gray-900 mb-4">
               Netra<span className="text-accent">ksh</span>
             </span>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl text-gray-900 mb-2">
               {step === "phone"
                 ? t("login.headingWelcome")
                 : t("login.headingVerify")}

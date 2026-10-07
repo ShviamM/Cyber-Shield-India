@@ -41,7 +41,7 @@ export function PhoneMockup() {
               
               <div className="text-center mb-8">
                 <p className="text-red-400 font-bold tracking-widest text-xs mb-2 animate-pulse">HIGH RISK CALL</p>
-                <h3 className="text-2xl font-bold mb-1">+91 98765-43210</h3>
+                <h3 className="text-2xl mb-1">+91 98765-43210</h3>
                 <p className="text-gray-400 text-sm">Reported as Courier Scam</p>
               </div>
 
@@ -108,7 +108,7 @@ export function PhoneMockup() {
             >
                <div className="text-center mb-8">
                 <ScanLine className="h-12 w-12 text-accent mx-auto mb-4" />
-                <h3 className="text-xl font-bold">Scanning QR...</h3>
+                <h3 className="text-xl">Scanning QR...</h3>
               </div>
               
               <div className="relative w-48 h-48 border-2 border-dashed border-gray-700 rounded-xl flex items-center justify-center">

@@ -344,7 +344,7 @@ export default function CheckScam() {
               <Search className="w-4 h-4" />
               <span>Netraksh</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+            <h1 className="text-4xl md:text-5xl tracking-tight mb-4">
               {t("heading")}
             </h1>
             <p className="text-lg text-gray-300 max-w-xl mx-auto leading-relaxed">
@@ -436,7 +436,7 @@ export default function CheckScam() {
                     <RiskIcon className="w-7 h-7" />
                   </div>
                   <div className="flex-1">
-                    <h2 className={`text-2xl font-bold ${risk.text}`}>
+                    <h2 className={`text-2xl  ${risk.text}`}>
                       {t(`verdict.${verdict.riskLevel}.title`)}
                     </h2>
                     <p className="text-gray-300 mt-1 leading-relaxed">
@@ -475,7 +475,7 @@ export default function CheckScam() {
 
                 {/* Reasons */}
                 <div className="mt-6">
-                  <h3 className="text-sm font-semibold text-gray-300 mb-3">
+                  <h3 className="text-sm text-gray-300 mb-3">
                     {t("reasonsLabel")}
                   </h3>
                   {verdict.reasons.length > 0 ? (
@@ -539,9 +539,9 @@ export default function CheckScam() {
       </section>
 
       {/* Trust / download band */}
-      <section className="py-16 bg-white">
+      <section className="py-12 md:py-16 bg-white">
         <div className="container mx-auto px-4 text-center max-w-2xl">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl md:text-3xl text-gray-900 mb-4">
             {t("download.title")}
           </h2>
           <p className="text-gray-600 mb-8">{t("download.desc")}</p>

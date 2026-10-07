@@ -94,7 +94,7 @@ export function FamilyRiskSelector() {
                     {t("risk.mostCommon", { age: active.age })}
                   </span>
                 </div>
-                <h4 className="mt-3 text-2xl font-bold text-gray-900">
+                <h4 className="mt-3 text-2xl text-gray-900">
                   {active.topThreat}
                 </h4>
                 <div className="mt-4 flex items-start gap-3 rounded-xl border border-red-100 bg-white p-4">

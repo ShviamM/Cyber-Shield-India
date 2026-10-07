@@ -16,7 +16,7 @@ export function FamilyStorytelling() {
           <div className="h-12 w-12 bg-red-50 rounded-full flex items-center justify-center text-red-500 mb-4">
             <MessageSquareWarning className="h-6 w-6" />
           </div>
-          <h4 className="font-bold text-gray-900 mb-2">{t("story.step1Title")}</h4>
+          <h4 className="text-gray-900 mb-2">{t("story.step1Title")}</h4>
           <p className="text-sm text-gray-600">{t("story.step1Desc")}</p>
           
           <div className="mt-4 p-3 bg-gray-50 rounded-lg text-xs text-gray-500 border border-gray-100 font-mono">
@@ -32,7 +32,7 @@ export function FamilyStorytelling() {
           <div className="h-12 w-12 bg-white/10 rounded-full flex items-center justify-center text-white mb-4">
             <ShieldCheck className="h-6 w-6" />
           </div>
-          <h4 className="font-bold mb-2">{t("story.step2Title")}</h4>
+          <h4 className="mb-2">{t("story.step2Title")}</h4>
           <p className="text-sm text-blue-100">{t("story.step2Desc")}</p>
         </motion.div>
 
@@ -44,7 +44,7 @@ export function FamilyStorytelling() {
           <div className="h-12 w-12 bg-green-50 rounded-full flex items-center justify-center text-green-600 mb-4">
             <BellRing className="h-6 w-6" />
           </div>
-          <h4 className="font-bold text-gray-900 mb-2">{t("story.step3Title")}</h4>
+          <h4 className="text-gray-900 mb-2">{t("story.step3Title")}</h4>
           <p className="text-sm text-gray-600">{t("story.step3Desc")}</p>
           
           <div className="mt-auto pt-4 flex items-center gap-2 text-green-600 text-sm font-semibold">

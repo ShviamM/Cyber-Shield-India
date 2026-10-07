@@ -55,7 +55,7 @@ export function PageHero({
         )}
         <motion.h1
           variants={appear}
-          className="bg-gradient-to-r from-white to-[#C9CEE0] bg-clip-text text-4xl font-bold leading-[1.15] tracking-tight text-transparent text-balance md:text-6xl"
+          className="bg-gradient-to-r from-white to-[#C9CEE0] bg-clip-text text-4xl leading-[1.15] tracking-tight text-transparent text-balance md:text-6xl"
         >
           {title}
         </motion.h1>

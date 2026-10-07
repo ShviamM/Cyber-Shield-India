@@ -27,7 +27,7 @@ function Block({ block }: { block: ArticleBlock }) {
   switch (block.type) {
     case "heading":
       return (
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mt-12 mb-5">
+        <h2 className="text-2xl md:text-3xl text-gray-900 mt-12 mb-5">
           {block.body}
         </h2>
       );
@@ -97,7 +97,7 @@ function Block({ block }: { block: ArticleBlock }) {
         <div className={`my-8 p-6 rounded-2xl border ${styles.wrap}`}>
           <div className="flex items-center gap-3 mb-2">
             {styles.icon}
-            <h3 className={`text-lg font-bold ${styles.title}`}>
+            <h3 className={`text-lg  ${styles.title}`}>
               {block.title}
             </h3>
           </div>
@@ -187,7 +187,7 @@ export default function ScamArticle() {
           <span className="px-3 py-1 bg-blue-50 text-primary text-xs font-semibold rounded-full uppercase tracking-wider">
             {t(`categories.${article.category}`)}
           </span>
-          <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mt-5 mb-6 leading-tight">
+          <h1 className="text-3xl md:text-5xl text-gray-900 mt-5 mb-6 leading-tight">
             {article.title}
           </h1>
 
@@ -233,7 +233,7 @@ export default function ScamArticle() {
                 <ShieldCheck className="h-7 w-7" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900">
+                <h3 className="text-xl text-gray-900">
                   {t("article.protectTitle")}
                 </h3>
                 <p className="text-gray-600">
@@ -252,7 +252,7 @@ export default function ScamArticle() {
 
           <div className="mt-6 p-8 rounded-3xl bg-gray-900 text-white text-center">
             <ShieldCheck className="h-10 w-10 text-accent mx-auto mb-4" />
-            <h3 className="text-2xl font-bold mb-3">
+            <h3 className="text-2xl mb-3">
               {t("article.reportTitle")}
             </h3>
             <p className="text-gray-300 mb-6 max-w-lg mx-auto">
@@ -273,9 +273,9 @@ export default function ScamArticle() {
         </div>
       </article>
 
-      <section className="bg-gray-50 py-16">
+      <section className="py-12 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4 max-w-5xl">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">
+          <h2 className="text-2xl text-gray-900 mb-8">
             {t("article.relatedGuides")}
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
@@ -288,7 +288,7 @@ export default function ScamArticle() {
                 <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full uppercase tracking-wider">
                   {t(`categories.${rel.category}`)}
                 </span>
-                <h3 className="text-lg font-bold text-gray-900 mt-4 mb-2 group-hover:text-primary transition-colors">
+                <h3 className="text-lg text-gray-900 mt-4 mb-2 group-hover:text-primary transition-colors">
                   {rel.title}
                 </h3>
                 <span className="text-primary font-medium text-sm inline-flex items-center gap-1">

@@ -63,7 +63,7 @@ export default function Contact() {
                   <MessageSquare className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold mb-1">{t("contact.support.title")}</h3>
+                  <h3 className="text-xl mb-1">{t("contact.support.title")}</h3>
                   <p className="text-gray-600 mb-2">{t("contact.support.desc")}</p>
                   <a href="mailto:support@netraksh.com" className="text-primary font-medium hover:underline">support@netraksh.com</a>
                 </div>
@@ -73,7 +73,7 @@ export default function Contact() {
                   <Building2 className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold mb-1">{t("contact.business.title")}</h3>
+                  <h3 className="text-xl mb-1">{t("contact.business.title")}</h3>
                   <p className="text-gray-600 mb-2">{t("contact.business.desc")}</p>
                   <a href="mailto:partners@netraksh.com" className="text-orange-600 font-medium hover:underline">partners@netraksh.com</a>
                 </div>
@@ -83,7 +83,7 @@ export default function Contact() {
                   <Mail className="h-6 w-6" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold mb-1">{t("contact.media.title")}</h3>
+                  <h3 className="text-xl mb-1">{t("contact.media.title")}</h3>
                   <p className="text-gray-600 mb-2">{t("contact.media.desc")}</p>
                   <a href="mailto:press@netraksh.com" className="text-green-600 font-medium hover:underline">press@netraksh.com</a>
                 </div>
@@ -99,7 +99,7 @@ export default function Contact() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-bold mb-2">{t("contact.success.title")}</h3>
+                <h3 className="text-2xl mb-2">{t("contact.success.title")}</h3>
                 <p className="text-gray-600">{t("contact.success.desc")}</p>
               </div>
             ) : (
