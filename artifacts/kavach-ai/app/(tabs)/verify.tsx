@@ -377,11 +377,13 @@ export default function VerifyScreen() {
       >
         {/* Tool type selector — grid */}
         <View style={s.typeGrid}>
-          {types.map((tp) => (
+          {types.map((tp, i) => (
             <TouchableOpacity
               key={tp.key}
               style={[
                 s.typeCard,
+                // An odd last card spans the full row instead of sitting alone at half width.
+                types.length % 2 === 1 && i === types.length - 1 && { width: "100%" },
                 selectedType === tp.key
                   ? { backgroundColor: tp.bg, borderColor: tp.color + "40", borderWidth: 1.5 }
                   : { backgroundColor: "#fff", borderColor: "rgba(11,61,145,0.08)", borderWidth: 1 },

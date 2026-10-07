@@ -10,6 +10,7 @@ import { Platform, StyleSheet, View, useColorScheme } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useColors } from "@/hooks/useColors";
+import { useStatusBarStyle } from "@/hooks/useStatusBarStyle";
 
 function NativeTabLayout() {
   const { t } = useTranslation();
@@ -149,6 +150,8 @@ function ClassicTabLayout() {
 }
 
 export default function TabLayout() {
+  // Every tab has a navy header, so the status bar icons are light here.
+  useStatusBarStyle("light");
   if (isLiquidGlassAvailable()) {
     return <NativeTabLayout />;
   }

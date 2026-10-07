@@ -501,6 +501,7 @@ const hi = {
     hotspotsEmpty: "अभी हॉटस्पॉट डेटा नहीं है।",
     hotspotsError: "हॉटस्पॉट लोड नहीं हो सके।",
     scamOfDayError: "आज की प्रमुख ठगी लोड नहीं हो सकी।",
+    scamOfDayEmpty: "अभी कोई ट्रेंडिंग ठगी नहीं है। थोड़ी देर बाद देखें।",
   },
 
   family: {
