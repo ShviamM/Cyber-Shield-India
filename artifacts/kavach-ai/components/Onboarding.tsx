@@ -1,9 +1,10 @@
 import { Feather } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  BackHandler,
   Image,
   StyleSheet,
   Text,
@@ -31,6 +32,16 @@ export function Onboarding({ onDone }: { onDone: () => void }) {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const [step, setStep] = useState<0 | 1>(0);
+
+  // Android back on the second step returns to language choice.
+  useEffect(() => {
+    const sub = BackHandler.addEventListener("hardwareBackPress", () => {
+      if (step === 0) return false;
+      setStep(0);
+      return true;
+    });
+    return () => sub.remove();
+  }, [step]);
 
   async function pickLanguage(code: LanguageCode) {
     Haptics.selectionAsync();

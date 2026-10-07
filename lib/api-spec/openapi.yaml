@@ -1265,6 +1265,27 @@ paths:
         default:
           $ref: "#/components/responses/Error"
 
+    delete:
+      operationId: unregisterPushToken
+      tags: [notifications]
+      summary: Stop sending pushes to this device (called on sign-out)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UnregisterPushTokenRequest"
+      responses:
+        "200":
+          description: Token removed (or was not registered)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        default:
+          $ref: "#/components/responses/Error"
   /notifications:
     get:
       operationId: listNotifications
@@ -3243,6 +3264,14 @@ components:
             $ref: "#/components/schemas/Payment"
       required:
         - payments
+
+    UnregisterPushTokenRequest:
+      type: object
+      properties:
+        token:
+          type: string
+      required:
+        - token
 
     RegisterPushTokenRequest:
       type: object

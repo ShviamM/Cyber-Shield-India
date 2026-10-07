@@ -151,6 +151,10 @@ const en = {
     logoSub: "CYBER CRIME PREVENTION · INDIA",
     sosHelpline: "Cyber Helpline",
     guardianActive: "Guardian Active",
+    protectionSetupPill: "Set up protection",
+    setupTitle: "Call protection is off",
+    setupBody: "{{n}} step(s) left before Netraksh can warn you about scam calls.",
+    setupCta: "Set up",
     guardianPaused: "Guardian Paused",
     statChecked: "Checked",
     statThreats: "Threats",
@@ -331,6 +335,7 @@ const en = {
       warning: "Warning",
       danger: "Danger",
       invalid: "Invalid",
+      unknown: "No reports",
     },
     local: {
       linkInvalidHeadline: "Enter a valid URL",
@@ -396,6 +401,7 @@ const en = {
     successTitle: "Report submitted",
     successMsg: "Thank you for helping protect the community.",
     submitFailed: "Couldn't submit your report. Please try again.",
+    dateInvalid: "Enter the date as YYYY-MM-DD, and not in the future.",
     done: "Done",
     disclaimer:
       "Reports are reviewed by moderators. False reports may be removed. For financial loss, also call 1930.",
@@ -595,6 +601,9 @@ const en = {
     limitMessage: "Your plan allows up to {{n}} family members.",
     addFailedTitle: "Couldn't add member",
     addFailedMessage: "Something went wrong. Please try again.",
+    invalidPhone: "Enter a valid 10-digit Indian mobile number.",
+    ownNumber: "That's your own number. Add a family member's number instead.",
+    duplicateMember: "This number is already in your family list.",
     removeFailedTitle: "Couldn't remove member",
     removeFailedMessage: "Something went wrong. Please try again.",
     relations: {
@@ -660,6 +669,7 @@ const en = {
     subtitle: "Real-time scam call protection",
     intro:
       "Let Netraksh watch for scam calls right on your phone and warn you the moment one arrives. To check a message, share it to Netraksh.",
+    contactsNote: "Android only checks calls from numbers that are not saved in your contacts. To test, call from a number that isn't in your contacts, or use \"Send test alert\" below.",
     unavailableTitle: "Available on Android app builds",
     unavailableBuild:
       "On-device screening needs the installed Android app. It can't run in this preview or Expo Go. You can still review the settings and privacy model here.",
@@ -876,6 +886,8 @@ const en = {
     title: "Premium",
     entryTitle: "Netraksh Premium",
     entrySub: "Unlock advanced protection for you and your family",
+    entryActiveTitle: "Netraksh Premium is active",
+    entryActiveSub: "Manage your plan and payments",
     choosePlan: "Choose your plan",
     mostPopular: "Most popular",
     free: "Free",

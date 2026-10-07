@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { eq } from "drizzle-orm";
-import { db, sessionsTable, usersTable } from "@workspace/db";
+import { db, sessionsTable, subscriptionsTable, usersTable } from "@workspace/db";
 import {
   AdminLoginBody,
   CheckPhoneBody,
@@ -372,6 +372,19 @@ router.post("/auth/demo-login", async (req, res) => {
   ) {
     throw new HttpError(404, "not_found", "Not found.");
   }
+
+  // Store reviewers must see the paid features end to end (no paywall, no
+  // free-check limit, family members allowed), so the demo account always has
+  // an active Family plan on the server, renewed on each demo login. The phone
+  // app's own "subscribed" flag alone left the server treating it as free.
+  const reviewPeriodEnd = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+  await db
+    .insert(subscriptionsTable)
+    .values({ userId: user.id, plan: "family", status: "active", currentPeriodStart: new Date(), currentPeriodEnd: reviewPeriodEnd })
+    .onConflictDoUpdate({
+      target: subscriptionsTable.userId,
+      set: { plan: "family", status: "active", currentPeriodEnd: reviewPeriodEnd, cancelAtPeriodEnd: false, updatedAt: new Date() },
+    });
 
   const token = generateToken();
   const expiresAt = new Date(

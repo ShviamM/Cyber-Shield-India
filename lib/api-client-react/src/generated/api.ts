@@ -94,6 +94,7 @@ import type {
   TargetReputation,
   TrendingScamListResponse,
   TrialListResponse,
+  UnregisterPushTokenRequest,
   UpdateContactMessageRequest,
   UpdateLocationRequest,
   UpdateReportStatusRequest,
@@ -3971,6 +3972,77 @@ export const useRegisterPushToken = <TError = ErrorType<ErrorResponse>,
         TContext
       > => {
       return useMutation(getRegisterPushTokenMutationOptions(options));
+    }
+
+export const getUnregisterPushTokenUrl = () => {
+
+
+
+
+  return `/api/me/push-token`
+}
+
+/**
+ * @summary Stop sending pushes to this device (called on sign-out)
+ */
+export const unregisterPushToken = async (unregisterPushTokenRequest: UnregisterPushTokenRequest, options?: RequestInit): Promise<SuccessResponse> => {
+
+  return customFetch<SuccessResponse>(getUnregisterPushTokenUrl(),
+  {
+    ...options,
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      unregisterPushTokenRequest,)
+  }
+);}
+
+
+
+
+export const getUnregisterPushTokenMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unregisterPushToken>>, TError,{data: BodyType<UnregisterPushTokenRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof unregisterPushToken>>, TError,{data: BodyType<UnregisterPushTokenRequest>}, TContext> => {
+
+const mutationKey = ['unregisterPushToken'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof unregisterPushToken>>, {data: BodyType<UnregisterPushTokenRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  unregisterPushToken(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UnregisterPushTokenMutationResult = NonNullable<Awaited<ReturnType<typeof unregisterPushToken>>>
+    export type UnregisterPushTokenMutationBody = BodyType<UnregisterPushTokenRequest>
+    export type UnregisterPushTokenMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Stop sending pushes to this device (called on sign-out)
+ */
+export const useUnregisterPushToken = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unregisterPushToken>>, TError,{data: BodyType<UnregisterPushTokenRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof unregisterPushToken>>,
+        TError,
+        {data: BodyType<UnregisterPushTokenRequest>},
+        TContext
+      > => {
+      return useMutation(getUnregisterPushTokenMutationOptions(options));
     }
 
 export const getListNotificationsUrl = () => {

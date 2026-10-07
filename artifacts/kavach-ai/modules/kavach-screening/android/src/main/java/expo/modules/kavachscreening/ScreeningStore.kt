@@ -149,8 +149,11 @@ object ScreeningStore {
     val n = normalize(rawNumber)
     if (n.length < 6) return false
     val tail = n.takeLast(10)
-    return getBlocklist(ctx).any { it.takeLast(10) == tail } ||
-      getUserBlocklist(ctx).any { it.takeLast(10) == tail }
+    // Only numbers the user blocked themselves are rejected. The synced risk list
+    // (community reports, the user's own risky checks) must never silently drop
+    // a call: those calls ring and get the warning card instead, so a false
+    // report can't hide a real call from the bank, a courier or family.
+    return getUserBlocklist(ctx).any { it.takeLast(10) == tail }
   }
 
   private fun normalize(number: String): String = number.filter { it.isDigit() }

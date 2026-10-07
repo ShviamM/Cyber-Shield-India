@@ -21,7 +21,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { FamilyInvite } from "@workspace/api-client-react";
 
 import { FamilyMember, FamilyMemberError, useAppContext } from "@/context/AppContext";
-import { formatIndianPhone } from "@/lib/phone";
+import { useAuth } from "@/context/AuthContext";
+import { formatIndianPhone, isValidIndianPhone, tenDigits } from "@/lib/phone";
 import { useColors } from "@/hooks/useColors";
 
 const NAVY = "#0B3D91";
@@ -48,6 +49,7 @@ export default function FamilyScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
   const router = useRouter();
+  const { user } = useAuth();
   const {
     familyMembers,
     familyMaxMembers,
@@ -105,6 +107,14 @@ export default function FamilyScreen() {
 
   async function handleAdd() {
     if (!name.trim() || !phone.trim() || saving) return;
+    if (!isValidIndianPhone(phone)) {
+      Alert.alert(t("family.addFailedTitle"), t("family.invalidPhone"));
+      return;
+    }
+    if (user && tenDigits(user.phone) === tenDigits(phone)) {
+      Alert.alert(t("family.addFailedTitle"), t("family.ownNumber"));
+      return;
+    }
     setSaving(true);
     try {
       await addFamilyMember({
@@ -123,6 +133,10 @@ export default function FamilyScreen() {
         promptUpgrade();
       } else if (status === 403) {
         Alert.alert(t("family.limitTitle"), t("family.limitMessage", { n: familyMaxMembers }));
+      } else if (status === 409) {
+        Alert.alert(t("family.addFailedTitle"), t("family.duplicateMember"));
+      } else if (status === 400) {
+        Alert.alert(t("family.addFailedTitle"), t("family.invalidPhone"));
       } else {
         Alert.alert(t("family.addFailedTitle"), t("family.addFailedMessage"));
       }
@@ -297,7 +311,9 @@ export default function FamilyScreen() {
             onDelete={() => handleDelete(item)}
             onMarkSafe={() => {
               Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-              markFamilyMemberSafe(item.id).catch(() => {});
+              markFamilyMemberSafe(item.id).catch(() =>
+                Alert.alert(t("family.inviteFailedTitle"), t("family.addFailedMessage")),
+              );
             }}
           />
         )}

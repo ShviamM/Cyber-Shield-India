@@ -9,6 +9,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
+  BackHandler,
   KeyboardAvoidingView,
   Platform,
   Image,
@@ -230,6 +231,17 @@ export default function LoginScreen() {
       setVerifying(false);
     }
   }
+
+  // Android back on the OTP or details step returns to the phone step instead
+  // of closing the app.
+  useEffect(() => {
+    const sub = BackHandler.addEventListener("hardwareBackPress", () => {
+      if (step === "phone") return false;
+      resetToPhone();
+      return true;
+    });
+    return () => sub.remove();
+  });
 
   function resetToPhone() {
     setStep("phone");

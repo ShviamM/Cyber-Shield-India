@@ -23,7 +23,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { categoryIcon, isCallReportCategory } from "@/constants/strings";
+import { categoryIcon, isCallReportCategory, localCategoryName } from "@/constants/strings";
 import { formatIndianPhone, phoneForApi } from "@/lib/phone";
 import { setPendingPostCallReport } from "@/lib/postCallReport";
 import { answerCall, blockNumber, endCall } from "@/lib/screening";
@@ -51,7 +51,7 @@ type ReportPhase =
 export default function CallAlertScreen() {
   useStatusBarStyle("light");
   const insets = useSafeAreaInsets();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const params = useLocalSearchParams<{ number?: string | string[]; verify?: string | string[] }>();
   const rawNumber = Array.isArray(params.number) ? params.number[0] : params.number;
   // Set by the native screening service when Android reports the caller's
@@ -627,7 +627,7 @@ export default function CallAlertScreen() {
                             />
                           </View>
                           <Text style={s.catName} numberOfLines={1}>
-                            {c.nameEn}
+                            {localCategoryName(c, i18n.language)}
                           </Text>
                           {busy ? (
                             <ActivityIndicator size="small" color="#dc2626" />

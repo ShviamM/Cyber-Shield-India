@@ -79,7 +79,8 @@ function RootLayoutNav() {
   const [minElapsed, setMinElapsed] = useState(false);
   const [launchHidden, setLaunchHidden] = useState(false);
   useEffect(() => {
-    const id = setTimeout(() => setMinElapsed(true), 5000);
+    // Long enough to read the brand, short enough not to feel slow.
+    const id = setTimeout(() => setMinElapsed(true), 1500);
     return () => clearTimeout(id);
   }, []);
   // An incoming-call deep link (kavach-ai://call-alert) must feel like a

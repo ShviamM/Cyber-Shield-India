@@ -3,7 +3,8 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 
-import { registerPushToken } from "@workspace/api-client-react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { registerPushToken, unregisterPushToken } from "@workspace/api-client-react";
 
 /**
  * Foreground presentation: show banners/sounds even while the app is open so
@@ -30,6 +31,24 @@ function resolveProjectId(): string | undefined {
  * push is a non-critical enhancement, so any failure (Expo Go without an EAS
  * projectId, a simulator, denied permission, offline) is swallowed.
  */
+const PUSH_TOKEN_KEY = "kv_push_token";
+
+/**
+ * Detach this phone from the signed-in account on the server, so it stops
+ * receiving that account's alerts after sign-out. Best effort: call it while
+ * the session token is still valid.
+ */
+export async function unregisterThisDevice(): Promise<void> {
+  try {
+    const token = await AsyncStorage.getItem(PUSH_TOKEN_KEY);
+    if (!token) return;
+    await unregisterPushToken({ token });
+    await AsyncStorage.removeItem(PUSH_TOKEN_KEY);
+  } catch {
+    // Non-fatal.
+  }
+}
+
 export async function registerForPushNotifications(): Promise<void> {
   try {
     if (!Device.isDevice) return;
@@ -61,6 +80,7 @@ export async function registerForPushNotifications(): Promise<void> {
       token,
       platform: Platform.OS === "ios" ? "ios" : Platform.OS === "android" ? "android" : "web",
     });
+    await AsyncStorage.setItem(PUSH_TOKEN_KEY, token);
   } catch {
     // Non-fatal — the app works without push.
   }
