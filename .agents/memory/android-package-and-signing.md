@@ -5,6 +5,11 @@ description: The permanent Play package name and how the upload keystore was gen
 
 # Android package name + signing key (kavach-ai / Netraksh)
 
+> **Update (October 2026):** the Android package is now **`com.netraksh.app`**
+> (owner's decision: the app was not yet live, so it ships as a new Play listing)
+> and the EAS project is @netraksh/kavach-ai. The notes below describe the old
+> `com.kavachai.com` setup.
+
 **Permanent Play package name = `com.kavachai.com`** (this is what the Play
 Console app entry was created with; package name is immutable once published).
 NOT `com.kavachai.app`. The iOS `bundleIdentifier` intentionally stays

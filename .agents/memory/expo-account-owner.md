@@ -5,6 +5,12 @@ description: Which EAS project/keystore matches the Google Play upload certifica
 
 # Which Expo keystore matches the Play listing (kavach-ai / Netraksh)
 
+> **Update (October 2026):** the app now lives in **@netraksh/kavach-ai**
+> (projectId `93d7ef97-d9e3-4800-ba22-0f81cdd6eef2`, owner `netraksh`) and the
+> Android package is **`com.netraksh.app`**, a new Play listing with its own new
+> upload key. Everything below is about the OLD `com.kavachai.com` listing and the
+> shviam keystore; it only matters if that old listing is ever revived.
+
 Google Play (app package `com.kavachai.com`) has a **registered upload
 certificate** with SHA1 `BA:E1:6E:17:A1:13:FA:63:F6:00:F7:4B:49:D8:83:D8:21:2C:CF:62`.
 Any production AAB MUST be signed with the keystore that produces that cert, or
