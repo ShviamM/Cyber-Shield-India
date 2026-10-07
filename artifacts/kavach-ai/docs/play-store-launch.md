@@ -1,7 +1,7 @@
 # Netraksh: Google Play launch checklist (Android-first)
 
 App ID: **`com.netraksh.app`** (permanent once the first build is uploaded to Play).
-EAS project: `e5d1313b-c177-4200-96df-82bfce6d97ee` (owner `shviam`).
+EAS project: `93d7ef97-d9e3-4800-ba22-0f81cdd6eef2` (@netraksh/kavach-ai, owner `netraksh`). Moved from @shviam/kavach-ai in October 2026; the old project still holds the `com.kavachai.*` keystores.
 
 Steps marked **(you)** need an account or console only the owner can access.
 
