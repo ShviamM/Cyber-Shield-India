@@ -679,6 +679,10 @@ const en = {
     callTitle: "Scam Call Screening",
     callSub: "Warns you when a high-risk number calls",
     smsTitle: "Scam SMS Screening",
+    smsAutoSub: "Checks every incoming SMS on your phone and warns you about scam messages",
+    smsDisclosureTitle: "Turn on SMS protection?",
+    smsDisclosureBody: "Netraksh will read your incoming text messages on this phone to warn you about scams, like Truecaller does.\n\n• Messages are checked on your phone and are never uploaded.\n• Only a link from a suspicious message is sent to Netraksh to check if it is a known scam site.\n• You can turn this off at any time.",
+    smsDisclosureAgree: "Agree and continue",
     smsSub: "Flags likely scam texts as they arrive",
     smsShareTitle: "Check any SMS instantly",
     smsShareSub:
@@ -833,7 +837,7 @@ const en = {
       "Netraksh (\"we\", \"us\") is committed to protecting your privacy. This policy explains what personal data we collect, why we collect it, and your rights under India's Digital Personal Data Protection Act, 2023 (DPDP Act) and the Information Technology Act, 2000 and the rules made under it.",
     callsAndFamily: {
       heading: "Call protection and Family Guardian",
-      body: "• Call protection (Android): if you turn it on, the number of each incoming call is sent to Netraksh to check whether it has been reported as a scam. We do not record calls, and the app does not read your call log, contacts or SMS.\n• Family Guardian: a Family plan user can add a family member's name, mobile number and relationship. Nothing about that person's calls is shared until they sign in with that number and accept the invite. They can stop sharing at any time from the Family tab.\n• After they accept, only a call from a number reported as a scam creates an alert. The guardian sees the caller's number, how many times it was reported, the scam type and the time, never the family member's other calls, contacts, messages or location.\n• Alerts are deleted automatically after 90 days, or straight away if the guardian removes the family member.",
+      body: "• Call protection (Android): if you turn it on, the number of each incoming call is sent to Netraksh to check whether it has been reported as a scam. We do not record calls, and the app does not read your call log, contacts or SMS.\n• Family Guardian: a Family plan user can add a family member's name, mobile number and relationship. Nothing about that person's calls is shared until they sign in with that number and accept the invite. They can stop sharing at any time from the Family tab.\n• After they accept, only a call from a number reported as a scam creates an alert. The guardian sees the caller's number, how many times it was reported, the scam type and the time, never the family member's other calls, contacts, messages or location.\n• Alerts are deleted automatically after 90 days, or straight away if the guardian removes the family member.\n• SMS protection (Android, optional): if you turn it on, incoming text messages are checked on your phone to warn you about scams. The text never leaves your phone; only a link from a suspicious message is sent to check it against known scam sites.",
     },
     sections: [
       {

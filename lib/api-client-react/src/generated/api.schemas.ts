@@ -923,6 +923,11 @@ export interface PaymentList {
   payments: Payment[];
 }
 
+export interface SmsLinkCheckRequest {
+  /** @maxLength 2000 */
+  url: string;
+}
+
 export interface UnregisterPushTokenRequest {
   token: string;
 }

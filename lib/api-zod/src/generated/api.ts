@@ -1095,6 +1095,35 @@ export const ListNotificationsResponse = zod.object({
 
 
 /**
+ * Called by the phone's SMS screener for a link in a suspicious message. Only the link is sent, never the message text. Runs the fast signals (phishing feed, URL heuristics, community reports), does not count against the free daily checks, and is rate limited per user.
+
+ * @summary Quick check of a link found in an incoming SMS (on-device SMS protection)
+ */
+export const smsLinkCheckBodyUrlMax = 2000;
+
+
+
+export const SmsLinkCheckBody = zod.object({
+  "url": zod.string().max(smsLinkCheckBodyUrlMax)
+})
+
+export const SmsLinkCheckResponse = zod.object({
+  "type": zod.enum(['phone', 'url', 'upi', 'message']),
+  "value": zod.string().describe('The normalized\/echoed target (never contains secrets)'),
+  "riskLevel": zod.enum(['low', 'medium', 'high', 'unknown']),
+  "score": zod.number().describe('Overall risk score from 0 (safe) to 100 (high risk)'),
+  "category": zod.string().nullish().describe('Detected scam category key when a message is classified'),
+  "confidence": zod.number().nullish().describe('AI classification confidence (0-1) when applicable'),
+  "reasons": zod.array(zod.string()).describe('Human-readable contributing reasons'),
+  "signals": zod.array(zod.object({
+  "source": zod.enum(['message_ai', 'url_heuristic', 'url_threat_feed', 'url_ai', 'url_reputation', 'phone_reputation', 'upi_heuristic', 'upi_reputation']).describe('Which analyzer produced this signal'),
+  "severity": zod.enum(['info', 'low', 'medium', 'high']),
+  "label": zod.string().describe('Human-readable explanation of the signal')
+}).describe('A single contributing factor in the overall verdict')).describe('Structured breakdown of every contributing signal')
+})
+
+
+/**
  * @summary List the current user's protected family members
  */
 export const ListFamilyMembersResponse = zod.object({

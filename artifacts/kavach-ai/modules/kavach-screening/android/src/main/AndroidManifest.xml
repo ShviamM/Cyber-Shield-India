@@ -1,4 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <!--
+    SMS scam protection: receive incoming texts to check them on the phone
+    (SmsScreeningReceiver). Google Play allows this for "Anti-SMS phishing" and
+    "spam detection" apps after a Permissions Declaration. Asked for only when
+    the user turns SMS protection on.
+  -->
+  <uses-permission android:name="android.permission.RECEIVE_SMS" />
   <application>
     <!--
       System-bound call screening service. Holding ROLE_CALL_SCREENING lets the
@@ -14,5 +21,13 @@
         <action android:name="android.telecom.CallScreeningService" />
       </intent-filter>
     </service>
+    <receiver
+      android:name="expo.modules.kavachscreening.SmsScreeningReceiver"
+      android:permission="android.permission.BROADCAST_SMS"
+      android:exported="true">
+      <intent-filter>
+        <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+      </intent-filter>
+    </receiver>
   </application>
 </manifest>
