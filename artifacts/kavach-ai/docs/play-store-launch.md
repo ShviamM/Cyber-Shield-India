@@ -11,8 +11,8 @@ Push (admin broadcasts and Family Guardian alerts) uses Firebase Cloud Messaging
 - [x] Firebase project `kavach-98e72` with Android app `com.netraksh.app`.
 - [x] `google-services.json` is committed at `artifacts/kavach-ai/google-services.json` (not secret); `app.config.js` picks it up.
 - [x] FCM v1 API enabled and the service account can send (checked with a validate-only request).
-- [ ] **(you)** Upload the FCM v1 service-account key to Expo: expo.dev → project → Credentials → Android → `com.netraksh.app` → *FCM V1 service account key*. Or run `eas credentials` → Android → production → *Google Service Account* → *Push Notifications (FCM V1)*.
-  The key is a secret: never commit it (`*firebase-adminsdk*.json` is git-ignored).
+- [x] FCM v1 service-account key (`net-54@kavach-98e72`, role *Firebase Cloud Messaging API Admin*) uploaded to Expo and attached to `com.netraksh.app` in @netraksh/kavach-ai.
+  Keys are secrets: never commit them (`*firebase-adminsdk*.json` is git-ignored). To rotate, generate a new key, upload it in expo.dev → Credentials → Android → `com.netraksh.app`, then delete the old key in Google Cloud.
 
 ## 2. RevenueCat (you)
 The Android app in RevenueCat must use the new package name.
