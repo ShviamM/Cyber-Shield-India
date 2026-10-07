@@ -36,7 +36,7 @@ export default {
     badge: "Who needs protecting?",
     title: "Every family member faces a different threat",
     subtitle:
-      "Tap a person to see the scam they’re most likely to face — and exactly how Netraksh shields them.",
+      "Tap a person to see the scam they’re most likely to face, and exactly how Netraksh shields them.",
   },
   alertSection: {
     badge: "Coming soon",
@@ -55,7 +55,7 @@ export default {
     stamp: "Blocked by Netraksh",
     aria: "{{headline}}. Activate to see how Netraksh blocks this scam.",
     note:
-      "Hover or tap a clipping. Headlines depict common scam patterns reported across India — the kind Netraksh is built to stop.",
+      "Hover or tap a clipping. Headlines depict common scam patterns reported across India, the kind Netraksh is built to stop.",
     items: [
       {
         masthead: "The Metro Sentinel",
@@ -77,7 +77,7 @@ export default {
         masthead: "Daily Chronicle",
         dateline: "MUMBAI · CITY DESK",
         kicker: "WHATSAPP SCAM",
-        headline: "‘Mummy, I Lost My Phone’ — Hijack Targets Anxious Parents",
+        headline: "‘Mummy, I Lost My Phone’: Hijack Targets Anxious Parents",
         standfirst:
           "Scammers impersonate children from new numbers, then demand urgent money transfers ‘before it’s too late’.",
       },
@@ -87,7 +87,7 @@ export default {
         kicker: "PHISHING",
         headline: "Fake Electricity Bill SMS Cuts Through a Family’s Savings",
         standfirst:
-          "‘Your connection will be disconnected tonight’ — a threat that pushed a household to install a remote-access app.",
+          "‘Your connection will be disconnected tonight’: a threat that pushed a household to install a remote-access app.",
       },
       {
         masthead: "Tribune Today",

@@ -36,7 +36,7 @@ const scenarios: Scenario[] = [
     phoneTitle: "+91 98765-43210",
     phoneSubtitle: "Reported as Bank Scam",
     steps: ["Incoming Call", "Netraksh Detects Risk", "Warning Displayed", "You Stay Protected"],
-    verdict: "High Risk — Call Blocked",
+    verdict: "High Risk: Call Blocked",
     verdictTone: "danger",
   },
   {
@@ -49,7 +49,7 @@ const scenarios: Scenario[] = [
     phoneTitle: "Your A/c will be blocked",
     phoneSubtitle: "Update KYC: http://bit.ly/fake",
     steps: ["Message Received", "Netraksh Analyzes", "Marked Dangerous", "Do Not Click"],
-    verdict: "Phishing Link — Blocked",
+    verdict: "Phishing Link: Blocked",
     verdictTone: "danger",
   },
   {
@@ -60,9 +60,9 @@ const scenarios: Scenario[] = [
     ring: "bg-green-500/15 text-green-400 border-green-500/30",
     chip: "from-emerald-950 to-gray-950",
     phoneTitle: "Forwarded many times",
-    phoneSubtitle: "“Win ₹25,000 — claim now!”",
+    phoneSubtitle: "“Win ₹25,000, claim now!”",
     steps: ["Share to Netraksh", "AI Analysis", "Scam Detected", "Protection Advice"],
-    verdict: "Lottery Scam — Avoid",
+    verdict: "Lottery Scam: Avoid",
     verdictTone: "danger",
   },
   {
@@ -75,7 +75,7 @@ const scenarios: Scenario[] = [
     phoneTitle: "Scanning QR Code",
     phoneSubtitle: "Verifying merchant…",
     steps: ["Scan QR", "Netraksh Checks", "Safe or Dangerous", "Decision Made"],
-    verdict: "Verified Merchant — Safe",
+    verdict: "Verified Merchant: Safe",
     verdictTone: "safe",
   },
 ];

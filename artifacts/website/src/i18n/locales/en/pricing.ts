@@ -2,12 +2,12 @@ export default {
   seo: {
     title: "Pricing & Plans | Netraksh",
     description:
-      "Start a 7-day free trial of Netraksh — Premium at ₹99/year for full real-time scam protection, or Family at ₹449/year for up to 5 family members.",
+      "Start a 7-day free trial of Netraksh: Premium at ₹99/year for full real-time scam protection, or Family at ₹449/year for up to 5 family members.",
   },
   hero: {
     heading: "Protection that fits your life",
     subtitle:
-      "Try Premium free for 7 days — no card needed. Then keep your protection for just ₹99/year, unlocked instantly in the Netraksh app on your mobile number.",
+      "Try Premium free for 7 days with no card needed. Then keep your protection for just ₹99/year, unlocked instantly in the Netraksh app on your mobile number.",
   },
   plans: {
     free: {
@@ -55,7 +55,7 @@ export default {
     included: "Included",
   },
   footnote:
-    "No card needed for your 7-day trial. After it, pay once a year to keep premium — no auto-charge. Payments are handled securely by Razorpay in Indian Rupees.",
+    "No card needed for your 7-day trial. After it, pay once a year to keep premium. There's no auto-charge. Payments are handled securely by Razorpay in Indian Rupees.",
   toast: {
     paymentSuccessTitle: "Payment successful",
     paymentSuccessDesc: "Your {{plan}} plan is now active.",
@@ -63,7 +63,7 @@ export default {
     paymentCancelledDesc: "No charge was made. You can try again anytime.",
     paymentFailedTitle: "Payment not completed",
     trialStartedTitle: "Your 7-day free trial is active",
-    trialStartedDesc: "Enjoy {{plan}} free for 7 days — no card needed.",
+    trialStartedDesc: "Enjoy {{plan}} free for 7 days. No card needed.",
     trialFailedTitle: "Couldn't start trial",
     trialFailedDesc: "Please try again in a moment.",
     genericError: "Something went wrong. Please try again.",

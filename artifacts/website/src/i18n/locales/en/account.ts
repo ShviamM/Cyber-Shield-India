@@ -70,7 +70,7 @@ export default {
     trialDaysLeftOne: "{{count}} day left in your free trial",
     trialDaysLeftOther: "{{count}} days left in your free trial",
     trialEndsOn:
-      "Trial ends on {{date}}. Subscribe before then to keep your protection — there's no automatic charge.",
+      "Trial ends on {{date}}. Subscribe before then to keep your protection. There's no automatic charge.",
     activeUntil: "Active until",
     renewal: "Renewal",
     renewalNote: "Pay yearly to renew (no auto-charge)",

@@ -1,6 +1,6 @@
 export default {
   seo: {
-    title: "Cyber Laws & SOPs | Know Your Rights — Netraksh",
+    title: "Cyber Laws & SOPs | Know Your Rights | Netraksh",
     description:
       "A citizen's guide to India's cyber laws (IT Act 2000, BNS 2023, DPDP Act 2023) and the official step-by-step SOPs to report cyber fraud via 1930 and cybercrime.gov.in.",
   },
@@ -9,25 +9,25 @@ export default {
     titleStart: "Cyber Laws & ",
     titleHighlight: "SOPs",
     subtitle:
-      "Exactly what to do if you've been scammed — and the laws of India that protect every digital citizen.",
+      "Exactly what to do if you've been scammed, and the laws of India that protect every digital citizen.",
   },
   emergency: {
     badge: "Been scammed?",
     title: "The Golden Hour matters.",
-    desc: "Report within the first hour — banks can often freeze the money before it disappears.",
+    desc: "Report within the first hour. Banks can often freeze the money before it disappears.",
     call: "Call 1930",
     fileComplaint: "File Complaint",
   },
   sop: {
     heading: "If You've Been Scammed",
     subtitle:
-      "Follow this official sequence — step by step, in order — to give yourself the best chance of recovery.",
+      "Follow this official sequence, step by step and in order, to give yourself the best chance of recovery.",
     stepLabel: "Step {{number}}",
     steps: [
       {
         time: "Within minutes",
         title: "Call 1930 immediately",
-        desc: "The National Cyber Crime Helpline (24×7, toll-free) can alert your bank to freeze the fraudulent transaction. Speed is everything — the first hour is your best chance to recover money.",
+        desc: "The National Cyber Crime Helpline (24×7, toll-free) can alert your bank to freeze the fraudulent transaction. Speed is everything: the first hour is your best chance to recover money.",
       },
       {
         time: "Same day",
@@ -37,7 +37,7 @@ export default {
       {
         time: "Before you forget",
         title: "Preserve all evidence",
-        desc: "Save screenshots, transaction IDs, UPI handles, caller numbers, SMS, emails and chat history. Do not delete anything — more evidence means a faster investigation.",
+        desc: "Save screenshots, transaction IDs, UPI handles, caller numbers, SMS, emails and chat history. Do not delete anything. More evidence means a faster investigation.",
       },
       {
         time: "Right away",
@@ -47,12 +47,12 @@ export default {
       {
         time: "Keep it safe",
         title: "Save your Complaint ID",
-        desc: "After submitting, you receive a Complaint Reference Number. Note it down — you'll need it to track your case and during any follow-up with police or your bank.",
+        desc: "After submitting, you receive a Complaint Reference Number. Note it down. You'll need it to track your case and during any follow-up with police or your bank.",
       },
       {
         time: "Follow up",
         title: "Track your case & file an FIR if needed",
-        desc: "Track status at cybercrime.gov.in. If the case stalls, file an FIR — any cyber police station should register a Zero FIR regardless of where the fraud happened. Some states are also rolling out e-Zero FIRs to fast-track high-value cases.",
+        desc: "Track status at cybercrime.gov.in. If the case stalls, file an FIR. Any cyber police station should register a Zero FIR regardless of where the fraud happened. Some states are also rolling out e-Zero FIRs to fast-track high-value cases.",
       },
     ],
   },
@@ -81,7 +81,7 @@ export default {
       {
         title: "Sextortion / blackmail",
         steps: [
-          "Do not pay — it never stops the threat",
+          "Do not pay. It never stops the threat",
           "Stop contact, but don't delete proof",
           "Report (anonymous option available)",
           "Call 1930 / file on the portal",
@@ -132,7 +132,7 @@ export default {
     {
       code: "Section 66D",
       title: "Cheating by personation",
-      desc: "Cheating by impersonating someone via phone, app or computer — covers fake bank calls and OTP scams.",
+      desc: "Cheating by impersonating someone via phone, app or computer. It covers fake bank calls and OTP scams.",
       penalty: "Up to 3 years imprisonment and fine up to ₹1 lakh",
     },
     {
@@ -158,7 +158,7 @@ export default {
     {
       code: "Section 319",
       title: "Cheating by personation",
-      desc: "Cheating by impersonation — often charged alongside IT Act Section 66D.",
+      desc: "Cheating by impersonation, often charged alongside IT Act Section 66D.",
       penalty: "Up to 5 years imprisonment and fine",
     },
     {
@@ -182,22 +182,22 @@ export default {
     alwaysDo: "Always Do",
     neverDo: "Never Do",
     dos: [
-      "Verify before you trust — call back only on official numbers",
+      "Verify before you trust: call back only on official numbers",
       "Turn on two-factor authentication for every important account",
-      "Report scams even if you lost nothing — it protects others",
+      "Report scams even if you lost nothing. It protects others",
       "Save evidence: screenshots, IDs, numbers and timestamps",
     ],
     donts: [
-      "Never share OTP, CVV, PIN or passwords — no bank ever asks",
+      "Never share OTP, CVV, PIN or passwords. No bank ever asks",
       "Don't click links in unexpected SMS, email or WhatsApp",
       "Don't install screen-sharing or “support” apps for a stranger",
-      "Don't pay blackmailers — report instead",
+      "Don't pay blackmailers. Report them instead",
     ],
   },
   resources: {
     heading: "Official Resources",
     subtitle:
-      "More government portals worth bookmarking — before you ever need them.",
+      "More government portals worth bookmarking before you ever need them.",
     items: [
       {
         name: "Sanchar Saathi · Chakshu",
@@ -211,7 +211,7 @@ export default {
       },
     ],
     disclaimer:
-      "This page is for general awareness and is not legal advice. Laws, sections and procedures are summarised and may change — always rely on official sources like cybercrime.gov.in and consult a qualified lawyer for your specific situation.",
+      "This page is for general awareness and is not legal advice. Laws, sections and procedures are summarised and may change. Always rely on official sources like cybercrime.gov.in and consult a qualified lawyer for your specific situation.",
   },
   finalCta: {
     title: "Report it. Protect the next person.",

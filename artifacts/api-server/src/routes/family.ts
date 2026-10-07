@@ -47,7 +47,11 @@ const DEDUPE_MS = 30 * 60 * 1000;
 type MemberStatus = FamilyMember["status"];
 
 function memberStatus(row: DbFamilyMember): MemberStatus {
-  return row.status === "accepted" || row.status === "declined" ? row.status : "pending";
+  if (row.status === "declined") return "declined";
+  // An acceptance only counts while the member's account exists: if they
+  // delete it, member_user_id is cleared and the invite needs accepting again.
+  if (row.status === "accepted" && row.memberUserId) return "accepted";
+  return "pending";
 }
 
 function toAlertDto(alert: DbFamilyAlert, member: DbFamilyMember): FamilyAlert {

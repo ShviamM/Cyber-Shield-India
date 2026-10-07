@@ -71,7 +71,7 @@ export default function FamilyProtection() {
         </ol>
       </PageHero>
 
-      {/* Newspaper clippings — the pinboard */}
+      {/* Newspaper clippings - the pinboard */}
       <section className="bg-[#efe9da] py-16">
         <div className="container mx-auto px-4">
           <div className="mx-auto mb-10 max-w-2xl text-center">

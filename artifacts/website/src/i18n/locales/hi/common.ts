@@ -26,7 +26,7 @@ export default {
     downloadApp: "ऐप डाउनलोड करें",
     checkNumber: "नंबर जाँचें",
     checkNumberFree: "मुफ़्त में नंबर जाँचें",
-    downloadFree: "नेत्रक्ष डाउनलोड करें — मुफ़्त",
+    downloadFree: "नेत्रक्ष मुफ़्त डाउनलोड करें",
     startFreeTrial: "मुफ़्त ट्रायल शुरू करें",
     protectMyFamily: "मेरे परिवार को सुरक्षित करें",
     seeAllFeatures: "सभी फ़ीचर्स देखें",

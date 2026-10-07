@@ -271,7 +271,7 @@ export default function CyberLaws() {
           </div>
         </section>
 
-        {/* KNOW YOUR RIGHTS — LAWS */}
+        {/* KNOW YOUR RIGHTS - LAWS */}
         <section className="py-24 bg-white">
           <div className="container mx-auto px-4 md:px-6">
             <motion.div
@@ -349,7 +349,7 @@ export default function CyberLaws() {
           </div>
         </section>
 
-        {/* SAFETY GUIDELINES — DO / DON'T */}
+        {/* SAFETY GUIDELINES - DO / DON'T */}
         <section className="py-24 bg-gray-900 text-white relative overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/25 via-gray-900 to-gray-900 pointer-events-none" />
           <div className="container mx-auto px-4 md:px-6 relative z-10">

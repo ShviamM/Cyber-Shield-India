@@ -278,10 +278,10 @@ export default {
   vision: {
     visionTitle: "Vision for India",
     visionDesc:
-      "A world where cyber awareness is a right, not a privilege — taught in every school and institution, so every citizen can defend themselves online.",
+      "A world where cyber awareness is a right, not a privilege, taught in every school and institution, so every citizen can defend themselves online.",
     movementTitle: "Cyber Safety Movement",
     movementDesc:
-      "More than an app, Netraksh is a national movement — educating communities and advising governments to put practical cyber safety in every Indian family's hands.",
+      "More than an app, Netraksh is a national movement, educating communities and advising governments to put practical cyber safety in every Indian family's hands.",
     roadmapTitle: "Future Roadmap",
     roadmap: [
       "Smarter AI-powered scam detection across calls, messages & QR codes.",

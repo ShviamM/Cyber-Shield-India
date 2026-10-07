@@ -31,9 +31,9 @@ function daysLeft(value?: string | null): number | null {
 }
 
 function formatDate(value?: string | null): string {
-  if (!value) return "—";
+  if (!value) return "-";
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "—";
+  if (Number.isNaN(date.getTime())) return "-";
   return date.toLocaleDateString("en-IN", {
     day: "numeric",
     month: "short",
@@ -136,7 +136,7 @@ export default function Account() {
     defaultValue: t("account.plans.free"),
   });
   const statusLabel = t(`account.statuses.${statusKey}`, {
-    defaultValue: "—",
+    defaultValue: "-",
   });
   const canCancel =
     isPremium && subscription?.status === "active" && !subscription?.cancelAtPeriodEnd;

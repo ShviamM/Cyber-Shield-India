@@ -35,10 +35,19 @@ export default function PrivacyScreen() {
       <Text style={[s.intro, { color: colors.text }]}>{t("privacy.intro")}</Text>
 
       {sections.map((sec, i) => (
-        <View key={i} style={s.section}>
-          <Text style={[s.heading, { color: colors.text }]}>{sec.heading}</Text>
-          <Text style={s.body}>{sec.body}</Text>
-        </View>
+        <React.Fragment key={i}>
+          <View style={s.section}>
+            <Text style={[s.heading, { color: colors.text }]}>{sec.heading}</Text>
+            <Text style={s.body}>{sec.body}</Text>
+          </View>
+          {/* Call protection and Family Guardian, right after "How we share data". */}
+          {i === 4 && (
+            <View style={s.section}>
+              <Text style={[s.heading, { color: colors.text }]}>{t("privacy.callsAndFamily.heading")}</Text>
+              <Text style={s.body}>{t("privacy.callsAndFamily.body")}</Text>
+            </View>
+          )}
+        </React.Fragment>
       ))}
     </ScrollView>
   );

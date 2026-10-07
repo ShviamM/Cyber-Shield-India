@@ -818,9 +818,13 @@ const en = {
 
   privacy: {
     title: "Privacy Policy",
-    updated: "Last updated: 2 June 2026",
+    updated: "Last updated: 7 October 2026",
     intro:
       "Netraksh (\"we\", \"us\") is committed to protecting your privacy. This policy explains what personal data we collect, why we collect it, and your rights under India's Digital Personal Data Protection Act, 2023 (DPDP Act) and the Information Technology Act, 2000 and the rules made under it.",
+    callsAndFamily: {
+      heading: "Call protection and Family Guardian",
+      body: "• Call protection (Android): if you turn it on, the number of each incoming call is sent to Netraksh to check whether it has been reported as a scam. We do not record calls, and the app does not read your call log, contacts or SMS.\n• Family Guardian: a Family plan user can add a family member's name, mobile number and relationship. Nothing about that person's calls is shared until they sign in with that number and accept the invite. They can stop sharing at any time from the Family tab.\n• After they accept, only a call from a number reported as a scam creates an alert. The guardian sees the caller's number, how many times it was reported, the scam type and the time, never the family member's other calls, contacts, messages or location.\n• Alerts are deleted automatically after 90 days, or straight away if the guardian removes the family member.",
+    },
     sections: [
       {
         heading: "1. Who we are",

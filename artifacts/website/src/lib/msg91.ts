@@ -98,7 +98,7 @@ function loadScript(): Promise<void> {
 let initialized = false;
 let widgetReady = false;
 // The DOM element id the widget renders its captcha into. Captured synchronously
-// by prepareOtpWidget so the FIRST init always binds the captcha — even if a
+// by prepareOtpWidget so the FIRST init always binds the captcha - even if a
 // racing sendOtp() triggers initialization first, it can never latch
 // `initialized=true` without the captcha target (which would strand the captcha).
 let captchaRenderTarget: string | undefined;
@@ -151,7 +151,7 @@ export function isOtpWidgetReady(): boolean {
 /**
  * Whether the user has solved the widget's captcha. Returns false until the
  * widget is ready (so callers can't send before the captcha can render), then
- * true when the widget doesn't expose the check (captcha disabled) — MSG91 still
+ * true when the widget doesn't expose the check (captcha disabled) - MSG91 still
  * enforces captcha server-side either way.
  */
 export function isCaptchaVerified(): boolean {

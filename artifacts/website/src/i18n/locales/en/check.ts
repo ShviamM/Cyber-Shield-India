@@ -1,6 +1,6 @@
 export default {
   seo: {
-    title: "Free Scam Check — Number, Link & UPI | Netraksh",
+    title: "Free Scam Check: Number, Link & UPI | Netraksh",
     description:
       "Check any phone number, link or UPI ID for fraud risk in real time. Free, instant scam detection powered by Netraksh's fraud engine.",
   },
@@ -35,7 +35,7 @@ export default {
     },
     low: {
       title: "Looks Safe",
-      desc: "We didn't find strong risk signals — but stay alert if anything feels off.",
+      desc: "We didn't find strong risk signals, but stay alert if anything feels off.",
     },
     unknown: {
       title: "Not Enough Information",

@@ -3,8 +3,14 @@ export const LEGAL_UPDATED: Record<"en" | "hi", string> = {
   hi: "अंतिम अपडेट: मई 2026",
 };
 
-const intro = (lang: "en" | "hi", text: string) =>
-  `<p class="lead">${LEGAL_UPDATED[lang]}</p><p>${text}</p>`;
+// The privacy policy was revised for Family Guardian after the other pages.
+const PRIVACY_UPDATED: Record<"en" | "hi", string> = {
+  en: "Last updated: October 2026",
+  hi: "अंतिम अपडेट: अक्टूबर 2026",
+};
+
+const intro = (lang: "en" | "hi", text: string, updated = LEGAL_UPDATED[lang]) =>
+  `<p class="lead">${updated}</p><p>${text}</p>`;
 
 export const legalContent: Record<"en" | "hi", Record<string, string>> = {
   en: {
@@ -12,13 +18,16 @@ export const legalContent: Record<"en" | "hi", Record<string, string>> = {
       intro(
         "en",
         "Netraksh ('we', 'us', 'our') is committed to protecting your privacy. This policy explains what information we collect, how we use it, and the rights you have under India's Digital Personal Data Protection Act, 2023 (DPDP Act).",
+        PRIVACY_UPDATED.en,
       ) +
       `
     <h2>Information we collect</h2>
     <ul>
       <li><strong>Account information:</strong> your phone number and basic profile details when you sign up.</li>
       <li><strong>Protection data:</strong> when you ask Netraksh to check a call, message, link or UPI ID, we process that content only to return a safety verdict.</li>
-      <li><strong>Device and usage data:</strong> app version, device type and diagnostic logs used to keep the service reliable and secure.</li>
+      <li><strong>Incoming calls (Android app):</strong> if you turn on call protection, the number of each incoming call is sent to Netraksh so we can tell you whether it has been reported as a scam. We do not record calls, and the app does not read your call log, contacts or SMS.</li>
+      <li><strong>Family Guardian:</strong> the names, mobile numbers and relationships of family members a guardian adds, and the scam-call alerts described in the Family Guardian section below.</li>
+      <li><strong>Device and usage data:</strong> app version, device type, push notification tokens and diagnostic logs used to keep the service reliable and secure.</li>
       <li><strong>Location:</strong> with your permission, your approximate device location is used to show cyber-cell contacts and scam alerts relevant to your area. Location is accessed only while the app is open (in the foreground), never in the background, and you can decline it or turn it off in your device settings at any time.</li>
     </ul>
     <h2>How we use your information</h2>
@@ -33,8 +42,17 @@ export const legalContent: Record<"en" | "hi", Record<string, string>> = {
       <li>We do not sell your personal data to anyone.</li>
       <li>We do not read your private messages in the background. Content is checked only when you submit it for a scan.</li>
     </ul>
+    <h2>Family Guardian</h2>
+    <p>Family Guardian lets a Netraksh user on the Family plan (the "guardian") get an alert when a number reported as a scam calls a family member who has agreed to it.</p>
+    <ul>
+      <li><strong>Adding a family member:</strong> the guardian enters the person's name, mobile number and relationship. We store this to send them an invite. Nothing about the family member's calls is shared until they accept.</li>
+      <li><strong>Consent:</strong> the family member must sign in to Netraksh with that mobile number and accept the invite in the app. They can decline, or stop sharing at any time from the Family tab, and alerts stop straight away. Deleting their account also stops alerts.</li>
+      <li><strong>What is checked:</strong> once the family member accepts, their app sends the number of each incoming call to Netraksh, and we check it against community scam reports. If the number has not been reported as a scam, it is not saved to anyone's account and nobody is told about the call.</li>
+      <li><strong>What the guardian sees:</strong> only when the caller has been reported as a scam, the guardian is sent an alert with the caller's number, how many times it has been reported, the type of scam and the time of the call. The guardian never sees the family member's other calls, contacts, messages or location.</li>
+      <li><strong>How long alerts are kept:</strong> 90 days, then they are deleted automatically. If the guardian removes the family member, their alerts are deleted immediately.</li>
+    </ul>
     <h2>Data sharing</h2>
-    <p>We share data only with trusted service providers who help us run Netraksh (such as cloud hosting and SMS delivery), under strict confidentiality obligations, and where required by law.</p>
+    <p>We share data only with trusted service providers who help us run Netraksh (such as cloud hosting, SMS delivery and push notification delivery), under strict confidentiality obligations, and where required by law. With your consent, Family Guardian alerts are shared with the family members you accepted, as described above.</p>
     <h2>Your rights</h2>
     <p>Under the DPDP Act you may request access to, correction of, or deletion of your personal data. To exercise these rights, contact us at <a href="mailto:privacy@netraksh.com">privacy@netraksh.com</a>.</p>
     <h2>Data retention</h2>
@@ -120,6 +138,8 @@ export const legalContent: Record<"en" | "hi", Record<string, string>> = {
     <ul>
       <li><strong>Account data:</strong> retained while your account is active. Deleted on request or within a reasonable period after account closure.</li>
       <li><strong>Scan content:</strong> the calls, messages or links you submit for checking are processed to return a verdict and are not retained as identifiable personal content beyond what is needed to operate and improve detection.</li>
+      <li><strong>Incoming call checks:</strong> numbers checked by call protection are used only to return a warning. They are not saved to your account, and appear only in our short-lived diagnostic logs.</li>
+      <li><strong>Family Guardian alerts:</strong> kept for 90 days, then deleted automatically. Removing a family member deletes their alerts immediately.</li>
       <li><strong>Diagnostic logs:</strong> kept for a limited period to maintain security and reliability, then deleted or anonymised.</li>
     </ul>
     <h2>Deletion requests</h2>
@@ -191,13 +211,16 @@ export const legalContent: Record<"en" | "hi", Record<string, string>> = {
       intro(
         "hi",
         "Netraksh ('हम', 'हमारा') आपकी निजता की रक्षा के लिए प्रतिबद्ध है। यह नीति बताती है कि हम कौन-सी जानकारी इकट्ठा करते हैं, उसका उपयोग कैसे करते हैं, और भारत के डिजिटल पर्सनल डेटा प्रोटेक्शन एक्ट, 2023 (DPDP Act) के तहत आपको कौन-से अधिकार मिलते हैं।",
+        PRIVACY_UPDATED.hi,
       ) +
       `
     <h2>हम कौन-सी जानकारी इकट्ठा करते हैं</h2>
     <ul>
       <li><strong>खाता जानकारी:</strong> साइन अप करते समय आपका फ़ोन नंबर और बुनियादी प्रोफ़ाइल विवरण।</li>
       <li><strong>सुरक्षा डेटा:</strong> जब आप Netraksh से किसी कॉल, मैसेज, लिंक या UPI ID को जाँचने के लिए कहते हैं, तो हम उस सामग्री को केवल सुरक्षा परिणाम देने के लिए प्रोसेस करते हैं।</li>
-      <li><strong>डिवाइस और उपयोग डेटा:</strong> ऐप वर्शन, डिवाइस का प्रकार और डायग्नोस्टिक लॉग, जो सेवा को भरोसेमंद और सुरक्षित बनाए रखने में मदद करते हैं।</li>
+      <li><strong>आने वाली कॉल (Android ऐप):</strong> अगर आप कॉल सुरक्षा चालू करते हैं, तो हर आने वाली कॉल का नंबर Netraksh को भेजा जाता है ताकि हम बता सकें कि उसे स्कैम के रूप में रिपोर्ट किया गया है या नहीं। हम कॉल रिकॉर्ड नहीं करते, और ऐप आपका कॉल लॉग, कॉन्टैक्ट या SMS नहीं पढ़ता।</li>
+      <li><strong>Family Guardian:</strong> गार्डियन द्वारा जोड़े गए परिवार के सदस्यों के नाम, मोबाइल नंबर और रिश्ता, और नीचे Family Guardian सेक्शन में बताए गए स्कैम-कॉल अलर्ट।</li>
+      <li><strong>डिवाइस और उपयोग डेटा:</strong> ऐप वर्शन, डिवाइस का प्रकार, पुश नोटिफ़िकेशन टोकन और डायग्नोस्टिक लॉग, जो सेवा को भरोसेमंद और सुरक्षित बनाए रखने में मदद करते हैं।</li>
       <li><strong>स्थान (लोकेशन):</strong> आपकी अनुमति से, आपके क्षेत्र से जुड़े साइबर सेल संपर्क और स्कैम अलर्ट दिखाने के लिए आपके डिवाइस का अनुमानित स्थान उपयोग किया जाता है। स्थान केवल तभी एक्सेस किया जाता है जब ऐप खुला हो (फ़ोरग्राउंड), पृष्ठभूमि में कभी नहीं, और आप इसे कभी भी अस्वीकार कर सकते हैं या अपनी डिवाइस सेटिंग्स में बंद कर सकते हैं।</li>
     </ul>
     <h2>हम आपकी जानकारी का उपयोग कैसे करते हैं</h2>
@@ -212,8 +235,17 @@ export const legalContent: Record<"en" | "hi", Record<string, string>> = {
       <li>हम आपका निजी डेटा किसी को नहीं बेचते।</li>
       <li>हम पृष्ठभूमि में आपके निजी मैसेज नहीं पढ़ते। सामग्री केवल तभी जाँची जाती है जब आप उसे स्कैन के लिए सबमिट करते हैं।</li>
     </ul>
+    <h2>Family Guardian</h2>
+    <p>Family Guardian से Family प्लान वाले Netraksh उपयोगकर्ता ("गार्डियन") को तब अलर्ट मिलता है जब स्कैम के रूप में रिपोर्ट किया गया कोई नंबर परिवार के ऐसे सदस्य को कॉल करता है जिसने इसकी सहमति दी है।</p>
+    <ul>
+      <li><strong>परिवार का सदस्य जोड़ना:</strong> गार्डियन उस व्यक्ति का नाम, मोबाइल नंबर और रिश्ता दर्ज करता है। निमंत्रण भेजने के लिए हम इसे सहेजते हैं। जब तक सदस्य स्वीकार नहीं करता, उसकी कॉल के बारे में कुछ भी साझा नहीं किया जाता।</li>
+      <li><strong>सहमति:</strong> परिवार के सदस्य को उसी मोबाइल नंबर से Netraksh में साइन इन करके ऐप में निमंत्रण स्वीकार करना होता है। वे इसे अस्वीकार कर सकते हैं, या फ़ैमिली टैब से कभी भी साझा करना बंद कर सकते हैं, और अलर्ट तुरंत रुक जाते हैं। अपना खाता हटाने पर भी अलर्ट रुक जाते हैं।</li>
+      <li><strong>क्या जाँचा जाता है:</strong> सदस्य के स्वीकार करने के बाद, उनका ऐप हर आने वाली कॉल का नंबर Netraksh को भेजता है, और हम उसे समुदाय की स्कैम रिपोर्ट से मिलाते हैं। अगर नंबर को स्कैम के रूप में रिपोर्ट नहीं किया गया है, तो उसे किसी के खाते में सहेजा नहीं जाता और किसी को कॉल के बारे में नहीं बताया जाता।</li>
+      <li><strong>गार्डियन क्या देखता है:</strong> केवल तब, जब कॉल करने वाले नंबर को स्कैम के रूप में रिपोर्ट किया गया हो, गार्डियन को कॉल करने वाले का नंबर, उसकी रिपोर्ट की संख्या, स्कैम का प्रकार और कॉल का समय भेजा जाता है। गार्डियन सदस्य की बाकी कॉल, कॉन्टैक्ट, मैसेज या लोकेशन कभी नहीं देखता।</li>
+      <li><strong>अलर्ट कितने समय तक रखे जाते हैं:</strong> 90 दिन, फिर अपने-आप हटा दिए जाते हैं। अगर गार्डियन सदस्य को हटा देता है, तो उनके अलर्ट तुरंत हटा दिए जाते हैं।</li>
+    </ul>
     <h2>डेटा साझा करना</h2>
-    <p>हम डेटा केवल उन भरोसेमंद सेवा प्रदाताओं के साथ साझा करते हैं जो Netraksh को चलाने में मदद करते हैं (जैसे क्लाउड होस्टिंग और SMS डिलीवरी), सख्त गोपनीयता शर्तों के तहत, और जहाँ कानूनन ज़रूरी हो।</p>
+    <p>हम डेटा केवल उन भरोसेमंद सेवा प्रदाताओं के साथ साझा करते हैं जो Netraksh को चलाने में मदद करते हैं (जैसे क्लाउड होस्टिंग, SMS डिलीवरी और पुश नोटिफ़िकेशन डिलीवरी), सख्त गोपनीयता शर्तों के तहत, और जहाँ कानूनन ज़रूरी हो। आपकी सहमति से, Family Guardian अलर्ट उन परिवार के सदस्यों के साथ साझा किए जाते हैं जिन्हें आपने स्वीकार किया है, जैसा ऊपर बताया गया है।</p>
     <h2>आपके अधिकार</h2>
     <p>DPDP Act के तहत आप अपने निजी डेटा तक पहुँच, उसमें सुधार या उसे हटाने का अनुरोध कर सकते हैं। इन अधिकारों का उपयोग करने के लिए हमसे <a href="mailto:privacy@netraksh.com">privacy@netraksh.com</a> पर संपर्क करें।</p>
     <h2>डेटा संग्रहण</h2>
@@ -299,6 +331,8 @@ export const legalContent: Record<"en" | "hi", Record<string, string>> = {
     <ul>
       <li><strong>खाता डेटा:</strong> जब तक आपका खाता सक्रिय है तब तक रखा जाता है। अनुरोध पर या खाता बंद होने के बाद उचित अवधि में हटा दिया जाता है।</li>
       <li><strong>स्कैन सामग्री:</strong> जाँच के लिए आप जो कॉल, मैसेज या लिंक सबमिट करते हैं, उन्हें परिणाम देने के लिए प्रोसेस किया जाता है और पहचान योग्य निजी सामग्री के रूप में उतना ही रखा जाता है जितना सेवा चलाने और पहचान को बेहतर बनाने के लिए ज़रूरी हो।</li>
+      <li><strong>आने वाली कॉल की जाँच:</strong> कॉल सुरक्षा द्वारा जाँचे गए नंबरों का उपयोग केवल चेतावनी देने के लिए होता है। उन्हें आपके खाते में सहेजा नहीं जाता, और वे केवल हमारे थोड़े समय तक रखे जाने वाले डायग्नोस्टिक लॉग में आते हैं।</li>
+      <li><strong>Family Guardian अलर्ट:</strong> 90 दिन तक रखे जाते हैं, फिर अपने-आप हटा दिए जाते हैं। परिवार के किसी सदस्य को हटाने पर उनके अलर्ट तुरंत हटा दिए जाते हैं।</li>
       <li><strong>डायग्नोस्टिक लॉग:</strong> सुरक्षा और भरोसेमंदी बनाए रखने के लिए सीमित अवधि तक रखे जाते हैं, फिर हटा दिए जाते हैं या गुमनाम कर दिए जाते हैं।</li>
     </ul>
     <h2>हटाने के अनुरोध</h2>
