@@ -148,11 +148,11 @@ export default function Account() {
         title={t("account.seo.title")}
         description={t("account.seo.description")}
       />
-      <section className="py-16 px-4 bg-gray-50 min-h-[80vh]">
+      <section className="py-12 md:py-16 px-4 bg-gray-50 min-h-[80vh]">
         <div className="container mx-auto max-w-3xl">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-3xl text-gray-900">
                 {t("account.heading")}
               </h1>
               <p className="text-gray-600 mt-1">
@@ -179,7 +179,7 @@ export default function Account() {
                   <p className="text-sm text-gray-500">
                     {t("account.currentPlan")}
                   </p>
-                  <p className="text-xl font-bold text-gray-900">{planLabel}</p>
+                  <p className="font-heading text-xl font-semibold text-gray-900">{planLabel}</p>
                 </div>
               </div>
               <span
@@ -291,7 +291,7 @@ export default function Account() {
 
           {/* Payment history */}
           <div className="bg-white rounded-3xl border border-gray-200 shadow-sm p-8">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">
+            <h2 className="text-lg text-gray-900 mb-4">
               {t("account.paymentHistory")}
             </h2>
             {payments.length === 0 ? (

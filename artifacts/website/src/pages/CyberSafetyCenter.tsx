@@ -116,7 +116,7 @@ export default function CyberSafetyCenter() {
                       {t(`categories.${article.category}`)}
                     </span>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-primary transition-colors">
+                  <h3 className="text-xl text-gray-900 mb-3 group-hover:text-primary transition-colors">
                     {article.title}
                   </h3>
                   <p className="text-gray-600 mb-5 flex-1 line-clamp-3">{article.excerpt}</p>
@@ -129,13 +129,13 @@ export default function CyberSafetyCenter() {
             })}
           </div>
 
-          <div className="mt-16 p-8 md:p-10 rounded-3xl bg-gray-900 text-white flex flex-col md:flex-row items-center gap-6 justify-between">
+          <div className="mt-10 md:mt-12 p-8 md:p-10 rounded-3xl bg-gray-900 text-white flex flex-col md:flex-row items-center gap-6 justify-between">
             <div className="flex items-center gap-4">
               <div className="p-4 bg-accent/20 text-accent rounded-2xl">
                 <Phone className="h-7 w-7" />
               </div>
               <div>
-                <h3 className="text-2xl font-bold">{t("helpCta.title")}</h3>
+                <h3 className="text-2xl">{t("helpCta.title")}</h3>
                 <p className="text-gray-300">
                   {t("helpCta.desc")}
                 </p>

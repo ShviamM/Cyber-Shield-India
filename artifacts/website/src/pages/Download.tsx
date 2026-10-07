@@ -102,7 +102,7 @@ export default function Download() {
         title={t("download.seoTitle")} 
         description={t("download.seoDescription")}
       />
-      <div className="container mx-auto px-4 py-20 max-w-5xl">
+      <div className="container mx-auto px-4 py-12 md:py-16 max-w-5xl">
         <div className="bg-[#0A0F24] rounded-[3rem] overflow-hidden relative text-white shadow-2xl">
           <div className="grid lg:grid-cols-2 gap-12 p-12 md:p-20 relative z-10">
             <div className="flex flex-col justify-center">
@@ -110,7 +110,7 @@ export default function Download() {
                 <Shield className="w-4 h-4" />
                 {t("download.badge")}
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">{t("download.heading")}</h1>
+              <h1 className="text-4xl md:text-5xl mb-6 leading-tight">{t("download.heading")}</h1>
               <p className="text-xl text-gray-400 mb-8">
                 {t("download.description")}
               </p>

@@ -10,7 +10,7 @@ export function Footer() {
   return (
     <footer className="bg-[#0A0F24] text-[#B4BBD0] pt-20 pb-24 lg:pb-10 border-t border-white/10">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10 mb-10 md:mb-12">
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2.5 mb-5 group inline-flex">
               <img
@@ -43,7 +43,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="text-white font-semibold mb-4">{t("footer.colProduct")}</h4>
+            <h4 className="text-white mb-4">{t("footer.colProduct")}</h4>
             <ul>
               <li><Link href="/features" className="inline-flex min-h-[44px] items-center text-[#B4BBD0] hover:text-white transition-colors">{t("footer.links.features")}</Link></li>
               <li><Link href="/check" className="inline-flex min-h-[44px] items-center text-[#B4BBD0] hover:text-white transition-colors">{t("footer.links.checkScam")}</Link></li>
@@ -53,7 +53,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="text-white font-semibold mb-4">{t("footer.colResources")}</h4>
+            <h4 className="text-white mb-4">{t("footer.colResources")}</h4>
             <ul>
               <li><Link href="/cyber-safety-center" className="inline-flex min-h-[44px] items-center text-[#B4BBD0] hover:text-white transition-colors">{t("footer.links.cyberSafetyCenter")}</Link></li>
               <li><Link href="/cyber-laws" className="inline-flex min-h-[44px] items-center text-[#B4BBD0] hover:text-white transition-colors">{t("footer.links.cyberLaws")}</Link></li>
@@ -63,7 +63,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="text-white font-semibold mb-4">{t("footer.colCompany")}</h4>
+            <h4 className="text-white mb-4">{t("footer.colCompany")}</h4>
             <ul>
               <li><Link href="/about" className="inline-flex min-h-[44px] items-center text-[#B4BBD0] hover:text-white transition-colors">{t("footer.links.aboutUs")}</Link></li>
               <li><Link href="/founder" className="inline-flex min-h-[44px] items-center text-[#B4BBD0] hover:text-white transition-colors">{t("footer.links.founder")}</Link></li>
@@ -72,7 +72,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="text-white font-semibold mb-4">{t("footer.colLegal")}</h4>
+            <h4 className="text-white mb-4">{t("footer.colLegal")}</h4>
             <ul>
               <li><Link href="/privacy-policy" className="inline-flex min-h-[44px] items-center text-[#B4BBD0] hover:text-white transition-colors">{t("footer.links.privacyPolicy")}</Link></li>
               <li><Link href="/terms-of-service" className="inline-flex min-h-[44px] items-center text-[#B4BBD0] hover:text-white transition-colors">{t("footer.links.termsOfService")}</Link></li>

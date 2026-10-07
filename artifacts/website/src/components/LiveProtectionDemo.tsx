@@ -177,7 +177,7 @@ export function LiveProtectionDemo() {
                 <p className={`text-center text-[10px] font-bold tracking-widest uppercase mb-2 ${scenario.accent}`}>
                   Netraksh Scanning
                 </p>
-                <h4 className="text-center text-base font-bold leading-snug">{scenario.phoneTitle}</h4>
+                <h4 className="text-center text-base leading-snug">{scenario.phoneTitle}</h4>
                 <p className="text-center text-xs text-gray-400 mt-1">{scenario.phoneSubtitle}</p>
 
                 <div className="mt-auto">

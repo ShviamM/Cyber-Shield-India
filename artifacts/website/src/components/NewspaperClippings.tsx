@@ -58,7 +58,7 @@ function ClippingCard({ item, index }: { item: Clipping; index: number }) {
       </div>
 
       {/* Headline */}
-      <h3 className="mt-3 text-[19px] font-bold leading-[1.15] text-black/90">
+      <h3 className="mt-3 text-[19px] leading-[1.15] text-black/90">
         {item.headline}
       </h3>
       <p className="mt-2 columns-1 gap-3 text-[11px] leading-snug text-black/70 sm:columns-2 sm:[column-rule:1px_solid_rgba(0,0,0,0.12)]">

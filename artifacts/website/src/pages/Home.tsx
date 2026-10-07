@@ -50,7 +50,7 @@ function SectionHeading({ k, center = false, dark = false }: { k: string; center
   const { tx, otherLang } = useEcho();
   return (
     <h2
-      className={`text-[32px] sm:text-[42px] lg:text-[50px] font-bold leading-[1.15] tracking-tight text-balance ${
+      className={`text-[32px] sm:text-[42px] lg:text-[50px]  leading-[1.15] tracking-tight text-balance ${
         dark ? "text-white" : "text-[#121731]"
       } ${center ? "text-center mx-auto" : ""} max-w-3xl`}
     >
@@ -86,7 +86,7 @@ function HeroMockup() {
         </div>
         <div className="grid gap-4 p-4 lg:grid-cols-[1.3fr_1fr]">
           <div className="rounded-xl border border-white/10 bg-[#10162F] p-[18px]">
-            <h3 className="mb-3 text-[15px] font-semibold">{t("mockup.checkTitle")}</h3>
+            <h3 className="mb-3 text-[15px]">{t("mockup.checkTitle")}</h3>
             <div className="mb-3.5 flex gap-2">
               <div className="flex min-h-[46px] flex-1 items-center rounded-[10px] border border-white/20 px-3.5 text-base">+91 98765 43210</div>
               <div className="flex min-h-[46px] items-center rounded-[10px] bg-[#F7931E] px-[18px] font-bold text-[#1A1205]">{t("mockup.check")}</div>
@@ -101,7 +101,7 @@ function HeroMockup() {
             </div>
           </div>
           <div className="rounded-xl border border-white/10 bg-[#10162F] p-[18px]">
-            <h3 className="mb-3 text-[15px] font-semibold">{t("mockup.feedTitle")}</h3>
+            <h3 className="mb-3 text-[15px]">{t("mockup.feedTitle")}</h3>
             <ul className="grid gap-2.5">
               {feed.map((f) => (
                 <li key={f.title} className="flex items-center gap-3 rounded-[10px] border border-white/10 px-3 py-2.5">
@@ -160,7 +160,7 @@ export default function Home() {
               {t("hero.badge")}
             </motion.div>
 
-            <motion.h1 variants={appear} className="bg-gradient-to-r from-white to-[#C9CEE0] bg-clip-text text-[44px] font-bold leading-[1.15] tracking-tight text-transparent sm:text-6xl lg:text-[84px]">
+            <motion.h1 variants={appear} className="bg-gradient-to-r from-white to-[#C9CEE0] bg-clip-text text-[44px] leading-[1.15] tracking-tight text-transparent sm:text-6xl lg:text-[84px]">
               {t("hero.title")}
             </motion.h1>
             <motion.p variants={appear} lang={otherLang} className="mt-2 text-2xl font-semibold text-[#F6F7FB] sm:text-[32px]">
@@ -184,7 +184,7 @@ export default function Home() {
             <motion.dl
               variants={appear}
               aria-label={t("proof.label")}
-              className="mx-auto mt-14 grid max-w-[1080px] grid-cols-2 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] text-left lg:grid-cols-4"
+              className="mx-auto mt-10 md:mt-12 grid max-w-[1080px] grid-cols-2 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] text-left lg:grid-cols-4"
             >
               {proof.map((p, i) => (
                 <div
@@ -206,7 +206,7 @@ export default function Home() {
         </section>
 
         {/* Trusted on the ground: real photos and audience quotes */}
-        <section className="bg-[#F5F6FA] py-20 lg:py-26">
+        <section className="py-12 md:py-16 bg-[#F5F6FA]">
           <div className="container mx-auto px-4 md:px-6">
             <div className="text-center">
               <Kicker>{t("trusted.kicker")}</Kicker>
@@ -240,7 +240,7 @@ export default function Home() {
         </section>
 
         {/* Walkthrough of a digital-arrest call */}
-        <section className="bg-white py-20 lg:py-26">
+        <section className="py-12 md:py-16 bg-white">
           <div className="container mx-auto grid items-start gap-14 px-4 md:px-6 lg:grid-cols-[1fr_1.1fr]">
             <div>
               <Kicker>{t("walkthrough.kicker")}</Kicker>
@@ -265,7 +265,7 @@ export default function Home() {
                     {i + 1}
                   </span>
                   <div>
-                    <b className="block text-lg text-[#121731]">{s.title}</b>
+                    <b className="block font-heading text-lg font-semibold text-[#121731]">{s.title}</b>
                     <p className="text-[17px] text-[#4A5170]">{s.desc}</p>
                   </div>
                 </li>
@@ -275,15 +275,15 @@ export default function Home() {
         </section>
 
         {/* Features */}
-        <section className="bg-[#F5F6FA] py-20 lg:py-26">
+        <section className="py-12 md:py-16 bg-[#F5F6FA]">
           <div className="container mx-auto px-4 md:px-6">
             <SectionHeading k="features.heading" center />
-            <div className="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-10 md:mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
               {features.map((f, i) => {
                 const Icon = featureIcons[i];
                 return (
                   <div key={f.title}>
-                    <h3 className="mb-2 flex items-center gap-2.5 text-[19px] font-semibold text-[#121731]">
+                    <h3 className="mb-2 flex items-center gap-2.5 text-[19px] text-[#121731]">
                       <Icon className="h-[22px] w-[22px] text-[#8F4A00]" />
                       {f.title}
                     </h3>
@@ -296,7 +296,7 @@ export default function Home() {
         </section>
 
         {/* Family Guardian */}
-        <section className="bg-white py-20 lg:py-26">
+        <section className="py-12 md:py-16 bg-white">
           <div className="container mx-auto grid items-center gap-14 px-4 md:px-6 lg:grid-cols-[1.05fr_0.95fr]">
             <div>
               <Kicker>{t("family.kicker")}</Kicker>
@@ -326,7 +326,7 @@ export default function Home() {
         </section>
 
         {/* Why trust us */}
-        <section className="bg-[#F5F6FA] py-20 lg:py-26">
+        <section className="py-12 md:py-16 bg-[#F5F6FA]">
           <div className="container mx-auto grid items-center gap-14 px-4 md:px-6 lg:grid-cols-[0.9fr_1.1fr]">
             <div className="grid grid-cols-[1fr_0.62fr] items-end gap-4">
               <div className="overflow-hidden rounded-[18px] bg-gradient-to-b from-[#1A2246] to-[#0A0F24]">
@@ -346,7 +346,7 @@ export default function Home() {
                     <li key={p.title} className="grid grid-cols-[28px_1fr] gap-3">
                       <Icon className="mt-1 h-[22px] w-[22px] text-[#138A4B]" />
                       <div>
-                        <b className="block text-lg text-[#121731]">{p.title}</b>
+                        <b className="block font-heading text-lg font-semibold text-[#121731]">{p.title}</b>
                         <span className="text-[17px] text-[#4A5170]">{p.desc}</span>
                       </div>
                     </li>
@@ -366,7 +366,7 @@ export default function Home() {
         </section>
 
         {/* FAQ */}
-        <section className="bg-white py-20 lg:py-26">
+        <section className="py-12 md:py-16 bg-white">
           <div className="container mx-auto px-4 md:px-6">
             <SectionHeading k="faq.heading" center />
             <div className="mx-auto mt-12 max-w-[820px]">
@@ -393,7 +393,7 @@ export default function Home() {
         </section>
 
         {/* Closing CTA */}
-        <section className="relative overflow-hidden bg-[#0A0F24] py-28 text-center lg:py-32">
+        <section className="py-14 md:py-20 relative overflow-hidden bg-[#0A0F24] text-center">
           <div className="container relative z-10 mx-auto px-4 md:px-6">
             <SectionHeading k="finalCta.heading" center dark />
             <div className="mt-9 flex flex-col justify-center gap-3.5 sm:flex-row">

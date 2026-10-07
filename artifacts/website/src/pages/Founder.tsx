@@ -31,13 +31,11 @@ import {
   ArrowRight,
   ArrowDown,
   Smartphone,
-  CreditCard,
   AlertTriangle,
   Mic,
   Newspaper,
   Map,
   Flag,
-  Briefcase,
   Building2,
   FileSearch,
   Landmark,
@@ -60,6 +58,10 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  TrendingUp,
+  Radar,
+  MonitorCheck,
+  Rocket,
 } from "lucide-react";
 
 const BOOK_AMAZON_URL =
@@ -82,9 +84,9 @@ const statValues = [
 
 const insideTheBookIcons = [FileSearch, Landmark, Smartphone, UserX, ScanFace, Users];
 
-const storyFlowIcons = [Smartphone, CreditCard, AlertTriangle, ShieldCheck];
+const storyFlowIcons = [Smartphone, TrendingUp, AlertTriangle, ShieldCheck];
 
-const timelineIcons = [ShieldCheck, Brain, Briefcase, Flag, Sparkles];
+const timelineIcons = [ShieldCheck, Radar, MonitorCheck, Flag, Rocket];
 
 const achievementMeta = [
   { no: "01", icon: Award },
@@ -93,6 +95,9 @@ const achievementMeta = [
 ];
 
 // Order must match leaders.items in the founder locale files (newest first).
+// Badge icon per leader card, same order as leaders.items: the award, the BBC
+// segment and the meetings each get an icon that matches their label.
+const leaderIcons = [Award, Handshake, Mic, Handshake, Handshake, Handshake, Handshake, Handshake];
 const leaderImages = [leaderKanpurIcon, leaderTanwar, leaderBbc, leaderRamteke, leaderMahana, leaderKapoor, leaderVishwakarma, leaderJitendra];
 const leaderImagePositions = ["object-[center_25%]", "object-[center_30%]", "object-[center_45%]", "object-[center_22%]", "object-top", "object-top", "object-[center_33%]", "object-top"];
 
@@ -261,7 +266,7 @@ export default function Founder() {
                 <span className="h-px w-8 bg-accent" />
                 {t("hero.eyebrow")}
               </span>
-              <h1 className="mt-6 text-5xl md:text-7xl font-bold tracking-tight leading-[1.05]">
+              <h1 className="mt-6 text-5xl md:text-7xl tracking-tight leading-[1.05]">
                 {t("hero.firstName")} <span className="text-accent">{t("hero.lastName")}</span>
               </h1>
               <p className="mt-5 text-lg md:text-xl text-[#B4BBD0] font-medium">
@@ -320,11 +325,11 @@ export default function Founder() {
       </section>
 
       {/* Personal Mission */}
-      <section className="bg-white py-24">
+      <section className="py-12 md:py-16 bg-white">
         <div className="container mx-auto px-4 md:px-6 max-w-5xl">
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-14">
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-10 md:mb-12">
             <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("mission.eyebrow")}</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("mission.title")}</h2>
+            <h2 className="mt-4 text-4xl md:text-5xl text-gray-900">{t("mission.title")}</h2>
           </motion.div>
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6, delay: 0.1 }} className="grid md:grid-cols-2 gap-10 text-lg text-gray-600 leading-relaxed">
             <div className="space-y-5">
@@ -344,11 +349,11 @@ export default function Founder() {
       </section>
 
       {/* Book Showcase - Digital Dhokha */}
-      <section className="bg-gray-50 py-24">
+      <section className="py-12 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-12">
             <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("book.eyebrow")}</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("book.title")}</h2>
+            <h2 className="mt-4 text-4xl md:text-5xl text-gray-900">{t("book.title")}</h2>
             <p className="mt-3 text-lg text-gray-600 max-w-2xl mx-auto">{t("book.subtitle")}</p>
           </motion.div>
 
@@ -383,7 +388,7 @@ export default function Founder() {
                           <Icon className="h-4 w-4" />
                         </div>
                         <div>
-                          <div className="text-sm font-semibold">{item.title}</div>
+                          <div className="font-heading text-sm font-semibold">{item.title}</div>
                           <div className="text-xs text-[#B4BBD0] leading-snug">{item.desc}</div>
                         </div>
                       </div>
@@ -415,7 +420,7 @@ export default function Founder() {
       </section>
 
       {/* Founder Quote */}
-      <section className="bg-[#0A0F24] py-24 text-white relative overflow-hidden">
+      <section className="py-12 md:py-16 bg-[#0A0F24] text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.3] bg-[radial-gradient(circle_at_50%_0%,rgba(255,103,19,0.25),transparent_45%)]" />
         <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.7 }} className="container relative mx-auto px-4 md:px-6 max-w-4xl text-center">
           <Quote className="h-12 w-12 text-accent mx-auto mb-8" />
@@ -433,11 +438,11 @@ export default function Founder() {
       </section>
 
       {/* In Conversation with Leaders */}
-      <section className="bg-gray-50 py-24">
+      <section className="py-12 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-14">
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-10 md:mb-12">
             <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("leaders.eyebrow")}</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("leaders.title")}</h2>
+            <h2 className="mt-4 text-4xl md:text-5xl text-gray-900">{t("leaders.title")}</h2>
             <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">{t("leaders.subtitle")}</p>
           </motion.div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -462,10 +467,13 @@ export default function Founder() {
                 </div>
                 <div className="flex flex-1 flex-col p-6">
                   <div className="inline-flex items-center gap-2 self-start rounded-full bg-accent/10 px-3 py-1 text-xs font-semibold tracking-[0.12em] uppercase text-accent">
-                    <Handshake className="h-3.5 w-3.5" />
+                    {(() => {
+                      const LeaderIcon = leaderIcons[i] ?? Handshake;
+                      return <LeaderIcon className="h-3.5 w-3.5" />;
+                    })()}
                     {leader.role}
                   </div>
-                  <h3 className="mt-3 text-xl font-bold text-gray-900">{leader.name}</h3>
+                  <h3 className="mt-3 text-xl text-gray-900">{leader.name}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-gray-600">{leader.blurb}</p>
                 </div>
               </motion.div>
@@ -475,11 +483,11 @@ export default function Founder() {
       </section>
 
       {/* Impact counters */}
-      <section className="bg-white py-20">
+      <section className="py-12 md:py-16 bg-white">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-12">
             <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("impact.eyebrow")}</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("impact.title")}</h2>
+            <h2 className="mt-4 text-4xl md:text-5xl text-gray-900">{t("impact.title")}</h2>
           </motion.div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
             {statValues.map((s, i) => (
@@ -495,11 +503,11 @@ export default function Founder() {
       </section>
 
       {/* Why Netraksh Exists */}
-      <section className="bg-gray-50 py-24">
+      <section className="py-12 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-16">
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-10 md:mb-12">
             <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("story.eyebrow")}</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("story.title")}</h2>
+            <h2 className="mt-4 text-4xl md:text-5xl text-gray-900">{t("story.title")}</h2>
           </motion.div>
           <div className="grid md:grid-cols-4 gap-6 relative">
             {storyItems.map((step, i) => {
@@ -510,7 +518,7 @@ export default function Founder() {
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl mb-5 bg-accent/10 text-accent">
                     <Icon className="h-6 w-6" />
                   </div>
-                  <h3 className={`text-lg font-bold mb-2 ${i === storyItems.length - 1 ? "text-white" : "text-gray-900"}`}>{step.title}</h3>
+                  <h3 className={`text-lg mb-2 ${i === storyItems.length - 1 ? "text-white" : "text-gray-900"}`}>{step.title}</h3>
                   <p className={`text-sm leading-relaxed ${i === storyItems.length - 1 ? "text-[#B4BBD0]" : "text-gray-600"}`}>{step.desc}</p>
                 </div>
                 {i < storyItems.length - 1 && (
@@ -531,11 +539,11 @@ export default function Founder() {
       </section>
 
       {/* Journey timeline */}
-      <section className="bg-white py-24">
+      <section className="py-12 md:py-16 bg-white">
         <div className="container mx-auto px-4 md:px-6 max-w-4xl">
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-16">
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-10 md:mb-12">
             <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("journey.eyebrow")}</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("journey.title")}</h2>
+            <h2 className="mt-4 text-4xl md:text-5xl text-gray-900">{t("journey.title")}</h2>
           </motion.div>
           <div className="relative pl-8 md:pl-0">
             <div className="absolute left-2 md:left-1/2 top-2 bottom-2 w-px bg-gradient-to-b from-accent/60 via-gray-200 to-transparent md:-translate-x-1/2" />
@@ -550,7 +558,7 @@ export default function Founder() {
                         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/10 text-accent shrink-0">
                           <Icon className="h-5 w-5" />
                         </div>
-                        <h3 className="text-lg font-bold text-gray-900">{item.title}</h3>
+                        <h3 className="text-lg text-gray-900">{item.title}</h3>
                       </div>
                       <p className="text-sm text-gray-600 leading-relaxed">{item.desc}</p>
                     </div>
@@ -566,12 +574,12 @@ export default function Founder() {
       </section>
 
       {/* Recognition & Impact */}
-      <section className="bg-[#0A0F24] py-24 text-white relative overflow-hidden">
+      <section className="py-12 md:py-16 bg-[#0A0F24] text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.25] bg-[radial-gradient(circle_at_85%_15%,rgba(255,103,19,0.3),transparent_45%)]" />
         <div className="container relative mx-auto px-4 md:px-6 max-w-6xl">
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-14">
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-10 md:mb-12">
             <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("recognition.eyebrow")}</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold">{t("recognition.title")}</h2>
+            <h2 className="mt-4 text-4xl md:text-5xl">{t("recognition.title")}</h2>
           </motion.div>
           <div className="grid sm:grid-cols-3 gap-5">
             {recognitionItems.map((a, i) => {
@@ -581,7 +589,7 @@ export default function Founder() {
                 <div className="text-3xl font-bold text-accent/80 mb-3">{achievementMeta[i].no}</div>
                 <Icon className="h-6 w-6 text-accent mb-3" />
                 <div className="text-xs font-semibold tracking-[0.15em] uppercase text-[#B4BBD0] mb-1">{a.tag}</div>
-                <h3 className="text-lg font-bold mb-2">{a.title}</h3>
+                <h3 className="text-lg mb-2">{a.title}</h3>
                 <p className="text-sm text-[#B4BBD0] leading-relaxed">{a.desc}</p>
               </motion.div>
               );
@@ -591,11 +599,11 @@ export default function Founder() {
       </section>
 
       {/* Photo Gallery */}
-      <section className="bg-gray-50 py-24">
+      <section className="py-12 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-10">
             <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("gallery.eyebrow")}</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("gallery.title")}</h2>
+            <h2 className="mt-4 text-4xl md:text-5xl text-gray-900">{t("gallery.title")}</h2>
           </motion.div>
           <div className="flex flex-wrap justify-center gap-2 mb-10">
             {galleryCategories.map((cat) => (
@@ -644,11 +652,11 @@ export default function Founder() {
       </section>
 
       {/* Services */}
-      <section className="bg-white py-24">
+      <section className="py-12 md:py-16 bg-white">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-16">
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-10 md:mb-12">
             <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("services.eyebrow")}</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("services.title")}</h2>
+            <h2 className="mt-4 text-4xl md:text-5xl text-gray-900">{t("services.title")}</h2>
           </motion.div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {serviceItems.map((s, i) => {
@@ -658,7 +666,7 @@ export default function Founder() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10 text-accent mb-5 group-hover:bg-accent group-hover:text-white transition-colors">
                   <Icon className="h-6 w-6" />
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">{s.title}</h3>
+                <h3 className="text-gray-900 mb-2">{s.title}</h3>
                 <p className="text-sm text-gray-600 leading-relaxed mb-5 flex-1">{s.desc}</p>
                 <button onClick={() => scrollToId("book-event")} className="inline-flex items-center gap-1.5 text-sm font-semibold text-accent hover:gap-2.5 transition-all">
                   {t("services.enquire")} <ArrowRight className="h-4 w-4" />
@@ -671,11 +679,11 @@ export default function Founder() {
       </section>
 
       {/* Why organizations invite */}
-      <section className="bg-gray-50 py-24">
+      <section className="py-12 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-16">
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-10 md:mb-12">
             <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("whyInvite.eyebrow")}</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("whyInvite.title")}</h2>
+            <h2 className="mt-4 text-4xl md:text-5xl text-gray-900">{t("whyInvite.title")}</h2>
           </motion.div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {whyInviteItems.map((c, i) => {
@@ -685,7 +693,7 @@ export default function Founder() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10 text-accent mb-5">
                   <Icon className="h-6 w-6" />
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">{c.title}</h3>
+                <h3 className="text-gray-900 mb-2">{c.title}</h3>
                 <p className="text-sm text-gray-600 leading-relaxed">{c.desc}</p>
               </motion.div>
               );
@@ -695,11 +703,11 @@ export default function Founder() {
       </section>
 
       {/* Workshops & Awareness Programs */}
-      <section className="bg-white py-24">
+      <section className="py-12 md:py-16 bg-white">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-16">
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-10 md:mb-12">
             <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("workshops.eyebrow")}</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("workshops.title")}</h2>
+            <h2 className="mt-4 text-4xl md:text-5xl text-gray-900">{t("workshops.title")}</h2>
           </motion.div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {workshopItems.map((p, i) => {
@@ -711,7 +719,7 @@ export default function Founder() {
                   <span className="absolute bottom-2 right-2 text-[10px] uppercase tracking-wider text-white/40">{t("workshops.photo")}</span>
                 </div>
                 <div className="p-5">
-                  <h3 className="font-bold text-gray-900 text-sm mb-1">{p.title}</h3>
+                  <h3 className="text-gray-900 text-sm mb-1">{p.title}</h3>
                   <p className="text-xs text-gray-600 leading-relaxed">{p.desc}</p>
                 </div>
               </motion.div>
@@ -722,18 +730,18 @@ export default function Founder() {
       </section>
 
       {/* Media & Press */}
-      <section className="bg-white py-24">
+      <section className="pb-12 md:pb-16 bg-white">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-16">
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-10 md:mb-12">
             <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("media.eyebrow")}</span>
-            <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("media.title")}</h2>
+            <h2 className="mt-4 text-4xl md:text-5xl text-gray-900">{t("media.title")}</h2>
           </motion.div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {mediaList.map((m, i) => (
               <motion.div key={m.title} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp} transition={{ duration: 0.5, delay: i * 0.08 }} className="rounded-3xl border border-gray-100 bg-gray-50 p-6 flex flex-col">
                 <Newspaper className="h-6 w-6 text-accent mb-4" />
                 <span className="text-[11px] font-semibold tracking-wider uppercase text-accent mb-2">{m.category}</span>
-                <h3 className="font-bold text-gray-900 mb-2 leading-snug">{m.title}</h3>
+                <h3 className="text-gray-900 mb-2 leading-snug">{m.title}</h3>
                 <p className="text-sm text-gray-600 leading-relaxed">{m.blurb}</p>
               </motion.div>
             ))}
@@ -742,10 +750,10 @@ export default function Founder() {
       </section>
 
       {/* Trust Section */}
-      <section className="bg-gray-50 py-24">
+      <section className="py-12 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
-          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-16 max-w-3xl mx-auto">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900">
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="text-center mb-10 md:mb-12 max-w-3xl mx-auto">
+            <h2 className="text-4xl md:text-5xl text-gray-900">
               {t("trust.titleLine1")}<br className="hidden md:block" /> <span className="text-accent">{t("trust.titleLine2")}</span>
             </h2>
           </motion.div>
@@ -757,7 +765,7 @@ export default function Founder() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10 text-accent mb-5 group-hover:bg-accent group-hover:text-white transition-colors">
                   <Icon className="h-6 w-6" />
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">{card.title}</h3>
+                <h3 className="text-gray-900 mb-2">{card.title}</h3>
                 <p className="text-sm text-gray-600 leading-relaxed">{card.desc}</p>
               </motion.div>
               );
@@ -767,12 +775,12 @@ export default function Founder() {
       </section>
 
       {/* Testimonials */}
-      <section className="bg-white py-24">
+      <section className="py-12 md:py-16 bg-white">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl">
           <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="flex items-end justify-between mb-12 gap-6">
             <div>
               <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">{t("testimonials.eyebrow")}</span>
-              <h2 className="mt-4 text-4xl md:text-5xl font-bold text-gray-900">{t("testimonials.title")}</h2>
+              <h2 className="mt-4 text-4xl md:text-5xl text-gray-900">{t("testimonials.title")}</h2>
             </div>
             <div className="hidden md:flex gap-2 shrink-0">
               <button onClick={() => scrollTestimonials(-1)} className="h-11 w-11 rounded-full border border-gray-200 flex items-center justify-center hover:border-accent hover:text-accent transition-colors" aria-label={t("testimonials.prev")}>
@@ -800,14 +808,14 @@ export default function Founder() {
       </section>
 
       {/* Vision & Roadmap */}
-      <section className="bg-gray-50 py-24">
+      <section className="py-12 md:py-16 bg-gray-50">
         <div className="container mx-auto px-4 md:px-6 max-w-6xl space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
             <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-60px" }} variants={fadeUp} transition={{ duration: 0.6 }} className="rounded-3xl border border-gray-100 bg-white p-9 shadow-sm">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10 text-accent mb-5">
                 <Globe2 className="h-6 w-6" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">Vision for India</h3>
+              <h3 className="text-2xl text-gray-900 mb-3">Vision for India</h3>
               <p className="text-gray-600 leading-relaxed">
                 A world where cyber awareness is not a privilege but a fundamental right, taught in every school, every institution, across every nation. A digitally literate society where every citizen, from the schoolroom to the boardroom, is equipped to defend themselves in cyberspace.
               </p>
@@ -816,7 +824,7 @@ export default function Founder() {
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10 text-accent mb-5">
                 <Users className="h-6 w-6" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3">Cyber Safety Movement</h3>
+              <h3 className="text-2xl text-gray-900 mb-3">Cyber Safety Movement</h3>
               <p className="text-gray-600 leading-relaxed">
                 Beyond an app, Netraksh is a national movement, securing nations, educating communities, and advising governments. Through workshops and awareness drives, the mission is to put practical cyber safety into the hands of every Indian family.
               </p>
@@ -826,7 +834,7 @@ export default function Founder() {
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/10 text-accent mb-5">
               <Map className="h-6 w-6" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-5">Future Roadmap</h3>
+            <h3 className="text-2xl text-gray-900 mb-5">Future Roadmap</h3>
             <div className="grid sm:grid-cols-2 gap-4 text-sm text-gray-600">
               <div className="flex items-start gap-3"><ArrowRight className="h-4 w-4 text-accent shrink-0 mt-0.5" />Smarter AI-powered scam detection across calls, messages &amp; QR codes.</div>
               <div className="flex items-start gap-3"><ArrowRight className="h-4 w-4 text-accent shrink-0 mt-0.5" />Deeper family protection for seniors, parents, and children.</div>
@@ -838,13 +846,13 @@ export default function Founder() {
       </section>
 
       {/* Book Shivam for an Event */}
-      <section id="book-event" className="bg-[#0A0F24] py-24 text-white relative overflow-hidden scroll-mt-24">
+      <section id="book-event" className="py-12 md:py-16 bg-[#0A0F24] text-white relative overflow-hidden scroll-mt-24">
         <div className="absolute inset-0 opacity-[0.3] bg-[radial-gradient(circle_at_15%_20%,rgba(255,103,19,0.25),transparent_45%)]" />
         <div className="container relative mx-auto px-4 md:px-6 max-w-6xl">
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.6 }}>
               <span className="text-sm font-semibold tracking-[0.2em] uppercase text-accent">Book Shivam for an Event</span>
-              <h2 className="mt-4 text-4xl md:text-5xl font-bold leading-tight">Invite Shivam to speak or train your audience</h2>
+              <h2 className="mt-4 text-4xl md:text-5xl leading-tight">Invite Shivam to speak or train your audience</h2>
               <p className="mt-5 text-[#B4BBD0] leading-relaxed">
                 From school programs to government training and podcast appearances. Share a few details and the team will get back to you.
               </p>
@@ -906,10 +914,10 @@ export default function Founder() {
       </section>
 
       {/* Final CTA */}
-      <section className="bg-white py-28 relative overflow-hidden">
+      <section className="py-14 md:py-20 bg-white relative overflow-hidden">
         <motion.div initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }} variants={fadeUp} transition={{ duration: 0.7 }} className="container relative mx-auto px-4 md:px-6 max-w-3xl text-center">
           <span className="text-sm font-semibold tracking-[0.25em] uppercase text-accent">One Mission. One Vision.</span>
-          <h2 className="mt-5 text-4xl md:text-5xl font-bold leading-tight text-gray-900">Making India the safest digital society in the world.</h2>
+          <h2 className="mt-5 text-4xl md:text-5xl leading-tight text-gray-900">Making India the safest digital society in the world.</h2>
           <p className="mt-6 text-lg text-gray-600 leading-relaxed">
             Ensuring that every citizen has access to simple, powerful protection against cyber fraud.
           </p>
