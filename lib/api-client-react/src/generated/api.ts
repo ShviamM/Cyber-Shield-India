@@ -85,6 +85,7 @@ import type {
   ScamOfDay,
   ScreeningBlocklist,
   SendBroadcastRequest,
+  SmsLinkCheckRequest,
   StartTrialRequest,
   SubscriptionOrder,
   SubscriptionPlanList,
@@ -4121,6 +4122,79 @@ export function useListNotifications<TData = Awaited<ReturnType<typeof listNotif
 
 
 
+
+export const getSmsLinkCheckUrl = () => {
+
+
+
+
+  return `/api/sms/link-check`
+}
+
+/**
+ * Called by the phone's SMS screener for a link in a suspicious message. Only the link is sent, never the message text. Runs the fast signals (phishing feed, URL heuristics, community reports), does not count against the free daily checks, and is rate limited per user.
+
+ * @summary Quick check of a link found in an incoming SMS (on-device SMS protection)
+ */
+export const smsLinkCheck = async (smsLinkCheckRequest: SmsLinkCheckRequest, options?: RequestInit): Promise<FraudVerdict> => {
+
+  return customFetch<FraudVerdict>(getSmsLinkCheckUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      smsLinkCheckRequest,)
+  }
+);}
+
+
+
+
+export const getSmsLinkCheckMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof smsLinkCheck>>, TError,{data: BodyType<SmsLinkCheckRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof smsLinkCheck>>, TError,{data: BodyType<SmsLinkCheckRequest>}, TContext> => {
+
+const mutationKey = ['smsLinkCheck'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof smsLinkCheck>>, {data: BodyType<SmsLinkCheckRequest>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  smsLinkCheck(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SmsLinkCheckMutationResult = NonNullable<Awaited<ReturnType<typeof smsLinkCheck>>>
+    export type SmsLinkCheckMutationBody = BodyType<SmsLinkCheckRequest>
+    export type SmsLinkCheckMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Quick check of a link found in an incoming SMS (on-device SMS protection)
+ */
+export const useSmsLinkCheck = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof smsLinkCheck>>, TError,{data: BodyType<SmsLinkCheckRequest>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof smsLinkCheck>>,
+        TError,
+        {data: BodyType<SmsLinkCheckRequest>},
+        TContext
+      > => {
+      return useMutation(getSmsLinkCheckMutationOptions(options));
+    }
 
 export const getListFamilyMembersUrl = () => {
 

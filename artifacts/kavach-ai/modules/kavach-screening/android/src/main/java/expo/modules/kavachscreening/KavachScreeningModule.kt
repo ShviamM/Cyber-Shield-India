@@ -24,8 +24,8 @@ import expo.modules.kotlin.modules.ModuleDefinition
  * Native bridge for on-device call screening (Android 10+). Calls are screened
  * by [KavachCallScreeningService] once the user grants the system
  * call-screening role; this module manages the toggle state, the synced
- * blocklist/keywords, and the role request. SMS is handled in-app via the
- * share sheet (no READ_SMS), so `smsScreening` is state-only here.
+ * blocklist/keywords, and the role request. Incoming SMS are checked by
+ * [SmsScreeningReceiver] when `smsScreening` is on and RECEIVE_SMS is granted.
  */
 class KavachScreeningModule : Module() {
   private val context: Context
@@ -235,7 +235,7 @@ class KavachScreeningModule : Module() {
       "callScreening" to ScreeningStore.isCallEnabled(ctx),
       "smsScreening" to ScreeningStore.isSmsEnabled(ctx),
       "hasCallRole" to hasCallRole(ctx),
-      "hasSmsPermission" to false,
+      "hasSmsPermission" to hasSmsPermission(ctx),
       "hasNotificationPermission" to hasNotificationPermission(ctx),
       "hasFullScreenIntentPermission" to hasFullScreenIntentPermission(ctx),
       "hasOverlayPermission" to KavachCallOverlay.canDraw(ctx),
@@ -393,6 +393,13 @@ class KavachScreeningModule : Module() {
     }
   }
 
+  private fun hasSmsPermission(ctx: Context): Boolean =
+    ContextCompat.checkSelfPermission(ctx, Manifest.permission.RECEIVE_SMS) == PackageManager.PERMISSION_GRANTED
+
+  private fun emitSmsScreened(sender: String, level: String) {
+    sendEvent("onSmsScreened", mapOf("sender" to sender, "keyword" to level))
+  }
+
   private fun emitCallScreened(number: String, blocked: Boolean) {
     sendEvent("onCallScreened", mapOf("number" to number, "blocked" to blocked))
   }
@@ -432,6 +439,10 @@ class KavachScreeningModule : Module() {
     /** Bridges a screened call from the background service to JS listeners. */
     fun notifyCallScreened(number: String, blocked: Boolean) {
       current?.emitCallScreened(number, blocked)
+    }
+
+    fun notifySmsScreened(sender: String, level: String) {
+      current?.emitSmsScreened(sender, level)
     }
   }
 }

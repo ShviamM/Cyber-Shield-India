@@ -30,7 +30,8 @@ The Android app in RevenueCat must use the new package name.
    - **Target audience**: 18+ (the app handles payments and phone numbers).
    - **Data safety**: see section 4.
    - **Full-screen intent** (`USE_FULL_SCREEN_INTENT`): declare it for the incoming-call caller card. Explain it shows a scam warning for an incoming call. Google may question it for non-dialer apps, and the app works without it (falls back to a heads-up notification).
-   - **Call screening**: the app uses the `ROLE_CALL_SCREENING` role and `ANSWER_PHONE_CALLS` (Answer button on the caller card). No call-log or SMS permissions are requested.
+   - **Call screening**: the app uses the `ROLE_CALL_SCREENING` role and `ANSWER_PHONE_CALLS` (Answer button on the caller card). No call-log permission is requested.
+   - **SMS (`RECEIVE_SMS`) — Permissions Declaration Form required.** SMS protection checks incoming texts for scams, like Truecaller. Declare it under Play's permitted uses **"Anti-SMS phishing"** / **"Caller ID, spam detection and/or spam blocking"**. Include a short screen recording: Profile → On-device screening → turn on SMS protection → the disclosure dialog → permission prompt → a scam SMS arriving → the "Scam SMS" warning notification → tapping it opens Verify. Until Google approves the declaration, Play rejects any build that contains `RECEIVE_SMS`; if approval is slow, ask to ship a build without it.
    - **Financial features**: none (no loans, no money transfer).
 4. Store listing: app name "Netraksh: Scam Call Protection" (≤30 chars), short description (≤80), full description, 512×512 icon, 1024×500 feature graphic, at least 4 phone screenshots. Hindi listing recommended.
 5. Promote Internal → Closed testing (Play requires 12 testers for 14 days for new personal developer accounts) → Production.
@@ -43,15 +44,18 @@ The Android app in RevenueCat must use the new package name.
 | Approximate location | Yes (city, optional) | Local scam hotspots | No |
 | Phone numbers / links / UPI IDs the user checks or reports | Yes | App functionality, fraud prevention | Aggregated, anonymised stats only |
 | Device push token | Yes | Notifications | No |
+| SMS messages | No (checked on the phone only, never transmitted) | SMS protection (optional) | No |
+| Links found in a suspicious SMS (only when SMS protection is on) | Yes, the link only | Fraud prevention: checked against phishing feeds and community reports, not stored with the account | No |
 | Purchase history | Yes (via Google Play / RevenueCat) | Subscriptions | With RevenueCat (processor) |
 | Incoming caller's number (only for users who accepted a Family Guardian invite) | Yes, sent for each incoming call | Family Guardian: alert the family members the user chose when a reported scam number calls | Only a reported scam number is shown, and only to the family members the user accepted. Other calls are not stored or shown. |
 
 - Data is encrypted in transit (HTTPS). Users can delete their account in the app (Profile → Delete account), which deletes their data.
 - Precise location is **not** collected (`ACCESS_FINE_LOCATION` is blocked in `app.json`).
-- SMS are **not** read automatically. A message is only checked when the user shares it to the app.
+- SMS are read **only** if the user turns on SMS protection and accepts the disclosure. The text is analysed on the phone; only a link from a suspicious message is sent to the server. Without it, a message is only checked when the user shares it to the app.
 
 ## 5. Before promoting to production
 - [ ] Test on 2–3 real phones (incl. Xiaomi/Realme/Vivo): call screening role, lock-screen caller card, post-call report notification, share-to-check SMS, QR scan, login (OTP + demo), subscription purchase in Play's test track, account deletion.
 - [ ] Push: send a test broadcast from Admin → Broadcast Center.
+- [ ] SMS protection: turn it on, then from another phone (a number not in contacts) send "Your SBI account will be blocked. Update KYC: http://sbi-kyc-update.xyz/u". A "Scam SMS" notification should appear; tapping it opens Verify with the message. A normal message from a friend and a bank OTP SMS must not trigger it.
 - [ ] Family Guardian on two phones: owner (Family plan) adds the member's number → member signs in with that number, accepts on the Family tab, keeps call protection on → call the member from a number reported 5+ times → owner gets the push, "Call" and "Mark safe" work.
 - [ ] Email the website launch waitlist (Admin → Launch Waitlist → Export CSV) once the app is live.

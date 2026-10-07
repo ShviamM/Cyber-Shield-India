@@ -108,6 +108,7 @@ export * from './scamCategory';
 export * from './scamOfDay';
 export * from './screeningBlocklist';
 export * from './sendBroadcastRequest';
+export * from './smsLinkCheckRequest';
 export * from './startTrialRequest';
 export * from './startTrialRequestPlan';
 export * from './subscriptionOrder';

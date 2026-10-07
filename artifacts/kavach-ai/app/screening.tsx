@@ -55,7 +55,7 @@ export default function ScreeningScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { t, i18n } = useTranslation();
-  const { callScreening, setCallScreening } = useAppContext();
+  const { callScreening, setCallScreening, smsScreening, setSmsScreening } = useAppContext();
 
   const topInset = Platform.OS === "web" ? 0 : insets.top;
   const bottomPad = (Platform.OS === "web" ? 34 : insets.bottom) + 24;
@@ -161,6 +161,36 @@ export default function ScreeningScreen() {
     } else {
       Alert.alert(t("screening.testAlert.failTitle"), t("screening.testAlert.failMsg"));
     }
+  }
+
+  // SMS protection: incoming texts are checked on the phone. Google Play
+  // requires a clear disclosure before asking for SMS access, so explain first.
+  async function toggleSms(next: boolean) {
+    Haptics.selectionAsync();
+    if (!next) {
+      setSmsScreening(false);
+      return;
+    }
+    if (!supported) {
+      setSmsScreening(true);
+      return;
+    }
+    const agreed = await new Promise<boolean>((resolve) =>
+      Alert.alert(t("screening.smsDisclosureTitle"), t("screening.smsDisclosureBody"), [
+        { text: t("common.cancel"), style: "cancel", onPress: () => resolve(false) },
+        { text: t("screening.smsDisclosureAgree"), onPress: () => resolve(true) },
+      ]),
+    );
+    if (!agreed) return;
+    const result = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECEIVE_SMS);
+    if (result === PermissionsAndroid.RESULTS.GRANTED) {
+      setSmsScreening(true);
+      await requestNotificationPermission();
+    } else {
+      setSmsScreening(false);
+      Alert.alert(t("screening.smsDeniedTitle"), t("screening.smsDeniedMsg"));
+    }
+    refreshStatus();
   }
 
   async function toggleCall(next: boolean) {
@@ -288,9 +318,24 @@ export default function ScreeningScreen() {
               thumbColor="#FFFFFF"
             />
           </View>
-          <View style={s.row}>
+          <View style={[s.row, s.rowBorder]}>
             <View style={[s.rowIcon, { backgroundColor: "#ecfeff" }]}>
               <Feather name="message-square" size={18} color="#0891b2" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={s.rowLabel}>{t("screening.smsTitle")}</Text>
+              <Text style={s.rowSub}>{t("screening.smsAutoSub")}</Text>
+            </View>
+            <Switch
+              value={smsScreening && (!supported || status.hasSmsPermission)}
+              onValueChange={toggleSms}
+              trackColor={{ false: "#e2e8f0", true: NAVY }}
+              thumbColor="#FFFFFF"
+            />
+          </View>
+          <View style={s.row}>
+            <View style={[s.rowIcon, { backgroundColor: "#f0fdf4" }]}>
+              <Feather name="share-2" size={18} color="#138808" />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={s.rowLabel}>{t("screening.smsShareTitle")}</Text>

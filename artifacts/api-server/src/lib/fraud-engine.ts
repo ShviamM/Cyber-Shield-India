@@ -194,19 +194,21 @@ async function targetReputationSignal(
   };
 }
 
-async function analyzeUrlTarget(raw: string): Promise<Analysis> {
+async function analyzeUrlTarget(raw: string, quick = false): Promise<Analysis> {
   const { url, signals } = analyzeUrlHeuristics(raw);
   if (!url) {
     return { signals, couldAnalyze: false };
   }
-  const [safeBrowsing, aiResult] = await Promise.all([
-    checkSafeBrowsing(url),
-    classifyUrl(url.toString()),
-  ]);
+  // Quick mode (automatic SMS link checks) skips the paid/slow lookups: Safe
+  // Browsing and the AI classifier. The phishing feed, heuristics and community
+  // reports still run.
+  const [safeBrowsing, aiResult] = quick
+    ? [null, null]
+    : await Promise.all([checkSafeBrowsing(url), classifyUrl(url.toString())]);
   signals.push(checkPhishFeed(url));
   // Google Safe Browsing is optional (and its v4 API is non-commercial only);
   // don't show a "not configured" note when the phishing feed already ran.
-  if (config.safeBrowsingApiKey) signals.push(safeBrowsing);
+  if (config.safeBrowsingApiKey && safeBrowsing) signals.push(safeBrowsing);
   if (aiResult) {
     const signal = urlAiSignal(aiResult);
     if (signal) signals.push(signal);
@@ -362,6 +364,7 @@ function echoValue(type: FraudCheckType, raw: string, normalized?: string): stri
 export async function runFraudCheck(
   type: FraudCheckType,
   rawValue: string,
+  options: { quick?: boolean } = {},
 ): Promise<FraudVerdict> {
   let analysis: Analysis;
   let value: string;
@@ -392,7 +395,7 @@ export async function runFraudCheck(
       break;
     }
     case "url": {
-      analysis = await analyzeUrlTarget(rawValue);
+      analysis = await analyzeUrlTarget(rawValue, options.quick);
       value = echoValue(type, rawValue);
       break;
     }

@@ -122,9 +122,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [callScreening, setCallScreeningState] = useState(
     Platform.OS === "android",
   );
-  const [smsScreening, setSmsScreeningState] = useState(
-    Platform.OS === "android",
-  );
+  // SMS protection reads incoming texts, so it stays off until the user turns
+  // it on and agrees to the disclosure (a Google Play requirement).
+  const [smsScreening, setSmsScreeningState] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
   // The family roster is server-owned. Fetch it once authenticated, and poll
@@ -227,7 +227,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (prev === "authenticated" && authStatus === "unauthenticated") {
       setRecentChecks([]);
       setCallScreeningState(Platform.OS === "android");
-      setSmsScreeningState(Platform.OS === "android");
+      setSmsScreeningState(false);
     }
   }, [authStatus]);
 

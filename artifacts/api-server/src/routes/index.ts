@@ -17,6 +17,7 @@ import familyRouter from "./family";
 import webhooksRouter from "./webhooks";
 import waitlistRouter from "./waitlist";
 import contactRouter from "./contact";
+import smsRouter from "./sms";
 
 const router: IRouter = Router();
 
@@ -38,5 +39,6 @@ router.use(familyRouter);
 router.use(webhooksRouter);
 router.use(waitlistRouter);
 router.use(contactRouter);
+router.use(smsRouter);
 
 export default router;

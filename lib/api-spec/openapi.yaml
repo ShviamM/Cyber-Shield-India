@@ -1303,6 +1303,34 @@ paths:
         default:
           $ref: "#/components/responses/Error"
 
+  /sms/link-check:
+    post:
+      operationId: smsLinkCheck
+      tags: [fraud]
+      summary: Quick check of a link found in an incoming SMS (on-device SMS protection)
+      description: >
+        Called by the phone's SMS screener for a link in a suspicious message.
+        Only the link is sent, never the message text. Runs the fast signals
+        (phishing feed, URL heuristics, community reports), does not count
+        against the free daily checks, and is rate limited per user.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SmsLinkCheckRequest"
+      responses:
+        "200":
+          description: Verdict for the link
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FraudVerdict"
+        default:
+          $ref: "#/components/responses/Error"
+
   /family/members:
     get:
       operationId: listFamilyMembers
@@ -3264,6 +3292,15 @@ components:
             $ref: "#/components/schemas/Payment"
       required:
         - payments
+
+    SmsLinkCheckRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          maxLength: 2000
+      required:
+        - url
 
     UnregisterPushTokenRequest:
       type: object

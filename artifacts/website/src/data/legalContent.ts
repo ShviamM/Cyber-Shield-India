@@ -26,6 +26,7 @@ export const legalContent: Record<"en" | "hi", Record<string, string>> = {
       <li><strong>Account information:</strong> your phone number and basic profile details when you sign up.</li>
       <li><strong>Protection data:</strong> when you ask Netraksh to check a call, message, link or UPI ID, we process that content only to return a safety verdict.</li>
       <li><strong>Incoming calls (Android app):</strong> if you turn on call protection, the number of each incoming call is sent to Netraksh so we can tell you whether it has been reported as a scam. We do not record calls, and the app does not read your call log, contacts or SMS.</li>
+      <li><strong>Incoming SMS (Android app, optional):</strong> if you turn on SMS protection, the app reads each incoming text message on your phone to warn you about scams. The message text stays on your phone. Only a web link from a message that looks suspicious is sent to Netraksh, to check it against known scam and phishing sites. You can turn this off at any time.</li>
       <li><strong>Family Guardian:</strong> the names, mobile numbers and relationships of family members a guardian adds, and the scam-call alerts described in the Family Guardian section below.</li>
       <li><strong>Device and usage data:</strong> app version, device type, push notification tokens and diagnostic logs used to keep the service reliable and secure.</li>
       <li><strong>Location:</strong> with your permission, your approximate device location is used to show cyber-cell contacts and scam alerts relevant to your area. Location is accessed only while the app is open (in the foreground), never in the background, and you can decline it or turn it off in your device settings at any time.</li>
@@ -40,7 +41,7 @@ export const legalContent: Record<"en" | "hi", Record<string, string>> = {
     <h2>What we do not do</h2>
     <ul>
       <li>We do not sell your personal data to anyone.</li>
-      <li>We do not read your private messages in the background. Content is checked only when you submit it for a scan.</li>
+      <li>We do not read your messages unless you turn on SMS protection in the Android app. When it is on, incoming SMS are checked on your phone and the message text is never uploaded.</li>
     </ul>
     <h2>Family Guardian</h2>
     <p>Family Guardian lets a Netraksh user on the Family plan (the "guardian") get an alert when a number reported as a scam calls a family member who has agreed to it.</p>
@@ -219,6 +220,7 @@ export const legalContent: Record<"en" | "hi", Record<string, string>> = {
       <li><strong>खाता जानकारी:</strong> साइन अप करते समय आपका फ़ोन नंबर और बुनियादी प्रोफ़ाइल विवरण।</li>
       <li><strong>सुरक्षा डेटा:</strong> जब आप Netraksh से किसी कॉल, मैसेज, लिंक या UPI ID को जाँचने के लिए कहते हैं, तो हम उस सामग्री को केवल सुरक्षा परिणाम देने के लिए प्रोसेस करते हैं।</li>
       <li><strong>आने वाली कॉल (Android ऐप):</strong> अगर आप कॉल सुरक्षा चालू करते हैं, तो हर आने वाली कॉल का नंबर Netraksh को भेजा जाता है ताकि हम बता सकें कि उसे स्कैम के रूप में रिपोर्ट किया गया है या नहीं। हम कॉल रिकॉर्ड नहीं करते, और ऐप आपका कॉल लॉग, कॉन्टैक्ट या SMS नहीं पढ़ता।</li>
+      <li><strong>आने वाले SMS (Android ऐप, वैकल्पिक):</strong> अगर आप SMS सुरक्षा चालू करते हैं, तो ऐप ठगी की चेतावनी देने के लिए आपके फ़ोन पर आने वाला हर SMS पढ़ता है। मैसेज का टेक्स्ट आपके फ़ोन पर ही रहता है। केवल संदिग्ध लगने वाले मैसेज का वेब लिंक Netraksh को भेजा जाता है, ताकि उसे ज्ञात ठगी और फ़िशिंग साइटों से मिलाया जा सके। आप इसे कभी भी बंद कर सकते हैं।</li>
       <li><strong>Family Guardian:</strong> गार्डियन द्वारा जोड़े गए परिवार के सदस्यों के नाम, मोबाइल नंबर और रिश्ता, और नीचे Family Guardian सेक्शन में बताए गए स्कैम-कॉल अलर्ट।</li>
       <li><strong>डिवाइस और उपयोग डेटा:</strong> ऐप वर्शन, डिवाइस का प्रकार, पुश नोटिफ़िकेशन टोकन और डायग्नोस्टिक लॉग, जो सेवा को भरोसेमंद और सुरक्षित बनाए रखने में मदद करते हैं।</li>
       <li><strong>स्थान (लोकेशन):</strong> आपकी अनुमति से, आपके क्षेत्र से जुड़े साइबर सेल संपर्क और स्कैम अलर्ट दिखाने के लिए आपके डिवाइस का अनुमानित स्थान उपयोग किया जाता है। स्थान केवल तभी एक्सेस किया जाता है जब ऐप खुला हो (फ़ोरग्राउंड), पृष्ठभूमि में कभी नहीं, और आप इसे कभी भी अस्वीकार कर सकते हैं या अपनी डिवाइस सेटिंग्स में बंद कर सकते हैं।</li>
@@ -233,7 +235,7 @@ export const legalContent: Record<"en" | "hi", Record<string, string>> = {
     <h2>हम क्या नहीं करते</h2>
     <ul>
       <li>हम आपका निजी डेटा किसी को नहीं बेचते।</li>
-      <li>हम पृष्ठभूमि में आपके निजी मैसेज नहीं पढ़ते। सामग्री केवल तभी जाँची जाती है जब आप उसे स्कैन के लिए सबमिट करते हैं।</li>
+      <li>जब तक आप Android ऐप में SMS सुरक्षा चालू नहीं करते, हम आपके मैसेज नहीं पढ़ते। चालू होने पर आने वाले SMS आपके फ़ोन पर ही जाँचे जाते हैं और मैसेज का टेक्स्ट कभी अपलोड नहीं होता।</li>
     </ul>
     <h2>Family Guardian</h2>
     <p>Family Guardian से Family प्लान वाले Netraksh उपयोगकर्ता ("गार्डियन") को तब अलर्ट मिलता है जब स्कैम के रूप में रिपोर्ट किया गया कोई नंबर परिवार के ऐसे सदस्य को कॉल करता है जिसने इसकी सहमति दी है।</p>
