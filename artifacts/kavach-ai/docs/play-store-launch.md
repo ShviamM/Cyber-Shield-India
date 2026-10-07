@@ -21,7 +21,7 @@ The Android app in RevenueCat must use the new package name.
 
 ## 3. Google Play Console (you)
 1. Create a developer account (one-time US$25) and the app **Netraksh**, default language English (India), free app with in-app purchases.
-2. **Upload the first build**: `pnpm --filter @workspace/kavach-ai run build:android:prod` (produces an `.aab`), upload it to **Internal testing**.
+2. **Upload the first build.** Signing keys are managed by Expo (EAS remote credentials). The very first build must be interactive so EAS can create the upload keystore: on your computer run `npm i -g eas-cli`, `eas login` (netraksh account), then in `artifacts/kavach-ai` run `eas build -p android --profile preview` (test APK) and answer **Yes** to "Generate a new Android Keystore?". After that, `eas build -p android --profile production` (or `pnpm --filter @workspace/kavach-ai run build:android:prod`) produces the `.aab`; upload it to **Internal testing**. Back up the keystore once with `eas credentials` → Android → *Download credentials*.
 3. App content declarations:
    - **Privacy policy**: <https://netraksh.com/privacy-policy>
    - **App access**: provide the demo login number for reviewers (see `lib/demo.ts`).
